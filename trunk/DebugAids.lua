@@ -1,6 +1,5 @@
 local addonName,addonTable = ...
-local DA = _G[addonName]
---
+local DA = LibStub("AceAddon-3.0"):GetAddon("Skillet")
 -- Chat and Debugging Aids
 --
 -- Add the first two lines of this file to all

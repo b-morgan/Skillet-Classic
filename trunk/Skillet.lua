@@ -1,5 +1,4 @@
 local addonName,addonTable = ...
-local DA = _G[addonName] -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
 
@@ -30,8 +29,8 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 Skillet.L = L
 
 -- Get version info from the .toc file
-local MAJOR_VERSION = GetAddOnMetadata("Skillet", "Version");
-local PACKAGE_VERSION = GetAddOnMetadata("Skillet", "X-Curse-Packaged-Version");
+local MAJOR_VERSION = GetAddOnMetadata("Skillet-Classic", "Version");
+local PACKAGE_VERSION = GetAddOnMetadata("Skillet-Classic", "X-Curse-Packaged-Version");
 local ADDON_BUILD = (select(4, GetBuildInfo())) < 20000 and "Classic" or "Retail"
 Skillet.version = MAJOR_VERSION
 Skillet.package = PACKAGE_VERSION
