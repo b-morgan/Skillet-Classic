@@ -1,0 +1,95 @@
+﻿## Interface: 11302
+## Title: Skillet-Classic |cff7fff7f -Ace3-|r
+## Notes: A replacement tradeskill window
+## Notes-esES: Una sustitucion de la ventana de Habilidades de Comercio
+## Notes-ruRU: Заменяет окно профессий на более функциональное.
+## Author: bsmorgan
+## Version: 5.00
+## X-Category: Tradeskill
+## X-License GPL v3 or later
+## X-RelSite-WoWI: 7571
+#### X-AceForum: 9179
+## X-Website: http://www.wowace.com/addons/skillet-classic/
+## SavedVariables: SkilletDB
+## SavedVariablesPerCharacter: SkilletDBPC, SkilletMemory
+## OptionalDeps: Ace3, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1, GFW_ReagentCost, TradeSkillInfo, TradeSkillMaster
+## X-Embeds: Ace3, LibStub, CallbackHandler-1.0, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1
+## X-Curse-Packaged-Version: 5.00
+## X-Curse-Project-Name: Skillet-Classic
+## X-Curse-Project-ID: skillet-classic
+## X-Curse-Repository-ID: wow/skillet-classic/mainline
+
+## LoadManagers: AddonLoader
+## X-LoadOn-Always: delayed
+
+#### List of embedded libraries
+#@no-lib-strip@
+Libs\LibStub\LibStub.lua
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+Libs\AceAddon-3.0\AceAddon-3.0.xml
+Libs\AceEvent-3.0\AceEvent-3.0.xml
+Libs\AceHook-3.0\AceHook-3.0.xml
+Libs\AceDB-3.0\AceDB-3.0.xml
+Libs\AceDBOptions-3.0\AceDBOptions-3.0.xml
+Libs\AceLocale-3.0\AceLocale-3.0.xml
+Libs\AceConsole-3.0\AceConsole-3.0.xml
+Libs\AceGUI-3.0\AceGUI-3.0.xml
+Libs\AceConfig-3.0\AceConfig-3.0.xml
+Libs\AceTimer-3.0\AceTimer-3.0.xml
+Libs\LibDialog-1.0\lib.xml
+Libs\LibWindow-1.1\LibWindow-1.1.lua
+Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1.lua
+Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1-Tradeskill\LibPeriodicTable-3.1-Tradeskill.lua
+Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1-TradeskillResultMats\LibPeriodicTable-3.1-TradeskillResultMats.lua
+Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1-TradeskillLevels\LibPeriodicTable-3.1-TradeskillLevels.lua
+#@end-no-lib-strip@
+
+#### Localization files
+Locale\Locale-enUS.lua
+
+Locale\Locale-deDE.lua
+Locale\Locale-esES.lua
+Locale\Locale-frFR.lua
+Locale\Locale-itIT.lua
+Locale\Locale-koKR.lua
+Locale\Locale-ptBR.lua
+Locale\Locale-ruRU.lua
+Locale\Locale-zhCN.lua
+Locale\Locale-zhTW.lua
+
+#### Main files
+Skillet.lua
+SkilletData.lua
+SkilletARL.lua
+TradeskillInfo.lua
+SkilletQueue.lua
+ThirdPartyHooks.lua
+Upgrades.lua
+SkillLevelData.lua
+RecipeGroups.lua
+Inventory.lua
+SkilletPlugin.lua
+FormatMoney.lua
+DebugAids.lua
+## Only needed for serious debugging.
+## DeepCopy.lua 
+
+#### Plugins
+Plugins\AckisRecipeList.lua
+Plugins\TradeSkillInfo.lua
+Plugins\BeanCounter.lua
+
+#### UI files
+UI\Utils.lua
+UI\Sorting.lua
+UI\QueueMgt.lua
+UI\MainFrame.lua
+UI\MainFrame.xml
+UI\RecipeNotes.lua
+UI\RecipeNotes.xml
+UI\MerchantWindow.lua
+UI\MerchantWindow.xml
+UI\ShoppingList.lua
+UI\ShoppingList.xml
+UI\IgnoreList.lua
+UI\IgnoreList.xml
