@@ -117,7 +117,7 @@
 		<Size>
 			<AbsDimension x="20" y="20"/>
 		</Size>
-		<CheckedTexture name="$parentChecked" alphaMode="ADD" file="Interface\Addons\Skillet\Icons\highlight.tga"/>
+		<CheckedTexture name="$parentChecked" alphaMode="ADD" file="Interface\Addons\Skillet-Classic\Icons\highlight.tga"/>
 		<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
 		<Scripts>
 			<OnLoad>
@@ -1312,11 +1312,11 @@
 				<Size>
 					<AbsDimension x="20" y="20"/>
 				</Size>
-				<NormalTexture file="Interface\Addons\Skillet\Icons\bag.tga"/>
-				<PushedTexture file="Interface\Addons\Skillet\Icons\bag.tga"/>
+				<NormalTexture file="Interface\Addons\Skillet-Classic\Icons\bag.tga"/>
+				<PushedTexture file="Interface\Addons\Skillet-Classic\Icons\bag.tga"/>
 				<CheckedTexture alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
 				<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
-				<DisabledCheckedTexture file="Interface\Addons\Skillet\Icons\bag.tga"/>
+				<DisabledCheckedTexture file="Interface\Addons\Skillet-Classic\Icons\bag.tga"/>
 				<Scripts>
 					<OnShow>
 						local hideUncraftable = Skillet:GetTradeSkillOption("hideuncraftable")
@@ -1392,7 +1392,7 @@
 						</Offset>
 					</Anchor>
 				</Anchors>
-				<NormalTexture name="$parentIcon" file="Interface\Addons\Skillet\Icons\backpack_icon.tga"/>
+				<NormalTexture name="$parentIcon" file="Interface\Addons\Skillet-Classic\Icons\backpack_icon.tga"/>
 				<Scripts>
 					<OnLoad>
 						self:SetFrameLevel(self:GetFrameLevel()+5)
@@ -1409,7 +1409,7 @@
 						</Offset>
 					</Anchor>
 				</Anchors>
-				<NormalTexture name="$parentIcon" file="Interface\Addons\Skillet\Icons\crafted.tga"/>
+				<NormalTexture name="$parentIcon" file="Interface\Addons\Skillet-Classic\Icons\crafted.tga"/>
 				<Scripts>
 					<OnLoad>
 						self:SetFrameLevel(self:GetFrameLevel()+5)
@@ -1426,7 +1426,7 @@
 						</Offset>
 					</Anchor>
 				</Anchors>
-				<NormalTexture name="$parentIcon" file="Interface\Addons\Skillet\Icons\vendor_icon.tga"/>
+				<NormalTexture name="$parentIcon" file="Interface\Addons\Skillet-Classic\Icons\vendor_icon.tga"/>
 				<Scripts>
 					<OnLoad>
 						self:SetFrameLevel(self:GetFrameLevel()+5)
@@ -1443,7 +1443,7 @@
 						</Offset>
 					</Anchor>
 				</Anchors>
-				<NormalTexture name="$parentIcon" file="Interface\Addons\Skillet\Icons\alts_icon.tga"/>
+				<NormalTexture name="$parentIcon" file="Interface\Addons\Skillet-Classic\Icons\alts_icon.tga"/>
 				<Scripts>
 					<OnLoad>
 						self:SetFrameLevel(self:GetFrameLevel()+5)
@@ -1456,7 +1456,7 @@
 				<Size>
 					<AbsDimension x="20" y="20"/>
 				</Size>
-				<NormalTexture name="SkilletRecipeDifficultyButtonTexture" file="Interface\Addons\Skillet\Icons\skill_colors.tga"/>
+				<NormalTexture name="SkilletRecipeDifficultyButtonTexture" file="Interface\Addons\Skillet-Classic\Icons\skill_colors.tga"/>
 				<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
 				<Anchors>
 					<Anchor point="BOTTOMRIGHT" relativeTo="SkilletHideUncraftableRecipes" relativePoint="BOTTOMLEFT">
@@ -1496,7 +1496,7 @@
 						</Offset>
 					</Anchor>
 				</Anchors>
-				<NormalTexture file="Interface\Addons\Skillet\Icons\skill_colors.tga"/>
+				<NormalTexture file="Interface\Addons\Skillet-Classic\Icons\skill_colors.tga"/>
 				<Scripts>
 					<OnLoad>
 						self:SetFrameLevel(self:GetFrameLevel()+2)
@@ -1525,7 +1525,7 @@
 				<Size>
 					<AbsDimension x="20" y="20"/>
 				</Size>
-				<NormalTexture name="$parentIcon" file="Interface\Addons\Skillet\Icons\collapse_icon.tga"/>
+				<NormalTexture name="$parentIcon" file="Interface\Addons\Skillet-Classic\Icons\collapse_icon.tga"/>
 				<Anchors>
 					<Anchor point="BOTTOMRIGHT" relativeTo="SkilletRecipeDifficultyButton" relativePoint="BOTTOMLEFT">
 						<Offset>
@@ -1551,7 +1551,7 @@
 				<Size>
 					<AbsDimension x="20" y="20"/>
 				</Size>
-				<NormalTexture name="$parentIcon" file="Interface\Addons\Skillet\Icons\expand_icon.tga"/>
+				<NormalTexture name="$parentIcon" file="Interface\Addons\Skillet-Classic\Icons\expand_icon.tga"/>
 				<Anchors>
 					<Anchor point="BOTTOMRIGHT" relativeTo="SkilletCollapseAllButton" relativePoint="BOTTOMLEFT">
 						<Offset>

@@ -1,5 +1,5 @@
 local addonName,addonTable = ...
-local DA = _G[addonName] -- for DebugAids.lua
+local DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
 
@@ -892,11 +892,11 @@ function Skillet:internal_UpdateTradeSkillWindow()
 					countText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, textAlpha)
 					local expanded = skill.subGroup.expanded
 					if expanded then
-						buttonExpand:SetNormalTexture("Interface\\Addons\\Skillet\\Icons\\expand_arrow_open.tga")
-						buttonExpand:SetHighlightTexture("Interface\\Addons\\Skillet\\Icons\\expand_arrow_open.tga")
+						buttonExpand:SetNormalTexture("Interface\\Addons\\Skillet-Classic\\Icons\\expand_arrow_open.tga")
+						buttonExpand:SetHighlightTexture("Interface\\Addons\\Skillet-Classic\\Icons\\expand_arrow_open.tga")
 					else
-						buttonExpand:SetNormalTexture("Interface\\Addons\\Skillet\\Icons\\expand_arrow_closed.tga")
-						buttonExpand:SetHighlightTexture("Interface\\Addons\\Skillet\\Icons\\expand_arrow_closed.tga")
+						buttonExpand:SetNormalTexture("Interface\\Addons\\Skillet-Classic\\Icons\\expand_arrow_closed.tga")
+						buttonExpand:SetHighlightTexture("Interface\\Addons\\Skillet-Classic\\Icons\\expand_arrow_closed.tga")
 					end
 					local name = skill.name.." ("..#skill.subGroup.entries..")"
 					buttonText:SetText(name)      -- THIS IS A HEADER SO DON'T TRY TO USE THE RECIPE ID!

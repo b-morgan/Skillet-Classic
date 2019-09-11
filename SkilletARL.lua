@@ -1,5 +1,5 @@
 local addonName,addonTable = ...
-local DA = _G[addonName] -- for DebugAids.lua
+local DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
 Copyright (c) 2007 Robert Clark <nogudnik@gmail.com>
@@ -166,10 +166,10 @@ function SkilletARL:RecipeSourceButtonInit()
 		b:SetScript("OnEnter", function(self) SkilletARL:RecipeFilterToggleButton_OnEnter(self) end)
 		b:SetScript("OnLeave", function(self) SkilletARL:RecipeFilterToggleButton_OnLeave(self) end)
 		b:SetScript("OnShow", function(self) SkilletARL:RecipeFilterToggleButton_OnShow(self) end)
-		b.trainerButton = initFilterButton("ARLRecipeSourceTrainerButton", "Interface\\Addons\\Skillet\\Icons\\vendor_icon.tga", b, "trainer")
+		b.trainerButton = initFilterButton("ARLRecipeSourceTrainerButton", "Interface\\Addons\\Skillet-Classic\\Icons\\vendor_icon.tga", b, "trainer")
 		b.trainerButton:SetPoint("TOP", b:GetName(), "BOTTOM", -50,0)
 		b.trainerButton:SetFrameLevel(b:GetFrameLevel()+5)
-		b.vendorButton = initFilterButton("ARLRecipeSourceVendorButton", "Interface\\Addons\\Skillet\\Icons\\vendor_icon.tga", b, "vendor")
+		b.vendorButton = initFilterButton("ARLRecipeSourceVendorButton", "Interface\\Addons\\Skillet-Classic\\Icons\\vendor_icon.tga", b, "vendor")
 		b.vendorButton:SetPoint("LEFT", "ARLRecipeSourceTrainerButton", "RIGHT", 0,0)
 		b.vendorButton:SetFrameLevel(b:GetFrameLevel()+5)
 		b.questButton = initFilterButton("ARLRecipeSourceQuestButton", "Interface\\Icons\\INV_Misc_Map_01", b, "quest")

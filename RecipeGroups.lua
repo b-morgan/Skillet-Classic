@@ -1,5 +1,5 @@
 local addonName,addonTable = ...
-local DA = _G[addonName] -- for DebugAids.lua
+local DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
 
@@ -609,7 +609,7 @@ function SkilletRecipeGroupDropdown_Initialize(menuFrame,level)
 		entry.func = Skillet.RecipeGroupSelect
 		entry.arg1 = Skillet
 		entry.arg2 = "Flat"
-		entry.icon = "Interface\\Addons\\Skillet\\Icons\\locked.tga"
+		entry.icon = "Interface\\Addons\\Skillet-Classic\\Icons\\locked.tga"
 		if Skillet.currentGroupLabel == "Flat" then
 			entry.checked = true
 		else
@@ -626,9 +626,9 @@ function SkilletRecipeGroupDropdown_Initialize(menuFrame,level)
 					entry.arg1 = Skillet
 					entry.arg2 = labelName
 					if labelName == "Blizzard" or Skillet:GetTradeSkillOption(labelName.."-locked") then
-						entry.icon = "Interface\\Addons\\Skillet\\Icons\\locked.tga"
+						entry.icon = "Interface\\Addons\\Skillet-Classic\\Icons\\locked.tga"
 					else
-						entry.icon = nil -- "Interface\\Addons\\Skillet\\Icons\\unlocked.tga"
+						entry.icon = nil -- "Interface\\Addons\\Skillet-Classic\\Icons\\unlocked.tga"
 					end
 					if Skillet.currentGroupLabel == labelName then
 						entry.checked = true
