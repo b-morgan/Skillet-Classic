@@ -116,13 +116,13 @@ local function createShoppingListFrame(self)
 
 	-- Ace Window manager library, allows the window position (and size)
 	-- to be automatically saved
-	local windowManger = LibStub("LibWindow-1.1")
 	local shoppingListLocation = {
 		prefix = "shoppingListLocation_"
 	}
-	windowManger.RegisterConfig(frame, self.db.profile, shoppingListLocation)
-	windowManger.RestorePosition(frame)  -- restores scale also
-	windowManger.MakeDraggable(frame)
+	local windowManager = LibStub("LibWindow-1.1")
+	windowManager.RegisterConfig(frame, self.db.profile, shoppingListLocation)
+	windowManager.RestorePosition(frame)  -- restores scale also
+	windowManager.MakeDraggable(frame)
 	-- lets play the resize me game!
 	Skillet:EnableResize(frame, 300, 165, Skillet.UpdateShoppingListWindow)
 	-- so hitting [ESC] will close the window

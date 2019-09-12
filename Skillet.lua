@@ -753,12 +753,12 @@ Skillet.options =
 					SkilletFrame:SetWidth(700);
 					SkilletFrame:SetHeight(600);
 					SkilletFrame:SetPoint("TOPLEFT",200,-100);                    
-					SkilletStandalonQueue:SetWidth(385);
-					SkilletStandalonQueue:SetHeight(240);
-					SkilletStandalonQueue:SetPoint("TOPLEFT",300,-150);
-					local windowManger = LibStub("LibWindow-1.1")
-					windowManger.SavePosition(SkilletFrame)
-					windowManger.SavePosition(SkilletStandalonQueue) 
+					SkilletStandaloneQueue:SetWidth(385);
+					SkilletStandaloneQueue:SetHeight(240);
+					SkilletStandaloneQueue:SetPoint("TOPLEFT",300,-150);
+					local windowManager = LibStub("LibWindow-1.1")
+					windowManager.SavePosition(SkilletFrame)
+					windowManager.SavePosition(SkilletStandaloneQueue) 
 				else
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
 												  " Leave combat and try again.")
@@ -1165,12 +1165,12 @@ function Skillet:SkilletShowWindow()
 	self.currentGroupLabel = self:GetTradeSkillOption("grouping")
 	self:RecipeGroupDropdown_OnShow()
 	self:ShowTradeSkillWindow()
-	local filterbox = _G["SkilletFilterBox"]
-	local oldtext = filterbox:GetText()
+	local searchbox = _G["SkilletSearchBox"]
+	local oldtext = searchbox:GetText()
 	local filterText = self:GetTradeSkillOption("filtertext")
 	-- if the text is changed, set the new text (which fires off an update) otherwise just do the update
 	if filterText ~= oldtext then
-		filterbox:SetText(filterText)
+		searchbox:SetText(filterText)
 	else
 		self:UpdateTradeSkillWindow()
 	end
@@ -1280,12 +1280,12 @@ function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 				self.data.skillList[player][tradeID] = {}
 			end
 			-- remove any filters currently in place
-			local filterbox = _G["SkilletFilterBox"]
-			local oldtext = filterbox:GetText()
+			local searchbox = _G["SkilletSearchBox"]
+			local oldtext = searchbox:GetText()
 			local filterText = self:GetTradeSkillOption("filtertext")
 			-- if the text is changed, set the new text (which fires off an update) otherwise just do the update
 			if filterText ~= oldtext then
-				filterbox:SetText(filterText)
+				searchbox:SetText(filterText)
 			else
 				self:UpdateTradeSkillWindow()
 			end
@@ -1310,10 +1310,10 @@ function Skillet:UpdateTradeSkill()
 		-- And start the update sequence through the rest of the mod
 		self:SetSelectedTrade(new_trade)
 		-- remove any filters currently in place
-		local filterbox = _G["SkilletFilterBox"];
+		local searchbox = _G["SkilletSearchBox"];
 		local filtertext = self:GetTradeSkillOption("filtertext", self.currentPlayer, new_trade)
 		-- this fires off a redraw event, so only change after data has been acquired
-		filterbox:SetText(filtertext);
+		searchbox:SetText(filtertext);
 	end
 	DA.DEBUG(0,"UPDATE TRADE SKILL complete")
 end
@@ -1403,8 +1403,8 @@ function Skillet:SetSelectedSkill(skillIndex, wasClicked)
 end
 
 -- Updates the text we filter the list of recipes against.
-function Skillet:UpdateFilter(text)
-	DA.DEBUG(0,"UpdateFilter("..tostring(text)..")")
+function Skillet:UpdateSearch(text)
+	DA.DEBUG(0,"UpdateSearch("..tostring(text)..")")
 	self:SetTradeSkillOption("filtertext", text)
 	self:SortAndFilterRecipes()
 	self:UpdateTradeSkillWindow()

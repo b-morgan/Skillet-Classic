@@ -306,7 +306,6 @@ end
 function Skillet:QueueAllItems()
 	DA.DEBUG(0,"QueueAllItems");
 	local count = self:QueueItems()						-- no argument means queue em all
-	self:UpdateNumItemsSlider(0, false)
 	return count
 end
 
