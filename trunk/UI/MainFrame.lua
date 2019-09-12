@@ -131,8 +131,8 @@ function Skillet:CreateTradeSkillWindow()
 	titletext:SetShadowOffset(1,-1)
 	titletext:SetTextColor(1,1,1)
 	titletext:SetText(L["Skillet Trade Skills"].." "..Skillet.version);
-	local label = _G["SkilletFilterLabel"];
-	label:SetText(L["Filter"]);
+	local label = _G["SkilletSearchLabel"];
+	label:SetText(L["Search"]);
 	SkilletCreateAllButton:SetText(L["Create All"])
 	SkilletQueueAllButton:SetText(L["Queue All"])
 	SkilletCreateButton:SetText(L["Create"])
@@ -154,10 +154,6 @@ function Skillet:CreateTradeSkillWindow()
 
 	-- Always want these visible.
 	SkilletItemCountInputBox:SetText("1");
-	SkilletCreateCountSlider:SetMinMaxValues(1, 20);
-	SkilletCreateCountSlider:SetValue(1);
-	SkilletCreateCountSlider:Show();
-	SkilletCreateCountSliderThumb:Show();
 
 	-- Progression status bar
 	SkilletRankFrame:SetStatusBarColor(0.2, 0.2, 1.0, 1.0)
@@ -230,13 +226,13 @@ function Skillet:CreateTradeSkillWindow()
 	gearTexture:SetWidth(16)
 	-- Ace Window manager library, allows the window position (and size)
 	-- to be automatically saved
-	local windowManger = LibStub("LibWindow-1.1")
 	local tradeSkillLocation = {
 		prefix = "tradeSkillLocation_"
 	}
-	windowManger.RegisterConfig(frame, self.db.profile, tradeSkillLocation)
-	windowManger.RestorePosition(frame)  -- restores scale also
-	windowManger.MakeDraggable(frame)
+	local windowManager = LibStub("LibWindow-1.1")
+	windowManager.RegisterConfig(frame, self.db.profile, tradeSkillLocation)
+	windowManager.RestorePosition(frame)  -- restores scale also
+	windowManager.MakeDraggable(frame)
 	-- lets play the resize me game!
 	local minwidth = self:GetMinSkillButtonWidth()
 	if not minwidth or minwidth < SKILLET_SKILLLIST_MIN_WIDTH then					-- upped from 165
@@ -309,19 +305,6 @@ function Skillet:TradeSkillRank_Updated()
 		SkilletRankFrame.subRanks.gray:SetValue(maxRank)
 	end
 	DA.DEBUG(0,"TradeSkillRank_Updated over")
-end
-
--- Someone dragged the slider or set the value programatically.
-function Skillet:UpdateNumItemsSlider(item_count, clicked)
-	local value = floor(item_count + 0.5);
-	self.numItemsToCraft = value
-	if SkilletCreateCountSlider:IsVisible() then
-		SkilletItemCountInputBox:SetText(tostring(value))
-		SkilletItemCountInputBox:HighlightText()
-		if not clicked then
-			SkilletCreateCountSlider:SetValue(value)
-		end
-	end
 end
 
 -- Called when the list of skills is scrolled
@@ -411,8 +394,6 @@ function Skillet:ConfigureRecipeControls(enchant)
 		SkilletQueueButton:Hide()
 		SkilletCreateAllButton:Hide()
 		SkilletCreateButton:Hide()
-		SkilletCreateCountSlider:Hide()
-		SkilletCreateCountSliderThumb:Hide()
 		SkilletItemCountInputBox:Hide()
 --        SkilletQueueParent:Hide()
 		SkilletStartQueueButton:Hide()
@@ -423,8 +404,6 @@ function Skillet:ConfigureRecipeControls(enchant)
 		SkilletQueueButton:Show()
 		SkilletCreateAllButton:Show()
 		SkilletCreateButton:Show()
-		SkilletCreateCountSlider:Show()
-		SkilletCreateCountSliderThumb:Show()
 		SkilletItemCountInputBox:Show()
 		SkilletQueueParent:Show()
 		SkilletStartQueueButton:Show()
@@ -808,7 +787,6 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	for c,s in pairs(SkilletRankFrame.subRanks) do
 		s:SetMinMaxValues(0, maxRank)
 	end
-	SkilletPlayerSelectText:SetText(self.currentPlayer)
 	-- it seems the resize for the main skillet window happens before the resize for the skill list box
 	local button_count = (SkilletFrame:GetHeight() - 115) / SKILLET_TRADE_SKILL_HEIGHT
 	button_count = math.floor(button_count)
@@ -1350,8 +1328,6 @@ function Skillet:HideDetailWindow()
 	SkilletFrame.selectedSkill = -1;
 	-- Always want these set.
 	SkilletItemCountInputBox:SetText("1");
-	SkilletCreateCountSlider:SetMinMaxValues(1, 20);
-	SkilletCreateCountSlider:SetValue(1);
 	for i=1, SKILLET_NUM_REAGENT_BUTTONS, 1 do
 		local button = _G["SkilletReagent"..i]
 		button:Hide();
@@ -1467,10 +1443,8 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		SkilletSkillIconCount:Hide()
 	end
 	-- How many can we queue/create?
-	SkilletCreateCountSlider:SetValue(self.numItemsToCraft);
 	SkilletItemCountInputBox:SetText("" .. self.numItemsToCraft);
 	SkilletItemCountInputBox:HighlightText()
-	SkilletCreateCountSlider.tooltipText = L["Number of items to queue/create"];
 	-- Reagents required ...
 	SkilletReagentLabel:SetText(self:GetReagentLabel(SkilletFrame.selectedSkill));
 	SkilletReagentLabel:Show();
@@ -1651,6 +1625,21 @@ function Skillet:UpdateQueueWindow()
 	   local button = get_queue_button(i)
 	   button:Hide()
 	end
+end
+
+function Skillet:ChangeItemCount(this, button, count)
+	local val = SkilletItemCountInputBox:GetNumber()
+	if button == "RightButton" then
+		count = count * 10
+	end
+	if val == 1 and count > 1 then
+		val = 0
+	end
+	val = val + count
+	if val < 1 then
+		val = 1
+	end
+	SkilletItemCountInputBox:SetText(val)
 end
 
 function Skillet:SkillButton_SetSelections(id1, id2)
@@ -2636,17 +2625,17 @@ function Skillet:ShowFullView()
 	SkilletQueueParentBase:SetParent(SkilletFrame)
 	SkilletQueueParentBase:SetPoint("TOPLEFT",SkilletCreateAllButton,"BOTTOMLEFT",0,-3)
 	SkilletQueueParentBase:SetPoint("BOTTOMRIGHT",SkilletFrame,"BOTTOMRIGHT",-10,32)
-	SkilletStandalonQueue:Hide()
+	SkilletStandaloneQueue:Hide()
 	SkilletQueueOnlyButton:SetText(">")
 	Skillet:UpdateQueueWindow()
 end
 
 function Skillet:ShowQueueView()
 	Skillet.fullView = false
-	SkilletQueueParentBase:SetParent(SkilletStandalonQueue)
-	SkilletQueueParentBase:SetPoint("TOPLEFT",SkilletStandalonQueue,"TOPLEFT",5,-32)
-	SkilletQueueParentBase:SetPoint("BOTTOMRIGHT",SkilletStandalonQueue,"BOTTOMRIGHT",-5,30)
-	SkilletStandalonQueue:Show()
+	SkilletQueueParentBase:SetParent(SkilletStandaloneQueue)
+	SkilletQueueParentBase:SetPoint("TOPLEFT",SkilletStandaloneQueue,"TOPLEFT",5,-32)
+	SkilletQueueParentBase:SetPoint("BOTTOMRIGHT",SkilletStandaloneQueue,"BOTTOMRIGHT",-5,30)
+	SkilletStandaloneQueue:Show()
 	SkilletQueueOnlyButton:SetText("<")
 	Skillet:UpdateQueueWindow()
 end
@@ -2671,12 +2660,12 @@ function Skillet:HideStandaloneQueue()
 	if not self.skilletStandalonQueue or not self.skilletStandalonQueue:IsVisible() then
 		return
 	end
-	SkilletStandalonQueue:Hide()
+	SkilletStandaloneQueue:Hide()
 end
 
 -- Creates and sets up the shopping list window
 function Skillet:CreateStandaloneQueueFrame()
-	local frame = SkilletStandalonQueue
+	local frame = SkilletStandaloneQueue
 	if not frame then
 		return nil
 	end
@@ -2715,13 +2704,13 @@ function Skillet:CreateStandaloneQueueFrame()
 	backdrop:SetResizable(true)
 	-- Ace Window manager library, allows the window position (and size)
 	-- to be automatically saved
-	local windowManger = LibStub("LibWindow-1.1")
 	local standaloneQueueLocation = {
 		prefix = "standaloneQueueLocation_"
 	}
-	windowManger.RegisterConfig(frame, self.db.profile, standaloneQueueLocation)
-	windowManger.RestorePosition(frame)  -- restores scale also
-	windowManger.MakeDraggable(frame)
+	local windowManager = LibStub("LibWindow-1.1")
+	windowManager.RegisterConfig(frame, self.db.profile, standaloneQueueLocation)
+	windowManager.RestorePosition(frame)  -- restores scale also
+	windowManager.MakeDraggable(frame)
 	-- lets play the resize me game!
 	Skillet:EnableResize(frame, 320, 165, Skillet.UpdateStandaloneQueueWindow)
 	-- so hitting [ESC] will close the window
@@ -2733,8 +2722,8 @@ function Skillet:UpdateStandaloneQueueWindow()
 	if not self.skilletStandalonQueue or not self.skilletStandalonQueue:IsVisible() then
 		return
 	end
-	SkilletStandalonQueue:SetAlpha(self.db.profile.transparency)
-	SkilletStandalonQueue:SetScale(self.db.profile.scale)
+	SkilletStandaloneQueue:SetAlpha(self.db.profile.transparency)
+	SkilletStandaloneQueue:SetScale(self.db.profile.scale)
 end
 
 -- Add Auctionator support
