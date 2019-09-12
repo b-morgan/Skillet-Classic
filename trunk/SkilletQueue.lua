@@ -388,11 +388,13 @@ end
 -- item as that requires a "SpellStopCasting" call which can only be
 -- made from secure code. All this does is stop repeating after the current item
 function Skillet:CancelCast()
-	StopTradeSkillRepeat()
+	DA.DEBUG(0,"CancelCast()")
+--	StopTradeSkillRepeat()
 end
 
 -- Removes an item from the queue
 function Skillet:RemoveQueuedCommand(queueIndex)
+	DA.DEBUG(0,"RemoveQueuedCommand("..tostring(queueIndex)..")")
 	if queueIndex == 1 then
 		self:CancelCast()
 	end
@@ -404,7 +406,7 @@ end
 
 -- Rebuilds reagentsInQueue list
 function Skillet:ScanQueuedReagents()
-DA.DEBUG(0,"ScanQueuedReagents")
+	DA.DEBUG(0,"ScanQueuedReagents()")
 	if self.linkedSkill or self.isGuild then
 		return
 	end

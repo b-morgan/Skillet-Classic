@@ -1398,7 +1398,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 				s:Show()
 			end
 		end
-		local description = GetTradeSkillDescription(skillIndex)
+--		local description = GetTradeSkillDescription(skillIndex)
 		--DA.DEBUG(0,"description="..tostring(description))
 		if description then
 			description = description:gsub("\r","")	-- Skillet frame has less space than Blizzard frame, so
@@ -1591,7 +1591,8 @@ function Skillet:UpdateQueueWindow()
 		SkilletStartQueueButton:Disable()
 		SkilletEmptyQueueButton:Disable()
 	end
-	if self.queuecasting and UnitCastingInfo("player") then
+--	if self.queuecasting and UnitCastingInfo("player") then
+	if self.queuecasting then
 		SkilletStartQueueButton:SetText(L["Pause"])
 	else
 		SkilletStartQueueButton:SetText(L["Process"])
@@ -1631,7 +1632,7 @@ function Skillet:UpdateQueueWindow()
 			if queueCommand then
 				local recipe = self:GetRecipe(queueCommand.recipeID)
 				--self.db.global.recipeData[queueCommand.recipeID]
-				queueName:SetText((self:GetTradeName(recipe.tradeID) or recipe.tradeID)..":"..(recipe.name or recipeID))
+				queueName:SetText(tostring(self:GetTradeName(recipe.tradeID) or recipe.tradeID)..":"..tostring(recipe.name or recipeID))
 				queueCount:SetText(queueCommand.count)
 			end
 			nameButton:Show()

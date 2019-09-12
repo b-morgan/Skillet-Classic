@@ -30,6 +30,7 @@ local TradeSkillList = {
 	25229,		-- jewelcrafting
 	2108,		-- leatherworking
 	2656,		-- smelting (from mining, 2575)
+	2575,		-- mining
 	3908,		-- tailoring
 	2550,		-- cooking
 	3273,		-- first aid
@@ -930,7 +931,6 @@ function Skillet:CollectTradeSkillData()
 end
 
 -- this routine collects the basic data (which tradeskills a player has)
--- clean = true means wipe the old data
 function Skillet:ScanPlayerTradeSkills(player)
 	DA.DEBUG(0,"Skillet:ScanPlayerTradeSkills("..tostring(player)..")")
 	if player == (UnitName("player")) then -- only for active player
@@ -1072,7 +1072,6 @@ function Skillet:ScanTrade()
 	for i = 1, numSkills do
 		local skillName, skillType, numAvailable, isExpanded = GetTradeSkillInfo(i)
 		DA.DEBUG(3,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
-		if i == 1 and skillType == "subheader" then skillType = "header" end --**-- workaround for Blizzard bug in 6.02
 		if skillType == "header" or skillType == "subheader" then
 			if not isExpanded then
 				ExpandTradeSkillSubClass(i)

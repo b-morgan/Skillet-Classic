@@ -1129,7 +1129,9 @@ function Skillet:SkilletShow()
 	else
 		self.currentPlayer = (UnitName("player"))
 	end
-	self.currentTrade = self.tradeSkillIDsByName[(GetTradeSkillLine())] or 2656      -- smelting caveat
+	local name = GetTradeSkillLine()
+	--DA.DEBUG(1,"name= '"..tostring(name).."'")
+	self.currentTrade = self.tradeSkillIDsByName[name]
 	if not self.linkedSkill and not self.isGuild then
 		self:InitializeDatabase(self.currentPlayer)
 	else
