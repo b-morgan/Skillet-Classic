@@ -1376,6 +1376,7 @@ end
 
 -- Show the options window
 function Skillet:ShowOptions()
+	InterfaceOptionsFrame_Show()
 	InterfaceOptionsFrame_OpenToCategory("Skillet")
 end
 
