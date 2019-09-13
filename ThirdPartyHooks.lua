@@ -71,25 +71,6 @@ your own in as sane a fashion as possible.
 
 ]]
 
-local function tradejunkie_custom_add()
-	if TradeJunkieMain and TJ_OpenButtonTradeSkill then
-		-- Override the default action of the button to attach it
-		-- to our window, rather than the Blizzard trade skill window
-		TJ_OpenButtonTradeSkill:SetScript("OnClick", function()
-			TradeJunkie_Attach("SkilletFrame")
-			TradeJunkieMain:SetPoint("TOPLEFT", "SkilletFrame", "TOPRIGHT", 0, 0)
-		end)
-	end
-end
-
-local function armorcraft_custom_add()
-	if AC_Craft and AC_UseButton and AC_ToggleButton then
-		AC_Craft:SetParent("SkilletFrame")
-		AC_Craft:SetPoint("TOPLEFT","SkilletFrame","TOPRIGHT", 0, 0)
-		AC_Craft:SetAlpha(1.0)
-	end
-end
-
 local function Skillet_NOP()
 	-- do nothing!
 end
@@ -108,11 +89,6 @@ end
 function Skillet:AddButtonToTradeskillWindow(button)
 	if not SkilletFrame.added_buttons then
 		SkilletFrame.added_buttons = {}
-	end
-	if TJ_OpenButtonTradeSkill and button == TJ_OpenButtonTradeSkill then
-		tradejunkie_custom_add()
-	elseif AC_UseButton and button == AC_UseButton then
-		armorcraft_custom_add()
 	end
 		button:Hide()
 		-- See if this button has already been added ....
@@ -164,25 +140,7 @@ end
 -- @param skill_index the index of the currently selected recipe
 --
 function Skillet:GetReagentLabel(tradeskill, skill_index)
-	if (FRC_PriceSource ~= nil and FRC_CraftFrame_SetSelection and FRC_TradeSkillFrame_SetSelection) then
-		-- Support for Fizzwidget's Reagent Cost
-		if self:IsCraft() then
-			local Orig_CraftFrame_SetSelection = FRC_Orig_CraftFrame_SetSelection;
-			FRC_Orig_CraftFrame_SetSelection = Skillet_NOP;
-			FRC_CraftFrame_SetSelection(skill_index);
-			FRC_Orig_CraftFrame_SetSelection = Orig_CraftFrame_SetSelection;
-			return CraftReagentLabel:GetText();
-		else
-			local Orig_TradeSkillFrame_SetSelection = FRC_Orig_TradeSkillFrame_SetSelection
-			FRC_Orig_TradeSkillFrame_SetSelection = Skillet_NOP
-			FRC_TradeSkillFrame_SetSelection(skill_index)
-			FRC_Orig_TradeSkillFrame_SetSelection = Orig_TradeSkillFrame_SetSelection
-			return TradeSkillReagentLabel:GetText()
-		end
-	else
-		-- boring
-		return SPELL_REAGENTS;
-	end
+	return SPELL_REAGENTS;
 end
 
 --
@@ -535,86 +493,4 @@ Recipe = {
 So, recipe.name is the name of the recipe, recipe[1].name is the name of
 the first required reagent.
 
-Profession = {
-	["name"] = trade skill name
-	["count"] = number of recipes for this profession
-	[recipe 1] = Recipe,
-	[recipe 2] = Recipe,
-	....
-}
-
-So, profession.name is the name of the profession, profession[1].name is the
-name of the first recipe in the profession.
-
-Character = {
-	["name"] = name of the character
-	["count"] = number of professions for this character
-	[profession 1] = Profession,
-	[profession 2] = Profession,
-	...
-}
-
-So, character.name is the name of the character, character[1].name is the
-name of the first profession known by that character.
-
-Characters = {
-	["count"] = number of characters
-	[character 1] = Character,
-	[character 2] = Character,
-}
-
-So, characters.count is the number of characters, characters[1].name is the
-name of the first character.
-
 ]]
-
---
--- Returns a list of characters for which Skillet recipe data
--- is available. This list will apply only to current realm and
--- faction. Characters on other servers or in the opposite
--- faction will no be included.
---
--- You should not hook this method, you should call it directly.
---
--- @return A list of characters for which Skillet has data
---
-function Skillet:GetCharacters()
-	return self:internal_GetCharacters()
-end
-
---
--- Returns the list of professions that a particular character
--- knows. The character name must be one of those returned by
--- Skillet:GetCharacters().
---
--- You should not hook this method, you should call it directly.
---
--- @param character_name the character for which a profession list
---           should be returned
---
--- @return A list of professions for the specified character or nil
---            if the character has no professions known to Skillet.
---
-function Skillet:GetCharacterProfessions(character_name)
-	return self:internal_GetCharacterProfessions(character_name)
-end
-
---
--- Returns the list of tradeskills for the specified character
--- and profession, or nil if either the character or profession
--- is unknown to Skillet.
---
--- You should not hook this method, you should call it directly.
---
--- @param character_name the character for which a tradeksill list
---           should be returned
--- @param professions the profession for which a tradeksill list
---           should be returned
---
--- @return A table of tradeskills known for the specified character name
---           and profession. Refer to the comment above for details on
---           the table's format.
---
-function Skillet:GetCharacterTradeskills(character_name, profession)
-	return self:internal_GetCharacterTradeskills(character_name, profession)
-end
