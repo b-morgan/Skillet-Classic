@@ -97,7 +97,7 @@
 		<Anchors>
 			<Anchor point="TOPRIGHT">
 				<Offset>
-					<AbsDimension x="-12" y="-75"/>
+					<AbsDimension x="-12" y="-78"/>
 				</Offset>
 			</Anchor>
 		</Anchors>
@@ -255,7 +255,11 @@
 						<AbsDimension x="25" y="0" />
 					</Size>
 					<Anchors>
-						<Anchor point="LEFT" />
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="16" y="0"/>
+							</Offset>
+						</Anchor>
 					</Anchors>
 					<Color r="1" g="1" b="1" a="1" />
 				</FontString>
@@ -271,6 +275,12 @@
 				<FontString name="$parentName" inherits="GameFontNormal" justifyH="LEFT">
 					<Anchors>
 						<Anchor point="LEFT" relativeTo="$parentLevel" relativePoint="RIGHT" />
+						<Anchor point="RIGHT" relativeTo="$parentCounts" relativePoint="LEFT" />
+					</Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</FontString>
+				<FontString name="$parentSuffix" inherits="GameFontNormalSmall" justifyH="RIGHT">
+					<Anchors>
 						<Anchor point="RIGHT" relativeTo="$parentCounts" relativePoint="LEFT" />
 					</Anchors>
 					<Color r="1" g="1" b="1" a="1" />
@@ -802,9 +812,9 @@
 		</Layers>
 	</GameTooltip>
 	<!-- Don't change the name 'SkilletFrame' as other mods may depend on it -->
-	<Frame name="SkilletFrame" toplevel="true" movable="true" resizable="true" parent="UIParent" enableMouse="true" hidden="true">
+	<Frame name="SkilletFrame" toplevel="true" movable="true" clampedToScreen="true" resizable="true" parent="UIParent" enableMouse="true" hidden="true">
 		<Size>
-			<AbsDimension x="660" y="512"/>
+			<AbsDimension x="750" y="580"/>
 		</Size>
 		<Frames>
 			<!--
@@ -962,7 +972,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletFrame" relativePoint="TOPLEFT">
 						<Offset>
-							<AbsDimension x="10" y="-100"/>
+							<AbsDimension x="10" y="-130"/>
 						</Offset>
 					</Anchor>
 					<Anchor point="BOTTOM" relativeTo="SkilletFrame" relativePoint="BOTTOM">
@@ -1031,7 +1041,7 @@
 				<Anchors>
 					<Anchor point="BOTTOMLEFT" relativeTo="SkilletSkillListParent" relativePoint="TOPLEFT">
 						<Offset>
-							<AbsDimension x="45" y="38"/>
+							<AbsDimension x="60" y="68"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -1085,7 +1095,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletRecipeGroupDropdown" relativePoint="BOTTOMLEFT">
 						<Offset>
-							<AbsDimension x="0" y="8"/>
+							<AbsDimension x="0" y="6"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -1152,7 +1162,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletSortDropdown" relativePoint="BOTTOMLEFT">
 						<Offset>
-							<AbsDimension x="22" y="6"/>
+							<AbsDimension x="22" y="4"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -1200,7 +1210,7 @@
 							<Anchors>
 								<Anchor point="RIGHT" relativeTo="$parent" relativePoint="LEFT">
 									<Offset>
-										<AbsDimension x="-5" y="0"/>
+										<AbsDimension x="-8" y="0"/>
 									</Offset>
 								</Anchor>
 							</Anchors>
@@ -1460,7 +1470,7 @@
 					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
---						PlaySound("igMainMenuOptionCheckBoxOn");
+						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON); -- "igMainMenuOptionCheckBoxOn"
 						local bottom = self:GetBottom()
 						local top = self:GetTop()
 						local x,y = GetCursorPosition()
@@ -1537,7 +1547,7 @@
 			-->
 			<Button name="SkilletPluginButton" inherits="UIPanelButtonTemplate" text="Plugins" parent="SkilletFrame">
 				<Size>
-					<AbsDimension x="60" y="22"/>
+					<AbsDimension x="80" y="22"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletFrame" relativePoint="TOPLEFT">
@@ -1593,12 +1603,12 @@
 			-->
 			<Frame name="SkilletReagentParent" parent="SkilletFrame">
 				<Size>
-					<AbsDimension x="280" y="280"/>
+					<AbsDimension x="280" y="300"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeTo="SkilletFrame" relativePoint="TOPRIGHT">
 						<Offset>
-							<AbsDimension x="-10" y="-100"/>
+							<AbsDimension x="-10" y="-130"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -1664,7 +1674,7 @@
 							<Anchors>
 								<Anchor point="TOPLEFT" relative="SkilletReagentParent" relativePoint="TOPLEFT">
 									<Offset>
-										<AbsDimension x="10" y="-90"/>
+										<AbsDimension x="-47" y="-20"/>
 									</Offset>
 								</Anchor>
 							</Anchors>
@@ -1971,7 +1981,7 @@
 			-->
 			<Button name="SkilletRecipeNotesButton" inherits="UIPanelButtonTemplate" parent="SkilletFrame">
 				<Size>
-					<AbsDimension x="60" y="20"/>
+					<AbsDimension x="80" y="20"/>
 				</Size>
 				<Anchors>
 					<Anchor point="BOTTOMRIGHT" relativeTo="SkilletReagentParent" relativePoint="TOPRIGHT">
@@ -1989,7 +1999,7 @@
 			</Button>
 			<Button name="SkilletQueueManagementButton" inherits="UIPanelButtonTemplate" parent="SkilletFrame">
 				<Size>
-					<AbsDimension x="70" y="20"/>
+					<AbsDimension x="110" y="20"/>
 				</Size>
 				<Anchors>
 					<Anchor point="RIGHT" relativeTo="SkilletRecipeNotesButton" relativePoint="LEFT">
@@ -2226,7 +2236,7 @@
 			-->
 			<Button name="SkilletQueueAllButton" inherits="UIPanelButtonTemplate" text="QUEUE_ALL" parent="SkilletFrame">
 				<Size>
-					<AbsDimension x="85" y="22"/>
+					<AbsDimension x="105" y="22"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletReagentParent" relativePoint="BOTTOMLEFT">
@@ -2244,7 +2254,7 @@
 			</Button>
 			<Button name="SkilletEnchantButton" inherits="UIPanelButtonTemplate" text="QUEUE_ALL" parent="SkilletFrame">
 				<Size>
-					<AbsDimension x="85" y="22"/>
+					<AbsDimension x="105" y="22"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletReagentParent" relativePoint="BOTTOMLEFT">
@@ -2262,7 +2272,7 @@
 			</Button>
 			<Button name="SkilletCreateAllButton" inherits="UIPanelButtonTemplate" text="CREATE_ALL" parent="SkilletFrame">
 				<Size>
-					<AbsDimension x="85" y="22"/>
+					<AbsDimension x="105" y="22"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletQueueAllButton" relativePoint="BOTTOMLEFT">
@@ -2288,7 +2298,7 @@
 			-->
 			<Button name="SkilletQueueButton" inherits="UIPanelButtonTemplate" text="QUEUE" parent="SkilletFrame">
 				<Size>
-					<AbsDimension x="85" y="22"/>
+					<AbsDimension x="105" y="22"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeTo="SkilletReagentParent" relativePoint="BOTTOMRIGHT">
@@ -2311,7 +2321,7 @@
 			-->
 			<Button name="SkilletCreateButton" inherits="UIPanelButtonTemplate" text="Create" parent="SkilletFrame">
 				<Size>
-					<AbsDimension x="85" y="22"/>
+					<AbsDimension x="105" y="22"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeTo="SkilletQueueButton" relativePoint="BOTTOMRIGHT">
@@ -2609,7 +2619,7 @@
 			-->
 			<Button name="SkilletStartQueueButton" inherits="UIPanelButtonTemplate" text="Start" parent="SkilletQueueParentBase">
 				<Size>
-					<AbsDimension x="80" y="22"/>
+					<AbsDimension x="90" y="22"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletQueueParent" relativePoint="BOTTOMLEFT">
@@ -2635,7 +2645,7 @@
 			-->
 			<Button name="SkilletEmptyQueueButton" inherits="UIPanelButtonTemplate" text="Clear" parent="SkilletQueueParentBase">
 				<Size>
-					<AbsDimension x="80" y="22"/>
+					<AbsDimension x="90" y="22"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletStartQueueButton" relativePoint="TOPRIGHT">
@@ -2681,12 +2691,12 @@
 			-->
 			<Button name="SkilletShoppingListButton" inherits="UIPanelButtonTemplate" text="Shopping List" parent="SkilletQueueParentBase">
 				<Size>
-					<AbsDimension x="100" y="22"/>
+					<AbsDimension x="110" y="22"/>
 				</Size>
 				<Anchors>
-					<Anchor point="TOPRIGHT" relativeTo="SkilletQueueParent" relativePoint="BOTTOMRIGHT">
+					<Anchor point="TOPLEFT" relativeTo="SkilletQueueOnlyButton" relativePoint="TOPRIGHT">
 						<Offset>
-							<AbsDimension x="0" y="-1"/>
+							<AbsDimension x="5" y=""/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -2718,9 +2728,9 @@
 			</OnUpdate>
 		</Scripts>
 	</Frame> <!-- main trade skill frame -->
-	<Frame name="SkilletStandaloneQueue" toplevel="true" movable="true" resizable="true" parent="UIParent" enableMouse="true" hidden="true">
+	<Frame name="SkilletStandaloneQueue" toplevel="true" movable="true" clampedToScreen="true" resizable="true" parent="UIParent" enableMouse="true" hidden="true">
 		<Size>
-			<AbsDimension x="385" y="240"/>
+			<AbsDimension x="385" y="170"/>
 		</Size>
 		<Frames>
 			<!--
@@ -2728,7 +2738,7 @@
 			# A button on the top right to close the window
 			#
 			-->
-			<Button name="SkilletStandalonQueueCloseButton" inherits="UIPanelCloseButton" parent="SkilletStandaloneQueue">
+			<Button name="SkilletStandaloneQueueCloseButton" inherits="UIPanelCloseButton" parent="SkilletStandaloneQueue">
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeTo="SkilletStandaloneQueue" relativePoint="TOPRIGHT">
 						<Offset>
