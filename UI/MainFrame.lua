@@ -30,7 +30,7 @@ local COLORGRAY =   "|cff808080"
 -- min height for Skillet window
 local SKILLET_MIN_HEIGHT = 580
 -- height of the header portion
-local SKILLET_HEADER_HEIGHT = 145
+local SKILLET_HEADER_HEIGHT = 115		-- 145 if Filter is added under Search
 
 -- min width for skill list window
 local SKILLET_SKILLLIST_MIN_WIDTH = 440
