@@ -714,7 +714,6 @@ function Skillet:internal_UpdateTradeSkillWindow()
 		return
 	end
 	local skillListKey = self.currentPlayer..":"..self.currentTrade..":"..self.currentGroupLabel
-	DA.DEBUG(0,"3 updateWindowBusy= "..tostring(updateWindowBusy))
 	local numTradeSkills = 0
 	if not self.dataScanned then
 		self.dataScanned = self:RescanTrade()
@@ -739,8 +738,6 @@ function Skillet:internal_UpdateTradeSkillWindow()
 		-- nothing to see, nothing to update
 		self:SetSelectedSkill(nil)
 		self.skillMainSelection = nil
-		updateWindowBusy = false
-		DA.DEBUG(0,"4 updateWindowBusy= "..tostring(updateWindowBusy))
 		return
 	end
 	-- shopping list button always shown
@@ -1866,7 +1863,7 @@ function Skillet:SkillButton_MakeGroup()
 end
 
 function Skillet:SkillButton_OnKeyDown(button, key)
-	--DA.DEBUG(0,key)
+	DA.DEBUG(3,"SkillButton_OnKeyDown("..tostring(button)..", "..tostring(key)..")")
 	if key == "D" then
 		self:SkillButton_SetAllSelections(false)
 	elseif key == "A" then
@@ -1909,37 +1906,10 @@ end
 local lastClick = 0
 -- When one of the skill buttons in the left scroll pane is clicked
 function Skillet:SkillButton_OnClick(button, mouse)
+	DA.DEBUG(3,"SkillButton_OnClick("..tostring(button)..", "..tostring(mouse)..")")
 	if (mouse=="LeftButton") then
 		Skillet:QueueManagementToggle(true)
-		local doubleClicked = false
-		local thisClick = GetTime()
-		local delay = thisClick - lastClick
-		lastClick = thisClick
-		if delay < .25 then
-			doubleClicked = true
-		end
-		if doubleClicked then
-			if button.skill.subGroup then
-				if button.skill.mainGroup or self.currentGroup == button.skill.name then
-					self.currentGroup = nil
-					Skillet:SetTradeSkillOption("group", nil)
-					button.skill.subGroup.expanded = true
-				else
-					self.currentGroup = button.skill.name
-					Skillet:SetTradeSkillOption("group", button.skill.name)
-					button.skill.subGroup.expanded = true
-				end
-				self:SortAndFilterRecipes()
-			else
-				local id = button:GetID()
-				local spellLink = GetTradeSkillRecipeLink(id)
-				if (ChatEdit_GetLastActiveWindow():IsVisible() or WIM_EditBoxInFocus ~= nil) then
-					ChatEdit_InsertLink(spellLink)
-				else
-					DA.DEBUG(0, spellLink)
-				end
-			end
-		elseif not button.skill.mainGroup then
+		if not button.skill.mainGroup then
 			if IsShiftKeyDown() and self.skillMainSelection then
 				self:SkillButton_ClearSelections()
 				self:SkillButton_SetSelections(self.skillMainSelection, button.rawIndex)
@@ -2323,12 +2293,14 @@ local skillMenuList = {
 	{
 		text = "Link Recipe",
 		func = function()
-					local spellLink = GetTradeSkillRecipeLink(Skillet.menuButton:GetID())
+--[[
+					local spellLink = GetTradeSkillRecipeLink(Skillet.menuButton:GetID())	-- find a replacement API call
 					if (ChatEdit_GetLastActiveWindow():IsVisible() or WIM_EditBoxInFocus ~= nil) then
 						ChatEdit_InsertLink(spellLink)
 					else
 						DA.DEBUG(0, spellLink)
 					end
+]]--
 				end,
 	},
 	{

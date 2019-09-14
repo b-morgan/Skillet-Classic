@@ -1027,24 +1027,27 @@ end
 -- Called when the addon is enabled
 function Skillet:OnEnable()
 	DA.DEBUG(0,"Skillet:OnEnable()");
+	--
 	-- Hook into the events that we care about
+	--
 	-- Trade skill window changes
+	--
 	self:RegisterEvent("TRADE_SKILL_CLOSE", "SkilletClose")
 	self:RegisterEvent("TRADE_SKILL_SHOW", "SkilletShow")
 	self:RegisterEvent("TRADE_SKILL_NAME_UPDATE")
---	self:RegisterEvent("GUILD_RECIPE_KNOWN_BY_MEMBERS", "SkilletShowGuildCrafters")
---	self:RegisterEvent("GARRISON_TRADESKILL_NPC_CLOSED")
-	-- TODO: Tracks when the number of items on hand changes
 	self:RegisterEvent("BAG_UPDATE") -- Fires for both bag and bank updates.
 	self:RegisterEvent("BAG_UPDATE_DELAYED") -- Fires after all applicable BAG_UPADTE events for a specific action have been fired.
+	--
 	-- MERCHANT_SHOW, MERCHANT_HIDE, MERCHANT_UPDATE events needed for auto buying.
+	--
 	self:RegisterEvent("MERCHANT_SHOW")
 	self:RegisterEvent("MERCHANT_UPDATE")
 	self:RegisterEvent("MERCHANT_CLOSED")
-	-- May need to show a shopping list when at the bank/guildbank/auction house
+	--
+	-- To show a shopping list when at the bank/guildbank/auction house
+	--
 	self:RegisterEvent("BANKFRAME_OPENED")
 	self:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
---	self:RegisterEvent("PLAYERREAGENTBANKSLOTS_CHANGED")
 	self:RegisterEvent("BANKFRAME_CLOSED")
 --[[
 	self:RegisterEvent("GUILDBANKFRAME_OPENED")
@@ -1052,14 +1055,31 @@ function Skillet:OnEnable()
 	self:RegisterEvent("GUILDBANKFRAME_CLOSED")
 ]]--
 	self:RegisterEvent("AUCTION_HOUSE_SHOW")
-	-- self:RegisterEvent("AUCTION_OWNED_LIST_UPDATE") -- Update event only when the AH is open
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
-	self:RegisterEvent("PLAYER_LOGOUT")
 	--
-	-- Messages from the Stitch libary
-	-- These need to update the tradeskill window, not just the queue
-	-- as we need to redisplay the number of items that can be crafted
-	-- as we consume reagents.
+	-- Events needed to process the queue and to update
+	-- the tradeskill window to update the number of items
+	-- that can be crafted as we consume reagents.
+	--
+	self:RegisterEvent("UNIT_SPELLCAST_START")
+	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
+	self:RegisterEvent("UNIT_SPELLCAST_FAILED")
+	self:RegisterEvent("UNIT_SPELLCAST_FAILED_QUIET")
+	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
+	--
+	-- Not sure these are needed for crafting but they
+	-- are useful for debugging.
+	--
+	self:RegisterEvent("UNIT_SPELLCAST_SENT")
+	self:RegisterEvent("UNIT_SPELLCAST_DELAYED")
+	self:RegisterEvent("UNIT_SPELLCAST_STOP")
+	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
+	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP")
+	--
+	-- Debugging cleanup if enabled
+	--
+	self:RegisterEvent("PLAYER_LOGOUT")
+
 	self.hideUncraftableRecipes = false
 	self.hideTrivialRecipes = false
 	self.currentTrade = nil
@@ -1204,7 +1224,10 @@ end
 
 -- So we can track when the players inventory changes and update craftable counts
 function Skillet:BAG_UPDATE(event, bagID)
-	--DA.DEBUG(2,"BAG_UPDATE( "..bagID.." )")
+	DA.DEBUG(4,"BAG_UPDATE( "..bagID.." )")
+	if UnitAffectingCombat("player") then
+		return
+	end
 	if not self.rescan_auto_targets_timer then
 		self.rescan_auto_targets_timer = self:ScheduleTimer("UpdateAutoTradeButtons", 0.3)
 	end

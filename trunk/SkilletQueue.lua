@@ -235,7 +235,7 @@ function Skillet:ProcessQueue(altMode)
 			if craftable then break end
 		end
 		qpos = qpos + 1
-	until qpos>#queue
+	until qpos > #queue
 	-- if we can't craft anything, show error from first item in queue
 	if qpos > #queue then
 		qpos = 1
@@ -325,11 +325,84 @@ function Skillet:CreateAllItems(mouse)
 	end
 end
 
+function Skillet:UNIT_SPELLCAST_SENT(event, unit, target, castGUID)
+	DA.DEBUG(4,"UNIT_SPELLCAST_SENT("..tostring(unit)..", "..tostring(target)..", "..tostring(castGUID)..")")
+	DA.DEBUG(4,"processingSpell= "..tostring(self.processingSpell))
+end
+
+function Skillet:UNIT_SPELLCAST_START(event, unit, castGUID, spellID)
+	DA.DEBUG(4,"UNIT_SPELLCAST_START("..tostring(unit)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
+	spell = GetSpellInfo(spellID)
+	DA.DEBUG(4,"spell= "..tostring(spell)..", processingSpell= "..tostring(self.processingSpell))
+end
+
+function Skillet:UNIT_SPELLCAST_SUCCEEDED(event, unit, castGUID, spellID)
+	DA.DEBUG(4,"UNIT_SPELLCAST_SUCCEEDED("..tostring(unit)..", "..tostring(castGUID)..", "..tostring(spell)..")")
+	spell = GetSpellInfo(spellID)
+	DA.DEBUG(4,"spell= "..tostring(spell)..", processingSpell= "..tostring(self.processingSpell))
+	if unit == "player" and self.processingSpell and self.processingSpell == spell then
+		self:ContinueCast(spell)
+	end
+end
+
+function Skillet:UNIT_SPELLCAST_FAILED(event, unit, castGUID, spellID)
+	DA.DEBUG(4,"UNIT_SPELLCAST_FAILED("..tostring(unit)..", "..tostring(castGUID)..", "..tostring(spell)..")")
+	spell = GetSpellInfo(spellID)
+	DA.DEBUG(4,"spell= "..tostring(spell)..", processingSpell= "..tostring(self.processingSpell))
+	if unit == "player" and self.processingSpell and self.processingSpell == spell then
+		self:StopCast(spell)
+	end
+end
+
+function Skillet:UNIT_SPELLCAST_FAILED_QUIET(event, unit, castGUID, spellID)
+	DA.DEBUG(4,"UNIT_SPELLCAST_FAILED_QUIET("..tostring(unit)..", "..tostring(castGUID)..", "..tostring(spell)..")")
+	spell = GetSpellInfo(spellID)
+	DA.DEBUG(4,"spell= "..tostring(spell)..", processingSpell= "..tostring(self.processingSpell))
+	if unit == "player" and self.processingSpell and self.processingSpell == spell then
+		self:StopCast(spell)
+	end
+end
+
+function Skillet:UNIT_SPELLCAST_INTERRUPTED(event, unit, castGUID, spellID)
+	DA.DEBUG(4,"UNIT_SPELLCAST_INTERRUPTED("..tostring(unit)..", "..tostring(castGUID)..", "..tostring(spell)..")")
+	spell = GetSpellInfo(spellID)
+	DA.DEBUG(4,"spell= "..tostring(spell)..", processingSpell= "..tostring(self.processingSpell))
+	if unit == "player" and self.processingSpell and self.processingSpell == spell then
+		self:StopCast(spell)
+	end
+end
+
+function Skillet:UNIT_SPELLCAST_DELAYED(event, unit, sGUID, spellID)
+	DA.DEBUG(4,"UNIT_SPELLCAST_DELAYED("..tostring(unit)..", "..tostring(castGUID)..", "..tostring(spell)..")")
+	spell = GetSpellInfo(spellID)
+	DA.DEBUG(4,"spell= "..tostring(spell)..", processingSpell= "..tostring(self.processingSpell))
+end
+
+function Skillet:UNIT_SPELLCAST_STOP(event, unit, sGUID, spellID)
+	DA.DEBUG(4,"UNIT_SPELLCAST_STOP("..tostring(unit)..", "..tostring(castGUID)..", "..tostring(spell)..")")
+	spell = GetSpellInfo(spellID)
+	DA.DEBUG(4,"spell= "..tostring(spell)..", processingSpell= "..tostring(self.processingSpell))
+end
+
+function Skillet:UNIT_SPELLCAST_CHANNEL_START(event, unit, sGUID, spellID)
+	DA.DEBUG(4,"UNIT_SPELLCAST_CHANNEL_START("..tostring(unit)..", "..tostring(castGUID)..", "..tostring(spell)..")")
+	spell = GetSpellInfo(spellID)
+	DA.DEBUG(4,"spell= "..tostring(spell)..", processingSpell= "..tostring(self.processingSpell))
+end
+
+function Skillet:UNIT_SPELLCAST_CHANNEL_STOP(event, unit, sGUID, spellID)
+	DA.DEBUG(4,"UNIT_SPELLCAST_CHANNEL_STOP("..tostring(unit)..", "..tostring(castGUID)..", "..tostring(spell)..")")
+	spell = GetSpellInfo(spellID)
+	DA.DEBUG(4,"spell= "..tostring(spell)..", processingSpell= "..tostring(self.processingSpell))
+end
+
 function Skillet:ContinueCast(spell)
+	DA.DEBUG(3,"ContinueCast("..tostring(spell)..")")
 	Skillet:StopCast(spell, true)
 end
 
 function Skillet:StopCast(spell, success)
+	DA.DEBUG(3,"StopCast("..tostring(spell)..", "..tostring(success)..")")
 	if not self.db.realm.queueData then
 		self.db.realm.queueData = {}
 	end
