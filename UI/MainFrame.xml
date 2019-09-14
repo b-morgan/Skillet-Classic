@@ -1739,7 +1739,7 @@
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeTo="SkilletFrame" relativePoint="TOPRIGHT">
 						<Offset>
-							<AbsDimension x="-10" y="-100"/>
+							<AbsDimension x="-10" y="-110"/>
 						</Offset>
 					</Anchor>
 				</Anchors>

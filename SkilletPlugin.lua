@@ -63,7 +63,7 @@ end
 function Skillet:InitializePlugins()
 	DA.DEBUG(0,"InitializePlugins()")
 	for k,v in pairs(Skillet.displayDetailPlugins) do
-		DA.DEBUG(1,"k= "..tostring(k)..", v= "..tostring(v))
+		--DA.DEBUG(1,"k= "..tostring(k)..", v= "..tostring(v))
 		if v and v.OnInitialize then
 			v.OnInitialize()
 		end

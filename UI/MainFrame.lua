@@ -545,7 +545,7 @@ function Skillet:TradeButton_OnClick(this,button)
 end
 
 function Skillet:UpdateTradeButtons(player)
-	DA.DEBUG(0,"UpdateTradeButtons started")
+	DA.DEBUG(3,"UpdateTradeButtons started")
 	local position = 0 -- pixels
 	local tradeSkillList = self.tradeSkillList
 	local frameName = "SkilletFrameTradeButtons-"..player
@@ -624,11 +624,11 @@ function Skillet:UpdateTradeButtons(player)
 		button:Show()
 	end
 	Skillet:UpdateAutoTradeButtons()
-	DA.DEBUG(0,"UpdateTradeButtons complete")
+	--DA.DEBUG(3,"UpdateTradeButtons complete")
 end
 
 function Skillet:UpdateAutoTradeButtons()
-	--DA.DEBUG(0,"UpdateAutoTradeButtons()")
+	--DA.DEBUG(3,"UpdateAutoTradeButtons()")
 	local tradeSkillList = self.tradeSkillList
 	Skillet.AutoButtonsList = {}
 	for i=1,#tradeSkillList,1 do
@@ -660,7 +660,7 @@ function Skillet:UpdateAutoTradeButtons()
 		end
 	end
 	self.rescan_auto_targets_timer = nil
-	DA.DEBUG(0,"UpdateAutoTradeButtons complete")
+	--DA.DEBUG(3,"UpdateAutoTradeButtons complete")
 end
 
 function SkilletPluginDropdown_OnClick(this)
@@ -710,7 +710,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	DA.DEBUG(0,"internal_UpdateTradeSkillWindow()")
 	self:NameEditSave()
 	if not self.currentPlayer or not self.currentTrade then 
-		DA.DEBUG(0,"leaving early")
+		DA.DEBUG(3,"leaving early")
 		return
 	end
 	local skillListKey = self.currentPlayer..":"..self.currentTrade..":"..self.currentGroupLabel
@@ -828,7 +828,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 		button:SetWidth(width)
 		if rawSkillIndex <= numTradeSkills then
 			local skill = sortedSkillList[rawSkillIndex]
-			DA.DEBUG(2,"rawSkillIndex= "..tostring(rawSkillIndex)..", name= "..tostring(skill.name))
+			--DA.DEBUG(2,"rawSkillIndex= "..tostring(rawSkillIndex)..", name= "..tostring(skill.name))
 			--DA.DEBUG(3,"skill= "..DA.DUMP1(skill,1))
 			local skillIndex = skill.skillIndex
 			local buttonText = _G[button:GetName() .. "Name"]

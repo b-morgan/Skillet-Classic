@@ -830,6 +830,9 @@ function Skillet:OnInitialize()
 	self.db = AceDB:New("SkilletDB", defaults)
 
 -- Clean up obsolete data
+	if self.db.global.cachedGuildbank then
+		self.db.global.cachedGuildbank = nil
+	end
 
 -- Clean up if database is stale 
 	local _,wowBuild,_,wowVersion = GetBuildInfo();
@@ -854,9 +857,15 @@ function Skillet:OnInitialize()
 	if not self.db.global.itemRecipeUsedIn then
 		self.db.global.itemRecipeUsedIn = {}
 	end
+--
+-- Classic doesn't have a Guild Bank
+-- Currently this only effects ShoppingList.lua
+--
+--[[
 	if not self.db.global.cachedGuildbank then
 		self.db.global.cachedGuildbank = {}
 	end
+]]--
 	self:InitializeDatabase(UnitName("player"))
 
 -- Hook default tooltips
@@ -995,6 +1004,16 @@ function Skillet:InitializeDatabase(player)
 			end
 			if not self.db.realm.inventoryData[player] then
 				self.db.realm.inventoryData[player] = {}
+			end
+--
+-- You can't craft from the bank in Classic but
+-- if might be useful if we knew what was in there.
+--
+			if not self.db.realm.bankData then
+				self.db.realm.bankData = {}
+			end
+			if not self.db.realm.bankData[player] then
+				self.db.realm.bankData[player] = {}
 			end
 			if not self.db.realm.reagentsInQueue then
 				self.db.realm.reagentsInQueue = {}

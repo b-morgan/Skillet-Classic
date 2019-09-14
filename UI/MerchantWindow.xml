@@ -27,7 +27,7 @@
 -->
 <Frame name="SkilletMerchantBuyFrame" parent="UIParent" hidden="true">
 	<Size>
-		<AbsDimension x="120" y="50"/>
+		<AbsDimension x="100" y="20"/>
 	</Size>
 	<Frames>
 		<Button name="$parentButton" inherits="GameMenuButtonTemplate" parent="SkilletMerchantBuyFrame" text="Reagents">
@@ -37,7 +37,7 @@
 		  <Anchors>
 			<Anchor point="TOP">
 				<Offset>
-					<AbsDimension x="0" y="-25"/>
+					<AbsDimension x="0" y="0"/>
 				</Offset>
 			</Anchor>
 		  </Anchors>
