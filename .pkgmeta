@@ -20,6 +20,7 @@ externals:
     Libs/LibPeriodicTable-3.1/LibPeriodicTable-3.1-TradeskillResultMats:   https://repos.wowace.com/wow/libperiodictable-3-1/trunk/LibPeriodicTable-3.1-TradeskillResultMats
 
 ignore:
+    - extras
     - db
     - hooks
     - locks
