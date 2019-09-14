@@ -44,12 +44,11 @@ local FrameBackdrop = {
 }
 
 local bankFrameOpen = false
-local bank                   -- Detailed contents of the bank.
-
+local bank						-- Detailed contents of the bank.
 local guildbankFrameOpen = false
-local guildbankQuery = 0     -- Need to wait until all the QueryGuildBankTab()s finish
-local guildbankOnce = true   -- but only indexGuildBank once for each OPENED
-local guildbank              -- Detailed contents of the guildbank
+local guildbankQuery = 0		-- Need to wait until all the QueryGuildBankTab()s finish
+local guildbankOnce = true		-- but only indexGuildBank once for each OPENED
+local guildbank					-- Detailed contents of the guildbank
 
 -- Creates and sets up the shopping list window
 local function createShoppingListFrame(self)
@@ -168,10 +167,12 @@ end
 function Skillet:GetShoppingList(player, includeGuildbank)
 	DA.DEBUG(0,"GetShoppingList("..tostring(player)..", "..tostring(includeGuildbank)..")")
 	self:InventoryScan()
+--[[
 	if not Skillet.db.global.cachedGuildbank then
 		Skillet.db.global.cachedGuildbank = {}
 	end
  	local cachedGuildbank = Skillet.db.global.cachedGuildbank
+]]--
 	local list = {}
 	local playerList
 	if player then
@@ -189,10 +190,12 @@ function Skillet:GetShoppingList(player, includeGuildbank)
 	if not usedInventory[curPlayer] then
 		usedInventory[curPlayer] = {}
 	end
+--[[
 	local curGuild = GetGuildInfo("player")
 	if curGuild and not cachedGuildbank[curGuild] then
 		cachedGuildbank[curGuild] = {}
 	end
+]]--
 	for i=1,#playerList,1 do
 		local player = playerList[i]
 		if not usedInventory[player] then
@@ -202,7 +205,8 @@ function Skillet:GetShoppingList(player, includeGuildbank)
 		DA.DEBUG(1,"player: "..player)
 		if reagentsInQueue then
 			for id,count in pairs(reagentsInQueue) do
-			DA.DEBUG(2,"reagent: "..id.." x "..count)
+				local name = GetItemInfo(id)
+				DA.DEBUG(2,"reagent: "..id.." ("..tostring(name)..") x "..count)
 				local deficit = count -- deficit is usually negative
 				local numInBoth, numInBothCurrent, numGuildbank = 0,0,0
 				local _
@@ -223,6 +227,7 @@ function Skillet:GetShoppingList(player, includeGuildbank)
 					end
 				end
 				deficit = deficit + numInBoth + numInBothCurrent
+--[[
 				if curGuild and not cachedGuildbank[curGuild][id] then
 					cachedGuildbank[curGuild][id] = 0
 				end
@@ -240,6 +245,7 @@ function Skillet:GetShoppingList(player, includeGuildbank)
 					usedGuild[id] = usedGuild[id] + temp  -- keep track how many have been used
 					usedGuild[id] = math.min(usedGuild[id], cachedGuildbank[curGuild][id]) -- but don't use more than there is
 				end
+]]--
 				if deficit < 0 then
 					local entry = { ["id"] = id, ["count"] = -deficit, ["player"] = player, ["value"] = 0, ["source"] = "?" }
 					table.insert(list, entry)
@@ -260,12 +266,14 @@ end
 
 local function indexBank()
 	DA.DEBUG(0,"indexBank()")
+--
 -- bank contains detailed contents of each tab,slot which 
 -- is only needed while the bank is open.
 --
 	bank = {}
 	local player = Skillet.currentPlayer
-	local bankBags = {-1,5,6,7,8,9,10,11,-3}
+--	local bankBags = {-1,5,6,7,8,9,10,11,-3}
+	local bankBags = {-1,5,6,7,8,9,10,11}		-- In Classic, there is no reagent bank
 	for _, container in pairs(bankBags) do
 		for i = 1, GetContainerNumSlots(container), 1 do
 			local item = GetContainerItemLink(container, i)
@@ -285,6 +293,8 @@ local function indexBank()
 	end
 end
 
+-- In Classic, there is no guild bank
+--[[
 local function indexGuildBank(tab)
 	DA.DEBUG(0,"indexGuildBank("..tostring(tab)..")")
 	--
@@ -333,6 +343,7 @@ function Skillet:indexAllGuildBankTabs()
 	end
 	guildbankFrameOpen = true
 end
+]]--
 
 -- Called when the bank frame is opened
 function Skillet:BANKFRAME_OPENED()
@@ -344,6 +355,9 @@ function Skillet:BANKFRAME_OPENED()
 	end
 	Skillet.bankBusy = false
 	Skillet.bankQueue = {}
+	if self.db.realm.bankData and self.db.realm.bankData[player] then
+		self.db.realm.bankData[player] = bank	-- In Classic, it might be useful to save a copy
+	end
 	bank = {}
 	cache_list(self)
 	if #self.cachedShoppingList == 0 then
@@ -359,6 +373,8 @@ function Skillet:BANKFRAME_CLOSED()
 	self:HideShoppingList()
 end
 
+-- In Classic, there is no guild bank
+--[[
 function Skillet:GUILDBANKFRAME_OPENED()
 	DA.DEBUG(0,"GUILDBANKFRAME_OPENED")
 	guildbankQuery = 0
@@ -388,6 +404,7 @@ function Skillet:GUILDBANKFRAME_CLOSED()
 	guildbankFrameOpen = false
 	self:HideShoppingList()
 end
+]]--
 
 -- Called when the cursor has changed (should only be needed while debugging)
 function Skillet:CURSOR_UPDATE()
@@ -495,6 +512,8 @@ local function getItemFromBank(itemID, bag, slot, count)
 	return num_moved
 end
 
+-- In Classic, there is no guild bank
+--[[
 local function getItemFromGuildBank(itemID, bag, slot, count)
 	DA.DEBUG(0,"getItemFromGuildBank(",itemID, bag, slot, count,")")
 	ClearCursor()
@@ -524,9 +543,12 @@ local function getItemFromGuildBank(itemID, bag, slot, count)
 	ClearCursor()
 	return num_moved
 end
+]]--
 
+--
 -- Called once to get things started and then is called after both
 -- BANK_UPDATE (subset of BAG_UPDATE) and BAG_UPDATE_DELAYED events have fired.
+--
 local function processBankQueue(where)
 	DA.DEBUG(1,"processBankQueue("..where..")")
 	local bankQueue = Skillet.bankQueue
@@ -558,8 +580,10 @@ local function processBankQueue(where)
 	end
 end
 
+--
 -- Subset of the BAG_UPDATE event processed in Skillet.lua
 -- It may look like a real Blizzard event but its not.
+--
 function Skillet:BANK_UPDATE(event,bagID) 
 	DA.DEBUG(2,"BANK_UPDATE( "..tostring(bagID).." )")
 	if Skillet.bankBusy then
@@ -571,8 +595,12 @@ function Skillet:BANK_UPDATE(event,bagID)
 	end
 end
 
+-- In Classic, there is no guild bank
+--[[
+--
 -- Called once to get things started and then is called after both
 -- GUILDBANKBAGSLOTS_CHANGED and BAG_UPDATE_DELAYED events have fired.
+--
 local function processGuildQueue(where)
 	DA.DEBUG(1,"processGuildQueue("..where..")")
 	local guildQueue = Skillet.guildQueue
@@ -603,8 +631,10 @@ local function processGuildQueue(where)
 	end
 end
 
+--
 -- Event is fired when the guild bank contents change.
 -- Called as a result of a QueryGuildBankTab call or as a result of a change in the guildbank's contents.
+--
 function Skillet:GUILDBANKBAGSLOTS_CHANGED(event)
 	DA.DEBUG(2,"GUILDBANKBAGSLOTS_CHANGED")
 	if guildbankOnce then
@@ -622,8 +652,11 @@ function Skillet:GUILDBANKBAGSLOTS_CHANGED(event)
 		end
 	end
 end
+]]--
 
+--
 -- Event is fired when the main bank (bagID == -1) contents change.
+--
 function Skillet:PLAYERBANKSLOTS_CHANGED(event,slot)
 	DA.DEBUG(2,"PLAYERBANKSLOTS_CHANGED"..", slot="..tostring(slot))
 	if Skillet.bankBusy then
@@ -635,7 +668,10 @@ function Skillet:PLAYERBANKSLOTS_CHANGED(event,slot)
 	end
 end
 
+--
 -- Event is fired when the reagent bank (bagID == -3) contents change.
+--
+--[[
 function Skillet:PLAYERREAGENTBANKSLOTS_CHANGED(event,slot)
 	DA.DEBUG(2,"PLAYERREAGENTBANKSLOTS_CHANGED"..", slot="..tostring(slot))
 	if Skillet.bankBusy then
@@ -646,9 +682,12 @@ function Skillet:PLAYERREAGENTBANKSLOTS_CHANGED(event,slot)
 		end
 	end
 end
+]]--
 
+--
 -- Event fires after all applicable BAG_UPDATE events for a specific action have been fired.
 -- It doesn't happen as often as BAG_UPDATE so its a better event for us to use.
+--
 function Skillet:BAG_UPDATE_DELAYED(event)
 	DA.DEBUG(4,"BAG_UPDATE_DELAYED")
 	if Skillet.bankBusy then
@@ -658,6 +697,7 @@ function Skillet:BAG_UPDATE_DELAYED(event)
 			processBankQueue("bag update")
 		end
 	end
+--[[
 	if Skillet.guildBusy then
 		DA.DEBUG(1,"BAG_UPDATE_DELAYED and guildBusy")
 		Skillet.gotBagUpdateEvent = true
@@ -665,6 +705,7 @@ function Skillet:BAG_UPDATE_DELAYED(event)
 			processGuildQueue("bag update")
 		end
 	end
+]]--
 end
 
 -- Gets all the reagents possible for queued recipes from the bank
@@ -674,7 +715,9 @@ function Skillet:GetReagentsFromBanks()
 	local incAlts = Skillet.db.char.include_alts
 	local name = UnitName("player")
 
-	-- Do things using a queue and events.
+--
+-- Do things using a queue and events.
+--
 	if bankFrameOpen then
 		DA.DEBUG(0,"#list=",#list)
 		local bankQueue = Skillet.bankQueue
@@ -706,7 +749,12 @@ function Skillet:GetReagentsFromBanks()
 		end
 	end
 
-	-- Do things using a queue and events.
+--
+-- Do things using a queue and events.
+--
+-- In Classic, there is no guild bank
+--
+--[[
 	if guildbankFrameOpen then
 		DA.DEBUG(0,"#list=",#list)
 		local guildQueue = Skillet.guildQueue
@@ -737,6 +785,7 @@ function Skillet:GetReagentsFromBanks()
 			end
 		end
 	end
+]]--
 end
 
 function Skillet:ShoppingListToggleShowAlts()

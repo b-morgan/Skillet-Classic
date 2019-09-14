@@ -917,11 +917,11 @@ end
 
 -- collects generic tradeskill data (id to name and name to id)
 function Skillet:CollectTradeSkillData()
-	--DA.DEBUG(0,"CollectTradeSkillData()")
+	DA.DEBUG(0,"CollectTradeSkillData()")
 	for i=1,#TradeSkillList,1 do
 		local id = TradeSkillList[i]
 		local name = GetSpellInfo(id)
-		DA.DEBUG(0,"id= "..tostring(id)..", name= "..tostring(name))
+		--DA.DEBUG(1,"id= "..tostring(id)..", name= "..tostring(name))
 		if name then
 			TradeSkillIDsByName[name] = id
 		end
