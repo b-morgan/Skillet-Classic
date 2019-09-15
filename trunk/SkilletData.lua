@@ -149,17 +149,17 @@ local skill_style_type = {
 
 local lastAutoTarget = {}
 function Skillet:GetAutoTargetItem(tradeID)
-	if Skillet.TradeSkillAutoTarget[tradeID] then
+	if self.TradeSkillAutoTarget[tradeID] then
 		local itemID = lastAutoTarget[tradeID]
 		if itemID then
-			local limit	 = Skillet.TradeSkillAutoTarget[tradeID][itemID]
-			local count = GetItemCount(itemID)
+			local limit	 = self.TradeSkillAutoTarget[tradeID][itemID]
+			local count = self:GetItemCountR(itemID)
 			if count >= limit then
 				return itemID
 			end
 		end
-		for itemID,limit in pairs(Skillet.TradeSkillAutoTarget[tradeID]) do
-			local count = GetItemCount(itemID)
+		for itemID,limit in pairs(self.TradeSkillAutoTarget[tradeID]) do
+			local count = self:GetItemCountR(itemID)
 			if count >= limit then
 				lastAutoTarget[tradeID] = itemID
 				return itemID
@@ -326,7 +326,7 @@ end
 
 -- resets the blizzard tradeskill search filters just to make sure no other addon has monkeyed with them
 function Skillet:ExpandTradeSkillSubClass(i)
-	--DA.DEBUG(0,"Skillet:ExpandTradeSkillSubClass "..tostring(i))
+	--DA.DEBUG(0,"ExpandTradeSkillSubClass "..tostring(i))
 end
 
 function Skillet:GetRecipeName(id)
@@ -341,7 +341,7 @@ function Skillet:GetRecipeName(id)
 end
 
 function Skillet:GetRecipe(id)
-	--DA.DEBUG(0,"Skillet:GetRecipe("..tostring(id)..")")
+	--DA.DEBUG(0,"GetRecipe("..tostring(id)..")")
 	if id and id ~= 0 then 
 		if Skillet.data.recipeList[id] then
 			return Skillet.data.recipeList[id]
@@ -423,7 +423,7 @@ function Skillet:GetNumSkills(player, trade)
 end
 
 function Skillet:GetSkillRanks(player, trade)
-	--DA.PROFILE("Skillet:GetSkillRanks("..tostring(player)..", "..tostring(trade)..")")
+	--DA.DEBUG(0,"GetSkillRanks("..tostring(player)..", "..tostring(trade)..")")
 	if player and trade then
 		if Skillet.db.realm.tradeSkills[player] then
 			return Skillet.db.realm.tradeSkills[player][trade]
@@ -432,8 +432,9 @@ function Skillet:GetSkillRanks(player, trade)
 end
 
 function Skillet:GetSkill(player,trade,index)
-	--DA.PROFILE("Skillet:GetSkill("..tostring(player)..", "..tostring(trade)..", "..tostring(index)..")")
-	if player and trade and index then
+	--DA.DEBUG(0,"GetSkill("..tostring(player)..", "..tostring(trade)..", "..tostring(index)..")")
+	if not index then return end
+	if (player and trade and index) then
 		if not Skillet.data.skillList[player] then
 			Skillet.data.skillList[player] = {}
 		end
@@ -541,54 +542,9 @@ function Skillet:GetRecipeDataByTradeIndex(tradeID, index)
 	return self.unknownRecipe
 end
 
-function Skillet:ContinueCastCheckUnit(event, unit, spell, rank)
-	--DA.DEBUG(0,"ContinueCastCheckUnit "..(unit or "nil"))
-	if unit == "player" and spell==self.processingSpell then
-		self:ContinueCast(spell)
-		-- AceEvent:ScheduleEvent("Skillet_StopCast", self.StopCast, 0.1,self,event,spell)
-	end
-end
-
-function Skillet:StopCastCheckUnit(event, unit, spell, rank)
-	if unit == "player" then
-		self:StopCast(spell)
-		-- AceEvent:ScheduleEvent("Skillet_StopCast", self.StopCast, 0.1,self,event,spell)
-	end
-end
-
-local rescan_time = 1
--- Internal
--- scan trade, if it fails, rescan after 1 sek, if it fails, rescan after 5 sek and give up
-function Skillet:Skillet_AutoRescan()
-	Skillet.scheduleRescan = false
-	local start = GetTime()
-	DA.DEBUG(0,"Skillet_AutoRescan Start")
-	if InCombatLockdown() or not SkilletFrame:IsVisible() then
-		self.auto_rescan_timer = nil
-		return
-	end
-	local scanResult = self:RescanTrade()
-	if not scanResult or Skillet.scheduleRescan then
-		if rescan_time > 5 then
-			rescan_time = 1
-			self.auto_rescan_timer = nil
-			return
-		end
-		self.auto_rescan_timer = self:ScheduleTimer("Skillet_AutoRescan", rescan_time)
-		rescan_time = rescan_time + 4
-	else
-		rescan_time = 1
-		self.auto_rescan_timer = nil
-		self:UpdateTradeSkillWindow()
-	end
-	local elapsed = GetTime() - start
-	DA.DEBUG(1,"Skillet_AutoRescan complete in "..(math.floor(elapsed*100+.5)/100).." seconds")
-end
-
-function Skillet:CalculateCraftableCounts(playerOverride)
-	DA.DEBUG(0,"CalculateCraftableCounts("..tostring(playerOverride)..")")
-	local player = playerOverride or self.currentPlayer
-	--DA.DEBUG(0,tostring(player).." "..tostring(self.currentTrade))
+function Skillet:CalculateCraftableCounts()
+	DA.DEBUG(0,"CalculateCraftableCounts()")
+	local player = self.currentPlayer
 	self.visited = {}
 	local n = self:GetNumSkills(player, self.currentTrade)
 	if n then
@@ -603,32 +559,13 @@ function Skillet:CalculateCraftableCounts(playerOverride)
 	DA.DEBUG(0,"CalculateCraftableCounts Complete")
 end
 
-function Skillet:RescanTrade()
-	--DA.PROFILE("Skillet:RescanTrade()")
-	local player, tradeID = Skillet.currentPlayer, Skillet.currentTrade
-	if not player or not tradeID then return end
-	Skillet.scanInProgress = true
-	if not Skillet.data.skillList[player] then
-		Skillet.data.skillList[player] = {}
-	end
-	if not Skillet.data.skillList[player][tradeID] then
-		Skillet.data.skillList[player][tradeID]={}
-	end
-	if not Skillet.db.realm.skillDB[player] then
-		Skillet.db.realm.skillDB[player] = {}
-	end
-	if not Skillet.db.realm.skillDB[player][tradeID] then
-		Skillet.db.realm.skillDB[player][tradeID] = {}
-	end
-	Skillet.dataScanned = self:ScanTrade()
-	Skillet.scanInProgress = false
-	return Skillet.dataScanned
-end
-
-function Skillet:ScanTrade()
-	DA.DEBUG(0,"Skillet:ScanTrade()")
+--
+-- This is a local function only called from Skillet:ReScanTrade() which
+-- is defined after this one
+--
+local function ScanTrade()
 	local profession, rank, maxRank = GetTradeSkillLine()
-	local tradeID = self.tradeSkillIDsByName[profession]
+	local tradeID = Skillet.tradeSkillIDsByName[profession]
 	local player = Skillet.currentPlayer
 	local numSkills = GetNumTradeSkills()
 	for i = 1, numSkills do
@@ -649,7 +586,6 @@ function Skillet:ScanTrade()
 	local skillData = Skillet.data.skillList[player][tradeID]
 	local recipeDB = Skillet.db.global.recipeDB
 	if not skillData then
-		self.scanInProgress = false
 		return false
 	end
 	local lastHeader = nil
@@ -820,7 +756,6 @@ function Skillet:ScanTrade()
 			end
 		end
 	end
-	DA.DEBUG(0,"SkilletData:ScanTrade Complete, numSkills= "..tostring(numSkills)..", numHeaders= "..tostring(numHeaders))
 
 	if DA.deepcopy then
 		SkilletMemory.groupList1 = {}
@@ -830,12 +765,42 @@ function Skillet:ScanTrade()
 	Skillet:InventoryScan()
 	Skillet:CalculateCraftableCounts()
 	Skillet:SortAndFilterRecipes()
-	DA.DEBUG(0,"all sorted")
-	self.scanInProgress = false
+	DA.DEBUG(0,"ScanTrade Complete, numSkills= "..tostring(numSkills)..", numHeaders= "..tostring(numHeaders))
 	if numHeaders == 0 then
 		skillData.scanned = false
 		return false
 	end
 	skillData.scanned = true
 	return true
+end
+
+--
+-- This is the global function everyone else should use
+--
+function Skillet:RescanTrade()
+	DA.DEBUG(0,"RescanTrade()")
+	local player, tradeID = Skillet.currentPlayer, Skillet.currentTrade
+	if not player or not tradeID then return end
+--
+-- Make sure all the data structures exist
+--
+	if not Skillet.data.skillList[player] then
+		Skillet.data.skillList[player] = {}
+	end
+	if not Skillet.data.skillList[player][tradeID] then
+		Skillet.data.skillList[player][tradeID]={}
+	end
+	if not Skillet.db.realm.skillDB[player] then
+		Skillet.db.realm.skillDB[player] = {}
+	end
+	if not Skillet.db.realm.skillDB[player][tradeID] then
+		Skillet.db.realm.skillDB[player][tradeID] = {}
+	end
+--
+-- Now the hard work begins
+--
+	Skillet.scanInProgress = true
+	Skillet.dataScanned = ScanTrade()	-- local function that does all the work
+	Skillet.scanInProgress = false
+	return Skillet.dataScanned
 end

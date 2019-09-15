@@ -87,11 +87,11 @@ function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
 			local reagent = recipe.reagentData[i]
 			DA.DEBUG(1,"reagent= "..DA.DUMP1(reagent))
 			local need = count * reagent.numNeeded
-			local numInBoth = GetItemCount(reagent.id,true)
-			local numInBags = GetItemCount(reagent.id)
+			local numInBoth = self:GetItemCountR(reagent.id, true)
+			local numInBags = self:GetItemCountR(reagent.id, false)
 			local numInBank =  numInBoth - numInBags
 			DA.DEBUG(1,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
-			local have = numInBoth + (reagentsInQueue[reagent.id] or 0);
+			local have = numInBags + (reagentsInQueue[reagent.id] or 0);	-- In Classic just bags
 			reagentsInQueue[reagent.id] = (reagentsInQueue[reagent.id] or 0) - need;
 			reagentsChanged[reagent.id] = true
 			DA.DEBUG(1,"queueCraftables= "..tostring(queueCraftables)..", need= "..tostring(need)..", have= "..tostring(have))
@@ -221,12 +221,12 @@ function Skillet:ProcessQueue(altMode)
 					local reagent = recipe.reagentData[i]
 					local reagentName = GetItemInfo(reagent.id) or reagent.id
 					DA.DEBUG(1,"id= "..tostring(reagent.id)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(reagent.numNeeded))
-					local numInBoth = GetItemCount(reagent.id,true)
-					local numInBags = GetItemCount(reagent.id)
+					local numInBoth = self:GetItemCountR(reagent.id, true)
+					local numInBags = self:GetItemCountR(reagent.id, false)
 					local numInBank =  numInBoth - numInBags
 					DA.DEBUG(1,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
-					if numInBoth < reagent.numNeeded then
-						Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded,"x",reagentName,"("..L["have"],numInBoth..")")
+					if numInBags < reagent.numNeeded then
+						Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded,"x",reagentName,"("..L["have"],numInBags..")")
 						craftable = false
 						break
 					end
@@ -275,7 +275,9 @@ end
 
 -- Adds the currently selected number of items to the queue
 function Skillet:QueueItems(count)
-	DA.DEBUG(0,"QueueItems");
+	--DA.DEBUG(0,"QueueItems("..tostring(count)..")")
+	--DA.DEBUG(1,"currentPlayer= "..tostring(self.currentPlayer)..", currentTrade= "..tostring(self.currentTrade)..", selectedSkill= "..tostring(self.selectedSkill))
+	if not self.selectedSkill then return 0 end
 	local skill = self:GetSkill(self.currentPlayer, self.currentTrade, self.selectedSkill)
 	if not skill then return 0 end
 	local recipe = self:GetRecipe(skill.id)
