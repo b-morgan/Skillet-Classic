@@ -51,7 +51,6 @@ Skillet.TradeSkillAutoTarget = {
 --
 -- None of these "features" exist in Classic
 --
-]]--
 }
 
 --
