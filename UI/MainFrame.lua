@@ -30,7 +30,7 @@ local COLORGRAY =   "|cff808080"
 -- min height for Skillet window
 local SKILLET_MIN_HEIGHT = 580
 -- height of the header portion
-local SKILLET_HEADER_HEIGHT = 115		-- 145 if Filter is added under Search
+local SKILLET_HEADER_HEIGHT = 125		-- 145 if Filter is added under Search
 
 -- min width for skill list window
 local SKILLET_SKILLLIST_MIN_WIDTH = 440
@@ -984,8 +984,8 @@ function Skillet:internal_UpdateTradeSkillWindow()
 					countText:Hide()
 				end
 				-- show the count of the item currently owned that the recipe will produce
-				if showOwned and Skillet.currentPlayer == UnitName("player") then
-					local numowned = (self.db.realm.auctionData[Skillet.currentPlayer][recipe.itemID] or 0) + GetItemCount(recipe.itemID,true)
+				if showOwned and self.currentPlayer == UnitName("player") then
+					local numowned = (self.db.realm.auctionData[self.currentPlayer][recipe.itemID] or 0) + self:GetItemCountR(recipe.itemID,true)
 					if numowned > 0 then
 						if numowned >= 1000 then
 							numowned = "##"

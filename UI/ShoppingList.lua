@@ -45,10 +45,17 @@ local FrameBackdrop = {
 
 local bankFrameOpen = false
 local bank						-- Detailed contents of the bank.
+local bankData					-- By item contents of the bank.
+--
+-- In Classic, there is no guildbank
+--
+--[[
 local guildbankFrameOpen = false
 local guildbankQuery = 0		-- Need to wait until all the QueryGuildBankTab()s finish
 local guildbankOnce = true		-- but only indexGuildBank once for each OPENED
 local guildbank					-- Detailed contents of the guildbank
+local guildbankData				-- By item  contents of the guildbank
+]]--
 
 -- Creates and sets up the shopping list window
 local function createShoppingListFrame(self)
@@ -270,8 +277,11 @@ local function indexBank()
 -- bank contains detailed contents of each tab,slot which 
 -- is only needed while the bank is open.
 --
+-- bankData is a count by item.
+--
 	bank = {}
 	local player = Skillet.currentPlayer
+	local bankData = Skillet.db.realm.bankData[player]
 --	local bankBags = {-1,5,6,7,8,9,10,11,-3}
 	local bankBags = {-1,5,6,7,8,9,10,11}		-- In Classic, there is no reagent bank
 	for _, container in pairs(bankBags) do
@@ -287,6 +297,10 @@ local function indexBank()
 						["id"]  = id,
 						["count"] = count,
 					})
+					if not bankData[id] then
+						bankData[id] = 0
+					end
+					bankData[id] = bankData[id] + count
 				end
 			end
 		end
@@ -297,18 +311,18 @@ end
 --[[
 local function indexGuildBank(tab)
 	DA.DEBUG(0,"indexGuildBank("..tostring(tab)..")")
-	--
-	-- Build a current view of the contents of the Guildbank (one tab at a time).
-	--
-	-- guildbank contains detailed contents of each tab,slot which 
-	-- is only needed while the guildbank is open.
-	--
-	-- cachedGuildbank is a count by item, usable (but not necessarily 
-	-- accurate) when the Guildbank is closed.
-	-- It is in db.global instead of db.realm because of connected realms 
-	-- This means it is broken if this account is in guilds on 
-	-- different realms (not connected) with the same name.
-	--
+--
+-- Build a current view of the contents of the Guildbank (one tab at a time).
+--
+-- guildbank contains detailed contents of each tab,slot which 
+-- is only needed while the guildbank is open.
+--
+-- cachedGuildbank is a count by item, usable (but not necessarily 
+-- accurate) when the Guildbank is closed.
+-- It is in db.global instead of db.realm because of connected realms 
+-- This means it is broken if this account is in guilds on 
+-- different realms (not connected) with the same name.
+--
 	local guildName = GetGuildInfo("player")
 	local cachedGuildbank = Skillet.db.global.cachedGuildbank
 	local name, icon, isViewable, canDeposit, numWithdrawals, remainingWithdrawals = GetGuildBankTabInfo(tab);
@@ -349,16 +363,20 @@ end
 function Skillet:BANKFRAME_OPENED()
 	DA.DEBUG(0,"BANKFRAME_OPENED")
 	bankFrameOpen = true
+	local player = self.currentPlayer
+--
+-- Unless crafting happens while the bank is open,
+-- the next three lines are unnecessary as better data
+-- is collected when the BANKFRAME_CLOSED event fires.
+--
+	self.db.realm.bankData[player] = {}
+	bank = {}
 	indexBank()
 	if not self.db.profile.display_shopping_list_at_bank then
 		return
 	end
 	Skillet.bankBusy = false
 	Skillet.bankQueue = {}
-	if self.db.realm.bankData and self.db.realm.bankData[player] then
-		self.db.realm.bankData[player] = bank	-- In Classic, it might be useful to save a copy
-	end
-	bank = {}
 	cache_list(self)
 	if #self.cachedShoppingList == 0 then
 		return
@@ -369,6 +387,10 @@ end
 -- Called when the bank frame is closed
 function Skillet:BANKFRAME_CLOSED()
 	DA.DEBUG(0,"BANKFRAME_CLOSED")
+	local player = self.currentPlayer
+	self.db.realm.bankData[player] = {}
+	bank = {}
+	indexBank()
 	bankFrameOpen = false
 	self:HideShoppingList()
 end
@@ -381,9 +403,9 @@ function Skillet:GUILDBANKFRAME_OPENED()
 	guildbankOnce = true
 	Skillet.guildBusy = false
 	Skillet.guildQueue = {}
-	guildbank = {}
 	local guildName = GetGuildInfo("player")
 	Skillet.db.global.cachedGuildbank[guildName] = {}
+	guildbank = {}
 	local numTabs = GetNumGuildBankTabs()
 	for tab=1, numTabs, 1 do
 		QueryGuildBankTab(tab)  -- event GUILDBANKBAGSLOTS_CHANGED will fire when the data is available
@@ -579,6 +601,9 @@ local function processBankQueue(where)
 		end
 	end
 end
+function Skillet:UpdateBankQueue(where)
+	processBankQueue(where)
+end
 
 --
 -- Subset of the BAG_UPDATE event processed in Skillet.lua
@@ -630,7 +655,9 @@ local function processGuildQueue(where)
 		end
 	end
 end
-
+function Skillet:UpdateGuildQueue(where)
+	processGuildQueue(where)
+end
 --
 -- Event is fired when the guild bank contents change.
 -- Called as a result of a QueryGuildBankTab call or as a result of a change in the guildbank's contents.
@@ -684,29 +711,6 @@ function Skillet:PLAYERREAGENTBANKSLOTS_CHANGED(event,slot)
 end
 ]]--
 
---
--- Event fires after all applicable BAG_UPDATE events for a specific action have been fired.
--- It doesn't happen as often as BAG_UPDATE so its a better event for us to use.
---
-function Skillet:BAG_UPDATE_DELAYED(event)
-	DA.DEBUG(4,"BAG_UPDATE_DELAYED")
-	if Skillet.bankBusy then
-		DA.DEBUG(1,"BAG_UPDATE_DELAYED and bankBusy")
-		Skillet.gotBagUpdateEvent = true
-		if Skillet.gotBankEvent and Skillet.gotBagUpdateEvent then
-			processBankQueue("bag update")
-		end
-	end
---[[
-	if Skillet.guildBusy then
-		DA.DEBUG(1,"BAG_UPDATE_DELAYED and guildBusy")
-		Skillet.gotBagUpdateEvent = true
-		if Skillet.gotGuildbankEvent and Skillet.gotBagUpdateEvent then
-			processGuildQueue("bag update")
-		end
-	end
-]]--
-end
 
 -- Gets all the reagents possible for queued recipes from the bank
 function Skillet:GetReagentsFromBanks()

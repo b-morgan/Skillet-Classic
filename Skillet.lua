@@ -930,6 +930,8 @@ function Skillet:FlushAllData()
 	Skillet.db.realm.auctionData = {}
 	Skillet.db.realm.reagentsInQueue = {}
 	Skillet.db.realm.inventoryData = {}
+	Skillet.db.realm.bagData = {}
+	Skillet.db.realm.bagDetails = {}
 	Skillet.db.realm.userIgnoredMats = {}
 	Skillet:FlushRecipeData()
 end
@@ -1006,7 +1008,23 @@ function Skillet:InitializeDatabase(player)
 				self.db.realm.inventoryData[player] = {}
 			end
 --
--- You can't craft from the bank in Classic but
+-- In Classic, GetItemCount is FUBAR so we need to keep
+-- track of the current bag contents as well.
+--
+			if not self.db.realm.bagData then
+				self.db.realm.bagData = {}
+			end
+			if not self.db.realm.bagData[player] then
+				self.db.realm.bagData[player] = {}
+			end
+			if not self.db.realm.bagDetails then
+				self.db.realm.bagDetails = {}
+			end
+			if not self.db.realm.bagDetails[player] then
+				self.db.realm.bagDetails[player] = {}
+			end
+--
+-- In Classic, you can't craft from the bank  but
 -- if might be useful if we knew what was in there.
 --
 			if not self.db.realm.bankData then
@@ -1015,6 +1033,7 @@ function Skillet:InitializeDatabase(player)
 			if not self.db.realm.bankData[player] then
 				self.db.realm.bankData[player] = {}
 			end
+--
 			if not self.db.realm.reagentsInQueue then
 				self.db.realm.reagentsInQueue = {}
 			end
@@ -1054,6 +1073,7 @@ function Skillet:OnEnable()
 	self:RegisterEvent("TRADE_SKILL_CLOSE", "SkilletClose")
 	self:RegisterEvent("TRADE_SKILL_SHOW", "SkilletShow")
 	self:RegisterEvent("TRADE_SKILL_NAME_UPDATE")
+	self:RegisterEvent("UNIT_INVENTORY_CHANGED") -- Not sure if this is helpful but we will track it.
 	self:RegisterEvent("BAG_UPDATE") -- Fires for both bag and bank updates.
 	self:RegisterEvent("BAG_UPDATE_DELAYED") -- Fires after all applicable BAG_UPADTE events for a specific action have been fired.
 	--
@@ -1099,6 +1119,7 @@ function Skillet:OnEnable()
 	--
 	self:RegisterEvent("PLAYER_LOGOUT")
 
+	self.bagsChanged = true
 	self.hideUncraftableRecipes = false
 	self.hideTrivialRecipes = false
 	self.currentTrade = nil
@@ -1223,27 +1244,69 @@ function Skillet:SkilletClose()
 	end
 end
 
--- Rescans the trades (and thus bags). Can only be called if the tradeskill
--- window is open and a trade selected.
-function Skillet:RescanBags()
-	DA.DEBUG(0,"RescanBags()")
-	local start = GetTime()
-	Skillet:InventoryScan()
-	Skillet:UpdateTradeSkillWindow()
-	Skillet:UpdateShoppingListWindow(true)
-	local elapsed = GetTime() - start
-	if elapsed > 0.5 then
-		DA.DEBUG(0,"WARNING: skillet inventory scan took " .. math.floor(elapsed*100+.5)/100 .. " seconds to complete.")
-	end
-end
-
 function Skillet:BAG_OPEN(event, bagID) -- Fires when a non-inventory container is opened.
 	DA.TRACE("BAG_OPEN( "..tostring(bagID).." )") -- We don't really care
 end
 
+function Skillet:BAG_CLOSED(event, bagID)        -- Fires when the whole bag is removed from 
+	DA.TRACE("BAG_CLOSED( "..tostring(bagID).." )") -- inventory or bank. We don't really care. 
+end
+
+function Skillet:UNIT_INVENTORY_CHANGED(event, unit)
+	--DA.TRACE("UNIT_INVENTORY_CHANGED( "..tostring(unit).." )")
+	DA.DEBUG(4,"UNIT_INVENTORY_CHANGED("..tostring(unit)..")")
+end
+
+--
+-- Trade window close, the counts may need to be updated.
+-- This could be because an enchant has used up mats or the player
+-- may have received more mats.
+--
+function Skillet:TRADE_CLOSED()
+	self:BAG_UPDATE("FAKE_BAG_UPDATE", 0)
+end
+
+local function indexBags()
+	DA.DEBUG(0,"indexBags()")
+	local player = Skillet.currentPlayer
+	if player then
+		local details = {}
+		local data = {}
+		local bags = {0,1,2,3,4}
+		for _, container in pairs(bags) do
+			for i = 1, GetContainerNumSlots(container), 1 do
+				local item = GetContainerItemLink(container, i)
+				if item then
+					local _,count = GetContainerItemInfo(container, i)
+					local id = Skillet:GetItemIDFromLink(item)
+					if id then
+						table.insert(details, {
+							["bag"]   = container,
+							["slot"]  = i,
+							["id"]  = id,
+							["count"] = count,
+						})
+						if not data[id] then
+							data[id] = 0
+						end
+						data[id] = data[id] + count
+					end
+				end
+			end
+		Skillet.db.realm.bagData[player] = data
+		Skillet.db.realm.bagDetails[player] = details
+		end
+	end
+end
+
+--
 -- So we can track when the players inventory changes and update craftable counts
+--
 function Skillet:BAG_UPDATE(event, bagID)
 	DA.DEBUG(4,"BAG_UPDATE( "..bagID.." )")
+	if bagID >= 0 and bagID <= 4 then
+		self.bagsChanged = true -- an inventory bag update, do nothing until BAG_UPDATE_DELAYED.
+	end
 	if UnitAffectingCombat("player") then
 		return
 	end
@@ -1257,11 +1320,7 @@ function Skillet:BAG_UPDATE(event, bagID)
 	if self.shoppingList and self.shoppingList:IsVisible() then
 		showing = true
 	end
-	-- bagID = tonumber(bagID)
 	if showing then
-		if bagID >= 0 and bagID <= 4 then
-			-- an inventory bag update, do nothing (wait for the BAG_UPDATE_DELAYED).
-		end
 		if bagID == -1 or bagID >= 5 then
 			-- a bank update, process it in ShoppingList.lua
 			Skillet:BANK_UPDATE(event,bagID) -- Looks like an event but its not.
@@ -1278,15 +1337,62 @@ function Skillet:BAG_UPDATE(event, bagID)
 	end
 end
 
-function Skillet:BAG_CLOSED(event, bagID)        -- Fires when the whole bag is removed from 
-	DA.TRACE("BAG_CLOSED( "..tostring(bagID).." )") -- inventory or bank. We don't really care. 
+--
+-- Event fires after all applicable BAG_UPDATE events for a specific action have been fired.
+-- It doesn't happen as often as BAG_UPDATE so its a better event for us to use.
+--
+function Skillet:BAG_UPDATE_DELAYED(event)
+	DA.DEBUG(4,"BAG_UPDATE_DELAYED")
+	if Skillet.bagsChanged and not UnitAffectingCombat("player") then
+		indexBags()
+		Skillet.bagsChanged = false
+	end
+	if Skillet.bankBusy then
+		DA.DEBUG(1,"BAG_UPDATE_DELAYED and bankBusy")
+		Skillet.gotBagUpdateEvent = true
+		if Skillet.gotBankEvent and Skillet.gotBagUpdateEvent then
+			Skillet:UpdateBankQueue("bag update") -- Implemented in ShoppingList.lua
+		end
+	end
+--[[
+	if Skillet.guildBusy then
+		DA.DEBUG(1,"BAG_UPDATE_DELAYED and guildBusy")
+		Skillet.gotBagUpdateEvent = true
+		if Skillet.gotGuildbankEvent and Skillet.gotBagUpdateEvent then
+			Skillet:UpdateGuildQueue("bag update")
+		end
+	end
+]]--
 end
 
--- Trade window close, the counts may need to be updated.
--- This could be because an enchant has used up mats or the player
--- may have received more mats.
-function Skillet:TRADE_CLOSED()
-	self:BAG_UPDATE("FAKE_BAG_UPDATE", 0)
+--
+-- In _classic_, Blizzard's 1) Skillet:GetItemCountR(id,false), 2) Skillet:GetItemCountR(id), and 3) Skillet:GetItemCountR(id, true)
+-- all return the same thing, the number of items in both bags and bank.
+-- In Retail, 1 and 2 return the number of items in bags and 3 returns both.
+--
+-- This function works the same as _retail_
+--
+function Skillet:GetItemCountR(id, includeBank)
+	DA.DEBUG(0,"GetItemCountR("..tostring(id)..", "..tostring(includeBank)..")")
+	local count = GetItemCount(id, true)	-- Just in case it gets fixed later
+	if not count then return end
+	if not includeBank then
+		local player = self.currentPlayer
+		local haveBank = #self.db.realm.bankData[player]
+		if haveBank > 0 then
+			local bank = self.db.realm.bankData[player][id]
+			if bank then
+				count = count - bank
+			end
+		else
+			local bags = self.db.realm.bagData[player][id]
+			if bags then
+				count = bags
+			end
+		end
+	end
+	DA.DEBUG(0,"GetItemCountR= "..tostring(count))
+	return count
 end
 
 function Skillet:SetTradeSkill(player, tradeID, skillIndex)
