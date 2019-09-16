@@ -1064,7 +1064,7 @@ end
 
 -- Called when the addon is enabled
 function Skillet:OnEnable()
-	DA.DEBUG(0,"Skillet:OnEnable()");
+	DA.DEBUG(0,"OnEnable()");
 	--
 	-- Hook into the events that we care about
 	--
@@ -1072,10 +1072,19 @@ function Skillet:OnEnable()
 	--
 	self:RegisterEvent("TRADE_SKILL_CLOSE", "SkilletClose")
 	self:RegisterEvent("TRADE_SKILL_SHOW", "SkilletShow")
+	self:RegisterEvent("TRADE_SKILL_UPDATE")
 	self:RegisterEvent("TRADE_SKILL_NAME_UPDATE")
-	self:RegisterEvent("UNIT_INVENTORY_CHANGED") -- Not sure if this is helpful but we will track it.
-	self:RegisterEvent("BAG_UPDATE") -- Fires for both bag and bank updates.
-	self:RegisterEvent("BAG_UPDATE_DELAYED") -- Fires after all applicable BAG_UPADTE events for a specific action have been fired.
+	self:RegisterEvent("CRAFT_CLOSE")				-- craft event (could call SkilletClose)
+	self:RegisterEvent("CRAFT_SHOW")				-- craft event (could call SkilletShow)
+	self:RegisterEvent("CRAFT_UPDATE")				-- craft event
+	self:RegisterEvent("UNIT_PET_TRAINING_POINTS")	-- craft event
+
+	self:RegisterEvent("UNIT_INVENTORY_CHANGED") 	-- Not sure if this is helpful but we will track it.
+	self:RegisterEvent("UNIT_PORTRAIT_UPDATE")		-- Not sure if this is helpful but we will track it.
+	self:RegisterEvent("SPELLS_CHANGED")			-- Not sure if this is helpful but we will track it.
+
+	self:RegisterEvent("BAG_UPDATE") 				-- Fires for both bag and bank updates.
+	self:RegisterEvent("BAG_UPDATE_DELAYED")		-- Fires after all applicable BAG_UPADTE events for a specific action have been fired.
 	--
 	-- MERCHANT_SHOW, MERCHANT_HIDE, MERCHANT_UPDATE events needed for auto buying.
 	--
@@ -1147,15 +1156,43 @@ function Skillet:PLAYER_LOGOUT()
 end
 
 function Skillet:TRADE_SKILL_NAME_UPDATE()
-	DA.DEBUG(0,"TRADE_SKILL_NAME_UPDATE")
+	DA.DEBUG(4,"TRADE_SKILL_NAME_UPDATE")
 	if Skillet.linkedSkill then
 		Skillet:SkilletShow()
 	end
 end
 
+function Skillet:TRADE_SKILL_UPDATE()
+	DA.DEBUG(4,"TRADE_SKILL_UPDATE")
+end
+
+function Skillet:UNIT_PORTRAIT_UPDATE()
+	DA.DEBUG(4,"UNIT_PORTRAIT_UPDATE")
+end
+
+function Skillet:SPELLS_CHANGED()
+	DA.DEBUG(4,"SPELLS_CHANGED")
+end
+
+function Skillet:CRAFT_UPDATE()
+	DA.DEBUG(4,"CRAFT_UPDATE")
+end
+
+function Skillet:UNIT_PET_TRAINING_POINTS()
+	DA.DEBUG(4,"UNIT_PET_TRAINING_POINTS")
+end
+
+function Skillet:CRAFT_CLOSE()		-- "SkilletClose"
+	DA.DEBUG(4,"CRAFT_CLOSE")
+end
+
+function Skillet:CRAFT_SHOW()		-- "SkilletShow"
+	DA.DEBUG(4,"CRAFT_SHOW")
+end
+
 -- Called when the addon is disabled
 function Skillet:OnDisable()
-	DA.DEBUG(0,"Skillet:OnDisable()");
+	DA.DEBUG(0,"OnDisable()");
 	self:UnregisterAllEvents()
 	self:EnableBlizzardFrame()
 end
@@ -1180,7 +1217,7 @@ end
 -- Show the tradeskill window, called from TRADE_SKILL_SHOW event, clicking on links, or clicking on guild professions
 function Skillet:SkilletShow()
 	DA.DEBUG(1,"SHOW WINDOW (was showing "..(self.currentTrade or "nil")..")");
-	TradeSkillFrame_Update();
+--	TradeSkillFrame_Update();
 	self.linkedSkill, self.currentPlayer, self.isGuild = Skillet:IsTradeSkillLinked()
 	if self.linkedSkill then
 		if not self.currentPlayer then
@@ -1267,7 +1304,7 @@ function Skillet:TRADE_CLOSED()
 end
 
 local function indexBags()
-	DA.DEBUG(0,"indexBags()")
+	DA.DEBUG(4,"indexBags()")
 	local player = Skillet.currentPlayer
 	if player then
 		local details = {}
