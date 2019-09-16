@@ -30,7 +30,7 @@ local skillColors = {
 
 function Skillet:GetTradeSkillLevels(spellID)
 	local a,b,c,d
-	DA.DEBUG(0,"Skillet:GetTradeSkillLevels("..tostring(spellID)..")")
+	DA.DEBUG(0,"GetTradeSkillLevels("..tostring(spellID)..")")
 	if spellID then 
 		if tonumber(spellID) ~= nil and spellID ~= 0 then
 -- TradeskillInfo seems to be more accurate than LibPeriodicTable-3.1
@@ -72,7 +72,7 @@ function Skillet:GetTradeSkillLevels(spellID)
 end
 
 function Skillet:GetTradeSkillLevelColor(spellID, rank)
-	DA.DEBUG(0,"Skillet:GetTradeSkillLevelColor("..tostring(spellID)..", "..tostring(rank)")")
+	DA.DEBUG(0,"GetTradeSkillLevelColor("..tostring(spellID)..", "..tostring(rank)")")
 	if spellID then
 		local orange, yellow, green, gray = self:GetTradeSkillLevels(spellID)
 		if rank >= gray then return skillColors["trivial"] end

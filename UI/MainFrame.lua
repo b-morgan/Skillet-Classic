@@ -635,7 +635,7 @@ function Skillet:UpdateAutoTradeButtons()
 		local tradeID = tradeSkillList[i]
 		local ranks = self:GetSkillRanks(UnitName("player"), tradeID)
 		if ranks then
-			local additionalSpellTab = Skillet.TradeSkillAdditionalAbilities[tradeID]
+			local additionalSpellTab = Skillet.AdditionalAbilities[tradeID]
 			if additionalSpellTab then
 				table.insert(Skillet.AutoButtonsList, additionalSpellTab)
 				local additionalSpellId = additionalSpellTab[1]
@@ -2054,7 +2054,7 @@ end
 
 -- Called when then mouse enters a reagent button
 function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
-	--DA.DEBUG(3,"Skillet:ReagentButtonOnEnter("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	--DA.DEBUG(3,"ReagentButtonOnEnter("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 	local skill = self:GetSkill(self.currentPlayer, self.currentTrade, skillIndex)
 	if skill then
@@ -2087,7 +2087,7 @@ function Skillet:ReagentButtonOnLeave(button, skillIndex, reagentIndex)
 end
 
 function Skillet:ReagentButtonSkillSelect(player, id)
-	DA.DEBUG(0,"Skillet:ReagentButtonSkillSelect("..tostring(player)..", "..tostring(id)..")")
+	DA.DEBUG(0,"ReagentButtonSkillSelect("..tostring(player)..", "..tostring(id)..")")
 	if player == Skillet.currentPlayer then -- Blizzard's 5.4 update prevents us from changing away from the current player
 		local skillIndexLookup = Skillet.data.skillIndexLookup[player]
 		gearTexture:Hide()
@@ -2103,7 +2103,7 @@ end
 
 -- Called when the reagent button is clicked
 function Skillet:ReagentButtonOnClick(button, skillIndex, reagentIndex)
-	DA.DEBUG(0,"Skillet:ReagentButtonOnClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	DA.DEBUG(0,"ReagentButtonOnClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	if not self.db.profile.link_craftable_reagents then
 		return
 	end
