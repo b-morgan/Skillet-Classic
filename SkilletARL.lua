@@ -70,8 +70,8 @@ function SkilletARL:RecipeFilterButton_OnClick(button)
 	Skillet:ToggleTradeSkillOption(option)
 	self:RecipeFilterButton_OnEnter(button)
 	self:RecipeFilterButton_OnShow(button)
-	Skillet:SortAndFilterRecipes()
-	Skillet:UpdateTradeSkillWindow()
+	self:SortAndFilterRecipes()
+	self:UpdateTradeSkillWindow()
 end
 
 function SkilletARL:RecipeFilterButton_OnEnter(button)
@@ -134,8 +134,8 @@ function SkilletARL:RecipeFilterToggleButton_OnClick(button, mouse)
 		end
 		local before = Skillet:GetTradeSkillOption("recipeSourceFilter")
 		Skillet:SetTradeSkillOption("recipeSourceFilter", not before)
-		Skillet:SortAndFilterRecipes()
-		Skillet:UpdateTradeSkillWindow()
+		self:SortAndFilterRecipes()
+		self:UpdateTradeSkillWindow()
 	else
 		if ARLRecipeSourceTrainerButton:IsVisible() then
 			SkilletARL:RecipeFilterButtons_Hide()

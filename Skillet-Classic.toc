@@ -4,7 +4,7 @@
 ## Notes-esES: Una sustitucion de la ventana de Habilidades de Comercio
 ## Notes-ruRU: Заменяет окно профессий на более функциональное.
 ## Author: bsmorgan
-## Version: @project-version@
+## Version: r29
 ## X-Category: Tradeskill
 ## X-License GPL v3 or later
 ## X-RelSite-WoWI: 25287
@@ -58,7 +58,6 @@ SkilletData.lua
 SkilletARL.lua
 TradeskillInfo.lua
 SkilletQueue.lua
-ThirdPartyHooks.lua
 Upgrades.lua
 SkillLevelData.lua
 RecipeGroups.lua

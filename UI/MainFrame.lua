@@ -70,13 +70,13 @@ local pre_show_callbacks = {}
 -- List of functions that are called before a button is hidden
 local pre_hide_callbacks = {}
 
-function Skillet:internal_AddPreButtonShowCallback(method)		-- AddPreButtonShowCallback()
+function Skillet:AddPreButtonShowCallback(method)
 	assert(method and type(method) == "function",
 		   "Usage: Skillet:AddPreButtonShowCallback(method). method must be a non-nil function")
 	table.insert(pre_show_callbacks, method)
 end
 
-function Skillet:internal_AddPreButtonHideCallback(method)		-- AddPreButtonHideCallback()
+function Skillet:AddPreButtonHideCallback(method)
 	assert(method and type(method) == "function",
 		   "Usage: Skillet:AddPreButtonHideCallback(method). method must be a non-nil function")
 	table.insert(pre_hide_callbacks, method)
@@ -144,6 +144,7 @@ function Skillet:CreateTradeSkillWindow()
 	titletext:SetText(L["Skillet Trade Skills"].." "..Skillet.version);
 	local label = _G["SkilletSearchLabel"];
 	label:SetText(L["Search"]);
+	SkilletPluginButton:SetText(L["Plugins"])
 	SkilletCreateAllButton:SetText(L["Create All"])
 	SkilletQueueAllButton:SetText(L["Queue All"])
 	SkilletCreateButton:SetText(L["Create"])
@@ -245,10 +246,7 @@ function Skillet:CreateTradeSkillWindow()
 	windowManager.RestorePosition(frame)  -- restores scale also
 	windowManager.MakeDraggable(frame)
 	-- lets play the resize me game!
-	local minwidth = self:GetMinSkillButtonWidth()
-	if not minwidth or minwidth < SKILLET_SKILLLIST_MIN_WIDTH then
-		minwidth = SKILLET_SKILLLIST_MIN_WIDTH
-	end
+	minwidth = SKILLET_SKILLLIST_MIN_WIDTH
 	minwidth = minwidth +                  -- minwidth of scroll button
 			   20 +                        -- padding between sroll and detail
 			   SKILLET_REAGENT_MIN_WIDTH + -- reagent window (fixed width)
@@ -534,11 +532,11 @@ function Skillet:TradeButton_OnClick(this,button)
 				if player == UnitName("player") then
 					Skillet:InitializeDatabase(player)
 				end
-				Skillet:RescanTrade(true)
+				Skillet:RescanTrade()
 			else
-				Skillet:RescanTrade(true)
+				Skillet:RescanTrade()
 			end
-			Skillet:UpdateTradeSkillWindow()
+			self:UpdateTradeSkillWindow()
 		end
 	end
 	GameTooltip:Hide()
@@ -706,11 +704,11 @@ end
 
 -- Updates the trade skill window whenever anything has changed,
 -- number of skills, skill type, skill level, etc
-function Skillet:internal_UpdateTradeSkillWindow()
-	DA.DEBUG(0,"internal_UpdateTradeSkillWindow()")
+function Skillet:UpdateTradeSkillWindow()
+	DA.DEBUG(0,"UpdateTradeSkillWindow()")
 	self:NameEditSave()
 	if not self.currentPlayer or not self.currentTrade then 
-		DA.DEBUG(3,"leaving early")
+		DA.DEBUG(3,"leaving early, no player or no trade")
 		return
 	end
 	local skillListKey = self.currentPlayer..":"..self.currentTrade..":"..self.currentGroupLabel
@@ -738,6 +736,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 		-- nothing to see, nothing to update
 		self:SetSelectedSkill(nil)
 		self.skillMainSelection = nil
+		DA.DEBUG(3,"leaving early, no trade")
 		return
 	end
 	-- shopping list button always shown
@@ -769,6 +768,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	self:RecipeDifficultyButton_OnShow()
 	SkilletHideUncraftableRecipes:SetChecked(self:GetTradeSkillOption("hideuncraftable"))
 	self:UpdateQueueWindow()
+	self:UpdateShoppingListWindow()
 	-- Window Title
 	local tradeName = self:GetTradeName(self.currentTrade)
 	local title = _G["SkilletTitleText"];
@@ -927,7 +927,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 						levelText:SetText(level)
 					end
 				end
-				text = (self:GetRecipeNamePrefix(self.currentTrade, skillIndex) or "") .. (skill.name or "")
+				text = skill.name or ""
 				if #recipe.reagentData > 0 then
 					local num, numrecursive, numwvendor, numwalts = get_craftable_counts(skill.skillData, recipe.numMade)
 					local cbag = "|cff80ff80" -- green
@@ -985,7 +985,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 				end
 				-- show the count of the item currently owned that the recipe will produce
 				if showOwned and self.currentPlayer == UnitName("player") then
-					local numowned = (self.db.realm.auctionData[self.currentPlayer][recipe.itemID] or 0) + self:GetItemCountR(recipe.itemID,true)
+					local numowned = (self.db.realm.auctionData[self.currentPlayer][recipe.itemID] or 0) + GetItemCount(recipe.itemID,true)
 					if numowned > 0 then
 						if numowned >= 1000 then
 							numowned = "##"
@@ -1004,7 +1004,6 @@ function Skillet:internal_UpdateTradeSkillWindow()
 					end
 				end
 				countText:SetWidth(math.max(countText:GetStringWidth(),SKILLET_COUNT_MIN_WIDTH)) -- make end of buttonText have a fixed location
-				Skillet:CustomizeCountsColumn(recipe, countText) -- ThirdPartyHook
 				button:SetID(skillIndex or 0)
 				-- If enhanced recipe display is enabled, show the difficulty as text,
 				-- rather than as a colour. This should help used that have problems
@@ -1012,9 +1011,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 				if self.db.profile.enhanced_recipe_display then
 					text = text .. skill_color.alttext;
 				end
-
-				-- Get any additional text that ThirdPartyHooks (or plugins) might add (right justified at end of text)
-				suffixText:SetText(self:GetRecipeNameSuffix(skill, recipe) or "")
+				suffixText:SetText("")
 				suffixText:Show()
 				buttonText:SetText(text)
 				buttonText:SetWordWrap(false)
@@ -1057,7 +1054,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 		SkilletFrameEmptySpace:SetPoint("TOPLEFT",SkilletSkillListParent,"TOPLEFT")
 	end
 	SkilletFrameEmptySpace:SetPoint("BOTTOMRIGHT",SkilletSkillListParent,"BOTTOMRIGHT")
-	DA.DEBUG(0,"internal_UpdateTradeSkillWindow Complete")
+	DA.DEBUG(3,"UpdateTradeSkillWindow Complete")
 end
 
 -- Display an action packed tooltip when we are over
@@ -1153,9 +1150,20 @@ function Skillet:SkillButton_OnEnter(button)
 			tip:AddLine(skill.name, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, false);
 		end
 	end
-	local num, numrecursive, numwvendor, numwalts = 0, 0, 0, 0
+	local num, numrecursive, numwvendor, numwalts, numbags, numbank = 0, 0, 0, 0, 0, 0
 	if skill.skillData then
 		num, numrecursive, numwvendor, numwalts = get_craftable_counts(skill.skillData, recipe.numMade)
+	end
+	numbags = GetItemCount(recipe.itemID,false)
+	numbank = GetItemCount(recipe.itemID,true) - numbags
+	-- how many are there already
+	if numbags > 0 then
+		local text = "\n" .. numbags .. " " .. L["in your inventory"];
+		tip:AddLine(text, 1, 1, 1, false); -- (text, r, g, b, wrap)
+	end
+	if numbank > 0 then
+		local text = "\n" .. numbank .. " " .. L["in your bank"];
+		tip:AddLine(text, 1, 1, 1, false); -- (text, r, g, b, wrap)
 	end
 	-- how many can be created with the reagents in the inventory
 	if num > 0 then
@@ -1176,17 +1184,20 @@ function Skillet:SkillButton_OnEnter(button)
 		if num > 0 or numrecursive > 0 then
 			text = "\n" .. text;
 		end
+	end
+	if numwvendor and numwvendor > 0 and numwvendor ~= num then
+		local text =  "\n" .. numwvendor .. " " .. L["can be created with reagents bought at vendor"];
 		tip:AddLine(text, 1, 1, 1, false);	-- (text, r, g, b, wrap)
 	end
-	Skillet:AddCustomTooltipInfo(tip, recipe)
-	tip:AddLine("\n" .. (self:GetReagentLabel(self.currentTrade, id) or ""));
+	tip:AddLine("\n" .. SPELL_REAGENTS);
 	-- now the list of regents for this recipe and some info about them
 	for i=1, #recipe.reagentData, 1 do
 		local reagent = recipe.reagentData[i]
 		if not reagent then
 			break
 		end
-		local numInBoth, numCraftable = self:GetInventory(self.currentPlayer, reagent.id)
+		local num, numCraftable = self:GetInventory(self.currentPlayer, reagent.id)
+		local bank = GetItemCount(reagent.id,true) - num
 		local itemName = GetItemInfo(reagent.id) or reagent.id
 		local text
 		if self:VendorSellsReagent(reagent.id) then
@@ -1194,10 +1205,13 @@ function Skillet:SkillButton_OnEnter(button)
 		else
 			text = string.format("  %d x %s", reagent.numNeeded, itemName)
 		end
-		local counts = string.format("|cff808080[%d/%d]|r", numInBoth, numCraftable)
+		local counts = string.format("|cff808080[%d/%d/%d]|r", num, bank, numCraftable)
 		tip:AddDoubleLine(text, counts, 1, 1, 1);
 	end
-	local text = string.format("[%s/%s]", L["Inventory"], L["craftable"]) -- match the case sometime
+	local text = string.format("[%s/%s/%s]", L["Inventory"], L["bank"], L["craftable"]) -- match the case sometime
+	tip:AddDoubleLine("\n", text)
+--	local text1 = string.format("recipeID= %d",skill.id)
+	local text = string.format("itemID= %d",recipe.itemID)
 	tip:AddDoubleLine("\n", text)
 	tip:Show()
 	button.locked = false
@@ -1212,11 +1226,6 @@ function Skillet:SetTradeSkillToolTip(skillIndex)
 		if recipe.itemID ~= 0 then
 --			GameTooltip:SetHyperlink("item:"..recipe.itemID)			-- creates an item, that's more interesting than the recipe
 			GameTooltip:SetTradeSkillItem(skillIndex)
-			if EnhTooltip and EnhTooltip.TooltipCall then
-				local name, link, quality = GetItemInfo("item:"..recipe.itemID)
-				local quantity = recipe.numMade
-				EnhTooltip.TooltipCall(GameTooltip, name, link, quality, quantity)
-			end
 			if IsShiftKeyDown() then
 				GameTooltip_ShowCompareItem()
 			end
@@ -1233,10 +1242,6 @@ function Skillet:SetReagentToolTip(reagentID, numNeeded, numCraftable)
 	--DA.DEBUG(2,"SetReagentToolTip("..tostring(reagentID)..", "..tostring(numNeeded)..", "..tostring(numCraftable)..")")
 	GameTooltip:ClearLines()
 	GameTooltip:SetHyperlink("item:"..reagentID)
-	if EnhTooltip and EnhTooltip.TooltipCall then
-		local name, link, quality = GetItemInfo("item:"..reagentID)
-		EnhTooltip.TooltipCall(GameTooltip, name, link, quality, numNeeded)
-	end
 	if self:VendorSellsReagent(reagentID) then
 		GameTooltip:AppendText(GRAY_FONT_COLOR_CODE .. " (" .. L["buyable"] .. ")" .. FONT_COLOR_CODE_CLOSE)
 	end
@@ -1329,8 +1334,10 @@ function Skillet:HideDetailWindow()
 		local button = _G["SkilletReagent"..i]
 		button:Hide();
 	end
-	for c,s in pairs(SkilletRankFrame.subRanks) do
-		s:Hide()
+	if SkilletRankFrame.subRanks then
+		for c,s in pairs(SkilletRankFrame.subRanks) do
+			s:Hide()
+		end
 	end
 end
 
@@ -1443,7 +1450,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 	SkilletItemCountInputBox:SetText("" .. self.numItemsToCraft);
 	SkilletItemCountInputBox:HighlightText()
 	-- Reagents required ...
-	SkilletReagentLabel:SetText(self:GetReagentLabel(SkilletFrame.selectedSkill) or "");
+	SkilletReagentLabel:SetText(SPELL_REAGENTS)
 	SkilletReagentLabel:Show();
 	local width = SkilletReagentParent:GetWidth()
 	local lastReagentButton = _G["SkilletReagent1"]
@@ -1462,12 +1469,9 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 				reagentName = "unknown"
 			end
 			local num, craftable = self:GetInventory(self.currentPlayer, reagent.id)
+			local bank = GetItemCount(reagent.id,true) - num
 			local count_text
-			if craftable > 0 then
-				count_text = string.format("[%d/%d]", num, craftable)
-			else
-				count_text = string.format("[%d]", num)
-			end
+			count_text = string.format("[%d/%d/%d]", num, bank, craftable)
 			if num < reagent.numNeeded then
 				-- grey it out if we don't have it
 				count:SetText(GRAY_FONT_COLOR_CODE .. count_text .. FONT_COLOR_CODE_CLOSE)

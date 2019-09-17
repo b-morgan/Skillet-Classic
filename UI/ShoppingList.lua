@@ -290,11 +290,18 @@ local function indexBank()
 			if item then
 				local _,count = GetContainerItemInfo(container, i)
 				local id = Skillet:GetItemIDFromLink(item)
+				local name = string.match(item,"%[.+%]")
+				if name then 
+					name = string.sub(name,2,-2)	-- remove the brackets
+				else
+					name = item						-- when all else fails, use the link
+				end
 				if id then
 					table.insert(bank, {
-						["bag"]   = container,
-						["slot"]  = i,
-						["id"]  = id,
+						["bag"] = container,
+						["slot"] = i,
+						["id"] = id,
+						["name"] = name,
 						["count"] = count,
 					})
 					if not bankData[id] then
@@ -305,6 +312,7 @@ local function indexBank()
 			end
 		end
 	end
+	Skillet.db.realm.bankDetails[player] = bank
 end
 
 -- In Classic, there is no guild bank
@@ -938,8 +946,8 @@ function Skillet:ShoppingList_OnScroll()
 end
 
 -- Fills out and displays the shopping list frame
-function Skillet:internal_DisplayShoppingList(atBank)
-	DA.TRACE("internal_DisplayShoppingList")
+function Skillet:DisplayShoppingList(atBank)
+	DA.TRACE("DisplayShoppingList")
 	if not self.shoppingList then
 		self.shoppingList = createShoppingListFrame(self)
 	end
@@ -959,7 +967,7 @@ function Skillet:internal_DisplayShoppingList(atBank)
 end
 
 -- Hides the shopping list window
-function Skillet:internal_HideShoppingList()
+function Skillet:HideShoppingList()
 	if self.shoppingList then
 		self.shoppingList:Hide()
 	end

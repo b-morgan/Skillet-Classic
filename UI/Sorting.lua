@@ -226,7 +226,7 @@ local function set_sort_desc(toggle)
 	for _,entry in pairs(sorters) do
 		if entry.sorter == recipe_sort_method then
 			Skillet:SetTradeSkillOption("sortdesc-" .. entry.name, toggle)
-			Skillet:SortAndFilterRecipes()
+			self:SortAndFilterRecipes()
 		end
 	end
 end
@@ -265,8 +265,8 @@ function Skillet:ExpandAll()
 			end
 		end
 	end
-	Skillet:SortAndFilterRecipes()
-	Skillet:UpdateTradeSkillWindow()
+	self:SortAndFilterRecipes()
+	self:UpdateTradeSkillWindow()
 end
 
 function Skillet:CollapseAll()
@@ -281,14 +281,14 @@ function Skillet:CollapseAll()
 			end
 		end
 	end
-	Skillet:SortAndFilterRecipes()
-	Skillet:UpdateTradeSkillWindow()
+	self:SortAndFilterRecipes()
+	self:UpdateTradeSkillWindow()
 end
 -- Builds a sorted and fitlered list of recipes for the
 -- currently selected tradekskill and sorting method
 -- if no sorting, then headers will be included
 
-local function SortAndFilterRecipes()
+function Skillet:SortAndFilterRecipes()
 	DA.DEBUG(0,"SortAndFilterRecipes()")
 	local skillListKey = Skillet.currentPlayer..":"..Skillet.currentTrade..":"..Skillet.currentGroupLabel
 	local numSkills = Skillet:GetNumSkills(Skillet.currentPlayer, Skillet.currentTrade)
@@ -360,7 +360,7 @@ end
 --
 -- Adds the sorting routine to the list of sorting routines.
 --
-function Skillet:internal_AddRecipeSorter(text, sorter)
+function Skillet:AddRecipeSorter(text, sorter)
 	assert(text and tostring(text),
 		"Usage Skillet:AddRecipeSorter(text, sorter), text must be a string")
 	assert(sorter and type(sorter) == "function",
@@ -407,12 +407,6 @@ function Skillet:InitializeSorting()
 	SkilletSortDescButton:SetScript("OnLeave", function()
 		GameTooltip:Hide()
 	end)
-end
---
--- Causes the list of recipes to be resorted
---
-function Skillet:internal_SortAndFilterRecipes()
-	return SortAndFilterRecipes()
 end
 
 -- called when the sort drop down is first loaded
@@ -473,6 +467,6 @@ function Skillet:SortDropdown_OnClick()
 	Skillet:SetTradeSkillOption("sortmethod", entry.name)
 	recipe_sort_method = entry.sorter
 	show_sort_toggle()
-	Skillet:SortAndFilterRecipes()
-	Skillet:UpdateTradeSkillWindow()
+	self:SortAndFilterRecipes()
+	self:UpdateTradeSkillWindow()
 end
