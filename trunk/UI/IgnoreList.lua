@@ -220,8 +220,8 @@ end
 -- Internal functions to show and hide the Ignorelist
 -- Calling functions can be found in ThirdPartyHooks.lua
 --
-function Skillet:internal_DisplayIgnoreList()
-	DA.DEBUG(0,"internal_DisplayIgnoreList")
+function Skillet:DisplayIgnoreList()
+	DA.DEBUG(0,"DisplayIgnoreList()")
 	if not self.ignoreList then
 		self.ignoreList = createIgnoreListFrame(self)
 	end
@@ -233,7 +233,7 @@ function Skillet:internal_DisplayIgnoreList()
 	self:UpdateIgnoreListWindow()
 end
 
-function Skillet:internal_HideIgnoreList()
+function Skillet:HideIgnoreList()
 	if self.ignoreList then
 		self.ignoreList:Hide()
 	end

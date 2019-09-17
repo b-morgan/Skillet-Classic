@@ -304,7 +304,7 @@ Skillet.options =
 					end,
 					set = function(self,value)
 						Skillet.db.profile.show_craft_counts = value
-						Skillet:UpdateTradeSkillWindow()
+						self:UpdateTradeSkillWindow()
 					end,
 					width = "double",
 					order = 25,
@@ -354,7 +354,7 @@ Skillet.options =
 					end,
 					set = function(self,value)
 						Skillet.db.profile.display_required_level = value
-						Skillet:UpdateTradeSkillWindow()
+						self:UpdateTradeSkillWindow()
 					end,
 					width = "double",
 					order = 1
@@ -369,7 +369,7 @@ Skillet.options =
 					end,
 					set = function(self,t)
 						Skillet.db.profile.transparency = t
-						Skillet:UpdateTradeSkillWindow()
+						self:UpdateTradeSkillWindow()
 						Skillet:UpdateShoppingListWindow(false)
 						Skillet:UpdateStandaloneQueueWindow()
 					end,
@@ -386,7 +386,7 @@ Skillet.options =
 					end,
 					set = function(self,t)
 						Skillet.db.profile.scale = t
-						Skillet:UpdateTradeSkillWindow()
+						self:UpdateTradeSkillWindow()
 						Skillet:UpdateShoppingListWindow(false)
 						Skillet:UpdateStandaloneQueueWindow()
 					end,
@@ -402,7 +402,7 @@ Skillet.options =
 					end,
 					set = function(self,value)
 						Skillet.db.profile.enhanced_recipe_display = value
-						Skillet:UpdateTradeSkillWindow()
+						self:UpdateTradeSkillWindow()
 					end,
 					width = "double",
 					order = 2,
@@ -1033,6 +1033,12 @@ function Skillet:InitializeDatabase(player)
 			if not self.db.realm.bankData[player] then
 				self.db.realm.bankData[player] = {}
 			end
+			if not self.db.realm.bankDetails then
+				self.db.realm.bankDetails = {}
+			end
+			if not self.db.realm.bankDetails[player] then
+				self.db.realm.bankDetails[player] = {}
+			end
 --
 			if not self.db.realm.reagentsInQueue then
 				self.db.realm.reagentsInQueue = {}
@@ -1316,11 +1322,18 @@ local function indexBags()
 				if item then
 					local _,count = GetContainerItemInfo(container, i)
 					local id = Skillet:GetItemIDFromLink(item)
+					local name = string.match(item,"%[.+%]")
+					if name then 
+						name = string.sub(name,2,-2)	-- remove the brackets
+					else
+						name = item						-- when all else fails, use the link
+					end
 					if id then
 						table.insert(details, {
-							["bag"]   = container,
-							["slot"]  = i,
-							["id"]  = id,
+							["bag"] = container,
+							["slot"] = i,
+							["id"] = id,
+							["name"] = name,
 							["count"] = count,
 						})
 						if not data[id] then
@@ -1504,8 +1517,8 @@ function Skillet:UpdateTradeSkill()
 end
 
 -- Shows the trade skill frame.
-function Skillet:internal_ShowTradeSkillWindow()
-	DA.DEBUG(0,"internal_ShowTradeSkillWindow")
+function Skillet:ShowTradeSkillWindow()
+	DA.DEBUG(0,"ShowTradeSkillWindow()")
 	local frame = self.tradeSkillFrame
 	if not frame then
 		frame = self:CreateTradeSkillWindow()
@@ -1519,13 +1532,13 @@ function Skillet:internal_ShowTradeSkillWindow()
 	else
 		self:UpdateTradeSkillWindow()
 	end
-	DA.DEBUG(0,"internal_ShowTradeSkillWindow complete")
+	DA.DEBUG(0,"ShowTradeSkillWindow complete")
 end
 
 --
 -- Hides the Skillet trade skill window. Does nothing if the window is not visible
 --
-function Skillet:internal_HideTradeSkillWindow()
+function Skillet:HideTradeSkillWindow()
 	local closed -- was anything closed by us?
 	local frame = self.tradeSkillFrame
 	if frame and frame:IsVisible() then
@@ -1539,7 +1552,7 @@ end
 --
 -- Hides any and all Skillet windows that are open
 --
-function Skillet:internal_HideAllWindows()
+function Skillet:HideAllWindows()
 	local closed -- was anything closed?
 	-- Cancel anything currently being created
 	if self:HideTradeSkillWindow() then

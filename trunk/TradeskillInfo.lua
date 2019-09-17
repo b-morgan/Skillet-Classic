@@ -243,7 +243,3 @@ function Skillet:GetTradeSkillNumMade(skillIndex)
 	end
 	return 1,1
 end
-
-function Skillet:internal_GetCraftersForItem(itemId)
-	return nil
-end

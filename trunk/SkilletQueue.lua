@@ -582,7 +582,7 @@ function Skillet:LoadQueue(name, overwrite)
 	end
 	self.db.realm.queueData[self.currentPlayer] = tcopy(self.db.profile.SavedQueues[name].queue)
 	self.db.realm.reagentsInQueue[self.currentPlayer] = tcopy(self.db.profile.SavedQueues[name].reagents)
-	Skillet:UpdateTradeSkillWindow()
+	self:UpdateTradeSkillWindow()
 end
 
 function Skillet:DeleteQueue(name, overwrite)
@@ -601,5 +601,5 @@ function Skillet:DeleteQueue(name, overwrite)
 	self.db.profile.SavedQueues[name] = nil
 	Skillet.selectedQueueName = ""
 	Skillet:QueueLoadDropdown_OnShow()
-	Skillet:UpdateTradeSkillWindow()
+	self:UpdateTradeSkillWindow()
 end

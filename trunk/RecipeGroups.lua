@@ -651,8 +651,8 @@ function Skillet:RecipeGroupSelect(menuFrame,label)
 	Skillet.currentGroup = nil
 	Skillet:RecipeGroupDropdown_OnShow()
 	Skillet:RecipeGroupGenerateAutoGroups()
-	Skillet:SortAndFilterRecipes()
-	Skillet:UpdateTradeSkillWindow()
+	self:SortAndFilterRecipes()
+	self:UpdateTradeSkillWindow()
 end
 
 function Skillet:RecipeGroupIsLocked()
@@ -725,8 +725,8 @@ function Skillet:RecipeGroupOpNew()
 	Skillet.currentGroupLabel = label
 	UIDropDownMenu_SetSelectedName(SkilletRecipeGroupDropdown, label, true)
 	UIDropDownMenu_SetText(SkilletRecipeGroupDropdown, label)
-	Skillet:SortAndFilterRecipes()
-	Skillet:UpdateTradeSkillWindow()
+	self:SortAndFilterRecipes()
+	self:UpdateTradeSkillWindow()
 end
 
 function Skillet:RecipeGroupOpCopy()
@@ -748,8 +748,8 @@ function Skillet:RecipeGroupOpCopy()
 	Skillet.currentGroupLabel = label
 	UIDropDownMenu_SetSelectedName(SkilletRecipeGroupDropdown, label, true)
 	UIDropDownMenu_SetText(SkilletRecipeGroupDropdown, label)
-	Skillet:SortAndFilterRecipes()
-	Skillet:UpdateTradeSkillWindow()
+	self:SortAndFilterRecipes()
+	self:UpdateTradeSkillWindow()
 end
 
 function Skillet:GroupNameEditSave()
@@ -797,7 +797,7 @@ function Skillet:RecipeGroupOpDelete()
 		Skillet.currentGroupLabel = label
 			UIDropDownMenu_SetSelectedName(SkilletRecipeGroupDropdown, label, true)
 		UIDropDownMenu_SetText(SkilletRecipeGroupDropdown, label)
-		Skillet:SortAndFilterRecipes()
-		Skillet:UpdateTradeSkillWindow()
+		self:SortAndFilterRecipes()
+		self:UpdateTradeSkillWindow()
 	end
 end
