@@ -1180,6 +1180,9 @@ end
 
 function Skillet:TRADE_SKILL_UPDATE()
 	DA.DEBUG(4,"TRADE_SKILL_UPDATE")
+	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
+		Skillet:AdjustInventory()
+	end
 end
 
 function Skillet:UNIT_PORTRAIT_UPDATE()
@@ -1192,6 +1195,9 @@ end
 
 function Skillet:CRAFT_UPDATE()
 	DA.DEBUG(4,"CRAFT_UPDATE")
+	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
+		Skillet:AdjustInventory()
+	end
 end
 
 function Skillet:UNIT_PET_TRAINING_POINTS()
