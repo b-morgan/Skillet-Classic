@@ -87,8 +87,8 @@ function Skillet:QueueAppendCommand(command, queueCraftables, noWindowRefresh)
 			local reagent = recipe.reagentData[i]
 			DA.DEBUG(1,"reagent= "..DA.DUMP1(reagent))
 			local need = count * reagent.numNeeded
-			local numInBoth = self:GetItemCountR(reagent.id, true)
-			local numInBags = self:GetItemCountR(reagent.id, false)
+			local numInBoth = GetItemCount(reagent.id, true)
+			local numInBags = GetItemCount(reagent.id, false)
 			local numInBank =  numInBoth - numInBags
 			DA.DEBUG(1,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
 			local have = numInBags + (reagentsInQueue[reagent.id] or 0);	-- In Classic just bags
@@ -221,8 +221,8 @@ function Skillet:ProcessQueue(altMode)
 					local reagent = recipe.reagentData[i]
 					local reagentName = GetItemInfo(reagent.id) or reagent.id
 					DA.DEBUG(1,"id= "..tostring(reagent.id)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(reagent.numNeeded))
-					local numInBoth = self:GetItemCountR(reagent.id, true)
-					local numInBags = self:GetItemCountR(reagent.id, false)
+					local numInBoth = GetItemCount(reagent.id, true)
+					local numInBags = GetItemCount(reagent.id, false)
 					local numInBank =  numInBoth - numInBags
 					DA.DEBUG(1,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
 					if numInBags < reagent.numNeeded then
