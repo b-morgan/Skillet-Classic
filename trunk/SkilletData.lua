@@ -157,13 +157,13 @@ function Skillet:GetAutoTargetItem(tradeID)
 		local itemID = lastAutoTarget[tradeID]
 		if itemID then
 			local limit	 = self.TradeSkillAutoTarget[tradeID][itemID]
-			local count = self:GetItemCountR(itemID)
+			local count = GetItemCount(itemID)
 			if count >= limit then
 				return itemID
 			end
 		end
 		for itemID,limit in pairs(self.TradeSkillAutoTarget[tradeID]) do
-			local count = self:GetItemCountR(itemID)
+			local count = GetItemCount(itemID)
 			if count >= limit then
 				lastAutoTarget[tradeID] = itemID
 				return itemID

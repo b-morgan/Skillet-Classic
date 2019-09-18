@@ -838,8 +838,17 @@ function Skillet:OnInitialize()
 	local _,wowBuild,_,wowVersion = GetBuildInfo();
 	self.wowBuild = wowBuild
 	self.wowVersion = wowVersion
-	if not self.db.global.dataVersion or self.db.global.dataVersion ~= 1 then
-		self.db.global.dataVersion = 1
+--
+-- Change the dataVersion when code changes obsolete 
+-- the current saved variables database.
+--
+-- When Blizzard releases a new build, there's a chance that
+-- recipes have changed (i.e. different reagent requirements) so
+-- we clear the saved variables recipe data just to be safe.
+--
+	local dataVersion = 2
+	if not self.db.global.dataVersion or self.db.global.dataVersion ~= dataVersion then
+		self.db.global.dataVersion = dataVersion
 		self:FlushAllData()
 	elseif not self.db.global.wowBuild or self.db.global.wowBuild ~= self.wowBuild then
 		self.db.global.wowBuild = self.wowBuild
@@ -896,7 +905,7 @@ function Skillet:OnInitialize()
 	acedia:AddToBlizOptions("Skillet Profiles", "Profiles", "Skillet")
 
 --
--- Copy the profile debugging variables to the "addon name" global table 
+-- Copy the profile debugging variables to the global table 
 -- where DebugAids.lua is looking for them.
 --
 -- Warning:	Setting TableDump can be a performance hog, use caution.
@@ -932,6 +941,8 @@ function Skillet:FlushAllData()
 	Skillet.db.realm.inventoryData = {}
 	Skillet.db.realm.bagData = {}
 	Skillet.db.realm.bagDetails = {}
+	Skillet.db.realm.bankData = {}
+	Skillet.db.realm.bankDetails = {}
 	Skillet.db.realm.userIgnoredMats = {}
 	Skillet:FlushRecipeData()
 end
@@ -1008,8 +1019,7 @@ function Skillet:InitializeDatabase(player)
 				self.db.realm.inventoryData[player] = {}
 			end
 --
--- In Classic, GetItemCount is FUBAR so we need to keep
--- track of the current bag contents as well.
+-- For debugging, having the contents of bags could be useful.
 --
 			if not self.db.realm.bagData then
 				self.db.realm.bagData = {}
@@ -1024,8 +1034,8 @@ function Skillet:InitializeDatabase(player)
 				self.db.realm.bagDetails[player] = {}
 			end
 --
--- In Classic, you can't craft from the bank  but
--- if might be useful if we knew what was in there.
+-- In Classic, you can't craft from the bank but
+-- for debugging, having the contents of the bank could be useful.
 --
 			if not self.db.realm.bankData then
 				self.db.realm.bankData = {}
@@ -1413,36 +1423,6 @@ function Skillet:BAG_UPDATE_DELAYED(event)
 		end
 	end
 ]]--
-end
-
---
--- In _classic_, Blizzard's 1) Skillet:GetItemCountR(id,false), 2) Skillet:GetItemCountR(id), and 3) Skillet:GetItemCountR(id, true)
--- all return the same thing, the number of items in both bags and bank.
--- In Retail, 1 and 2 return the number of items in bags and 3 returns both.
---
--- This function works the same as _retail_
---
-function Skillet:GetItemCountR(id, includeBank)
-	DA.DEBUG(0,"GetItemCountR("..tostring(id)..", "..tostring(includeBank)..")")
-	local count = GetItemCount(id, true)	-- Just in case it gets fixed later
-	if not count then return end
-	if not includeBank then
-		local player = self.currentPlayer
-		local haveBank = #self.db.realm.bankData[player]
-		if haveBank > 0 then
-			local bank = self.db.realm.bankData[player][id]
-			if bank then
-				count = count - bank
-			end
-		else
-			local bags = self.db.realm.bagData[player][id]
-			if bags then
-				count = bags
-			end
-		end
-	end
-	DA.DEBUG(0,"GetItemCountR= "..tostring(count))
-	return count
 end
 
 function Skillet:SetTradeSkill(player, tradeID, skillIndex)

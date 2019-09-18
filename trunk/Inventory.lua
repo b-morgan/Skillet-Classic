@@ -42,7 +42,7 @@ function Skillet:InventoryReagentCraftability(reagentID, playerOverride)
 				for i=1,#childRecipe.reagentData,1 do
 					local childReagent = childRecipe.reagentData[i]
 					DA.DEBUG(2,"childReagent="..DA.DUMP1(childReagent))
-					local numReagentOnHand = Skillet:GetItemCountR(childReagent.id,false) -- Classic can only craft from bags
+					local numReagentOnHand = GetItemCount(childReagent.id,false) -- Classic can only craft from bags
 					local numReagentCraftable = self:InventoryReagentCraftability(childReagent.id, player)
 					--DA.DEBUG(2,"id="..childReagent.id.." ("..tostring((GetItemInfo(childReagent.id))).."), numReagentCraftable="..numReagentCraftable..", numReagentOnHand= "..tostring(numReagentOnHand))
 					numReagentCraftable = numReagentCraftable + numReagentOnHand
@@ -58,13 +58,13 @@ function Skillet:InventoryReagentCraftability(reagentID, playerOverride)
 	if self.db.realm.reagentsInQueue[player] then
 		queued = self.db.realm.reagentsInQueue[player][reagentID] or 0
 	end
-	local numInBoth = self:GetInventory(player, reagentID)
+	local numCanUse = self:GetInventory(player, reagentID)
 	local numCrafted = numReagentsCrafted + queued
 	if numCrafted == 0 then
-		Skillet.db.realm.inventoryData[player][reagentID] = numInBoth
+		Skillet.db.realm.inventoryData[player][reagentID] = numCanUse
 	else
 		--DA.DEBUG(0,"player="..player..", numCrafted="..tostring(numCrafted)..", reagentID="..tostring(reagentID).."("..tostring((GetItemInfo(reagentID)))..")")
-		Skillet.db.realm.inventoryData[player][reagentID] = numInBoth.." "..numCrafted
+		Skillet.db.realm.inventoryData[player][reagentID] = numCanUse.." "..numCrafted
 	end
 	self.visited[reagentID] = false -- okay to calculate this reagent again
 	return numCrafted
@@ -144,7 +144,7 @@ function Skillet:InventoryScan()
 	local cachedInventory = self.db.realm.inventoryData[player]
 	local inventoryData = {}
 	local reagent
-	local numInBoth
+	local numCanUse
 	if self.db.global.itemRecipeUsedIn then
 		for reagentID in pairs(self.db.global.itemRecipeUsedIn) do
 			local a = GetItemInfo(reagentID)
@@ -153,16 +153,16 @@ function Skillet:InventoryScan()
 			if reagentID and not inventoryData[reagentID] then				-- have we calculated this one yet?
 				if self.currentPlayer == (UnitName("player")) then			-- if this is the current player, use the API
 					--DA.DEBUG(2,"Using API")
-					numInBoth = Skillet:GetItemCountR(reagentID,false)		-- In Classic just bags
+					numCanUse = GetItemCount(reagentID,false)		-- In Classic just bags
 				elseif cachedInventory and cachedInventory[reagentID] then	-- otherwise, use what cached data is available
 					--DA.DEBUG(2,"Using cachedInventory")
 					local a,b,c,d = string.split(" ", cachedInventory[reagentID])
-					numInBoth = a
+					numCanUse = a
 				else
 					--DA.DEBUG(2,"Using Zero")
-					numInBoth = 0
+					numCanUse = 0
 				end
-				inventoryData[reagentID] = tostring(numInBoth)	-- only what we have for now (no craftability info)
+				inventoryData[reagentID] = tostring(numCanUse)	-- only what we have for now (no craftability info)
 				--DA.DEBUG(2,"inventoryData["..reagentID.."]="..inventoryData[reagentID])
 			end
 		end
@@ -185,17 +185,23 @@ function Skillet:InventoryScan()
 end
 
 function Skillet:GetInventory(player, reagentID)
+	local numCanUse
 	if player and reagentID then
+		if player == self.currentPlayer then			-- UnitName("player")
+			numCanUse = GetItemCount(reagentID,false)	-- In Classic just bags
+		end
 		if self.db.realm.inventoryData[player] and self.db.realm.inventoryData[player][reagentID] then 
 			local data = { string.split(" ", self.db.realm.inventoryData[player][reagentID]) }
+			if numCanUse and data[1] and tonumber(numCanUse) ~= tonumber(data[1]) then
+				DA.DEBUG(0,"inventoryData is stale")
+			end
 			if #data == 1 then			-- no craftability info yet
 				return tonumber(data[1]) or 0, 0
 			else
 				return tonumber(data[1]) or 0, tonumber(data[2]) or 0
 			end
-		elseif player == UnitName("player") then
-			local numInBoth = Skillet:GetItemCountR(reagentID,false)		-- In Classic just bags
-			return tonumber(numInBoth) or 0, 0
+		elseif player == self.currentPlayer then	-- UnitName("player")
+			return tonumber(numCanUse) or 0, 0
 		end
 	end
 	return 0, 0		-- have, make
