@@ -369,7 +369,7 @@ Skillet.options =
 					end,
 					set = function(self,t)
 						Skillet.db.profile.transparency = t
-						self:UpdateTradeSkillWindow()
+						Skillet:UpdateTradeSkillWindow()
 						Skillet:UpdateShoppingListWindow(false)
 						Skillet:UpdateStandaloneQueueWindow()
 					end,
@@ -1277,7 +1277,11 @@ function Skillet:SkilletShowWindow()
 		self.db.realm.skillDB[self.currentPlayer][self.currentTrade] = {}
 	end
 	if not self:RescanTrade() then
-		DA.CHAT("No headers, try again");
+		if TSMAPI_FOUR then
+			DA.CHAT("Conflict between Skillet-Classic and TradeSkillMaster")
+		else
+			DA.CHAT("No headers, try again")
+		end
 		return
 	end
 	self.currentGroup = nil
@@ -1512,6 +1516,18 @@ function Skillet:ShowTradeSkillWindow()
 	end
 	self:ResetTradeSkillWindow()
 	Skillet:ShowFullView()
+	if TSMAPI_FOUR then
+		local TSMBackdrop = {
+			bgFile = "Interface\\Buttons\\WHITE8X8",
+			tile = true, tileSize = 16,
+			insets = { left = 3, right = 3, top = 3, bottom = 3 }
+		}
+		frame:SetFrameStrata("HIGH")
+		frame:SetBackdrop(TSMBackdrop);
+		frame:SetBackdropColor(0.1, 0.1, 0.1)
+		frame:SetBackdropBorderColor(0.6, 0.6, 0.6)
+		frame:SetBackdropColor(0.05, 0.05, 0.05)
+	end
 	if not frame:IsVisible() then
 		frame:Show()
 		self:UpdateTradeSkillWindow()
