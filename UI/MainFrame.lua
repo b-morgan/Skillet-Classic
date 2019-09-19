@@ -928,7 +928,7 @@ function Skillet:UpdateTradeSkillWindow()
 					end
 				end
 				text = skill.name or ""
-				if #recipe.reagentData > 0 then
+				if recipe.reagentData and #recipe.reagentData > 0 then
 					local num, numrecursive, numwvendor, numwalts = get_craftable_counts(skill.skillData, recipe.numMade)
 					local cbag = "|cff80ff80" -- green
 					local ccraft =  "|cffffff80" -- yellow
@@ -1129,9 +1129,9 @@ function Skillet:SkillButton_OnEnter(button)
 			altlink = GetSpellLink(skill.recipeID)
 			quantity = recipe.numMade
 		end
-		if altlink and IsAltKeyDown() then
+		if altlink and (IsAltKeyDown() or Skillet.isCraft) then
 			tip:SetHyperlink(altlink)
-		elseif link then
+		elseif link and not Skillet.isCraft then
 			tip:SetHyperlink(link)
 		end
 		if IsShiftKeyDown() then
@@ -1368,7 +1368,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		-- Name of the skill
 		SkilletSkillName:SetText(recipe.name)
 		SkilletRecipeNotesButton:Show()
-		if recipe.spellID then
+		if not self.isCraft and recipe.spellID then
 			local orange,yellow,green,gray = self:GetTradeSkillLevels((recipe.itemID>0 and recipe.itemID) or -recipe.spellID)			-- was spellID now is itemID or -spellID
 			SkilletRankFrame.subRanks.green:SetValue(gray)
 			SkilletRankFrame.subRanks.yellow:SetValue(green)
@@ -1378,31 +1378,32 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 				s:Show()
 			end
 		end
---		local description = GetTradeSkillDescription(skillIndex)
+		SkilletDescriptionText:SetText("")
+		local description = nil
+--		description = GetTradeSkillDescription(skillIndex)		-- Not implemented in Classic
 		--DA.DEBUG(0,"description="..tostring(description))
 		if description then
 			description = description:gsub("\r","")	-- Skillet frame has less space than Blizzard frame, so
 			description = description:gsub("\n","")	-- remove any extra blank lines, but
 			SkilletDescriptionText:SetMaxLines(4)	-- don't let the text get too big.
 			SkilletDescriptionText:SetText(description)
-		else
-			SkilletDescriptionText:SetText("")
 		end
 		-- Whether or not it is on cooldown.
-		local _, _, _, _, _, _, _, _, _, _, _, displayAsUnavailable, unavailableString = GetTradeSkillInfo(skillIndex)
-		--DA.DEBUG(0,"displayAsUnavailable="..tostring(displayAsUnavailable)..", unavailableString="..tostring(unavailableString))
-		local cooldown = 0
-		cooldown = (skill.cooldown or 0) - time()
-		if cooldown > 0 then
-			SkilletSkillCooldown:SetText(COOLDOWN_REMAINING.." "..SecondsToTime(cooldown))
-		elseif displayAsUnavailable then
-			local width = SkilletReagentParent:GetWidth()
-			local iconw = SkilletSkillIcon:GetWidth()
-			SkilletSkillCooldown:SetWidth(width - iconw - 15)
-			SkilletSkillCooldown:SetMaxLines(3)
-			SkilletSkillCooldown:SetText(unavailableString)
-		else
-			SkilletSkillCooldown:SetText("")
+		SkilletSkillCooldown:SetText("")
+		if not Skillet.isCraft then
+			local _, _, _, _, _, _, _, _, _, _, _, displayAsUnavailable, unavailableString = GetTradeSkillInfo(skillIndex)
+			--DA.DEBUG(0,"displayAsUnavailable="..tostring(displayAsUnavailable)..", unavailableString="..tostring(unavailableString))
+			local cooldown = 0
+			cooldown = (skill.cooldown or 0) - time()
+			if cooldown > 0 then
+				SkilletSkillCooldown:SetText(COOLDOWN_REMAINING.." "..SecondsToTime(cooldown))
+			elseif displayAsUnavailable then
+				local width = SkilletReagentParent:GetWidth()
+				local iconw = SkilletSkillIcon:GetWidth()
+				SkilletSkillCooldown:SetWidth(width - iconw - 15)
+				SkilletSkillCooldown:SetMaxLines(3)
+				SkilletSkillCooldown:SetText(unavailableString)
+			end
 		end
 	else
 		recipe = Skillet.UnknownRecipe
