@@ -38,6 +38,8 @@ Skillet.build = ADDON_BUILD
 Skillet.project = WOW_PROJECT_ID
 local isClassic = WOW_PROJECT_ID == 2
 
+Skillet.isCraft = false			-- true for the Blizzard Craft UI, false for the Blizzard TradeSkill UI
+
 local nonLinkingTrade = { [2656] = true, [53428] = true }				-- smelting, runeforging
 
 local defaults = {
@@ -1086,8 +1088,8 @@ function Skillet:OnEnable()
 	--
 	-- Trade skill window changes
 	--
-	self:RegisterEvent("TRADE_SKILL_CLOSE", "SkilletClose")
-	self:RegisterEvent("TRADE_SKILL_SHOW", "SkilletShow")
+	self:RegisterEvent("TRADE_SKILL_CLOSE")
+	self:RegisterEvent("TRADE_SKILL_SHOW")
 	self:RegisterEvent("TRADE_SKILL_UPDATE")
 	self:RegisterEvent("TRADE_SKILL_NAME_UPDATE")
 	self:RegisterEvent("CRAFT_CLOSE")				-- craft event (could call SkilletClose)
@@ -1173,6 +1175,7 @@ end
 
 function Skillet:TRADE_SKILL_NAME_UPDATE()
 	DA.DEBUG(4,"TRADE_SKILL_NAME_UPDATE")
+	Skillet.isCraft = false
 	if Skillet.linkedSkill then
 		Skillet:SkilletShow()
 	end
@@ -1180,6 +1183,7 @@ end
 
 function Skillet:TRADE_SKILL_UPDATE()
 	DA.DEBUG(4,"TRADE_SKILL_UPDATE")
+	Skillet.isCraft = false
 	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
 		Skillet:AdjustInventory()
 	end
@@ -1193,8 +1197,21 @@ function Skillet:SPELLS_CHANGED()
 	DA.DEBUG(4,"SPELLS_CHANGED")
 end
 
+function Skillet:TRADE_SKILL_CLOSE()
+	DA.DEBUG(4,"TRADE_SKILL_CLOSE")
+	Skillet:SkilletClose()
+	Skillet.isCraft = false
+end
+
+function Skillet:TRADE_SKILL_SHOW()
+	DA.DEBUG(4,"TRADE_SKILL_SHOW")
+	Skillet.isCraft = false
+	Skillet:SkilletShow()
+end
+
 function Skillet:CRAFT_UPDATE()
 	DA.DEBUG(4,"CRAFT_UPDATE")
+	Skillet.isCraft = true
 	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
 		Skillet:AdjustInventory()
 	end
@@ -1204,12 +1221,16 @@ function Skillet:UNIT_PET_TRAINING_POINTS()
 	DA.DEBUG(4,"UNIT_PET_TRAINING_POINTS")
 end
 
-function Skillet:CRAFT_CLOSE()		-- "SkilletClose"
+function Skillet:CRAFT_CLOSE()
 	DA.DEBUG(4,"CRAFT_CLOSE")
+	Skillet:SkilletClose()
+	Skillet.isCraft = false
 end
 
-function Skillet:CRAFT_SHOW()		-- "SkilletShow"
+function Skillet:CRAFT_SHOW()
 	DA.DEBUG(4,"CRAFT_SHOW")
+	Skillet.isCraft = true
+	Skillet:SkilletShow()
 end
 
 -- Called when the addon is disabled
@@ -1248,7 +1269,12 @@ function Skillet:SkilletShow()
 	else
 		self.currentPlayer = (UnitName("player"))
 	end
-	local name = GetTradeSkillLine()
+	local name
+	if self.isCraft then
+		name = GetCraftDisplaySkillLine()
+	else
+		name = GetTradeSkillLine()
+	end
 	--DA.DEBUG(1,"name= '"..tostring(name).."'")
 	self.currentTrade = self.tradeSkillIDsByName[name]
 	if not self.linkedSkill and not self.isGuild then
@@ -1484,7 +1510,7 @@ end
 
 -- Updates the tradeskill window, if the current trade has changed.
 function Skillet:UpdateTradeSkill()
-	DA.DEBUG(0,"UPDATE TRADE SKILL")
+	DA.DEBUG(0,"UpdateTradeSkill()")
 	local trade_changed = false
 	local new_trade = self:GetTradeSkillLine()
 	if not self.currentTrade and new_trade then
@@ -1503,7 +1529,7 @@ function Skillet:UpdateTradeSkill()
 		-- this fires off a redraw event, so only change after data has been acquired
 		searchbox:SetText(filtertext);
 	end
-	DA.DEBUG(0,"UPDATE TRADE SKILL complete")
+	DA.DEBUG(0,"UpdateTradeSkill complete")
 end
 
 -- Shows the trade skill frame.
