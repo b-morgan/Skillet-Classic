@@ -39,6 +39,7 @@ Skillet.project = WOW_PROJECT_ID
 local isClassic = WOW_PROJECT_ID == 2
 
 Skillet.isCraft = false			-- true for the Blizzard Craft UI, false for the Blizzard TradeSkill UI
+Skillet.ignoreClose = false		-- when switching from the Craft UI to the TradeSkill UI, ignore the other's close.
 
 local nonLinkingTrade = { [2656] = true, [53428] = true }				-- smelting, runeforging
 
@@ -776,19 +777,8 @@ local function DoNothing()
 	DA.DEBUG(0,"Do Nothing")
 end
 
-function Skillet:GetIDFromLink(link)	-- works with items or enchants
-	if (link) then
-		local found, _, string = string.find(link, "^|c%x+|H(.+)|h%[.+%]")
-		if found then
-			local _, id = strsplit(":", string)
-			return tonumber(id);
-		else
-			return nil
-		end
-	end
-end
-
 function Skillet:DisableBlizzardFrame()
+	DA.DEBUG(0,"DisableBlizzardFrame()")
 	if self.BlizzardTradeSkillFrame == nil then
 		if (not IsAddOnLoaded("Blizzard_TradeSkillUI")) then
 			LoadAddOn("Blizzard_TradeSkillUI");
@@ -798,9 +788,19 @@ function Skillet:DisableBlizzardFrame()
 		TradeSkillFrame:SetScript("OnHide", nil)
 		HideUIPanel(TradeSkillFrame)
 	end
+	if self.BlizzardCraftFrame == nil then
+		if (not IsAddOnLoaded("Blizzard_CraftUI")) then
+			LoadAddOn("Blizzard_CraftUI");
+		end
+		self.BlizzardCraftFrame = CraftFrame
+		self.craftHide = CraftFrame:GetScript("OnHide")
+		CraftFrame:SetScript("OnHide", nil)
+		HideUIPanel(CraftFrame)
+	end
 end
 
 function Skillet:EnableBlizzardFrame()
+	DA.DEBUG(0,"EnableBlizzardFrame()")
 	if self.BlizzardTradeSkillFrame ~= nil then
 		if (not IsAddOnLoaded("Blizzard_TradeSkillUI")) then
 			LoadAddOn("Blizzard_TradeSkillUI");
@@ -809,6 +809,15 @@ function Skillet:EnableBlizzardFrame()
 		TradeSkillFrame:SetScript("OnHide", Skillet.tradeSkillHide)
 		Skillet.tradeSkillHide = nil
 		ShowUIPanel(TradeSkillFrame)
+	end
+	if self.BlizzardCraftFrame ~= nil then
+		if (not IsAddOnLoaded("Blizzard_CraftUI")) then
+			LoadAddOn("Blizzard_CraftUI");
+		end
+		self.BlizzardCraftFrame = nil
+		CraftFrame:SetScript("OnHide", Skillet.craftHide)
+		Skillet.craftHide = nil
+		ShowUIPanel(CraftFrame)
 	end
 end
 
@@ -1199,6 +1208,10 @@ end
 
 function Skillet:TRADE_SKILL_CLOSE()
 	DA.DEBUG(4,"TRADE_SKILL_CLOSE")
+	if Skillet.ignoreClose then
+		Skillet.ignoreClose = false
+		return
+	end
 	Skillet:SkilletClose()
 	Skillet.isCraft = false
 end
@@ -1223,6 +1236,10 @@ end
 
 function Skillet:CRAFT_CLOSE()
 	DA.DEBUG(4,"CRAFT_CLOSE")
+	if Skillet.ignoreClose then
+		Skillet.ignoreClose = false
+		return
+	end
 	Skillet:SkilletClose()
 	Skillet.isCraft = false
 end
@@ -1260,7 +1277,6 @@ end
 -- Show the tradeskill window, called from TRADE_SKILL_SHOW event, clicking on links, or clicking on guild professions
 function Skillet:SkilletShow()
 	DA.DEBUG(1,"SHOW WINDOW (was showing "..(self.currentTrade or "nil")..")");
---	TradeSkillFrame_Update();
 	self.linkedSkill, self.currentPlayer, self.isGuild = Skillet:IsTradeSkillLinked()
 	if self.linkedSkill then
 		if not self.currentPlayer then
@@ -1279,8 +1295,6 @@ function Skillet:SkilletShow()
 	self.currentTrade = self.tradeSkillIDsByName[name]
 	if not self.linkedSkill and not self.isGuild then
 		self:InitializeDatabase(self.currentPlayer)
-	else
-		self:InitializeDatabase(self.currentPlayer)  -- Need to skip this but who knows what will blow up.
 	end 
 	if self:IsSupportedTradeskill(self.currentTrade) then
 		self:InventoryScan()
@@ -1289,11 +1303,19 @@ function Skillet:SkilletShow()
 		self.dataScanned = false
 		self:ScheduleTimer("SkilletShowWindow", 0.5)
 		if Skillet.db.profile.hide_blizzard_frame then
-			HideUIPanel(TradeSkillFrame)
+			if self.isCraft then
+				HideUIPanel(CraftFrame)
+			else
+				HideUIPanel(TradeSkillFrame)
+			end
 		end
 	else
 		self:HideAllWindows()
-		ShowUIPanel(TradeSkillFrame)
+		if self.isCraft then
+			ShowUIPanel(CraftFrame)
+		else
+			ShowUIPanel(TradeSkillFrame)
+		end
 	end
 end
 
@@ -1463,51 +1485,27 @@ end
 
 function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 	DA.DEBUG(0,"SetTradeSkill("..tostring(player)..", "..tostring(tradeID)..", "..tostring(skillIndex)..")")
-	if not self.db.realm.queueData[player] then
-		self.db.realm.queueData[player] = {}
+	if player ~= self.currentPlayer then
+		DA.DEBUG(0,"player not currentPlayer is not supported in Classic")
+		return
 	end
-	if player ~= self.currentPlayer or tradeID ~= self.currentTrade then
-		self.currentPlayer = player
+	if tradeID ~= self.currentTrade then
 		local oldTradeID = self.currentTrade
-		if player == (UnitName("player")) then	-- we can update the tradeskills if this toon is the current one
-			self.dataSource = "api"
-			self.dataScanned = false
-			self.currentGroup = nil
-			self.currentGroupLabel = self:GetTradeSkillOption("grouping")
-			self:RecipeGroupDropdown_OnShow()
-			DA.DEBUG(0,"cast: "..self:GetTradeName(tradeID))
-			CastSpellByName(self:GetTradeName(tradeID)) -- this will trigger the whole rescan process via a TRADE_SKILL_SHOW event
-		else
-			self.dataSource = "cache"
-			CloseTradeSkill()
-			self.dataScanned = false
-			self:HideNotesWindow();
-			self.currentTrade = tradeID
-			self.currentGroup = nil
-			self.currentGroupLabel = self:GetTradeSkillOption("grouping")
-			self:RecipeGroupGenerateAutoGroups()
-			self:RecipeGroupDropdown_OnShow()
-			if not self.data.skillList[player] then
-				self.data.skillList[player] = {}
-			end
-			if not self.data.skillList[player][tradeID] then
-				self.data.skillList[player][tradeID] = {}
-			end
-			-- remove any filters currently in place
-			local searchbox = _G["SkilletSearchBox"]
-			local oldtext = searchbox:GetText()
-			local filterText = self:GetTradeSkillOption("filtertext")
-			-- if the text is changed, set the new text (which fires off an update) otherwise just do the update
-			if filterText ~= oldtext then
-				searchbox:SetText(filterText)
-			else
-				self:UpdateTradeSkillWindow()
-			end
+		if self.skillIsCraft[oldTradeID] ~= self.skillIsCraft[TradeID] then
+			self.ignoreClose = true
 		end
+		self.dataSource = "api"
+		self.dataScanned = false
+		self.currentGroup = nil
+		self.currentGroupLabel = self:GetTradeSkillOption("grouping")
+		self:RecipeGroupDropdown_OnShow()
+		DA.DEBUG(0,"cast: "..self:GetTradeName(tradeID))
+		CastSpellByName(self:GetTradeName(tradeID)) -- trigger the whole rescan process via a TRADE_SKILL_SHOW or CRAFT_SHOW event
 	end
 	self:SetSelectedSkill(skillIndex, false)
 end
 
+--[[
 -- Updates the tradeskill window, if the current trade has changed.
 function Skillet:UpdateTradeSkill()
 	DA.DEBUG(0,"UpdateTradeSkill()")
@@ -1531,7 +1529,7 @@ function Skillet:UpdateTradeSkill()
 	end
 	DA.DEBUG(0,"UpdateTradeSkill complete")
 end
-
+]]--
 -- Shows the trade skill frame.
 function Skillet:ShowTradeSkillWindow()
 	DA.DEBUG(0,"ShowTradeSkillWindow()")
@@ -1623,7 +1621,7 @@ function Skillet:SetSelectedSkill(skillIndex, wasClicked)
 		-- new skill selected
 		self:HideNotesWindow() -- XXX: should this be an update?
 	end
-	self:ConfigureRecipeControls(false)				-- allow ALL trades to queue up items (enchants as well)
+	self:ConfigureRecipeControls(self.isCraft)				-- allow ALL trades to queue up items, but not Crafts
 	self.selectedSkill = skillIndex
 	self:ScrollToSkillIndex(skillIndex)
 	self:UpdateDetailsWindow(skillIndex)

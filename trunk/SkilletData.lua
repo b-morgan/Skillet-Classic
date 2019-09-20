@@ -37,12 +37,12 @@ local TradeSkillList = {
 }
 
 local CraftList = {
-	7411,		-- enchanting
-	2842,		-- poisons
+--	7411,		-- enchanting (Blizzard has restricted DoCraft(index) to anything but their own UI)
+	2842,		-- poisons (is it a craft or a tradeskill?)
 }
 
 Skillet.AdditionalAbilities = {
-	[7411]	= {13262,"Disenchant"},		-- enchanting = disenchant
+	[7411]	= {13262,"Disenchant"},		-- enchanting = disenchant (will disappear because enchanting is disabled)
 	[2550]	= {818,"Basic_Campfire"},	-- cooking = basic campfire
 	[45357] = {51005,"Milling"},		-- inscription = milling
 	[25229] = {31252,"Prospecting"},	-- jewelcrafting = prospecting

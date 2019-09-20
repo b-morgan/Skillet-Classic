@@ -252,7 +252,7 @@ function Skillet:ProcessQueue(altMode)
 			self.processingCommand = command
 			DA.DEBUG(0,"processingSpell= "..tostring(self.processingSpell)..", processingPosition= "..tostring(qpos)..", processingCommand= "..DA.DUMP1(command))
 			-- if alt down/right click - auto use items / like vellums
-			if altMode then
+			if not self.isCraft and altMode then
 				local itemID = Skillet:GetAutoTargetItem(recipe.tradeID)
 				if itemID then
 					DA.DEBUG(0,"(altMode) DoTradeSkill(spell= "..tostring(skillIndexLookup[command.recipeID])..", count= 1)")
@@ -265,8 +265,13 @@ function Skillet:ProcessQueue(altMode)
 					DoTradeSkill(skillIndexLookup[command.recipeID],command.count)
 				end
 			else
-				DA.DEBUG(0,"DoTradeSkill(spell= "..tostring(skillIndexLookup[command.recipeID])..", count= "..tostring(command.count))
-				DoTradeSkill(skillIndexLookup[command.recipeID],command.count)
+				if self.isCraft then
+					DA.DEBUG(0,"DoCraft(spell= "..tostring(skillIndexLookup[command.recipeID])..", count= "..tostring(command.count))
+					DoCraft(skillIndexLookup[command.recipeID],command.count)
+				else
+					DA.DEBUG(0,"DoTradeSkill(spell= "..tostring(skillIndexLookup[command.recipeID])..", count= "..tostring(command.count))
+					DoTradeSkill(skillIndexLookup[command.recipeID],command.count)
+				end
 			end
 			return
 		else
@@ -321,6 +326,12 @@ function Skillet:CreateItems(count, mouse)
 	if self:QueueItems(count) > 0 then
 		self:ProcessQueue(mouse == "RightButton" or IsAltKeyDown())
 	end
+end
+
+-- Adds one item to the queue and then starts the queue
+function Skillet:EnchantItem(mouse)
+	DA.DEBUG(0,"EnchantItem()");
+	self:CreateItems(1,mouse)
 end
 
 -- Queue and create the max number of craftable items for the currently selected skill
