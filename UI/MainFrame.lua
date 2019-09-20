@@ -405,9 +405,15 @@ function Skillet:ConfigureRecipeControls(enchant)
 		SkilletCreateAllButton:Hide()
 		SkilletCreateButton:Hide()
 		SkilletItemCountInputBox:Hide()
---        SkilletQueueParent:Hide()
+		SkilletQueueParent:Hide()
 		SkilletStartQueueButton:Hide()
 		SkilletEmptyQueueButton:Hide()
+		SkilletItemCountInputBox:Hide()
+		SkilletSub10Button:Hide()
+		SkilletSub1Button:Hide()
+		SkilletAdd1Button:Hide()
+		SkilletAdd10Button:Hide()
+		SkilletClearNumButton:Hide()
 		SkilletEnchantButton:Show();
 	else
 		SkilletQueueAllButton:Show()
@@ -418,6 +424,12 @@ function Skillet:ConfigureRecipeControls(enchant)
 		SkilletQueueParent:Show()
 		SkilletStartQueueButton:Show()
 		SkilletEmptyQueueButton:Show()
+		SkilletItemCountInputBox:Show()
+		SkilletSub10Button:Show()
+		SkilletSub1Button:Show()
+		SkilletAdd1Button:Show()
+		SkilletAdd10Button:Show()
+		SkilletClearNumButton:Show()
 		SkilletEnchantButton:Hide()
 	end
 	self:InitRecipeFilterButtons()
@@ -2048,6 +2060,7 @@ function Skillet:RankFrame_OnEnter(button)
 	local orange = SkilletRankFrame.subRanks.red:GetValue()
 	-- lets add the chance to level up that skill with that receipt
 	local chance = Skillet:getLvlUpChance()
+	chance = math.floor(chance*10)/10		-- one decimal is enough
 	GameTooltip:AddLine(COLORORANGE..orange.."|r/"..COLORYELLOW..yellow.."|r/"..COLORGREEN..green.."|r/"..COLORGRAY..gray.."|r/ Chance:"..chance.."|r%")
 	GameTooltip:Show()
 end
@@ -2504,23 +2517,35 @@ function Skillet:SkilletQueueMenu_Show(button)
 end
 
 function Skillet:ReAnchorButtons(newFrame)
+	DA.DEBUG(0,"ReAnchorButtons("..tostring(newFrame)..")")
 	SkilletRecipeNotesButton:SetPoint("BOTTOMRIGHT",newFrame,"TOPRIGHT",0,0)
 	SkilletQueueAllButton:SetPoint("TOPLEFT",newFrame,"BOTTOMLEFT",0,-2)
 	SkilletEnchantButton:SetPoint("TOPLEFT",newFrame,"BOTTOMLEFT",0,-2)
 	SkilletQueueButton:SetPoint("TOPRIGHT",newFrame,"BOTTOMRIGHT",0,-2)
+--[[
+-- Do we need to do these as well?
+--	SkilletItemCountInputBox
+--	SkilletSub10Button
+--	SkilletSub1Button
+--	SkilletAdd1Button
+--	SkilletAdd10Button
+--	SkilletClearNumButton
+]]--
 end
 
 function Skillet:ShowReagentDetails()
-		SkilletQueueManagementParent:Hide();
-		SkilletViewCraftersParent:Hide()
-		SkilletReagentParent:Show()
-		SkilletReagentParent:SetHeight(260)
-		SkilletQueueManagementParent:SetHeight(260)
-		SkilletViewCraftersParent:SetHeight(260)
-		Skillet:ReAnchorButtons(SkilletReagentParent)
+	DA.DEBUG(0,"ShowReagentDetails()")
+	SkilletQueueManagementParent:Hide();
+	SkilletViewCraftersParent:Hide()
+	SkilletReagentParent:Show()
+	SkilletReagentParent:SetHeight(260)
+	SkilletQueueManagementParent:SetHeight(260)
+	SkilletViewCraftersParent:SetHeight(260)
+	Skillet:ReAnchorButtons(SkilletReagentParent)
 end
 
 function Skillet:QueueManagementToggle(showDetails)
+	DA.DEBUG(0,"QueueManagementToggle("..tostring(showDetails)..")")
 	if SkilletQueueManagementParent:IsVisible() or showDetails then
 		Skillet:ShowReagentDetails()
 	else

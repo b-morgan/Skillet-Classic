@@ -2266,6 +2266,9 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
+					<OnLoad>
+						self:RegisterForClicks("LeftButtonUp")
+					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
 						Skillet:QueueAllItems();
@@ -2279,14 +2282,17 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletReagentParent" relativePoint="BOTTOMLEFT">
 						<Offset>
-							<AbsDimension x="0" y="-2"/>
+							<AbsDimension x="0" y="-1"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
 				<Scripts>
+					<OnLoad>
+						self:RegisterForClicks("LeftButtonUp")
+					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						Skillet:EnchantItem();
+						Skillet:EnchantItem(button);
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -2303,7 +2309,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+						self:RegisterForClicks("LeftButtonUp")
 					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
@@ -2328,6 +2334,9 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
+					<OnLoad>
+						self:RegisterForClicks("LeftButtonUp")
+					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
 						Skillet:QueueItems(SkilletItemCountInputBox:GetNumber())
@@ -2356,7 +2365,7 @@
 					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						Skillet:CreateItems(SkilletItemCountInputBox:GetNumber(),button)
+						Skillet:CreateItems(SkilletItemCountInputBox:GetNumber(), button)
 					</OnClick>
 				</Scripts>
 			</Button>
