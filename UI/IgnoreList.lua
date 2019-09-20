@@ -44,6 +44,12 @@ local ControlBackdrop  = {
 	tile = true, tileSize = 16, edgeSize = 16,
 	insets = { left = 3, right = 3, top = 3, bottom = 3 }
 }-- Additional things to used to modify the XML created frame
+local FrameBackdrop = {
+	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+	tile = true, tileSize = 16, edgeSize = 16,
+	insets = { left = 3, right = 3, top = 30, bottom = 3 }
+}
 
 local function createIgnoreListFrame(self)
 	DA.DEBUG(0,"createIgnoreListFrame")
@@ -51,6 +57,10 @@ local function createIgnoreListFrame(self)
 	if not frame then
 		return nil
 	end
+	if TSMAPI_FOUR then
+		frame:SetFrameStrata("HIGH")
+	end
+	frame:SetBackdrop(FrameBackdrop)
 	frame:SetBackdropColor(0.1, 0.1, 0.1)
 	-- A title bar stolen from the Ace2 Waterfall window.
 	local r,g,b = 0, 0.7, 0; -- dark green
@@ -77,12 +87,19 @@ local function createIgnoreListFrame(self)
 	titletext:SetShadowOffset(1,-1)
 	titletext:SetTextColor(1,1,1)
 	titletext:SetText("Skillet: Ignored Materials")
+
 	-- The frame enclosing the scroll list needs a border and a background .....
 	local backdrop = SkilletIgnoreListParent
+	if TSMAPI_FOUR then
+		backdrop:SetFrameStrata("HIGH")
+	end
 	backdrop:SetBackdrop(ControlBackdrop)
 	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
 	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
 	backdrop:SetResizable(true)
+
+	-- Ace Window manager library, allows the window position (and size)
+	-- to be automatically saved
 	local ignoreListLocation = {
 		prefix = "ignoreListLocation_"
 	}
@@ -217,8 +234,14 @@ function Skillet:UpdateIgnoreListWindow()
 end
 
 --
--- Internal functions to show and hide the Ignorelist
--- Calling functions can be found in ThirdPartyHooks.lua
+-- Updates the scrollbar when a scroll event happens
+--
+function Skillet:IgnoreList_OnScroll()
+	Skillet:UpdateIgnoreListWindow()
+end
+
+--
+-- Functions to show and hide the Ignorelist
 --
 function Skillet:DisplayIgnoreList()
 	DA.DEBUG(0,"DisplayIgnoreList()")
@@ -238,11 +261,4 @@ function Skillet:HideIgnoreList()
 		self.ignoreList:Hide()
 	end
 	self.cachedIgnoreList = nil
-end
-
---
--- Updates the scrollbar when a scroll event happens
---
-function Skillet:IgnoreList_OnScroll()
-	Skillet:UpdateIgnoreListWindow()
 end

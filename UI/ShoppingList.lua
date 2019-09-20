@@ -63,32 +63,28 @@ local function createShoppingListFrame(self)
 	if not frame then
 		return nil
 	end
-
-	frame:SetBackdrop(FrameBackdrop);
+	if TSMAPI_FOUR then
+		frame:SetFrameStrata("HIGH")
+	end
+	frame:SetBackdrop(FrameBackdrop)
 	frame:SetBackdropColor(0.1, 0.1, 0.1)
-
 	-- A title bar stolen from the Ace2 Waterfall window.
 	local r,g,b = 0, 0.7, 0; -- dark green
 	local titlebar = frame:CreateTexture(nil,"BACKGROUND")
 	local titlebar2 = frame:CreateTexture(nil,"BACKGROUND")
-
 	titlebar:SetPoint("TOPLEFT",frame,"TOPLEFT",3,-4)
 	titlebar:SetPoint("TOPRIGHT",frame,"TOPRIGHT",-3,-4)
 	titlebar:SetHeight(13)
-
 	titlebar2:SetPoint("TOPLEFT",titlebar,"BOTTOMLEFT",0,0)
 	titlebar2:SetPoint("TOPRIGHT",titlebar,"BOTTOMRIGHT",0,0)
 	titlebar2:SetHeight(13)
-
 	titlebar:SetGradientAlpha("VERTICAL",r*0.6,g*0.6,b*0.6,1,r,g,b,1)
 	titlebar:SetColorTexture(r,g,b,1)
 	titlebar2:SetGradientAlpha("VERTICAL",r*0.9,g*0.9,b*0.9,1,r*0.6,g*0.6,b*0.6,1)
 	titlebar2:SetColorTexture(r,g,b,1)
-
 	local title = CreateFrame("Frame",nil,frame)
 	title:SetPoint("TOPLEFT",titlebar,"TOPLEFT",0,0)
 	title:SetPoint("BOTTOMRIGHT",titlebar2,"BOTTOMRIGHT",0,0)
-
 	local titletext = title:CreateFontString("SkilletShoppingListTitleText", "OVERLAY", "GameFontNormalLarge")
 	titletext:SetPoint("TOPLEFT",title,"TOPLEFT",0,0)
 	titletext:SetPoint("TOPRIGHT",title,"TOPRIGHT",0,0)
@@ -100,25 +96,24 @@ local function createShoppingListFrame(self)
 
 	SkilletShowQueuesFromAllAltsText:SetText(L["Include alts"])
 	SkilletShowQueuesFromAllAlts:SetChecked(Skillet.db.char.include_alts)
-
 	SkilletShowQueuesInItemOrderText:SetText(L["Order by item"])
 	SkilletShowQueuesInItemOrder:SetChecked(Skillet.db.char.item_order)
-
 	SkilletShowQueuesMergeItemsText:SetText(L["Merge items"])
 	SkilletShowQueuesMergeItems:SetChecked(Skillet.db.char.merge_items)
-
 	SkilletShowQueuesIncludeGuildText:SetText(L["Include guild"])
 	SkilletShowQueuesIncludeGuild:SetChecked(Skillet.db.char.include_guild)
+	-- Button to retrieve items needed from the bank
+	SkilletShoppingListRetrieveButton:SetText(L["Retrieve"])
 
 	-- The frame enclosing the scroll list needs a border and a background .....
 	local backdrop = SkilletShoppingListParent
+	if TSMAPI_FOUR then
+		backdrop:SetFrameStrata("HIGH")
+	end
 	backdrop:SetBackdrop(ControlBackdrop)
 	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
 	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
 	backdrop:SetResizable(true)
-
-	-- Button to retrieve items needed from the bank
-	SkilletShoppingListRetrieveButton:SetText(L["Retrieve"])
 
 	-- Ace Window manager library, allows the window position (and size)
 	-- to be automatically saved
@@ -141,10 +136,6 @@ function Skillet:ShoppingListButton_OnEnter(button)
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 	GameTooltip:SetHyperlink(link)
 	GameTooltip:Show()
-	if EnhTooltip and EnhTooltip.TooltipCall then
-		local quantity = button.count
-		EnhTooltip.TooltipCall(GameTooltip, name, link, quality, quantity)
-	end
 	CursorUpdate(button)
 end
 
@@ -940,12 +931,16 @@ function Skillet:UpdateShoppingListWindow(use_cached_recipes)
 	end
 end
 
--- Called when the list of reagents is scrolled
+--
+-- Updates the scrollbar when a scroll event happens
+--
 function Skillet:ShoppingList_OnScroll()
 	Skillet:UpdateShoppingListWindow(true) -- true == use the cached list of recipes
 end
 
+--
 -- Fills out and displays the shopping list frame
+--
 function Skillet:DisplayShoppingList(atBank)
 	DA.TRACE("DisplayShoppingList")
 	if not self.shoppingList then

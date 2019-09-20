@@ -64,6 +64,12 @@ local FrameBackdrop = {
 	tile = true, tileSize = 16, edgeSize = 16,
 	insets = { left = 3, right = 3, top = 30, bottom = 3 }
 }
+local TSMBackdrop = {
+	bgFile = "Interface\\Buttons\\WHITE8X8",
+	tile = true, tileSize = 16,
+	insets = { left = 3, right = 3, top = 3, bottom = 3 }
+}
+
 -- List of functions that are called before a button is shown
 local pre_show_callbacks = {}
 
@@ -112,7 +118,12 @@ function Skillet:CreateTradeSkillWindow()
 	if frame:GetHeight() < 545 then
 		frame:SetHeight(545)
 	end
-	frame:SetBackdrop(FrameBackdrop);
+	if TSMAPI_FOUR then
+		frame:SetFrameStrata("HIGH")
+		frame:SetBackdrop(TSMBackdrop)
+	else
+		frame:SetBackdrop(FrameBackdrop)
+	end
 	frame:SetBackdropColor(0.1, 0.1, 0.1)
 
 	-- A title bar stolen from the Ace2 Waterfall window.
@@ -2665,11 +2676,14 @@ function Skillet:HideStandaloneQueue()
 	SkilletStandaloneQueue:Hide()
 end
 
--- Creates and sets up the shopping list window
+-- Creates and sets up the Standalone Queue Frame
 function Skillet:CreateStandaloneQueueFrame()
 	local frame = SkilletStandaloneQueue
 	if not frame then
 		return nil
+	end
+	if TSMAPI_FOUR then
+		frame:SetFrameStrata("HIGH")
 	end
 	frame:SetBackdrop(FrameBackdrop);
 	frame:SetBackdropColor(0.1, 0.1, 0.1)
@@ -2698,12 +2712,7 @@ function Skillet:CreateStandaloneQueueFrame()
 	titletext:SetShadowOffset(1,-1)
 	titletext:SetTextColor(1,1,1)
 	titletext:SetText("Skillet: " .. L["Queue"])
-	-- The frame enclosing the scroll list needs a border and a background .....
-	local backdrop = SkilletShoppingListParent
-	backdrop:SetBackdrop(ControlBackdrop)
-	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
-	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
-	backdrop:SetResizable(true)
+
 	-- Ace Window manager library, allows the window position (and size)
 	-- to be automatically saved
 	local standaloneQueueLocation = {
