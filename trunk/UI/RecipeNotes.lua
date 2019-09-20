@@ -62,6 +62,9 @@ local function get_edit_box()
 	editbox:SetAutoFocus(true)
 	editbox:SetMultiLine(false)
 	editbox:SetFontObject(ChatFontNormal)
+	if TSMAPI_FOUR then
+		editbox:SetFrameStrata("HIGH")
+	end
 	editbox:SetBackdrop(ControlBackdrop)
 	editbox:SetBackdropColor(0,0,0,1)
 	editbox:SetScript("OnEnterPressed", function(self)
@@ -80,7 +83,6 @@ local function get_edit_box()
 		local n = _G[b:GetName() .. "Notes"]
 		n:Show()
 	end);
-
 	return editbox
 end
 

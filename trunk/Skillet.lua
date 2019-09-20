@@ -1540,18 +1540,6 @@ function Skillet:ShowTradeSkillWindow()
 	end
 	self:ResetTradeSkillWindow()
 	Skillet:ShowFullView()
-	if TSMAPI_FOUR then
-		local TSMBackdrop = {
-			bgFile = "Interface\\Buttons\\WHITE8X8",
-			tile = true, tileSize = 16,
-			insets = { left = 3, right = 3, top = 3, bottom = 3 }
-		}
-		frame:SetFrameStrata("HIGH")
-		frame:SetBackdrop(TSMBackdrop);
-		frame:SetBackdropColor(0.1, 0.1, 0.1)
-		frame:SetBackdropBorderColor(0.6, 0.6, 0.6)
-		frame:SetBackdropColor(0.05, 0.05, 0.05)
-	end
 	if not frame:IsVisible() then
 		frame:Show()
 		self:UpdateTradeSkillWindow()
