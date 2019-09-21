@@ -43,7 +43,14 @@ local SKILLET_REAGENT_MIN_HEIGHT = 300
 -- min width of count text
 local SKILLET_COUNT_MIN_WIDTH = 100
 
-local nonLinkingTrade = { [2656] = true, [53428] = true , [193290] = true }				-- smelting, runeforging, herbalism
+--
+-- Smelting and Mining are bipolar so
+-- give them names to remember
+--
+local SMELTING = 2656
+local MINING = 2575
+
+local nonLinkingTrade = { [SMELTING] = true, [53428] = true , [193290] = true }				-- smelting, runeforging, herbalism
 
 -- Stack of previsouly selected skills for use by the
 -- "click on reagent, go to recipe" code and for clicking on Queue'd recipes
@@ -475,10 +482,14 @@ end
 function Skillet:TradeButton_OnEnter(button)
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 	GameTooltip:ClearLines()
-	local _, player, tradeID = string.split("-", button:GetName())
-	GameTooltip:AddLine(GetSpellInfo(tradeID))
+	local bName = button:GetName()
+	local _, player, tradeID = string.split("-", bName)
+	local sInfo = GetSpellInfo(tradeID)
+	DA.DEBUG(3,"TradeButton_OnEnter("..tostring(bName).."), player= "..tostring(player)..", tradeID= "..tostring(tradeID)..", sInfo= "..tostring(sInfo))
+	GameTooltip:AddLine(sInfo)
 	tradeID = tonumber(tradeID)
-	local data = self:GetSkillRanks(player, tradeID)
+	local data
+	data = self:GetSkillRanks(player, tradeID)
 	if not data or data == {} then
 		GameTooltip:AddLine(L["No Data"],1,0,0)
 	else
@@ -516,11 +527,11 @@ function Skillet:TradeButton_OnClick(this,button)
 	local _, player, tradeID = string.split("-", name)
 	tradeID = tonumber(tradeID)
 	local data =  self:GetSkillRanks(player, tradeID)
-	DA.DEBUG(0,"TradeButton_OnClick "..(name or "nil").." "..(player or "nil").." "..(tradeID or "nil"))
+	DA.DEBUG(0,"TradeButton_OnClick "..tostring(name).." "..tostring(player).." "..tostring(tradeID))
 	if button == "LeftButton" then
-		if player == UnitName("player") or (data and data ~= nil) then
+		if player == self.currentPlayer or (data and data ~= nil) then
 			if self.currentTrade == tradeID and IsShiftKeyDown() then
-				local link=GetTradeSkillListLink();
+				local link = GetTradeSkillListLink();
 				local activeEditBox =  ChatEdit_GetActiveWindow();
 				if activeEditBox or WIM_EditBoxInFocus ~= nil then
 					ChatEdit_InsertLink(link)
@@ -528,20 +539,16 @@ function Skillet:TradeButton_OnClick(this,button)
 					DA.DEBUG(0, link)
 				end
 			end
-			if player == UnitName("player") then
+			if player == self.currentPlayer then
 				self:SetTradeSkill(self.currentPlayer, tradeID)
 			else
 				local link = self.db.realm.tradeSkills[player][tradeID].link
-				local _,tradeString
-				if Skillet.wowVersion >= 50400 then
-					_,_,tradeString = string.find(link, "(trade:[0-9a-fA-F]+:%d+:[a-zA-Z0-9+/:]+)")
-				elseif Skillet.wowVersion >= 50300 then
-					_,_,tradeString = string.find(link, "(trade:[0-9a-fA-F]+:%d+:%d+:%d+:[a-zA-Z0-9+/:]+)")
-				else
+				if link then
+					local _,tradeString
 					_,_,tradeString = string.find(link, "(trade:%d+:%d+:%d+:[0-9a-fA-F]+:[a-zA-Z0-9+/]+)")
-				end
-				if tradeString then
-					SetItemRef(tradeString,link,"LeftButton")
+					if tradeString then
+						SetItemRef(tradeString,link,"LeftButton")
+					end
 				end
 			end
 			this:SetChecked(true)
@@ -551,14 +558,13 @@ function Skillet:TradeButton_OnClick(this,button)
 	else
 		if this:GetChecked() then
 			if IsShiftKeyDown() then
-				Skillet:FlushAllData()
-				if player == UnitName("player") then
-					Skillet:InitializeDatabase(player)
+				DA.DEBUG(0,"Flushing All Data")
+				self:FlushAllData()
+				if player == self.currentPlayer then
+					self:InitializeDatabase(player)
 				end
-				Skillet:RescanTrade()
-			else
-				Skillet:RescanTrade()
 			end
+			self:RescanTrade()
 			self:UpdateTradeSkillWindow()
 		end
 	end
@@ -566,7 +572,7 @@ function Skillet:TradeButton_OnClick(this,button)
 end
 
 function Skillet:UpdateTradeButtons(player)
-	DA.DEBUG(3,"UpdateTradeButtons started")
+	DA.DEBUG(3,"UpdateTradeButtons("..tostring(player)..")")
 	local position = 0 -- pixels
 	local tradeSkillList = self.tradeSkillList
 	local frameName = "SkilletFrameTradeButtons-"..player
@@ -575,7 +581,7 @@ function Skillet:UpdateTradeButtons(player)
 		frame = CreateFrame("Frame", frameName, SkilletFrame)
 	end
 	frame:Show()
-		for i=1,#tradeSkillList,1 do	-- iterate thru all skills in defined order for neatness (professions, secondary, class skills)
+	for i=1,#tradeSkillList,1 do	-- iterate thru all skills in defined order for neatness (professions, secondary, class skills)
 		local tradeID = tradeSkillList[i]
 		local ranks = self:GetSkillRanks(player, tradeID)
 		local tradeLink
@@ -589,14 +595,20 @@ function Skillet:UpdateTradeButtons(player)
 				end
 			end
 		end
-		if ranks then
+		DA.DEBUG(3,"tradeLink= "..tostring(tradeLink))
+		if ranks and tradeID ~= MINING then
 			local spellName, _, spellIcon = GetSpellInfo(tradeID)
+			if tradeID == SMELTING then
+				spellName = GetSpellInfo(MINING)
+			end
+			DA.DEBUG(3,"tradeID= "..tostring(tradeID)..", spellName= "..tostring(spellName))
 			local buttonName = "SkilletFrameTradeButton-"..player.."-"..tradeID
 			local button = _G[buttonName]
 			if not button then
 				button = CreateFrame("CheckButton", buttonName, frame, "SkilletTradeButtonTemplate")
 			end
-			if player ~= UnitName("player") and not tradeLink then						-- fade out buttons that don't have data collected
+			if player ~= self.currentPlayer and not tradeLink then						-- fade out buttons that don't have data collected
+				DA.DEBUG(3,"Fading "..tostring(buttonName))
 				button:SetAlpha(.4)
 				button:SetHighlightTexture("")
 				button:SetPushedTexture("")
@@ -607,9 +619,10 @@ function Skillet:UpdateTradeButtons(player)
 			local buttonIcon = _G[buttonName.."Icon"]
 			buttonIcon:SetTexture(spellIcon)
 			position = position + button:GetWidth()
+			if tradeID == SMELTING then tradeID = MINING end
 			if tradeID == self.currentTrade then
 				button:SetChecked(true)
-				if Skillet.data.skillList[player][tradeID].scanned then
+				if self.data.skillList[player][tradeID] and self.data.skillList[player][tradeID].scanned then
 					buttonIcon:SetVertexColor(1,1,1)
 				else
 					buttonIcon:SetVertexColor(1,0,0)
@@ -618,10 +631,16 @@ function Skillet:UpdateTradeButtons(player)
 				button:SetChecked(false)
 			end
 			button:Show()
+		else
+			DA.DEBUG(3,"No ranks for tradeID= "..tostring(tradeID)..", tradeName= "..tostring(self.tradeSkillNamesByID[tradeID]))
 		end
-	end
-		position = position + 10
-		for i=1,#Skillet.AutoButtonsList,1 do	-- iterate thru all skills in defined order for neatness (professions, secondary, class skills)
+	end		-- for
+--
+-- Add some space and then go through the list created by UpdateAutoTradeButtons()
+--
+	position = position + 10
+	Skillet:UpdateAutoTradeButtons()
+	for i=1,#Skillet.AutoButtonsList,1 do	-- iterate thru all skills in defined order for neatness (professions, secondary, class skills)
 		local additionalSpellTab = Skillet.AutoButtonsList[i]
 		local additionalSpellId = additionalSpellTab[1]
 		local additionalSpellName = additionalSpellTab[2]
@@ -644,17 +663,16 @@ function Skillet:UpdateTradeButtons(player)
 		position = position + button:GetWidth()
 		button:Show()
 	end
-	Skillet:UpdateAutoTradeButtons()
 	--DA.DEBUG(3,"UpdateTradeButtons complete")
 end
 
 function Skillet:UpdateAutoTradeButtons()
-	--DA.DEBUG(3,"UpdateAutoTradeButtons()")
+	DA.DEBUG(3,"UpdateAutoTradeButtons()")
 	local tradeSkillList = self.tradeSkillList
 	Skillet.AutoButtonsList = {}
 	for i=1,#tradeSkillList,1 do
 		local tradeID = tradeSkillList[i]
-		local ranks = self:GetSkillRanks(UnitName("player"), tradeID)
+		local ranks = self:GetSkillRanks(self.currentPlayer, tradeID)
 		if ranks then
 			local additionalSpellTab = Skillet.AdditionalAbilities[tradeID]
 			if additionalSpellTab then
@@ -662,6 +680,8 @@ function Skillet:UpdateAutoTradeButtons()
 				local additionalSpellId = additionalSpellTab[1]
 				local additionalSpellName = additionalSpellTab[2]
 				local spellName, _, spellIcon = GetSpellInfo(additionalSpellId)
+				DA.DEBUG(3,"tradeID= "..tostring(tradeID)..", additionalSpellId= "..tostring(additionalSpellId)..
+				  ", additionalSpellName= "..tostring(additionalSpellName)..", spellName= "..tostring(spellName))
 				local buttonName = "SkilletDo"..additionalSpellName
 				local buttonAutoName = "SkilletAuto"..additionalSpellName
 				local button = _G[buttonName]
@@ -674,14 +694,16 @@ function Skillet:UpdateAutoTradeButtons()
 				end
 				local macrotext = Skillet:GetAutoTargetMacro(additionalSpellId)
 				if button then
+					DA.DEBUG(3,"SetAttribute for "..tostring(buttonName))
 					button:SetAttribute("macrotext", macrotext)
 				end
+				DA.DEBUG(3,"SetAttribute for "..tostring(buttonAutoName))
 				buttonAuto:SetAttribute("macrotext", macrotext)
 			end
+		else
+			DA.DEBUG(3,"tradeID= "..tostring(tradeID).." has no ranks")
 		end
-	end
-	self.rescan_auto_targets_timer = nil
-	--DA.DEBUG(3,"UpdateAutoTradeButtons complete")
+	end		-- for
 end
 
 function SkilletPluginDropdown_OnClick(this)

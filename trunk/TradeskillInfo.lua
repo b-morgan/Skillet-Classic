@@ -31,10 +31,10 @@ function Skillet:GetLevelRequiredToUse(item)
 end
 
 function Skillet:GetItemIDFromLink(link)	-- works with items or enchants
-	DA.DEBUG(0,"GetItemIDFromLink("..DA.PLINK(link)..")")
+	--DA.DEBUG(4,"GetItemIDFromLink("..DA.PLINK(link)..")")
 	if (link) then
 		local linktype, id = string.match(link, "|H([^:]+):(%d+)")
-		DA.DEBUG(0,"linktype= "..tostring(linktype)..", id= "..tostring(id))
+		--DA.DEBUG(4,"linktype= "..tostring(linktype)..", id= "..tostring(id))
 		if id then
 			return tonumber(id);
 		else

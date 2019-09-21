@@ -20,14 +20,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 local PT = LibStub("LibPeriodicTable-3.1")
 local L = Skillet.L
 
+--
+-- Smelting and Mining are bipolar so
+-- give them names to remember
+--
+local SMELTING = 2656
+local MINING = 2575
+
 -- a table of tradeskills by id
 local TradeSkillList = {
 	2259,		-- alchemy
 	2018,		-- blacksmithing
 	4036,		-- engineering
 	2108,		-- leatherworking
-	2656,		-- smelting (from mining, 2575)
-	2575,		-- mining
+	SMELTING,	-- smelting
+	MINING,		-- mining
 	3908,		-- tailoring
 	2550,		-- cooking
 	3273,		-- first aid
@@ -48,9 +55,9 @@ Skillet.AdditionalAbilities = {
 	[25229] = {31252,"Prospecting"},	-- jewelcrafting = prospecting
 	[2018]	= {126462,"Thermal Anvil"},	 -- blacksmithing = thermal anvil (item:87216)
 	[4036]	= {126462,"Thermal Anvil"},	 -- engineering = thermal anvil (item:87216)
-	[2656]	= {126462,"Thermal Anvil"},	 -- smelting = thermal anvil (item:87216)
+	[SMELTING]	= {126462,"Thermal Anvil"},	 -- smelting = thermal anvil (item:87216)
 }
-Skillet.AutoButtonsList = {}
+Skillet.AutoButtonsList = {}			-- used before it is filled in MainFrame.lua
 Skillet.TradeSkillAutoTarget = {
 --
 -- None of these "features" exist in Classic
@@ -125,6 +132,8 @@ Skillet.scrollData = {
 }
 
 local TradeSkillIDsByName = {}		-- filled in with ids and names for reverse matching (since the same name has multiple id's based on level)
+local TradeSkillNamesByID = {}		-- filled in with names and ids for reverse matching
+
 local DifficultyText = {
 	x = "unknown",
 	o = "optimal",
@@ -413,7 +422,7 @@ function Skillet:GetRecipe(id)
 end
 
 function Skillet:GetNumSkills(player, trade)
-	DA.DEBUG(0,"GetNumSkills("..tostring(player)..", "..tostring(trade)..")")
+	DA.DEBUG(3,"GetNumSkills("..tostring(player)..", "..tostring(trade).."), tradeName= "..tostring(self.tradeSkillNamesByID[trade]))
 	local r
 	if not Skillet.db.realm.skillDB[player] then
 		r = 0
@@ -422,12 +431,12 @@ function Skillet:GetNumSkills(player, trade)
 	else
 		r = #Skillet.db.realm.skillDB[player][trade]
 	end
-	DA.DEBUG(2,"r= "..tostring(r))
+	DA.DEBUG(3,"GetNumSkills= "..tostring(r))
 	return r
 end
 
 function Skillet:GetSkillRanks(player, trade)
-	--DA.DEBUG(0,"GetSkillRanks("..tostring(player)..", "..tostring(trade)..")")
+	DA.DEBUG(3,"GetSkillRanks("..tostring(player)..", "..tostring(trade)..")")
 	if player and trade then
 		if Skillet.db.realm.tradeSkills[player] then
 			return Skillet.db.realm.tradeSkills[player][trade]
@@ -500,6 +509,7 @@ function Skillet:CollectTradeSkillData()
 			table.insert(self.tradeSkillList,id)
 			self.skillIsCraft[id] = false
 			TradeSkillIDsByName[name] = id
+			TradeSkillNamesByID[id] = name
 		end
 	end
 	for i=1,#CraftList,1 do
@@ -510,9 +520,11 @@ function Skillet:CollectTradeSkillData()
 			table.insert(self.tradeSkillList,id)
 			self.skillIsCraft[id] = true
 			TradeSkillIDsByName[name] = id
+			TradeSkillNamesByID[id] = name
 		end
 	end
 	self.tradeSkillIDsByName = TradeSkillIDsByName
+	self.tradeSkillNamesByID = TradeSkillNamesByID
 end
 
 -- this routine collects the basic data (which tradeskills a player has)
@@ -536,6 +548,7 @@ function Skillet:ScanPlayerTradeSkills(player)
 					DA.DEBUG(0,"Collecting tradeskill data for: "..tostring(name))
 					if not skillRanksData[id] then
 						skillRanksData[id] = {}
+						skillRanksData[id].name = name
 						skillRanksData[id].rank = 0
 						skillRanksData[id].maxRank = 0
 						skillRanksData[id].isCraft = false
@@ -555,6 +568,7 @@ function Skillet:ScanPlayerTradeSkills(player)
 					DA.DEBUG(0,"Collecting craft data for: "..tostring(name))
 					if not skillRanksData[id] then
 						skillRanksData[id] = {}
+						skillRanksData[id].name = name
 						skillRanksData[id].rank = 0
 						skillRanksData[id].maxRank = 0
 						skillRanksData[id].isCraft = true
@@ -675,10 +689,16 @@ local function ScanTrade()
 	if not Skillet.db.realm.tradeSkills[player][tradeID] then
 		Skillet.db.realm.tradeSkills[player][tradeID] = {}
 	end
---	local skillName, rank, maxRank = GetTradeSkillLine()
 --	Skillet.db.realm.tradeSkills[player][tradeID].link = link
 	Skillet.db.realm.tradeSkills[player][tradeID].rank = rank
 	Skillet.db.realm.tradeSkills[player][tradeID].maxRank = maxRank
+	if tradeID == MINING then
+		if not Skillet.db.realm.tradeSkills[player][SMELTING] then
+			Skillet.db.realm.tradeSkills[player][SMELTING] = {}
+		end
+		Skillet.db.realm.tradeSkills[player][SMELTING].rank = rank
+		Skillet.db.realm.tradeSkills[player][SMELTING].maxRank = maxRank
+	end
 	local numHeaders = 0
 	local parentGroup
 	for i = 1, numSkills, 1 do
