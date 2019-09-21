@@ -635,6 +635,19 @@ Skillet.options =
 			end,
 			order = 85
 		},
+		LogLevel = {
+			type = "toggle",
+			name = "LogLevel",
+			desc = "Option for debugging",
+			get = function()
+				return Skillet.db.profile.LogLevel
+			end,
+			set = function(self,value)
+				Skillet.db.profile.LogLevel = value
+				Skillet.LogLevel = value
+			end,
+			order = 86
+		},
 		TableDump = {
 			type = "toggle",
 			name = "TableDump",
@@ -646,7 +659,7 @@ Skillet.options =
 				Skillet.db.profile.TableDump = value
 				Skillet.TableDump = value
 			end,
-			order = 86
+			order = 87
 		},
 		TraceShow = {
 			type = "toggle",
@@ -663,7 +676,7 @@ Skillet.options =
 					Skillet.TraceLog = value
 				end
 			end,
-			order = 87
+			order = 88
 		},
 		TraceLog = {
 			type = "toggle",
@@ -676,7 +689,7 @@ Skillet.options =
 				Skillet.db.profile.TraceLog = value
 				Skillet.TraceLog = value
 			end,
-			order = 88
+			order = 89
 		},
 		ProfileShow = {
 			type = "toggle",
@@ -689,7 +702,7 @@ Skillet.options =
 				Skillet.db.profile.ProfileShow = value
 				Skillet.ProfileShow = value
 			end,
-			order = 89
+			order = 90
 		},
 		ClearDebugLog = {
 			type = "execute",
@@ -699,7 +712,7 @@ Skillet.options =
 				SkilletDBPC = {}
 				DA.DebugLog = SkilletDBPC
 			end,
-			order = 90
+			order = 91
 		},
 		DebugStatus = {
 			type = 'execute',
@@ -708,7 +721,7 @@ Skillet.options =
 			func = function()
 				DA.DebugAidsStatus()
 			end,
-			order = 91
+			order = 92
 		},
 		DebugOff = {
 			type = 'execute',
@@ -731,6 +744,15 @@ Skillet.options =
 					Skillet.db.profile.DebugLogging = false
 					Skillet.DebugLogging = false
 				end
+--
+-- DebugLevel is left alone but
+-- LogLevel is left undefined or set to false as
+-- the default should be log everything.
+--
+				if Skillet.db.profile.LogLevel then
+					Skillet.db.profile.LogLevel = false
+					Skillet.LogLevel = false
+				end
 				if Skillet.db.profile.TraceShow then
 					Skillet.db.profile.TraceShow = false
 					Skillet.TraceShow = false
@@ -744,7 +766,7 @@ Skillet.options =
 					Skillet.ProfileShow = false
 				end
 			end,
-			order = 92
+			order = 93
 		},
 
 		reset = {
@@ -923,14 +945,18 @@ function Skillet:OnInitialize()
 --			Setting DebugLogging (without DebugShow) is a minor performance hit.
 --			WarnLog (with or without WarnShow) can remain on as warning messages are rare.
 --
+-- Note:	Undefined is the same as false so we only need to predefine true variables
+--
 	if Skillet.db.profile.WarnLog == nil then
 		Skillet.db.profile.WarnLog = true
 	end
+
 	Skillet.WarnShow = Skillet.db.profile.WarnShow
 	Skillet.WarnLog = Skillet.db.profile.WarnLog
 	Skillet.DebugShow = Skillet.db.profile.DebugShow
 	Skillet.DebugLogging = Skillet.db.profile.DebugLogging
 	Skillet.DebugLevel = Skillet.db.profile.DebugLevel
+	Skillet.LogLevel = Skillet.db.profile.LogLevel
 	Skillet.TableDump = Skillet.db.profile.TableDump
 	Skillet.TraceShow = Skillet.db.profile.TraceShow
 	Skillet.TraceLog = Skillet.db.profile.TraceLog
@@ -1428,9 +1454,6 @@ function Skillet:BAG_UPDATE(event, bagID)
 	if UnitAffectingCombat("player") then
 		return
 	end
-	if not self.rescan_auto_targets_timer then
-		self.rescan_auto_targets_timer = self:ScheduleTimer("UpdateAutoTradeButtons", 0.3)
-	end
 	local showing = false
 	if self.tradeSkillFrame and self.tradeSkillFrame:IsVisible() then
 		showing = true
@@ -1499,8 +1522,10 @@ function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 		self.currentGroup = nil
 		self.currentGroupLabel = self:GetTradeSkillOption("grouping")
 		self:RecipeGroupDropdown_OnShow()
-		DA.DEBUG(0,"cast: "..self:GetTradeName(tradeID))
-		CastSpellByName(self:GetTradeName(tradeID)) -- trigger the whole rescan process via a TRADE_SKILL_SHOW or CRAFT_SHOW event
+		local spellName = self:GetTradeName(tradeID)
+		DA.DEBUG(0,"cast: "..tostring(spellName))
+		if spellName == "Mining" then spellName = "Smelting" end
+		CastSpellByName(spellName) -- trigger the whole rescan process via a TRADE_SKILL_SHOW or CRAFT_SHOW event
 	end
 	self:SetSelectedSkill(skillIndex, false)
 end

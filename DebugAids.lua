@@ -38,6 +38,10 @@ local DA = LibStub("AceAddon-3.0"):GetAddon("Skillet")
 -- DA.DebugLevel should constrained to be a 
 -- number between 1 and 10.
 --
+-- DA.LogLevel is a boolean with false meaning log all
+-- DA.DEBUG calls regardless of level and true meaning
+-- only log calls when they are less than DA.DebugLevel
+--
 --
 DA.WarnShow = false
 DA.WarnLog = true
