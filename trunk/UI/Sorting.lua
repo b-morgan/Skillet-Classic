@@ -142,18 +142,20 @@ local function NOSORT(tradeskill, a, b)
 end
 
 local function SkillIsFilteredOut(skillIndex)
-	DA.DEBUG(0,"SkillIsFilteredOut("..tostring(skillIndex)..")")
+	--DA.DEBUG(0,"SkillIsFilteredOut("..tostring(skillIndex)..")")
 	local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, skillIndex)
-	DA.DEBUG(1,"skill = "..DA.DUMP1(skill,1))
+	--DA.DEBUG(1,"skill= "..DA.DUMP1(skill,1))
 	local recipe = Skillet:GetRecipe(skill.id)
+	--DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe,1))
 	local recipeID = recipe.spellID or 0
 	if recipeID == 0 then
-		-- it's a header, don't filter here
+		--DA.DEBUG(1,"Detected header")
 		return false
 	end
 		-- are we hiding anything that is trivial (has no chance of giving a skill point)
 	if skill_style_type[skill.difficulty] then
 		if skill_style_type[skill.difficulty].level < (Skillet:GetTradeSkillOption("filterLevel") or 4) then
+			--DA.DEBUG(1,"Detected trivial")
 			return true
 		end
 	end
@@ -163,23 +165,29 @@ local function SkillIsFilteredOut(skillIndex)
 		   not (skill.numRecursive > 0 and Skillet:GetTradeSkillOption("filterInventory-crafted")) and
 		   not (skill.numCraftableVendor > 0 and Skillet:GetTradeSkillOption("filterInventory-vendor")) and
 		   not (skill.numCraftableAlts > 0 and Skillet:GetTradeSkillOption("filterInventory-alts")) then
+			--DA.DEBUG(1,"Detected uncraftable")
 			return true
 		end
 	end
 	if Skillet.recipeFilters then
 		for _,f in pairs(Skillet.recipeFilters) do
 			if f.filterMethod(f.namespace, skillIndex) then
+				--DA.DEBUG(1,"Detected recipeFilter")
 				return true
 			end
 		end
 	end
-	-- string search
+--
+-- string search
+--
 	local filtertext = Skillet:GetTradeSkillOption("filtertext")
 	if filtertext and filtertext ~= "" then
+		--DA.DEBUG(1,"Searching filtertext= "..tostring(filtertext))
 		local filter = string.lower(filtertext)
-		local nameOnly = false
+		local nameOnly = true					-- Classic will do name only for now
 		if string.sub(filter,1,1) == "!" then
 			filter = string.sub(filter,2)
+			DA.DEBUG(1,"Searching nameOnly")
 			nameOnly = true
 		end
 		local word
@@ -210,12 +218,16 @@ local function SkillIsFilteredOut(skillIndex)
 			end
 		end
 		if searchText then 
+			--DA.DEBUG(1,"Searching searchText= "..tostring(searchText))
 			searchText = string.lower(searchText)
 			local wordList = { string.split(" ",filter) }
 			for v,word in pairs(wordList) do
+				--DA.DEBUG(2,"word="..tostring(word))
 				if string.find(searchText, word, 1, true) == nil then
+					--DA.DEBUG(2,"not found")
 					return true
 				end
+				--DA.DEBUG(2,"found")
 			end
 		end
 	end
@@ -226,7 +238,7 @@ local function set_sort_desc(toggle)
 	for _,entry in pairs(sorters) do
 		if entry.sorter == recipe_sort_method then
 			Skillet:SetTradeSkillOption("sortdesc-" .. entry.name, toggle)
-			self:SortAndFilterRecipes()
+			Skillet:SortAndFilterRecipes()
 		end
 	end
 end
@@ -237,7 +249,6 @@ local function is_sort_desc()
 			return Skillet:GetTradeSkillOption("sortdesc-" .. entry.name)
 		end
 	end
-	-- default to true
 	return true
 end
 
@@ -284,10 +295,12 @@ function Skillet:CollapseAll()
 	self:SortAndFilterRecipes()
 	self:UpdateTradeSkillWindow()
 end
+
+--
 -- Builds a sorted and fitlered list of recipes for the
 -- currently selected tradekskill and sorting method
 -- if no sorting, then headers will be included
-
+--
 function Skillet:SortAndFilterRecipes()
 	DA.DEBUG(0,"SortAndFilterRecipes()")
 	local skillListKey = Skillet.currentPlayer..":"..Skillet.currentTrade..":"..Skillet.currentGroupLabel
@@ -302,13 +315,13 @@ function Skillet:SortAndFilterRecipes()
 	end
 	local sortedSkillList = Skillet.data.sortedSkillList[skillListKey]
 	local oldLength = #sortedSkillList
-	DA.DEBUG(1,"oldLength= "..tostring(oldLength))
+	--DA.DEBUG(1,"oldLength= "..tostring(oldLength))
 	local button_index = 0
 	local filtertext = Skillet:GetTradeSkillOption("filtertext")
 	local groupLabel = Skillet.currentGroupLabel
-	DA.DEBUG(1,"filtertext="..tostring(filtertext)..", groupLabel="..tostring(groupLabel))
+	--DA.DEBUG(1,"filtertext="..tostring(filtertext)..", groupLabel="..tostring(groupLabel))
 	if filtertext and filtertext ~= "" or groupLabel == "Flat" then
-		DA.DEBUG(1,"SortAndFilterRecipes Flat")
+		--DA.DEBUG(1,"SortAndFilterRecipes groupLabel= "..tostring(groupLabel))
 		for i=1, numSkills, 1 do
 			local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, i)
 			if skill then
@@ -321,6 +334,8 @@ function Skillet:SortAndFilterRecipes()
 						--if filtered out and selected - deselect
 						Skillet.selectedSkill = nil
 					end
+				else
+					--DA.DEBUG(2,"i= "..tostring(i).." is a header")
 				end
 			end
 		end
@@ -341,7 +356,7 @@ function Skillet:SortAndFilterRecipes()
 		end
 	else
 		local group = Skillet:RecipeGroupFind(Skillet.currentPlayer, Skillet.currentTrade, Skillet.currentGroupLabel, Skillet.currentGroup)
-		DA.DEBUG(1,"current grouping "..Skillet.currentGroupLabel.." "..(Skillet.currentGroup or "nil"))
+		--DA.DEBUG(1,"current grouping "..Skillet.currentGroupLabel.." "..(Skillet.currentGroup or "nil"))
 		if recipe_sort_method ~= NOSORT then
 			Skillet:RecipeGroupSort(group, recipe_sort_method, is_sort_desc())
 		end
@@ -467,6 +482,6 @@ function Skillet:SortDropdown_OnClick()
 	Skillet:SetTradeSkillOption("sortmethod", entry.name)
 	recipe_sort_method = entry.sorter
 	show_sort_toggle()
-	self:SortAndFilterRecipes()
-	self:UpdateTradeSkillWindow()
+	Skillet:SortAndFilterRecipes()
+	Skillet:UpdateTradeSkillWindow()
 end
