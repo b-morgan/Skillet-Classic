@@ -651,8 +651,8 @@ function Skillet:RecipeGroupSelect(menuFrame,label)
 	Skillet.currentGroup = nil
 	Skillet:RecipeGroupDropdown_OnShow()
 	Skillet:RecipeGroupGenerateAutoGroups()
-	self:SortAndFilterRecipes()
-	self:UpdateTradeSkillWindow()
+	Skillet:SortAndFilterRecipes()
+	Skillet:UpdateTradeSkillWindow()
 end
 
 function Skillet:RecipeGroupIsLocked()
