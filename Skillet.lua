@@ -287,8 +287,8 @@ Skillet.options =
 ]]--
 				display_shopping_list_at_auction = {
 					type = "toggle",
-					name = L["DISPLAYSGOPPINGLISTATAUCTIONNAME"],
-					desc = L["DISPLAYSGOPPINGLISTATAUCTIONDESC"],
+					name = L["DISPLAYSHOPPINGLISTATAUCTIONNAME"],
+					desc = L["DISPLAYSHOPPINGLISTATAUCTIONDESC"],
 					get = function()
 						return Skillet.db.profile.display_shopping_list_at_auction;
 					end,
@@ -357,7 +357,7 @@ Skillet.options =
 					end,
 					set = function(self,value)
 						Skillet.db.profile.display_required_level = value
-						self:UpdateTradeSkillWindow()
+						Skillet:UpdateTradeSkillWindow()
 					end,
 					width = "double",
 					order = 1
@@ -389,7 +389,7 @@ Skillet.options =
 					end,
 					set = function(self,t)
 						Skillet.db.profile.scale = t
-						self:UpdateTradeSkillWindow()
+						Skillet:UpdateTradeSkillWindow()
 						Skillet:UpdateShoppingListWindow(false)
 						Skillet:UpdateStandaloneQueueWindow()
 					end,
@@ -405,7 +405,7 @@ Skillet.options =
 					end,
 					set = function(self,value)
 						Skillet.db.profile.enhanced_recipe_display = value
-						self:UpdateTradeSkillWindow()
+						Skillet:UpdateTradeSkillWindow()
 					end,
 					width = "double",
 					order = 2,
@@ -1717,7 +1717,7 @@ function Skillet:AddItemNotesToTooltip(tooltip)
 	-- get item name
 	local name,link = tooltip:GetItem();
 	if not link then 
-		DA.DEBUG(0,"Error: Skillet:AddItemNotesToTooltip() could not determine link");
+--		DA.DEBUG(0,"Error: Skillet:AddItemNotesToTooltip() could not determine link");
 		return;
 	end
 	local id = self:GetItemIDFromLink(link);
