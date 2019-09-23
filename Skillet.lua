@@ -557,6 +557,59 @@ Skillet.options =
 			end,
 			order = 60
 		},
+		printsaved = {
+			type = 'execute',
+			name = "PrintSaved",
+			desc = "Print list of SavedQueues",
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:PrintSaved()
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
+												  " Leave combat and try again.")
+				end
+			end,
+			order = 61
+		},
+		printqueue = {
+			type = 'execute',
+			name = "PrintQueue",
+			desc = "Print Current Queue",
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:PrintQueue()
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
+												  " Leave combat and try again.")
+				end
+			end,
+			order = 62
+		},
+		printsavedqueue = {
+			type = 'input',
+			name = "PrintSavedQueue",
+			desc = "Print Named Saved Queue",
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:PrintQueue()
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
+												  " Leave combat and try again.")
+				end
+			end,
+			get = function()
+				return value
+			end,
+			set = function(self,value)
+				if not (UnitAffectingCombat("player")) then
+					Skillet:PrintQueue(value)
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
+												  " Leave combat and try again.")
+				end
+			end,
+			order = 63
+		},
 
 		WarnShow = {
 			type = "toggle",
@@ -879,7 +932,7 @@ function Skillet:OnInitialize()
 -- recipes have changed (i.e. different reagent requirements) so
 -- we clear the saved variables recipe data just to be safe.
 --
-	local dataVersion = 2
+	local dataVersion = 3
 	if not self.db.global.dataVersion or self.db.global.dataVersion ~= dataVersion then
 		self.db.global.dataVersion = dataVersion
 		self:FlushAllData()
@@ -1176,6 +1229,8 @@ function Skillet:OnEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_STOP")
 	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
 	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP")
+	self:RegisterEvent("UI_ERROR_MESSAGE")
+	self:RegisterEvent("UI_INFO_MESSAGE")
 	--
 	-- Debugging cleanup if enabled
 	--
@@ -1217,10 +1272,10 @@ function Skillet:TRADE_SKILL_NAME_UPDATE()
 end
 
 function Skillet:TRADE_SKILL_UPDATE()
-	DA.DEBUG(4,"TRADE_SKILL_UPDATE")
+	DA.DEBUG(0,"TRADE_SKILL_UPDATE")
 	Skillet.isCraft = false
 	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
-		Skillet:AdjustInventory()
+		Skillet:SkilletShow()
 	end
 end
 
@@ -1229,11 +1284,11 @@ function Skillet:UNIT_PORTRAIT_UPDATE()
 end
 
 function Skillet:SPELLS_CHANGED()
-	DA.DEBUG(4,"SPELLS_CHANGED")
+	DA.DEBUG(0,"SPELLS_CHANGED")
 end
 
 function Skillet:TRADE_SKILL_CLOSE()
-	DA.DEBUG(4,"TRADE_SKILL_CLOSE")
+	DA.DEBUG(0,"TRADE_SKILL_CLOSE")
 	if Skillet.ignoreClose then
 		Skillet.ignoreClose = false
 		return
@@ -1243,7 +1298,7 @@ function Skillet:TRADE_SKILL_CLOSE()
 end
 
 function Skillet:TRADE_SKILL_SHOW()
-	DA.DEBUG(4,"TRADE_SKILL_SHOW")
+	DA.DEBUG(0,"TRADE_SKILL_SHOW")
 	Skillet.isCraft = false
 	Skillet:SkilletShow()
 end
@@ -1300,9 +1355,11 @@ function Skillet:IsTradeSkillLinked()
 	return false, nil, false
 end
 
+--
 -- Show the tradeskill window, called from TRADE_SKILL_SHOW event, clicking on links, or clicking on guild professions
+--
 function Skillet:SkilletShow()
-	DA.DEBUG(1,"SHOW WINDOW (was showing "..(self.currentTrade or "nil")..")");
+	DA.DEBUG(1,"SkilletShow(), currentTrade= "..tostring(self.currentTrade))
 	self.linkedSkill, self.currentPlayer, self.isGuild = Skillet:IsTradeSkillLinked()
 	if self.linkedSkill then
 		if not self.currentPlayer then
@@ -1530,8 +1587,9 @@ function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 	self:SetSelectedSkill(skillIndex, false)
 end
 
---[[
+--
 -- Updates the tradeskill window, if the current trade has changed.
+--
 function Skillet:UpdateTradeSkill()
 	DA.DEBUG(0,"UpdateTradeSkill()")
 	local trade_changed = false
@@ -1554,7 +1612,7 @@ function Skillet:UpdateTradeSkill()
 	end
 	DA.DEBUG(0,"UpdateTradeSkill complete")
 end
-]]--
+
 -- Shows the trade skill frame.
 function Skillet:ShowTradeSkillWindow()
 	DA.DEBUG(0,"ShowTradeSkillWindow()")
