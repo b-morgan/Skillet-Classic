@@ -35,7 +35,7 @@
 		</ButtonText>
 		<Scripts>
 			<OnClick>
-				ChatFrame_SendTell(self.name);
+				ChatFrame_SendTell(self.name)
 			</OnClick>
 		</Scripts>
 		<NormalFont style="GameFontHighlightLeft"/>
@@ -59,10 +59,10 @@
 		</Layers>
 		<Scripts>
 			<OnEnter>
-				Skillet:TradeButton_OnEnter(self);
+				Skillet:TradeButton_OnEnter(self)
 			</OnEnter>
 			<OnLeave>
-				GameTooltip:Hide();
+				GameTooltip:Hide()
 			</OnLeave>
 			<OnClick>
 				Skillet:InventoryFilterButtons_Hide()
@@ -87,10 +87,10 @@
 				self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 			</OnLoad>
 			<OnEnter>
-				Skillet:TradeButtonAdditional_OnEnter(self);
+				Skillet:TradeButtonAdditional_OnEnter(self)
 			</OnEnter>
 			<OnLeave>
-				GameTooltip:Hide();
+				GameTooltip:Hide()
 			</OnLeave>
 		</Scripts>
 		<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
@@ -498,7 +498,7 @@
 				end
 			</OnEditFocusLost>
 			<OnEditFocusGained>
-				self:HighlightText();
+				self:HighlightText()
 			</OnEditFocusGained>
 		</Scripts>
 	</EditBox>
@@ -618,7 +618,7 @@
 					</OnLeave>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						Skillet:QueueItemButton_OnClick(self, button);
+						Skillet:QueueItemButton_OnClick(self, button)
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -636,7 +636,7 @@
 				<Scripts>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						Skillet:RemoveQueuedCommand(self:GetID());
+						Skillet:RemoveQueuedCommand(self:GetID())
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -720,15 +720,15 @@
 --				Skillet:SetTradeSkillToolTip(SkilletFrame.selectedSkill, self:GetID())
 				Skillet:ReagentButtonOnEnter(self, SkilletFrame.selectedSkill, self:GetID())
 --				GameTooltip:Show()
---				CursorUpdate(self);
+--				CursorUpdate(self)
 			</OnEnter>
 			<OnLeave>
 				Skillet:ReagentButtonOnLeave(self, SkilletFrame.selectedSkill, self:GetID())
-				GameTooltip:Hide();
-				ResetCursor();
+				GameTooltip:Hide()
+				ResetCursor()
 			</OnLeave>
 			<OnUpdate>
-				CursorOnUpdate(self);
+				CursorOnUpdate(self)
 			</OnUpdate>
 			<OnClick>
 				Skillet:InventoryFilterButtons_Hide()
@@ -736,11 +736,11 @@
 				if ( IsControlKeyDown() ) then
 				<!-- This opens up the dressing room window and display the character
 					 wearing the item (if that is possible) -->
-					DressUpItemLink(link);
+					DressUpItemLink(link)
 				elseif ( IsShiftKeyDown() ) then
 				<!-- This put a link to the *item* that can be created with this trade skill
 					 into the current chat edit box -->
-					ChatEdit_InsertLink(link);
+					ChatEdit_InsertLink(link)
 				else
 				<!-- generic click action -->
 					Skillet:ReagentButtonOnClick(self, Skillet.selectedSkill, self:GetID())
@@ -891,7 +891,7 @@
 				<Scripts>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						Skillet:ShowOptions();
+						Skillet:ShowOptions()
 					</OnClick>
 				</Scripts>
 				<NormalTexture file="Interface\Buttons\UI-MicroButton-Help-Up"/>
@@ -916,21 +916,21 @@
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						local activeEditBox =  ChatEdit_GetActiveWindow();
+						local activeEditBox =  ChatEdit_GetActiveWindow()
 						if activeEditBox then
-							local link=GetTradeSkillListLink();
+							local link=GetTradeSkillListLink()
 							if (not ChatEdit_InsertLink(link) ) then
 								assert(activeEditBox:GetName(), "Failed to add tradeskill link")
 							end
 						end
 					</OnClick>
 					<OnEnter>
-						GameTooltip:SetOwner(self,"ANCHOR_TOPLEFT");
-						GameTooltip:SetText(LINK_TRADESKILL_TOOLTIP, nil, nil, nil, nil, true);
-						GameTooltip:Show();
+						GameTooltip:SetOwner(self,"ANCHOR_TOPLEFT")
+						GameTooltip:SetText(LINK_TRADESKILL_TOOLTIP, nil, nil, nil, nil, true)
+						GameTooltip:Show()
 					</OnEnter>
 					<OnLeave>
-						GameTooltip:Hide();
+						GameTooltip:Hide()
 					</OnLeave>
 				</Scripts>
 				<NormalTexture file="Interface\TradeSkillFrame\UI-TradeSkill-LinkButton">
@@ -1129,22 +1129,22 @@
 				</Layers>
 				<Scripts>
 					<OnEnterPressed>
-						self:ClearFocus();
+						self:ClearFocus()
 					</OnEnterPressed>
 					<OnEscapePressed>
-						self:ClearFocus();
+						self:ClearFocus()
 					</OnEscapePressed>
 					<OnTextChanged>
-						Skillet:UpdateSearch(self:GetText());
+						Skillet:UpdateSearch(self:GetText())
 					</OnTextChanged>
 					<OnEditFocusLost>
-						self:HighlightText(0, 0);
+						self:HighlightText(0, 0)
 					</OnEditFocusLost>
 					<OnEditFocusGained>
 						if IsAltKeyDown() then
 							self:SetText("")
 						else
-							self:HighlightText();
+							self:HighlightText()
 						end
 					</OnEditFocusGained>
 				</Scripts>
@@ -1294,8 +1294,8 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						self:SetBackdropBorderColor(TOOLTIP_DEFAULT_COLOR.r, TOOLTIP_DEFAULT_COLOR.g, TOOLTIP_DEFAULT_COLOR.b);
-						self:SetBackdropColor(TOOLTIP_DEFAULT_BACKGROUND_COLOR.r, TOOLTIP_DEFAULT_BACKGROUND_COLOR.g, TOOLTIP_DEFAULT_BACKGROUND_COLOR.b);
+						self:SetBackdropBorderColor(TOOLTIP_DEFAULT_COLOR.r, TOOLTIP_DEFAULT_COLOR.g, TOOLTIP_DEFAULT_COLOR.b)
+						self:SetBackdropColor(TOOLTIP_DEFAULT_BACKGROUND_COLOR.r, TOOLTIP_DEFAULT_BACKGROUND_COLOR.g, TOOLTIP_DEFAULT_BACKGROUND_COLOR.b)
 					</OnLoad>
 				</Scripts>
 			</GameTooltip>
@@ -1336,7 +1336,7 @@
 						if button=="LeftButton" then
 							Skillet:InventoryFilterButtons_Hide()
 							if self:GetChecked() then
-								PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON); -- "igMainMenuOptionCheckBoxOn"
+								PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON) -- "igMainMenuOptionCheckBoxOn"
 							end
 							local before = Skillet:GetTradeSkillOption("hideuncraftable")
 							Skillet:SetTradeSkillOption("hideuncraftable", not before)
@@ -1481,7 +1481,7 @@
 					</OnShow>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON); -- "igMainMenuOptionCheckBoxOn"
+						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON) -- "igMainMenuOptionCheckBoxOn"
 						SkilletRecipeDifficultySelector:Show()
 						self:Hide()
 					</OnClick>
@@ -1513,7 +1513,7 @@
 					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON); -- "igMainMenuOptionCheckBoxOn"
+						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON) -- "igMainMenuOptionCheckBoxOn"
 						local bottom = self:GetBottom()
 						local top = self:GetTop()
 						local x,y = GetCursorPosition()
@@ -1766,7 +1766,7 @@
 								</Anchors>
 								<Scripts>
 									<OnClick>
-										Skillet:LoadQueue(Skillet.selectedQueueName);
+										Skillet:LoadQueue(Skillet.selectedQueueName)
 									</OnClick>
 								</Scripts>
 							</Button>
@@ -1783,7 +1783,7 @@
 								</Anchors>
 								<Scripts>
 									<OnClick>
-										Skillet:DeleteQueue(Skillet.selectedQueueName);
+										Skillet:DeleteQueue(Skillet.selectedQueueName)
 									</OnClick>
 								</Scripts>
 							</Button>
@@ -1860,24 +1860,24 @@
 								<Scripts>
 									<OnClick>
 										SkilletQueueSaveEditBox:ClearFocus()
-										Skillet:SaveQueue(SkilletQueueSaveEditBox:GetText());
+										Skillet:SaveQueue(SkilletQueueSaveEditBox:GetText())
 									</OnClick>
 								</Scripts>
 							</Button>
 						</Frames>
 						<Scripts>
 							<OnEnterPressed>
-								self:ClearFocus();
-								Skillet:SaveQueue(SkilletQueueSaveEditBox:GetText());
+								self:ClearFocus()
+								Skillet:SaveQueue(SkilletQueueSaveEditBox:GetText())
 							</OnEnterPressed>
 							<OnEscapePressed>
-								self:ClearFocus();
+								self:ClearFocus()
 							</OnEscapePressed>
 							<OnEditFocusLost>
-								self:HighlightText(0, 0);
+								self:HighlightText(0, 0)
 							</OnEditFocusLost>
 							<OnEditFocusGained>
-								self:HighlightText();
+								self:HighlightText()
 							</OnEditFocusGained>
 						</Scripts>
 						<FontString inherits="ChatFontNormal"/>
@@ -1907,7 +1907,7 @@
 							</Anchors>
 							<Scripts>
 								<OnVerticalScroll>
-									FauxScrollFrame_OnVerticalScroll(self, offset, TRADE_SKILL_HEIGHT, Skillet.ViewCraftersUpdate);
+									FauxScrollFrame_OnVerticalScroll(self, offset, TRADE_SKILL_HEIGHT, Skillet.ViewCraftersUpdate)
 								</OnVerticalScroll>
 							</Scripts>
 						</ScrollFrame>
@@ -1989,8 +1989,8 @@
 				</Frames>
 				<Scripts>
 					<OnLoad>
-						self:SetBackdropBorderColor(TOOLTIP_DEFAULT_COLOR.r, TOOLTIP_DEFAULT_COLOR.g, TOOLTIP_DEFAULT_COLOR.b);
-						self:SetBackdropColor(0.0, 0.0, 0.0, 0.9);
+						self:SetBackdropBorderColor(TOOLTIP_DEFAULT_COLOR.r, TOOLTIP_DEFAULT_COLOR.g, TOOLTIP_DEFAULT_COLOR.b)
+						self:SetBackdropColor(0.0, 0.0, 0.0, 0.9)
 					</OnLoad>
 				</Scripts>
 			</Frame>
@@ -2013,7 +2013,7 @@
 				<Scripts>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						Skillet:ShowRecipeNotes();
+						Skillet:ShowRecipeNotes()
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -2110,43 +2110,43 @@
 				</Layers>
 				<Scripts>
 					<OnLoad>
-						self:RegisterEvent("MODIFIER_STATE_CHANGED");
+						self:RegisterEvent("MODIFIER_STATE_CHANGED")
 					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						local link = Skillet:GetTradeSkillItemLink(Skillet.selectedSkill);
+						local link = Skillet:GetTradeSkillItemLink(Skillet.selectedSkill)
 						if ( IsControlKeyDown() ) then
 							<!-- This opens up the dressing room window and display the character
 								 wearing the item (if that is possible) -->
-							DressUpItemLink(link);
+							DressUpItemLink(link)
 						elseif ( IsShiftKeyDown() ) then
 							<!-- This put a link to the *item* that can be created with this trade skill
 								 into the current chat  box -->
-							ChatEdit_InsertLink(link);
+							ChatEdit_InsertLink(link)
 						end
 					</OnClick>
 					<OnEnter>
 						if ( Skillet.selectedSkill ~= -1 ) then
-							GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT");
-							Skillet:SetTradeSkillToolTip(SkilletFrame.selectedSkill);
+							GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
+							Skillet:SetTradeSkillToolTip(SkilletFrame.selectedSkill)
 							GameTooltip:Show()
-							CursorUpdate(self);
+							CursorUpdate(self)
 						end
 					</OnEnter>
 					<OnLeave>
-						GameTooltip:Hide();
-						ResetCursor();
+						GameTooltip:Hide()
+						ResetCursor()
 					</OnLeave>
 					<OnUpdate>
-						CursorOnUpdate(self);
+						CursorOnUpdate(self)
 					</OnUpdate>
 					<OnEvent>
 						if GameTooltip:IsVisible() and GameTooltip:IsOwned(self) then
 							if ( Skillet.selectedSkill ~= -1 ) then
-								GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT");
-								Skillet:SetTradeSkillToolTip(SkilletFrame.selectedSkill);
+								GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
+								Skillet:SetTradeSkillToolTip(SkilletFrame.selectedSkill)
 								GameTooltip:Show()
-								CursorUpdate(self);
+								CursorUpdate(self)
 							end
 						end
 					</OnEvent>
@@ -2245,7 +2245,7 @@
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						Skillet:AuctionatorSearch();
+						Skillet:AuctionatorSearch()
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -2254,7 +2254,7 @@
 			# Buttons to queue or create items
 			#
 			-->
-			<Button name="SkilletQueueAllButton" inherits="UIPanelButtonTemplate" text="QUEUE_ALL" parent="SkilletFrame">
+			<Button name="SkilletQueueAllButton" inherits="UIPanelButtonTemplate" text="Queue All" parent="SkilletFrame">
 				<Size>
 					<AbsDimension x="105" y="22"/>
 				</Size>
@@ -2271,11 +2271,11 @@
 					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						Skillet:QueueAllItems();
+						Skillet:QueueAllItems()
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="SkilletEnchantButton" inherits="UIPanelButtonTemplate" text="QUEUE_ALL" parent="SkilletFrame">
+			<Button name="SkilletEnchantButton" inherits="UIPanelButtonTemplate" text="Enchant" parent="SkilletFrame">
 				<Size>
 					<AbsDimension x="105" y="22"/>
 				</Size>
@@ -2292,11 +2292,11 @@
 					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						Skillet:EnchantItem(button);
+						Skillet:EnchantItem()
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="SkilletCreateAllButton" inherits="UIPanelButtonTemplate" text="CREATE_ALL" parent="SkilletFrame">
+			<Button name="SkilletCreateAllButton" inherits="UIPanelButtonTemplate" text="Create All" parent="SkilletFrame">
 				<Size>
 					<AbsDimension x="105" y="22"/>
 				</Size>
@@ -2313,7 +2313,7 @@
 					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						Skillet:CreateAllItems(button);
+						Skillet:CreateAllItems()
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -2322,7 +2322,7 @@
 			# A button to queue a specific number of items
 			#
 			-->
-			<Button name="SkilletQueueButton" inherits="UIPanelButtonTemplate" text="QUEUE" parent="SkilletFrame">
+			<Button name="SkilletQueueButton" inherits="UIPanelButtonTemplate" text="Queue" parent="SkilletFrame">
 				<Size>
 					<AbsDimension x="105" y="22"/>
 				</Size>
@@ -2365,7 +2365,7 @@
 					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						Skillet:CreateItems(SkilletItemCountInputBox:GetNumber(), button)
+						Skillet:CreateItems(SkilletItemCountInputBox:GetNumber())
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -2427,21 +2427,21 @@
 				</Layers>
 				<Scripts>
 					<OnEnterPressed>
-						self:ClearFocus();
+						self:ClearFocus()
 					</OnEnterPressed>
 					<OnEscapePressed>
-						self:ClearFocus();
+						self:ClearFocus()
 					</OnEscapePressed>
 					<OnTextChanged>
 						if ( self:GetText() == "0" ) then
-							self:SetText("1");
+							self:SetText("1")
 						end
 					</OnTextChanged>
 					<OnEditFocusLost>
-						self:HighlightText(0, 0);
+						self:HighlightText(0, 0)
 					</OnEditFocusLost>
 					<OnEditFocusGained>
-						self:HighlightText();
+						self:HighlightText()
 					</OnEditFocusGained>
 				</Scripts>
 				<FontString inherits="ChatFontNormal"/>
@@ -2627,7 +2627,7 @@
 				</Anchors>
 				<Scripts>
 					<OnVerticalScroll>
-						FauxScrollFrame_OnVerticalScroll(self, offset, SKILLET_TRADE_SKILL_HEIGHT, Skillet.QueueList_OnScroll);
+						FauxScrollFrame_OnVerticalScroll(self, offset, SKILLET_TRADE_SKILL_HEIGHT, Skillet.QueueList_OnScroll)
 					</OnVerticalScroll>
 				</Scripts>
 			</ScrollFrame>
@@ -2742,12 +2742,12 @@
 				Skillet:SkillButton_OnKeyDown(self, key)
 			</OnKeyDown>
 			<OnShow>
-				PlaySound(SOUNDKIT.IG_BACKPACK_OPEN); -- "igBackPackOpen"
+				PlaySound(SOUNDKIT.IG_BACKPACK_OPEN) -- "igBackPackOpen"
 				Skillet:Tradeskill_OnShow()
 				self:EnableKeyboard(false)
 			</OnShow>
 			<OnHide>
-				PlaySound(SOUNDKIT.IG_BACKPACK_CLOSE); -- "igBackPackClose"
+				PlaySound(SOUNDKIT.IG_BACKPACK_CLOSE) -- "igBackPackClose"
 				self:EnableKeyboard(false)
 			</OnHide>
 			<OnUpdate>

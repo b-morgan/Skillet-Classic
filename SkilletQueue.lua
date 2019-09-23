@@ -211,7 +211,10 @@ function Skillet:ProcessQueue(altMode)
 		if command and command.op == "iterate" then
 			local recipe = self:GetRecipe(command.recipeID)
 			local craftable = true
-			local cooldown = GetTradeSkillCooldown(skillIndexLookup[command.recipeID])
+			local cooldown
+			if skillIndex then
+				cooldown = GetTradeSkillCooldown(skillIndex)
+			end
 			if cooldown then
 				Skillet:Print(L["Skipping"],recipe.name,"-",L["has cooldown of"],SecondsToTime(cooldown))
 				craftable = false

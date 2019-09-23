@@ -100,14 +100,26 @@ function Skillet:GetQualityFromLink(link)
 	-- no match
 end
 
+--
 -- Returns the name of the current trade skill
+--
 function Skillet:GetTradeName(tradeID)
-	return (GetSpellInfo(tradeID))
+	DA.DEBUG(2,"GetTradeName("..tostring(tradeID)..")")
+	local tradeNameT,tradeNameS
+	tradeNameT = self.tradeSkillNamesByID[tradeID]
+	tradeNameS = GetSpellInfo(tradeID)
+	DA.DEBUG(2,"tradeNameT= "..tostring(tradeNameT)..", tradeNameS= "..tostring(tradeNameS))
+	if not tradeNameT then
+		return tradeNameS
+	end
+	return tradeNameT
 end
 
+--
 -- Returns a link for the currently selected tradeskill item.
 -- The input is an index into the currently selected tradeskill
 -- or craft.
+--
 function Skillet:GetTradeSkillItemLink(index)
 	local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, index)
 		if recipe then
@@ -198,16 +210,21 @@ end
 -- Gets the trade skill line, and knows how to do the right
 -- thing depending on whether or not this is a craft.
 function Skillet:GetTradeSkillLine()
-	local tradeName = GetSpellInfo(self.currentTrade)
-	local ranks = self:GetSkillRanks(self.currentPlayer, self.currentTrade)
+	DA.DEBUG(0,"GetTradeSkillLine(), currentTrade= "..tostring(self.currentTrade))
+	if self.currentTrade then
+		local tradeName = GetSpellInfo(self.currentTrade)
+		local ranks = self:GetSkillRanks(self.currentPlayer, self.currentTrade)
 		local rank, maxRank
-	if ranks then
-		rank, maxRank = ranks.rank, ranks.maxRank
+		if ranks then
+			rank, maxRank = ranks.rank, ranks.maxRank
+		else
+			rank, maxRank = 0, 0
+		end
+		DA.DEBUG(0,"GetTradeSkillLine= "..tostring(tradeName)..", "..tostring(rank)..", "..tostring(maxRank))
+		return tradeName, rank, maxRank
 	else
-		rank, maxRank = 0, 0
+		return nil, nil, nil
 	end
-	DA.DEBUG(0,"GetTradeSkillLine "..(tradeName or "nil").." "..(rank or "nil").." "..(maxRank or "nil"))	
-	return tradeName, rank, maxRank
 end
 
 -- Returns the number of trade or craft skills

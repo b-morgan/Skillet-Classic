@@ -816,6 +816,7 @@ function Skillet:UpdateTradeSkillWindow()
 	self:UpdateShoppingListWindow()
 	-- Window Title
 	local tradeName = self:GetTradeName(self.currentTrade)
+	if not tradeName then tradeName = "" end
 	local title = _G["SkilletTitleText"];
 	if title then
 		title:SetText(L["Skillet Trade Skills"] .. " "..self.version..": " .. self.currentPlayer .. "/" .. tradeName)
@@ -1612,7 +1613,6 @@ function Skillet:UpdateQueueWindow()
 		SkilletStartQueueButton:Disable()
 		SkilletEmptyQueueButton:Disable()
 	end
---	if self.queuecasting and UnitCastingInfo("player") then
 	if self.queuecasting then
 		SkilletStartQueueButton:SetText(L["Pause"])
 	else
@@ -1740,8 +1740,8 @@ function Skillet:SkillButton_DragUpdate()
 	end
 end
 
-function Skillet:SkillButton_OnDragStop(button, mouse)
-	Skillet:SkillButton_OnReceiveDrag(Skillet.mouseOver, mouse)
+function Skillet:SkillButton_OnDragStop(button)
+	Skillet:SkillButton_OnReceiveDrag(Skillet.mouseOver)
 	for i=1,num_recipe_buttons do
 		local button, buttonDrag = get_recipe_button(i)
 		buttonDrag:Hide()
@@ -1751,7 +1751,7 @@ function Skillet:SkillButton_OnDragStop(button, mouse)
 	self:UpdateTradeSkillWindow()
 end
 
-function Skillet:SkillButton_OnDragStart(button, mouse)
+function Skillet:SkillButton_OnDragStart(button)
 	local skill = button.skill
 	if skill.selected and skill then
 		if not self:RecipeGroupIsLocked() then
@@ -1782,7 +1782,7 @@ function Skillet:SkillButton_OnDragStart(button, mouse)
 	self:UpdateTradeSkillWindow()
 end
 
-function Skillet:SkillButton_OnReceiveDrag(button, mouse)
+function Skillet:SkillButton_OnReceiveDrag(button)
 	if not self:RecipeGroupIsLocked() then
 		local skill = nil
 		local destinationGroup = nil
@@ -1937,6 +1937,7 @@ function Skillet:SkillButton_OnKeyDown(button, key)
 end
 
 function Skillet:SkillButton_NameEditEnable(button)
+	DA.DEBUG(3,"SkillButton_NameEditEnable("..tostring(button)..")")
 	if not self:RecipeGroupIsLocked() then
 		SkillButtonNameEdit:SetText(button.skill.name)
 		SkillButtonNameEdit:SetParent(button:GetParent())
@@ -1955,9 +1956,10 @@ end
 
 local lastClick = 0
 -- When one of the skill buttons in the left scroll pane is clicked
-function Skillet:SkillButton_OnClick(button, mouse)
-	DA.DEBUG(3,"SkillButton_OnClick("..tostring(button)..", "..tostring(mouse)..")")
-	if (mouse=="LeftButton") then
+function Skillet:SkillButton_OnClick(button)
+	local mouse = GetMouseButtonClicked()
+	DA.DEBUG(3,"SkillButton_OnClick("..tostring(button).."), "..tostring(mouse))
+	if (mouse == "LeftButton") then
 		Skillet:QueueManagementToggle(true)
 		if not button.skill.mainGroup then
 			if IsShiftKeyDown() and self.skillMainSelection then
@@ -1988,13 +1990,15 @@ function Skillet:SkillButton_OnClick(button, mouse)
 			end
 		end
 		self:UpdateTradeSkillWindow()
-	elseif (mouse=="RightButton") then
+	elseif (mouse == "RightButton") then
 		self:SkilletSkillMenu_Show(button)
 	end
 end
 
 -- When one of the skill buttons in the left scroll pane is clicked
-function Skillet:SkillExpandButton_OnClick(button, mouse, doubleClicked)
+function Skillet:SkillExpandButton_OnClick(button)
+	local mouse = GetMouseButtonClicked()
+	DA.DEBUG(3,"SkillExpandButton_OnClick("..tostring(button).."), "..tostring(mouse))
 	if (mouse=="LeftButton") then
 		if button.group then
 			button.group.expanded = not button.group.expanded
@@ -2004,14 +2008,18 @@ function Skillet:SkillExpandButton_OnClick(button, mouse, doubleClicked)
 	end
 end
 
+--
 -- this function assures that a recipe that is indirectly selected (via reagent clicks, for example)
 -- will be visible in the skill list (ie, not scrolled off the top/bottom)
+--
 function Skillet:ScrollToSkillIndex(skillIndex)
 	DA.DEBUG(0,"ScrollToSkillIndex("..tostring(skillIndex)..")")
 	if skillIndex == nil then
 		return
 	end
-	-- scroll the skill list to make sure the new skill is revealed
+--
+-- scroll the skill list to make sure the new skill is revealed
+--
 	if SkilletSkillList:IsVisible() then
 		local skillListKey = self.currentPlayer..":"..self.currentTrade..":"..self.currentGroupLabel
 		local sortedSkillList = self.data.sortedSkillList[skillListKey]
@@ -2057,10 +2065,11 @@ function Skillet:PushSkill(player, tradeID, skillIndex)
 end
 
 function Skillet:getLvlUpChance()
-	-- icy: 03.03.2012:
-	-- according to pope (http://www.wowhead.com/spell=83949#comments)
-	-- % to level up with this receipt is calculated by: (greySkill - yourSkill) / (greySkill - yellowSkill
-	-- Lets add this information to skillet :)
+--
+-- icy: 03.03.2012:
+-- according to pope (http://www.wowhead.com/spell=83949#comments)
+-- % to level up with this receipt is calculated by: (greySkill - yourSkill) / (greySkill - yellowSkill
+--
 	local skilRanks = self:GetSkillRanks(self.currentPlayer, self.currentTrade)
 	local currentLevel, maxLevel = 0, 0
 	if skilRanks then
@@ -2234,8 +2243,12 @@ function Skillet:SkilletFrameForceClose()
 	end
 end
 
--- The start/pause queue button.
-function Skillet:StartQueue_OnClick(button,mouse)
+--
+-- Process/Pause button.
+--
+function Skillet:StartQueue_OnClick(button)
+	local mouse = GetMouseButtonClicked()
+	DA.DEBUG(0,"StartQueue_OnClick("..tostring(button).."), "..tostring(mouse))
 	if self.queuecasting then
 		self:CancelCast() -- next update will reset the text
 		button:Disable()
@@ -2250,7 +2263,7 @@ end
 local old_CloseSpecialWindows
 -- Called when the trade skill window is shown
 function Skillet:Tradeskill_OnShow()
-	DA.DEBUG(0,"Tradeskill_OnShow")
+	DA.DEBUG(0,"Tradeskill_OnShow()")
 	-- Need to hook this so that hitting [ESC] will close the Skillet window(s).
 	if not old_CloseSpecialWindows then
 		old_CloseSpecialWindows = CloseSpecialWindows
