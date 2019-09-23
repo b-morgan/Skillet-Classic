@@ -21,9 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- not considering alts
 -- does consider queued recipes
 function Skillet:InventoryReagentCraftability(reagentID, playerOverride)
-	DA.DEBUG(0,"InventoryReagentCraftability("..tostring(reagentID)..", "..tostring(playerOverride)..") -- "..tostring((GetItemInfo(reagentID))))
+	--DA.DEBUG(2,"InventoryReagentCraftability("..tostring(reagentID)..", "..tostring(playerOverride)..") -- "..tostring((GetItemInfo(reagentID))))
 	if self.visited[reagentID] then
-		DA.DEBUG(0,"Been Here Before")
+		--DA.DEBUG(2,"Been Here Before")
 		return 0			-- we've been here before, so bail out to avoid infinite loop
 	end
 	local player = playerOverride or Skillet.currentPlayer
@@ -41,16 +41,16 @@ function Skillet:InventoryReagentCraftability(reagentID, playerOverride)
 				local numCraftable = 100000
 				for i=1,#childRecipe.reagentData,1 do
 					local childReagent = childRecipe.reagentData[i]
-					DA.DEBUG(2,"childReagent="..DA.DUMP1(childReagent))
+					--DA.DEBUG(2,"childReagent="..DA.DUMP1(childReagent))
 					local numReagentOnHand = GetItemCount(childReagent.id,false) -- Classic can only craft from bags
 					local numReagentCraftable = self:InventoryReagentCraftability(childReagent.id, player)
 					--DA.DEBUG(2,"id="..childReagent.id.." ("..tostring((GetItemInfo(childReagent.id))).."), numReagentCraftable="..numReagentCraftable..", numReagentOnHand= "..tostring(numReagentOnHand))
 					numReagentCraftable = numReagentCraftable + numReagentOnHand
 					numCraftable = math.min(numCraftable, math.floor(numReagentCraftable/childReagent.numNeeded))
-					DA.DEBUG(2,"numCraftable="..numCraftable)
+					--DA.DEBUG(2,"numCraftable="..numCraftable)
 				end
 				numReagentsCrafted = numReagentsCrafted + numCraftable * childRecipe.numMade
-				DA.DEBUG(1,"numReagentsCrafted="..numReagentsCrafted)
+				--DA.DEBUG(2,"numReagentsCrafted="..numReagentsCrafted)
 			end
 		end
 	end
@@ -63,7 +63,7 @@ function Skillet:InventoryReagentCraftability(reagentID, playerOverride)
 	if numCrafted == 0 then
 		Skillet.db.realm.inventoryData[player][reagentID] = numCanUse
 	else
-		--DA.DEBUG(0,"player="..player..", numCrafted="..tostring(numCrafted)..", reagentID="..tostring(reagentID).."("..tostring((GetItemInfo(reagentID)))..")")
+		--DA.DEBUG(2,"player="..player..", numCrafted="..tostring(numCrafted)..", reagentID="..tostring(reagentID).."("..tostring((GetItemInfo(reagentID)))..")")
 		Skillet.db.realm.inventoryData[player][reagentID] = numCanUse.." "..numCrafted
 	end
 	self.visited[reagentID] = false -- okay to calculate this reagent again
