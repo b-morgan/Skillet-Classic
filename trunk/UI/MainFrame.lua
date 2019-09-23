@@ -1651,9 +1651,7 @@ function Skillet:UpdateQueueWindow()
 			nameButton:SetID(itemIndex)
 			local queueCommand = queue[itemIndex]
 			if queueCommand then
-				local recipe = self:GetRecipe(queueCommand.recipeID)
-				--self.db.global.recipeData[queueCommand.recipeID]
-				queueName:SetText(tostring(self:GetTradeName(recipe.tradeID) or recipe.tradeID)..":"..tostring(recipe.name or recipeID))
+				queueName:SetText(tostring(queueCommand.tradeName or queueCommand.tradeID)..":"..tostring(queueCommand.recipeID))	-- In Classic, recipeID is recipeName
 				queueCount:SetText(queueCommand.count)
 			end
 			nameButton:Show()
