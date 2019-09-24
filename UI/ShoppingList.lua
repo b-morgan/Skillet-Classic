@@ -956,11 +956,17 @@ function Skillet:DisplayShoppingList(atBank)
 	end
 	cache_list(self)
 	if not frame:IsVisible() then
-	DA.TRACE("wants to show shopping list")
 		frame:Show()
 	end
 	-- true == use cached recipes, we just loaded them after all
 	self:UpdateShoppingListWindow(true)
+end
+
+-- Tests for shopping list window visible
+function Skillet:IsShoppingListVisible()
+	if self.shoppingList then
+		return self.shoppingList:IsVisible()
+	end
 end
 
 -- Hides the shopping list window

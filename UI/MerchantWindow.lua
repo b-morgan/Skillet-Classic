@@ -214,6 +214,9 @@ function Skillet:BuyRequiredReagents()
 		self:Print(message)
 	end
 	self:InventoryScan()
+	if self:IsShoppingListVisible() then
+		self:UpdateShoppingListWindow()
+	end
 	update_merchant_buy_button()
 end
 
