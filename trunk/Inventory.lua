@@ -181,7 +181,7 @@ function Skillet:InventoryScan()
 			end
 		end
 	end
-		DA.DEBUG(0,"InventoryScan complete for "..tostring(player))
+	--DA.DEBUG(0,"InventoryScan complete for "..tostring(player))
 end
 
 function Skillet:GetInventory(player, reagentID)

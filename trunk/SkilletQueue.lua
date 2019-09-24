@@ -519,12 +519,10 @@ end
 
 function Skillet:ContinueCast(spell)
 	DA.DEBUG(0,"ContinueCast("..tostring(spell)..")")
-	if self.changingtrade then
---		self.currentTrade = self.changingtrade
+	if self.changingtrade then			-- contains the tradeID we are changing to
 		self.changingtrade = nil
-		Skillet:SkilletShow()
---		self:UpdateTradeSkillWindow()	-- self:UpdateTradeSkill()?
-		Skillet:SkilletShow()
+		self:UpdateTradeSkill()			-- Untested
+--		Skillet:SkilletShow()			-- seems to let DoTradeSkill know we have changed
 	else
 		self:AdjustInventory()
 	end

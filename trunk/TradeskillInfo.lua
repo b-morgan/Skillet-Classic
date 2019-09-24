@@ -104,11 +104,11 @@ end
 -- Returns the name of the current trade skill
 --
 function Skillet:GetTradeName(tradeID)
-	DA.DEBUG(2,"GetTradeName("..tostring(tradeID)..")")
+	--DA.DEBUG(2,"GetTradeName("..tostring(tradeID)..")")
 	local tradeNameT,tradeNameS
 	tradeNameT = self.tradeSkillNamesByID[tradeID]
 	tradeNameS = GetSpellInfo(tradeID)
-	DA.DEBUG(2,"tradeNameT= "..tostring(tradeNameT)..", tradeNameS= "..tostring(tradeNameS))
+	--DA.DEBUG(2,"tradeNameT= "..tostring(tradeNameT)..", tradeNameS= "..tostring(tradeNameS))
 	if not tradeNameT then
 		return tradeNameS
 	end

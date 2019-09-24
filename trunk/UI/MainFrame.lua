@@ -162,7 +162,9 @@ function Skillet:CreateTradeSkillWindow()
 	titletext:SetText(L["Skillet Trade Skills"].." "..Skillet.version);
 	local label = _G["SkilletSearchLabel"];
 	label:SetText(L["Search"]);
+
 	SkilletPluginButton:SetText(L["Plugins"])
+	SkilletPluginButton:Hide()						-- remove if there are any Plugins
 	SkilletCreateAllButton:SetText(L["Create All"])
 	SkilletQueueAllButton:SetText(L["Queue All"])
 	SkilletCreateButton:SetText(L["Create"])
@@ -170,6 +172,7 @@ function Skillet:CreateTradeSkillWindow()
 	SkilletStartQueueButton:SetText(L["Process"])
 	SkilletEmptyQueueButton:SetText(L["Clear"])
 	SkilletEnchantButton:SetText(L["Enchant"])
+	SkilletEnchantButton:Disable()					-- set because DoCraft is restricted
 	SkilletRecipeNotesButton:SetText(L["Notes"])
 	SkilletRecipeNotesFrameLabel:SetText(L["Notes"])
 	SkilletShoppingListButton:SetText(L["Shopping List"])
@@ -1482,10 +1485,16 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 	end
 	SkilletSkillIcon:SetNormalTexture(texture)
 	SkilletSkillIcon:Show()
-	if AuctionFrame and AuctionatorLoaded then
+--[[
+	if AuctionFrame and AuctionatorLoaded and self.auctionOpen then
 		SkilletAuctionatorButton:Show()
+	else
+		SkilletAuctionatorButton:Hide()
 	end
-	-- How many of these items are produced at one time ..
+]]--
+--
+-- How many of these items are produced at one time ..
+--
 	if recipe.numMade > 1 then
 		SkilletSkillIconCount:SetText(recipe.numMade)
 		SkilletSkillIconCount:Show()
@@ -1493,10 +1502,14 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		SkilletSkillIconCount:SetText("")
 		SkilletSkillIconCount:Hide()
 	end
-	-- How many can we queue/create?
+--
+-- How many can we queue/create?
+--
 	SkilletItemCountInputBox:SetText("" .. self.numItemsToCraft);
 	SkilletItemCountInputBox:HighlightText()
-	-- Reagents required ...
+--
+-- Reagents required ...
+--
 	SkilletReagentLabel:SetText(SPELL_REAGENTS)
 	SkilletReagentLabel:Show();
 	local width = SkilletReagentParent:GetWidth()
@@ -1529,7 +1542,9 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 					needed:SetTextColor(1,0,0)
 				end
 			else
-				-- ungrey it
+--
+-- ungrey it
+--
 				count:SetText(count_text)
 				text:SetText(reagentName)
 				needed:SetTextColor(1,1,1)
@@ -1541,8 +1556,10 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 			button:Show()
 			lastReagentButton = button
 		else
-			-- out of necessary reagents, don't need to show the button,
-			-- or any of the text.
+--
+-- out of necessary reagents, don't need to show the button,
+-- or any of the text.
+--
 			button:Hide()
 		end
 	end
@@ -1551,7 +1568,9 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 	else
 		SkilletPreviousItemButton:Hide()
 	end
+--
 --	Do any plugins want to add extra info to the details window?
+--
 	local label, extra_text = Skillet:GetExtraText(skill, recipe)
 	if extra_text then
 		SkilletExtraDetailTextLeft:SetPoint("TOPLEFT",lastReagentButton,"BOTTOMLEFT",0,-10)
@@ -2768,42 +2787,4 @@ function Skillet:UpdateStandaloneQueueWindow()
 	end
 	SkilletStandaloneQueue:SetAlpha(self.db.profile.transparency)
 	SkilletStandaloneQueue:SetScale(self.db.profile.scale)
-end
-
--- Add Auctionator support
-function Skillet:AuctionatorSearch()
-	if not AuctionatorLoaded or not AuctionFrame then
-		return
-	end
-	if not AuctionFrame:IsShown() then
-		Atr_Error_Display (ZT("When the Auction House is open\nclicking this button tells Auctionator\nto scan for the item and all its reagents."))
-		return
-	end
-	local recipe, recipeId = self:GetRecipeDataByTradeIndex(self.currentTrade, self.selectedSkill)
-	if not recipe then
-		return
-	end
-	local BUY_TAB = 3;
-	Atr_SelectPane (BUY_TAB);
-	local numReagents = #recipe.reagentData
-	local shoppingListName = GetItemInfo(recipe.itemID)
-	if (shoppingListName == nil) then
-		shoppingListName = self:GetRecipeName(recipeId)
-	end
-	local reagentIndex
-	local items = {}
-	if (shoppingListName) then
-		table.insert (items, shoppingListName)
-	end
-	for reagentIndex = 1, numReagents do
-		local reagentId = recipe.reagentData[reagentIndex].id
-		if (reagentId and (reagentId ~= 3371)) then
-			local reagentName = GetItemInfo(reagentId)
-			if (reagentName) then
-				table.insert (items, reagentName)
-				-- DA.DEBUG(0, "Reagent num "..reagentIndex.." ("..reagentId..") "..reagentName.." added")
-			end
-		end
-	end
-	Atr_SearchAH (shoppingListName, items)
 end
