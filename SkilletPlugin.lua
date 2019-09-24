@@ -17,7 +17,83 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
-Skillet.displayDetailPlugins = {}
+Skillet.displayDetailPlugins = {}		-- each plugin will register if it has something to add
+Skillet.RecipeNamePrefixes = {}			-- each plugin will register, only one can be active
+Skillet.RecipeNameSuffixes = {}			-- each plugin will register, only one can be active
+
+Skillet.pluginsOrder = 2
+Skillet.pluginsOptions = {
+		name = "Plugins",
+		type = "group",
+		childGroups = "tree",
+		args = {
+			RecipeNamePrefix = {
+				type = "select",
+				name = "RecipeNamePrefix",
+				desc = "Only one plugin can supply prefix text",
+				order = 1,
+				get = function() 
+					return Skillet.db.profile.plugins.recipeNamePrefix
+				end,
+				set = function(_, value)
+					Skillet.db.profile.plugins.recipeNamePrefix = value
+					Skillet:UpdateTradeSkillWindow()
+				end,
+				values = {
+					[" "] = " ",
+--					Additional entries filled in dynamically by RegisterRecipeNamePlugin
+				},
+			},
+			RecipeNameSuffix = {
+				type = "select",
+				name = "RecipeNameSuffix",
+				desc = "Only one plugin can supply suffix text",
+				order = 1,
+				get = function() 
+					return Skillet.db.profile.plugins.recipeNameSuffix
+				end,
+				set = function(_, value)
+					Skillet.db.profile.plugins.recipeNameSuffix = value
+					Skillet:UpdateTradeSkillWindow()
+				end,
+				values = {
+					[" "] = " ",
+--					Additional entries filled in dynamically by RegisterRecipeNamePlugin
+				},
+			},
+-- 			Filled in dynamically by AddPluginOptions
+		},
+	}
+
+function Skillet:AddPluginOptions(options)
+	options.order = Skillet.pluginsOrder
+	Skillet.pluginsOrder = Skillet.pluginsOrder + 1
+	Skillet.pluginsOptions.args[options.name] = options
+end
+
+function Skillet:RegisterRecipeNamePlugin(moduleName, priority)
+	DA.DEBUG(0,"RegisterRecipeNamePlugin("..tostring(moduleName)..", "..tostring(priority))
+	if not priority then priority = 100 end
+	if type(moduleName) == "string" then
+		local module = Skillet[moduleName]
+		if module and type(module) == "table" then
+			if module.RecipeNamePrefix then
+				Skillet.RecipeNamePrefixes[moduleName] = module
+				Skillet.pluginsOptions.args.RecipeNamePrefix.values[module.options.name] = module.options.name
+			end
+			if module.RecipeNameSuffix then
+				Skillet.RecipeNameSuffixes[moduleName] = module
+				Skillet.pluginsOptions.args.RecipeNameSuffix.values[module.options.name] = module.options.name
+			end
+		end
+	end
+end
+
+function Skillet:IsRecipeNamePluginRegistered(moduleName)
+	if type(moduleName)	 == "string" then
+		return Skillet.RecipeNamePlugins[moduleName] ~= nil
+	end
+end
 
 function Skillet:RegisterDisplayDetailPlugin(moduleName, priority)
 	DA.DEBUG(0,"RegisterDisplayDetailPlugin("..tostring(moduleName)..", "..tostring(priority))
@@ -60,6 +136,44 @@ function Skillet:GetExtraText(skill, recipe)
 	return output_label, output_text
 end
 
+function Skillet:RecipeNamePrefix(skill, recipe)
+	local text
+	local recipeNamePrefix = self.db.profile.plugins.recipeNamePrefix
+	if recipeNamePrefix and recipeNamePrefix ~= " " then
+		for k,v in pairs(Skillet.RecipeNamePrefixes) do
+			--DA.DEBUG(1,"k= "..tostring(k)..", v= "..tostring(v))
+			if v.RecipeNamePrefix and v.options.name == recipeNamePrefix then
+				text = v.RecipeNamePrefix(skill, recipe)
+				--DA.DEBUG(1,"text= "..tostring(text))
+				break
+			end
+		end
+	else
+--		call the ThirdPartyHooks function and process any returns
+		text = Skillet:GetRecipeNamePrefix(skill, recipe)
+	end
+	return text
+end
+
+function Skillet:RecipeNameSuffix(skill, recipe)
+	local text
+	local recipeNameSuffix = self.db.profile.plugins.recipeNameSuffix
+	if recipeNameSuffix and recipeNameSuffix ~= " " then
+		for k,v in pairs(Skillet.RecipeNameSuffixes) do
+			--DA.DEBUG(1,"k= "..tostring(k)..", v= "..tostring(v))
+			if v.RecipeNameSuffix and v.options.name == recipeNameSuffix then
+				text = v.RecipeNameSuffix(skill, recipe)
+				--DA.DEBUG(1,"text= "..tostring(text))
+				break
+			end
+		end
+	else
+--		call the ThirdPartyHooks function and process any returns
+		text = Skillet:GetRecipeNameSuffix(skill, recipe)
+	end
+	return text
+end
+
 function Skillet:InitializePlugins()
 	DA.DEBUG(0,"InitializePlugins()")
 	for k,v in pairs(Skillet.displayDetailPlugins) do
@@ -76,6 +190,8 @@ function Skillet:EnablePlugins()
 		DA.DEBUG(1,"k= "..tostring(k)..", v= "..tostring(v))
 		if v and v.OnEnable then
 			v.OnEnable()
+		elseif v and v.OnInitialize then
+			v.OnInitialize()
 		end
 	end
 end

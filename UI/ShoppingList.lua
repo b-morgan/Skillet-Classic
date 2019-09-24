@@ -435,6 +435,7 @@ end
 
 -- Called when the auction frame is opened
 function Skillet:AUCTION_HOUSE_SHOW()
+	self.auctionOpen = true
 	self:AuctionScan()
 	self:RegisterEvent("AUCTION_OWNED_LIST_UPDATE")
 	if not self.db.profile.display_shopping_list_at_auction then
@@ -449,6 +450,7 @@ end
 
 -- Called when the auction frame is closed
 function Skillet:AUCTION_HOUSE_CLOSED()
+	self.auctionOpen = false
 	self:UnregisterEvent("AUCTION_OWNED_LIST_UPDATE")
 	self:HideShoppingList()
 end

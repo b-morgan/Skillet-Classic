@@ -17,17 +17,67 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-
 Skillet.TSIPlugin = {}
 
 local plugin = Skillet.TSIPlugin
 local L = Skillet.L
+
+plugin.options =
+{
+	type = 'group',
+	name = "TradeskillInfo",
+	order = 1,
+	args = {
+		enabled = {
+			type = "toggle",
+			name = L["Enabled"],
+			get = function()
+				return Skillet.db.profile.plugins.TSI.enabled
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.TSI.enabled = value
+				Skillet:UpdateTradeSkillWindow()
+			end,
+			width = "double",
+			order = 1
+		},
+	},
+}
+
+function plugin.OnInitialize()
+	if not Skillet.db.profile.plugins.TSI then
+		Skillet.db.profile.plugins.TSI = {}
+		Skillet.db.profile.plugins.TSI.enabled = true
+	end
+	Skillet:AddPluginOptions(plugin.options)
+end
 
 local TSISourceColor = {
 	V = "|cff00ff00",
 	Q = "|cffffff00",
 	D = "|cffff0000",
 }
+
+local function GetMoneyString(value)
+	if not value then return "???" end
+	local neg = value < 0 and "-" or ""
+	local gold = floor(math.abs(value) / 10000)
+	local silver = mod(floor(math.abs(value) / 100), 100)
+	local copper = mod(floor(math.abs(value)), 100)
+	if gold ~= 0 then
+		if gold < 100 then
+			return format("%s%dg %ds %dc", neg, gold, silver, copper)
+		elseif gold < 1000 then
+			return format("%s%dg %ds", neg, gold, silver)
+		else
+			return format("%s%dg", neg, gold)
+		end
+	elseif silver ~= 0 then
+		return format("%s%ds %dc", neg, silver, copper)
+	else
+		return format("%s%dc", neg, copper)
+	end
+end
 
 local function TSIGetRecipeSources(recipe, opposing)
 	if not TradeskillInfo.vars.recipes[recipe] then
@@ -100,17 +150,13 @@ local function TSIGetRecipeSources(recipe, opposing)
 end
 
 function plugin.GetExtraText(skill, recipe)
-	if not TradeskillInfo then return end
+	if not TradeskillInfo or not Skillet.db.profile.plugins.TSI.enabled then return end
 	if not skill or not recipe then return end
-
 	local _, bop, extra_text
 	local label = GRAY_FONT_COLOR_CODE..L["Source:"]..FONT_COLOR_CODE_CLOSE
-
 	local tsiRecipeID = recipe.spellID
-
 	if tsiRecipeID then
 		local combineID = TradeskillInfo:GetCombineRecipe(tsiRecipeID)
-
 		if combineID then
 			_, extra_text = TSIGetRecipeSources(combineID, false)
 			if not extra_text then
@@ -118,36 +164,36 @@ function plugin.GetExtraText(skill, recipe)
 			end
 			if TradeskillInfo:ShowingSkillAuctioneerProfit() then -- insert item value and reagent costs from Auctioneer
 				local value, cost, profit = TradeskillInfo:GetCombineAuctioneerCost(tsiRecipeID)
-
+				if GetAuctionBuyout and Skillet.scrollData[tsiRecipeID] then
+					value = GetAuctionBuyout(Skillet.scrollData[tsiRecipeID]) or 0
+					profit = value - cost
+				end
 				label = label.."\n"..GRAY_FONT_COLOR_CODE.."Auction Profit:"..FONT_COLOR_CODE_CLOSE
-				extra_text = extra_text.."\n"..("%s - %s = %s"):format( TradeskillInfo:GetMoneyString(value), TradeskillInfo:GetMoneyString(cost), TradeskillInfo:GetMoneyString(profit) )
+				extra_text = extra_text.."\n"..("%s - %s = %s"):format(GetMoneyString(value), GetMoneyString(cost), GetMoneyString(profit))
 			end
-
 			if TradeskillInfo:ShowingSkillProfit() then -- insert item value and reagent costs
 				local value, cost, profit = TradeskillInfo:GetCombineCost(tsiRecipeID)
-
+				if Skillet.scrollData[tsiRecipeID] then
+					value = select(11, GetItemInfo(Skillet.scrollData[tsiRecipeID]))
+					profit = (value or 0) - (cost or 0) 
+				end
 				label = label.."\n"..GRAY_FONT_COLOR_CODE.."Vendor Profit:"..FONT_COLOR_CODE_CLOSE
-				extra_text = extra_text.."\n"..("%s - %s = %s"):format( TradeskillInfo:GetMoneyString(value), TradeskillInfo:GetMoneyString(cost), TradeskillInfo:GetMoneyString(profit) )
+				extra_text = extra_text.."\n"..("%s - %s = %s"):format(GetMoneyString(value), GetMoneyString(cost), GetMoneyString(profit))
 			end
-
 			if TradeskillInfo:ShowingSkillLevel() then
 				label = label.."\n"..GRAY_FONT_COLOR_CODE.."Skill Levels:"..FONT_COLOR_CODE_CLOSE
 				extra_text = extra_text.."\n"..TradeskillInfo:GetColoredDifficulty(tsiRecipeID)
 			end
-
 			if Skillet:bopCheck(combineID) then
 				bop = true
 			end
-
 		else
 			extra_text = "|cffff0000"..L["Unknown"].."|r"
 		end
 	end
-
 	if bop then
 		label = label.."\n|cffff0000(*BOP*)|r"
 	end
-
 	return label, extra_text
 end
 

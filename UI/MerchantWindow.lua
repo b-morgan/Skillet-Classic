@@ -70,7 +70,7 @@ end
 -- you to automatically buy reagents.
 local function update_merchant_buy_button()
 	Skillet:InventoryScan()
-	local list = Skillet:GetShoppingList(UnitName("player"))
+	local list = Skillet:GetShoppingList(Skillet.currentPlayer)
 	if not list or #list == 0 then
 		SkilletMerchantBuyFrame:Hide()
 		return
@@ -78,16 +78,15 @@ local function update_merchant_buy_button()
 		SkilletMerchantBuyFrame:Hide()
 		return
 	end
+	if Skillet.db.profile.display_shopping_list_at_merchant then
+		Skillet:DisplayShoppingList(false)
+	end
 	if SkilletMerchantBuyFrame:IsVisible() then
 		-- already inserted the button
 		return
 	end
 	SkilletMerchantBuyFrameButton:SetText(L["Reagents"]);
-	if Skillet.wowVersion > 50000 then
-		SkilletMerchantBuyFrame:SetPoint("TOPLEFT", "MerchantFrame", "TOPLEFT" , 55, -5);
-	else
-		SkilletMerchantBuyFrame:SetPoint("TOPLEFT", "MerchantFrame", "TOPLEFT" , 60, -28);
-	end
+	SkilletMerchantBuyFrame:SetPoint("TOPLEFT", "MerchantFrame", "TOPLEFT" , 60, -28) -- May need to be adjusted for each WoW build
 	SkilletMerchantBuyFrame:SetFrameStrata("HIGH");
 	SkilletMerchantBuyFrame:Show();
 end
@@ -132,7 +131,6 @@ function Skillet:MERCHANT_UPDATE()
 	if Skillet.db.profile.vendor_buy_button or Skillet.db.profile.vendor_auto_buy then
 		update_merchant_inventory()
 	end
-	self:InventoryScan()						-- prolly not needed
 end
 
 -- Merchant window closed
@@ -140,13 +138,12 @@ function Skillet:MERCHANT_CLOSED()
 	remove_merchant_buy_button()
 	merchant_inventory = {}
 	self.autoPurchaseComplete = nil
-	self:InventoryScan()						-- prolly not needed
 end
 
 -- If at a vendor with the window open, buy anything that they
--- sell that is required by any queued reciped.
+-- sell that is required by any queued recipe.
 function Skillet:BuyRequiredReagents()
-	local list = Skillet:GetShoppingList(UnitName("player"))
+	local list = Skillet:GetShoppingList(Skillet.currentPlayer)
 	if #list == 0 then
 		return
 	elseif does_merchant_sell_required_items(list) == false then
@@ -154,8 +151,8 @@ function Skillet:BuyRequiredReagents()
 	elseif not MerchantFrame or MerchantFrame:IsVisible() == false then
 		return
 	end
-	local totalspent = 0;
-	local items_purchased = 0;
+	local totalspent = 0
+	local items_purchased = 0
 	-- for each item they sell, see if we need it
 	-- ... if we do, buy the hell out of it.
 	local count = GetMerchantNumItems()
@@ -166,7 +163,7 @@ function Skillet:BuyRequiredReagents()
 			if numAvailable == -1 then
 				local id = self:GetItemIDFromLink(link)
 				-- OK, lets see if we need it.
-				local count = 0;
+				local count = 0
 				for j=1,#list,1 do
 					if list[j].id == id then
 						count = list[j].count
@@ -224,7 +221,7 @@ function Skillet:MerchantBuyButton_OnEnter(button)
 	GameTooltip:SetOwner(button, "ANCHOR_BOTTOMRIGHT")
 	GameTooltip:ClearLines()
 	GameTooltip:AddLine(L["Buy Reagents"])
-	local needList = Skillet:GetShoppingList(UnitName("player"))
+	local needList = Skillet:GetShoppingList(Skillet.currentPlayer)
 	local totalCost = 0
 	for i=1,#needList,1 do
 		local itemID = needList[i].id

@@ -49,7 +49,6 @@ local defaults = {
 		vendor_buy_button = true,
 		vendor_auto_buy   = false,
 		show_item_notes_tooltip = false,
-		show_crafters_tooltip = true,
 		show_detailed_recipe_tooltip = true,			-- show any tooltips?
 		display_full_tooltip = true,					-- show full blizzards tooltip
 		display_item_tooltip = true,					-- show item tooltip or recipe tooltip
@@ -60,8 +59,11 @@ local defaults = {
 		display_shopping_list_at_bank = true,
 		display_shopping_list_at_guildbank = false,		-- not in Classic
 		display_shopping_list_at_auction = true,
+		display_shopping_list_at_merchant = true,
 		use_blizzard_for_followers = false,				-- not in Classic
 		hide_blizzard_frame = true,
+		confirm_queue_clear = false,
+		queue_only_view = true,
 		transparency = 1.0,
 		scale = 1.0,
 		plugins = {},
@@ -75,6 +77,7 @@ local defaults = {
 		-- options specific to a current tradeskill
 		tradeskill_options = {},
 		include_alts = true,	-- Display alt's items in shopping list
+		same_faction = true,	-- Display same faction alt items only
 		item_order =  false,	-- Order shopping list by item
 		merge_items = false,	-- Merge same shopping list items together
 		include_guild = false,	-- Use the contents of the Guild Bank
@@ -105,6 +108,9 @@ Skillet.unknownRecipe = {
 	itemID = 0,
 	numMade = 0,
 	spellID = 0,
+	numCraftable = 0,
+	numCraftableVendor = 0,
+	numCraftableAlts = 0,
 }
 
 -- All the options that we allow the user to control.
@@ -129,10 +135,10 @@ Skillet.options =
 					name = L["VENDORBUYBUTTONNAME"],
 					desc = L["VENDORBUYBUTTONDESC"],
 					get = function()
-						return Skillet.db.profile.vendor_buy_button;
+						return Skillet.db.profile.vendor_buy_button
 					end,
 					set = function(self,value)
-						Skillet.db.profile.vendor_buy_button = value;
+						Skillet.db.profile.vendor_buy_button = value
 					end,
 					width = "double",
 					order = 12
@@ -142,10 +148,10 @@ Skillet.options =
 					name = L["VENDORAUTOBUYNAME"],
 					desc = L["VENDORAUTOBUYDESC"],
 					get = function()
-						return Skillet.db.profile.vendor_auto_buy;
+						return Skillet.db.profile.vendor_auto_buy
 					end,
 					set = function(self,value)
-						Skillet.db.profile.vendor_auto_buy = value;
+						Skillet.db.profile.vendor_auto_buy = value
 					end,
 					width = "double",
 					order = 13
@@ -155,63 +161,65 @@ Skillet.options =
 					name = L["SHOWITEMNOTESTOOLTIPNAME"],
 					desc = L["SHOWITEMNOTESTOOLTIPDESC"],
 					get = function()
-						return Skillet.db.profile.show_item_notes_tooltip;
+						return Skillet.db.profile.show_item_notes_tooltip
 					end,
 					set = function(self,value)
-						Skillet.db.profile.show_item_notes_tooltip = value;
+						Skillet.db.profile.show_item_notes_tooltip = value
 					end,
 					width = "double",
 					order = 14
 				},
-				show_detailed_recipe_tooltip = {
-					type = "toggle",
-					name = L["SHOWDETAILEDRECIPETOOLTIPNAME"],
-					desc = L["SHOWDETAILEDRECIPETOOLTIPDESC"],
-					get = function()
-						return Skillet.db.profile.show_detailed_recipe_tooltip;
-					end,
-					set = function(self,value)
-						Skillet.db.profile.show_detailed_recipe_tooltip = value;
-					end,
-					width = "double",
-					order = 15
-				},
-				display_full_tooltip = {
-					type = "toggle",
-					name = L["SHOWFULLTOOLTIPNAME"],
-					desc = L["SHOWFULLTOOLTIPDESC"],
-					get = function()
-						return Skillet.db.profile.display_full_tooltip;
-					end,
-					set = function(self,value)
-						Skillet.db.profile.display_full_tooltip = value;
-					end,
-					width = "double",
-					order = 16
-				},
-				display_item_tooltip = {
-					type = "toggle",
-					name = L["SHOWITEMTOOLTIPNAME"],
-					desc = L["SHOWITEMTOOLTIPDESC"],
-					get = function()
-						return Skillet.db.profile.display_item_tooltip;
-					end,
-					set = function(self,value)
-						Skillet.db.profile.display_item_tooltip = value;
-					end,
-					width = "double",
-					order = 17
-				},
+--[[
 				show_crafters_tooltip = {
 					type = "toggle",
 					name = L["SHOWCRAFTERSTOOLTIPNAME"],
 					desc = L["SHOWCRAFTERSTOOLTIPDESC"],
 					disabled = true, -- because of 5.4 changes to trade links 
 					get = function()
-						return Skillet.db.profile.show_crafters_tooltip;
+						return Skillet.db.profile.show_crafters_tooltip
 					end,
 					set = function(self,value)
-						Skillet.db.profile.show_crafters_tooltip = value;
+						Skillet.db.profile.show_crafters_tooltip = value
+					end,
+					width = "double",
+					order = 15
+				},
+]]--
+				show_detailed_recipe_tooltip = {
+					type = "toggle",
+					name = L["SHOWDETAILEDRECIPETOOLTIPNAME"],
+					desc = L["SHOWDETAILEDRECIPETOOLTIPDESC"],
+					get = function()
+						return Skillet.db.profile.show_detailed_recipe_tooltip
+					end,
+					set = function(self,value)
+						Skillet.db.profile.show_detailed_recipe_tooltip = value
+					end,
+					width = "double",
+					order = 16
+				},
+				display_full_tooltip = {
+					type = "toggle",
+					name = L["SHOWFULLTOOLTIPNAME"],
+					desc = L["SHOWFULLTOOLTIPDESC"],
+					get = function()
+						return Skillet.db.profile.display_full_tooltip
+					end,
+					set = function(self,value)
+						Skillet.db.profile.display_full_tooltip = value
+					end,
+					width = "double",
+					order = 17
+				},
+				display_item_tooltip = {
+					type = "toggle",
+					name = L["SHOWITEMTOOLTIPNAME"],
+					desc = L["SHOWITEMTOOLTIPDESC"],
+					get = function()
+						return Skillet.db.profile.display_item_tooltip
+					end,
+					set = function(self,value)
+						Skillet.db.profile.display_item_tooltip = value
 					end,
 					width = "double",
 					order = 18
@@ -221,10 +229,10 @@ Skillet.options =
 					name = L["LINKCRAFTABLEREAGENTSNAME"],
 					desc = L["LINKCRAFTABLEREAGENTSDESC"],
 					get = function()
-						return Skillet.db.profile.link_craftable_reagents;
+						return Skillet.db.profile.link_craftable_reagents
 					end,
 					set = function(self,value)
-						Skillet.db.profile.link_craftable_reagents = value;
+						Skillet.db.profile.link_craftable_reagents = value
 					end,
 					width = "double",
 					order = 19
@@ -234,10 +242,10 @@ Skillet.options =
 					name = L["QUEUECRAFTABLEREAGENTSNAME"],
 					desc = L["QUEUECRAFTABLEREAGENTSDESC"],
 					get = function()
-						return Skillet.db.profile.queue_craftable_reagents;
+						return Skillet.db.profile.queue_craftable_reagents
 					end,
 					set = function(self,value)
-						Skillet.db.profile.queue_craftable_reagents = value;
+						Skillet.db.profile.queue_craftable_reagents = value
 					end,
 					width = "double",
 					order = 20
@@ -248,10 +256,10 @@ Skillet.options =
 					name = L["QUEUEGLYPHREAGENTSNAME"],
 					desc = L["QUEUEGLYPHREAGENTSDESC"],
 					get = function()
-						return Skillet.db.profile.queue_glyph_reagents;
+						return Skillet.db.profile.queue_glyph_reagents
 					end,
 					set = function(self,value)
-						Skillet.db.profile.queue_glyph_reagents = value;
+						Skillet.db.profile.queue_glyph_reagents = value
 					end,
 					width = "double",
 					order = 21
@@ -262,10 +270,10 @@ Skillet.options =
 					name = L["DISPLAYSHOPPINGLISTATBANKNAME"],
 					desc = L["DISPLAYSHOPPINGLISTATBANKDESC"],
 					get = function()
-						return Skillet.db.profile.display_shopping_list_at_bank;
+						return Skillet.db.profile.display_shopping_list_at_bank
 					end,
 					set = function(self,value)
-						Skillet.db.profile.display_shopping_list_at_bank = value;
+						Skillet.db.profile.display_shopping_list_at_bank = value
 					end,
 					width = "double",
 					order = 22
@@ -276,10 +284,10 @@ Skillet.options =
 					name = L["DISPLAYSHOPPINGLISTATGUILDBANKNAME"],
 					desc = L["DISPLAYSHOPPINGLISTATGUILDBANKDESC"],
 					get = function()
-						return Skillet.db.profile.display_shopping_list_at_guildbank;
+						return Skillet.db.profile.display_shopping_list_at_guildbank
 					end,
 					set = function(self,value)
-						Skillet.db.profile.display_shopping_list_at_guildbank = value;
+						Skillet.db.profile.display_shopping_list_at_guildbank = value
 					end,
 					width = "double",
 					order = 23
@@ -290,13 +298,26 @@ Skillet.options =
 					name = L["DISPLAYSHOPPINGLISTATAUCTIONNAME"],
 					desc = L["DISPLAYSHOPPINGLISTATAUCTIONDESC"],
 					get = function()
-						return Skillet.db.profile.display_shopping_list_at_auction;
+						return Skillet.db.profile.display_shopping_list_at_auction
 					end,
 					set = function(self,value)
-						Skillet.db.profile.display_shopping_list_at_auction = value;
+						Skillet.db.profile.display_shopping_list_at_auction = value
 					end,
 					width = "double",
 					order = 24
+				},
+				display_shopping_list_at_merchant = {
+					type = "toggle",
+					name = L["DISPLAYSHOPPINGLISTATMERCHANTNAME"],
+					desc = L["DISPLAYSHOPPINGLISTATMERCHANTDESC"],
+					get = function()
+						return Skillet.db.profile.display_shopping_list_at_merchant
+					end,
+					set = function(self,value)
+						Skillet.db.profile.display_shopping_list_at_merchant = value
+					end,
+					width = "double",
+					order = 25
 				},
 				show_craft_counts = {
 					type = "toggle",
@@ -307,10 +328,10 @@ Skillet.options =
 					end,
 					set = function(self,value)
 						Skillet.db.profile.show_craft_counts = value
-						self:UpdateTradeSkillWindow()
+						Skillet:UpdateTradeSkillWindow()
 					end,
 					width = "double",
-					order = 25,
+					order = 26,
 				},
 --[[
 				use_blizzard_for_followers = {
@@ -318,13 +339,13 @@ Skillet.options =
 					name = L["USEBLIZZARDFORFOLLOWERSNAME"],
 					desc = L["USEBLIZZARDFORFOLLOWERSDESC"],
 					get = function()
-						return Skillet.db.profile.use_blizzard_for_followers;
+						return Skillet.db.profile.use_blizzard_for_followers
 					end,
 					set = function(self,value)
-						Skillet.db.profile.use_blizzard_for_followers = value;
+						Skillet.db.profile.use_blizzard_for_followers = value
 					end,
 					width = "double",
-					order = 26
+					order = 27
 				},
 ]]--
 				hide_blizzard_frame = {
@@ -332,13 +353,13 @@ Skillet.options =
 					name = L["HIDEBLIZZARDFRAMENAME"],
 					desc = L["HIDEBLIZZARDFRAMEDESC"],
 					get = function()
-						return Skillet.db.profile.hide_blizzard_frame;
+						return Skillet.db.profile.hide_blizzard_frame
 					end,
 					set = function(self,value)
-						Skillet.db.profile.hide_blizzard_frame = value;
+						Skillet.db.profile.hide_blizzard_frame = value
 					end,
 					width = "double",
-					order = 26
+					order = 28
 				},
 			}
 		},
@@ -362,6 +383,48 @@ Skillet.options =
 					width = "double",
 					order = 1
 				},
+				enhanced_recipe_display = {
+					type = "toggle",
+					name = L["ENHANCHEDRECIPEDISPLAYNAME"],
+					desc = L["ENHANCHEDRECIPEDISPLAYDESC"],
+					get = function()
+						return Skillet.db.profile.enhanced_recipe_display
+					end,
+					set = function(self,value)
+						Skillet.db.profile.enhanced_recipe_display = value
+						Skillet:UpdateTradeSkillWindow()
+					end,
+					width = "double",
+					order = 2,
+				},
+				confirm_queue_clear = {
+					type = "toggle",
+					name = L["CONFIRMQUEUECLEARNAME"],
+					desc = L["CONFIRMQUEUECLEARDESC"],
+					get = function()
+						return Skillet.db.profile.confirm_queue_clear
+					end,
+					set = function(self,value)
+						Skillet.db.profile.confirm_queue_clear = value
+						Skillet:UpdateTradeSkillWindow()
+					end,
+					width = "double",
+					order = 3,
+				},
+				queue_only_view = {
+					type = "toggle",
+					name = L["QUEUEONLYVIEWNAME"],
+					desc = L["QUEUEONLYVIEWDESC"],
+					get = function()
+						return Skillet.db.profile.queue_only_view
+					end,
+					set = function(self,value)
+						Skillet.db.profile.queue_only_view = value
+						Skillet:UpdateTradeSkillWindow()
+					end,
+					width = "double",
+					order = 4,
+				},
 				transparency = {
 					type = "range",
 					name = L["Transparency"],
@@ -377,7 +440,7 @@ Skillet.options =
 						Skillet:UpdateStandaloneQueueWindow()
 					end,
 					width = "double",
-					order = 2,
+					order = 5,
 				},
 				scale = {
 					type = "range",
@@ -394,21 +457,7 @@ Skillet.options =
 						Skillet:UpdateStandaloneQueueWindow()
 					end,
 					width = "double",
-					order = 3,
-				},
-				enhanced_recipe_display = {
-					type = "toggle",
-					name = L["ENHANCHEDRECIPEDISPLAYNAME"],
-					desc = L["ENHANCHEDRECIPEDISPLAYDESC"],
-					get = function()
-						return Skillet.db.profile.enhanced_recipe_display
-					end,
-					set = function(self,value)
-						Skillet.db.profile.enhanced_recipe_display = value
-						Skillet:UpdateTradeSkillWindow()
-					end,
-					width = "double",
-					order = 2,
+					order = 6,
 				},
 			},
 		},
@@ -557,6 +606,22 @@ Skillet.options =
 			end,
 			order = 60
 		},
+--[[
+		resetrecipefilter = {
+			type = 'execute',
+			name = L["Reset Recipe Filter"],
+			desc = L["RESETRECIPEFILTERDESC"],
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:ResetTradeSkillFilter()
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
+												  " Leave combat and try again.")
+				end
+			end,
+			order = 61
+		},
+]]--
 		printsaved = {
 			type = 'execute',
 			name = "PrintSaved",
@@ -569,7 +634,7 @@ Skillet.options =
 												  " Leave combat and try again.")
 				end
 			end,
-			order = 61
+			order = 62
 		},
 		printqueue = {
 			type = 'execute',
@@ -583,7 +648,7 @@ Skillet.options =
 												  " Leave combat and try again.")
 				end
 			end,
-			order = 62
+			order = 63
 		},
 		printsavedqueue = {
 			type = 'input',
@@ -608,7 +673,7 @@ Skillet.options =
 												  " Leave combat and try again.")
 				end
 			end,
-			order = 63
+			order = 64
 		},
 
 		WarnShow = {
@@ -660,7 +725,7 @@ Skillet.options =
 		},
 		DebugLogging = {
 			type = "toggle",
-			name = "DebugLoggibg",
+			name = "DebugLogging",
 			desc = "Option for debugging",
 			get = function()
 				return Skillet.db.profile.DebugLogging
@@ -688,19 +753,6 @@ Skillet.options =
 			end,
 			order = 85
 		},
-		LogLevel = {
-			type = "toggle",
-			name = "LogLevel",
-			desc = "Option for debugging",
-			get = function()
-				return Skillet.db.profile.LogLevel
-			end,
-			set = function(self,value)
-				Skillet.db.profile.LogLevel = value
-				Skillet.LogLevel = value
-			end,
-			order = 86
-		},
 		TableDump = {
 			type = "toggle",
 			name = "TableDump",
@@ -712,7 +764,7 @@ Skillet.options =
 				Skillet.db.profile.TableDump = value
 				Skillet.TableDump = value
 			end,
-			order = 87
+			order = 86
 		},
 		TraceShow = {
 			type = "toggle",
@@ -729,7 +781,7 @@ Skillet.options =
 					Skillet.TraceLog = value
 				end
 			end,
-			order = 88
+			order = 87
 		},
 		TraceLog = {
 			type = "toggle",
@@ -742,7 +794,7 @@ Skillet.options =
 				Skillet.db.profile.TraceLog = value
 				Skillet.TraceLog = value
 			end,
-			order = 89
+			order = 88
 		},
 		ProfileShow = {
 			type = "toggle",
@@ -755,7 +807,7 @@ Skillet.options =
 				Skillet.db.profile.ProfileShow = value
 				Skillet.ProfileShow = value
 			end,
-			order = 90
+			order = 89
 		},
 		ClearDebugLog = {
 			type = "execute",
@@ -764,6 +816,16 @@ Skillet.options =
 			func = function()
 				SkilletDBPC = {}
 				DA.DebugLog = SkilletDBPC
+			end,
+			order = 90
+		},
+		ClearProfileLog = {
+			type = "execute",
+			name = "ClearProfileLog",
+			desc = "Option for debugging",
+			func = function()
+				SkilletProfile = {}
+				DA.DebugProfile = SkilletProfile
 			end,
 			order = 91
 		},
@@ -821,6 +883,66 @@ Skillet.options =
 			end,
 			order = 93
 		},
+		LogLevel = {
+			type = "toggle",
+			name = "LogLevel",
+			desc = "Option for debugging",
+			get = function()
+				return Skillet.db.profile.LogLevel
+			end,
+			set = function(self,value)
+				Skillet.db.profile.LogLevel = value
+				Skillet.LogLevel = value
+			end,
+			order = 94
+		},
+		MaxDebug = {
+			type = "input",
+			name = "MaxDebug",
+			desc = "Option for debugging",
+			get = function()
+				return Skillet.db.profile.MAXDEBUG
+			end,
+			set = function(self,value)
+				value = tonumber(value)
+				if not value then value = 4000 end
+				Skillet.db.profile.MAXDEBUG = value
+				Skillet.MAXDEBUG = value
+			end,
+			order = 95
+		},
+		MaxProfile = {
+			type = "input",
+			name = "MaxProfile",
+			desc = "Option for debugging",
+			get = function()
+				return Skillet.db.profile.MAXPROFILE
+			end,
+			set = function(self,value)
+				value = tonumber(value)
+				if not value then value = 2000 end
+				Skillet.db.profile.MAXPROFILE = value
+				Skillet.MAXPROFILE = value
+			end,
+			order = 96
+		},
+		FixBugs = {
+			type = "toggle",
+			name = "FixBugs",
+			desc = "Option for debugging",
+			get = function()
+				return Skillet.db.profile.FixBugs
+			end,
+			set = function(self,value)
+				Skillet.db.profile.FixBugs = value
+				Skillet.FixBugs = value
+				if value then
+					Skillet.db.profile.TraceLog = value
+					Skillet.TraceLog = value
+				end
+			end,
+			order = 97
+		},
 
 		reset = {
 			type = 'execute',
@@ -828,22 +950,37 @@ Skillet.options =
 			desc = L["RESETDESC"],
 			func = function()
 				if not (UnitAffectingCombat("player")) then
-					SkilletFrame:SetWidth(700);
-					SkilletFrame:SetHeight(600);
-					SkilletFrame:SetPoint("TOPLEFT",200,-100);                    
-					SkilletStandaloneQueue:SetWidth(385);
-					SkilletStandaloneQueue:SetHeight(240);
-					SkilletStandaloneQueue:SetPoint("TOPLEFT",300,-150);
 					local windowManager = LibStub("LibWindow-1.1")
-					windowManager.SavePosition(SkilletFrame)
-					windowManager.SavePosition(SkilletStandaloneQueue) 
-				else
+					if SkilletFrame and SkilletFrame:IsVisible() then
+						SkilletFrame:SetWidth(750);
+						SkilletFrame:SetHeight(580);
+						SkilletFrame:SetPoint("TOPLEFT",200,-100);
+						windowManager.SavePosition(SkilletFrame)
+					end
+					if SkilletStandaloneQueue and SkilletStandaloneQueue:IsVisible() then
+						SkilletStandaloneQueue:SetWidth(385);
+						SkilletStandaloneQueue:SetHeight(170);
+						SkilletStandaloneQueue:SetPoint("TOPLEFT",950,-100);
+						windowManager.SavePosition(SkilletStandaloneQueue)
+					end
+					if SkilletShoppingList and SkilletShoppingList:IsVisible() then
+						SkilletShoppingList:SetWidth(385);
+						SkilletShoppingList:SetHeight(170);
+						SkilletShoppingList:SetPoint("TOPLEFT",950,-400);
+						windowManager.SavePosition(SkilletShoppingList)
+					end
+--					SkilletFrame:SetWidth(700);
+--					SkilletFrame:SetHeight(600);
+--					SkilletFrame:SetPoint("TOPLEFT",200,-100)
+--					SkilletStandaloneQueue:SetWidth(385)
+--					SkilletStandaloneQueue:SetHeight(240)
+--					SkilletStandaloneQueue:SetPoint("TOPLEFT",300,-150)
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
 												  " Leave combat and try again.")
 				end
 			end,
 			order = 99
-		},        
+		},
 	}
 }
 
@@ -961,7 +1098,6 @@ function Skillet:OnInitialize()
 		self.db.global.cachedGuildbank = {}
 	end
 ]]--
-	self:InitializeDatabase(UnitName("player"))
 
 -- Hook default tooltips
 	local tooltipsToHook = { ItemRefTooltip, GameTooltip, ShoppingTooltip1, ShoppingTooltip2 };
@@ -985,10 +1121,12 @@ function Skillet:OnInitialize()
 	acecfg:RegisterOptionsTable("Skillet Features", self.options.args.features)
 	acecfg:RegisterOptionsTable("Skillet Appearance", self.options.args.appearance)
 	acecfg:RegisterOptionsTable("Skillet Profiles", LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db))
+	acecfg:RegisterOptionsTable("Skillet Plugins", Skillet.pluginsOptions)
 	local acedia = LibStub("AceConfigDialog-3.0")
 	acedia:AddToBlizOptions("Skillet Features", "Skillet")
 	acedia:AddToBlizOptions("Skillet Appearance", "Appearance", "Skillet")
 	acedia:AddToBlizOptions("Skillet Profiles", "Profiles", "Skillet")
+	acedia:AddToBlizOptions("Skillet Plugins", "Plugins", "Skillet")
 
 --
 -- Copy the profile debugging variables to the global table 
@@ -1004,17 +1142,31 @@ function Skillet:OnInitialize()
 		Skillet.db.profile.WarnLog = true
 	end
 
-	Skillet.WarnShow = Skillet.db.profile.WarnShow
 	Skillet.WarnLog = Skillet.db.profile.WarnLog
+	Skillet.WarnShow = Skillet.db.profile.WarnShow
 	Skillet.DebugShow = Skillet.db.profile.DebugShow
 	Skillet.DebugLogging = Skillet.db.profile.DebugLogging
 	Skillet.DebugLevel = Skillet.db.profile.DebugLevel
 	Skillet.LogLevel = Skillet.db.profile.LogLevel
+	Skillet.MAXDEBUG = Skillet.db.profile.MAXDEBUG or 4000
+	Skillet.MAXPROFILE = Skillet.db.profile.MAXPROFILE or 2000
 	Skillet.TableDump = Skillet.db.profile.TableDump
 	Skillet.TraceShow = Skillet.db.profile.TraceShow
 	Skillet.TraceLog = Skillet.db.profile.TraceLog
 	Skillet.ProfileShow = Skillet.db.profile.ProfileShow
-	Skillet:InitializePlugins()
+--
+-- Profile variable to control Skillet fixes for Blizzard bugs.
+-- Can be toggled [or turned off] with "/skillet fixbugs [off]"
+--
+	if Skillet.db.profile.FixBugs == nil then
+		Skillet.db.profile.FixBugs = true
+	end
+	Skillet.FixBugs = Skillet.db.profile.FixBugs
+
+--
+-- Now do the character initialization
+--
+	self:InitializeDatabase(UnitName("player"))
 end
 
 function Skillet:FlushAllData()
@@ -1155,6 +1307,16 @@ function Skillet:InitializeDatabase(player)
 			if not self.db.profile.SavedQueues then
 				self.db.profile.SavedQueues = {}
 			end
+			if not self.db.profile.plugins then
+				self.db.profile.plugins = {}
+			end
+			if self.db.profile.plugins.recipeNamePlugin then
+				if not self.db.profile.plugins.recipeNameSuffix then
+					self.db.profile.plugins.recipeNameSuffix = self.db.profile.plugins.recipeNamePlugin
+				end
+				self.db.profile.plugins.recipeNamePlugin = nil
+			end
+			self:InitializePlugins()
 			self:ScanPlayerTradeSkills(player)
 		end
 	end
@@ -1171,11 +1333,11 @@ end
 -- Called when the addon is enabled
 function Skillet:OnEnable()
 	DA.DEBUG(0,"OnEnable()");
-	--
-	-- Hook into the events that we care about
-	--
-	-- Trade skill window changes
-	--
+--
+-- Hook into the events that we care about
+--
+-- Trade skill window changes
+--
 	self:RegisterEvent("TRADE_SKILL_CLOSE")
 	self:RegisterEvent("TRADE_SKILL_SHOW")
 	self:RegisterEvent("TRADE_SKILL_UPDATE")
@@ -1191,15 +1353,15 @@ function Skillet:OnEnable()
 
 	self:RegisterEvent("BAG_UPDATE") 				-- Fires for both bag and bank updates.
 	self:RegisterEvent("BAG_UPDATE_DELAYED")		-- Fires after all applicable BAG_UPADTE events for a specific action have been fired.
-	--
-	-- MERCHANT_SHOW, MERCHANT_HIDE, MERCHANT_UPDATE events needed for auto buying.
-	--
+--
+-- MERCHANT_SHOW, MERCHANT_HIDE, MERCHANT_UPDATE events needed for auto buying.
+--
 	self:RegisterEvent("MERCHANT_SHOW")
 	self:RegisterEvent("MERCHANT_UPDATE")
 	self:RegisterEvent("MERCHANT_CLOSED")
-	--
-	-- To show a shopping list when at the bank/guildbank/auction house
-	--
+--
+-- To show a shopping list when at the bank/guildbank/auction house
+--
 	self:RegisterEvent("BANKFRAME_OPENED")
 	self:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
 	self:RegisterEvent("BANKFRAME_CLOSED")
@@ -1210,20 +1372,20 @@ function Skillet:OnEnable()
 ]]--
 	self:RegisterEvent("AUCTION_HOUSE_SHOW")
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
-	--
-	-- Events needed to process the queue and to update
-	-- the tradeskill window to update the number of items
-	-- that can be crafted as we consume reagents.
-	--
+--
+-- Events needed to process the queue and to update
+-- the tradeskill window to update the number of items
+-- that can be crafted as we consume reagents.
+--
 	self:RegisterEvent("UNIT_SPELLCAST_START")
 	self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 	self:RegisterEvent("UNIT_SPELLCAST_FAILED")
 	self:RegisterEvent("UNIT_SPELLCAST_FAILED_QUIET")
 	self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
-	--
-	-- Not sure these are needed for crafting but they
-	-- are useful for debugging.
-	--
+--
+-- Not sure these are needed for crafting but they
+-- are useful for debugging.
+--
 	self:RegisterEvent("UNIT_SPELLCAST_SENT")
 	self:RegisterEvent("UNIT_SPELLCAST_DELAYED")
 	self:RegisterEvent("UNIT_SPELLCAST_STOP")
@@ -1231,9 +1393,9 @@ function Skillet:OnEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP")
 	self:RegisterEvent("UI_ERROR_MESSAGE")
 	self:RegisterEvent("UI_INFO_MESSAGE")
-	--
-	-- Debugging cleanup if enabled
-	--
+--
+-- Debugging cleanup if enabled
+--
 	self:RegisterEvent("PLAYER_LOGOUT")
 
 	self.bagsChanged = true
@@ -1244,7 +1406,9 @@ function Skillet:OnEnable()
 	self.currentPlayer = UnitName("player")
 	self.currentGroupLabel = "Blizzard"
 	self.currentGroup = nil
-	-- run the upgrade code to convert any old settings
+--
+-- run the upgrade code to convert any old settings
+--
 	self:UpgradeDataAndOptions()
 	self:CollectTradeSkillData()
 	self:UpdateAutoTradeButtons()
@@ -1275,7 +1439,8 @@ function Skillet:TRADE_SKILL_UPDATE()
 	DA.DEBUG(0,"TRADE_SKILL_UPDATE")
 	Skillet.isCraft = false
 	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
-		Skillet:SkilletShow()
+--		Skillet:SkilletShow()
+		Skillet:UpdateTradeSkillWindow()	-- Untested
 	end
 end
 
@@ -1340,6 +1505,9 @@ end
 
 function Skillet:IsTradeSkillLinked()
 --[[
+--
+-- Not implemented in Classic
+--
 	local isGuild = IsTradeSkillGuild()
 	local isLinked, linkedPlayer = IsTradeSkillLinked()
 	DA.DEBUG(0,"IsTradeSkillLinked, isGuild="..tostring(isGuild)..", isLinked="..tostring(isLinked)..", linkedPlayer="..tostring(linkedPlayer))
@@ -1403,7 +1571,7 @@ function Skillet:SkilletShow()
 end
 
 function Skillet:SkilletShowWindow()
-	DA.DEBUG(0,"SkilletShowWindow, (was showing "..(self.currentTrade or "nil")..")");
+	DA.DEBUG(0,"SkilletShowWindow(), (was showing "..tostring(self.currentTrade)..")")
 	if IsControlKeyDown() then
 		self.db.realm.skillDB[self.currentPlayer][self.currentTrade] = {}
 	end
@@ -1727,7 +1895,7 @@ function Skillet:GetItemNote(key)
 	if id then
 		result = self.db.realm.notes[self.currentPlayer][id]
 	else
-		self:Print("Error: Skillet:GetItemNote() could not determine item ID for " .. key);
+		self:Print("Error: Skillet:GetItemNote() could not determine item ID for " .. key)
 	end
 	if result and result == "" then
 		result = nil
@@ -1755,7 +1923,7 @@ function Skillet:SetItemNote(key, note)
 	if id then
 		self.db.realm.notes[self.currentPlayer][id] = note
 	else
-		self:Print("Error: Skillet:SetItemNote() could not determine item ID for " .. key);
+		self:Print("Error: Skillet:SetItemNote() could not determine item ID for " .. key)
 	end
 end
 
@@ -1775,12 +1943,12 @@ function Skillet:AddItemNotesToTooltip(tooltip)
 	-- get item name
 	local name,link = tooltip:GetItem();
 	if not link then 
---		DA.DEBUG(0,"Error: Skillet:AddItemNotesToTooltip() could not determine link");
+--		DA.DEBUG(0,"Error: Skillet:AddItemNotesToTooltip() could not determine link")
 		return;
 	end
 	local id = self:GetItemIDFromLink(link);
 	if not id then
-		DA.DEBUG(0,"Error: Skillet:AddItemNotesToTooltip() could not determine id");
+		DA.DEBUG(0,"Error: Skillet:AddItemNotesToTooltip() could not determine id")
 		return
 	end
 	--DA.DEBUG(1,"link= "..tostring(link)..", id= "..tostring(id)..", notes= "..tostring(notes_enabled)..", crafters= "..tostring(crafters_enabled))
@@ -1844,7 +2012,6 @@ function Skillet:SetTradeSkillOption(option, value, playerOverride, tradeOverrid
 	end
 end
 
--- workaround for Ace2
 function Skillet:IsActive()
 	return Skillet:IsEnabled()
 end

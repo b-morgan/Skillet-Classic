@@ -69,9 +69,12 @@ DebugAids.lua
 ## DeepCopy.lua 
 
 #### Plugins
-Plugins\AckisRecipeList.lua
-Plugins\TradeSkillInfo.lua
 Plugins\BeanCounter.lua
+Plugins\Auctionator.lua
+#### Addons not ported to Classic
+## Plugins\AckisRecipeList.lua
+## Plugins\TradeSkillInfo.lua
+## Plugins\TheUndermineJournal.lua
 
 #### UI files
 UI\Utils.lua
