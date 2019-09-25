@@ -254,10 +254,10 @@ function Skillet:CollectRecipeInformation()
 --				local skillData = self:GetSkill(player, trade, i)
 				local skillString = self.db.realm.skillDB[player][trade][i]
 				if skillString then
-					local skillData = string.split(" ",skillString)
+					local skillData = string.split("|",skillString)
 					if skillData ~= "header" or skillData ~= "subheader" then
 						local recipeID = string.sub(skillData,2)
-						recipeID = tonumber(recipeID) or 0
+						recipeID = recipeID or "0"
 						self.data.skillIndexLookup[player][recipeID] = i
 					end
 				end
@@ -457,24 +457,25 @@ function Skillet:GetSkill(player,trade,index)
 		if not Skillet.data.skillList[player][trade][index] and Skillet.db.realm.skillDB[player][trade][index] then
 			local skillString = Skillet.db.realm.skillDB[player][trade][index]
 			if skillString then
+				--DA.DEBUG(0,"skillString= '"..skillString..'"')
 				local skill = {}
-				local data = { string.split(" ",skillString) }
+				local data = { string.split("|",skillString) }
 				if data[1] == "header" or data[1] == "subheader" then
 					skill.id = 0
+					skill.index = index
 				else
 					local difficulty = string.sub(data[1],1,1)
 					local recipeID = string.sub(data[1],2)
-					skill.id = tonumber(recipeID)
+					skill.id = recipeID
+					skill.index = index
 					skill.difficulty = DifficultyText[difficulty]
 					skill.color = skill_style_type[DifficultyText[difficulty]]
 					skill.tools = nil
-					recipeID = tonumber(recipeID)
 					for i=2,#data do
 						local subData = { string.split("=",data[i]) }
 						if subData[1] == "cd" then
 							skill.cooldown = tonumber(subData[2])
 						elseif subData[1] == "t" then
-							local recipe = Skillet:GetRecipe(recipeID)
 							skill.tools = {}
 							for j=1,string.len(subData[2]) do
 								local missingTool = tonumber(string.sub(subData[2],j,j))
@@ -486,8 +487,10 @@ function Skillet:GetSkill(player,trade,index)
 				Skillet.data.skillList[player][trade][index] = skill
 			end
 		end
+		--DA.DEBUG(0,"GetSkill= "..DA.DUMP1(Skillet.data.skillList[player][trade][index]))
 		return Skillet.data.skillList[player][trade][index]
 	end
+	--DA.DEBUG(0,"GetSkill= "..DA.DUMP1(self.unknownRecipe))
 	return self.unknownRecipe
 end
 
@@ -612,7 +615,7 @@ end
 -- is defined after this one
 --
 local function ScanTrade()
-	DA.DEBUG(2,"RescanTrade()")
+	DA.DEBUG(2,"ScanTrade()")
 	local profession, rank, maxRank
 	if Skillet.isCraft then
 		profession, rank, maxRank = GetCraftDisplaySkillLine()
@@ -654,6 +657,9 @@ local function ScanTrade()
 	else
 		numSkills = GetNumTradeSkills()
 	end
+--
+-- Make sure all the data tables exist
+--
 	--DA.DEBUG(2,"Scanning Trade "..tostring(profession)..": "..tostring(tradeID).." "..numSkills.." recipes")
 	if not Skillet.data.skillIndexLookup[player] then
 		Skillet.data.skillIndexLookup[player] = {}
@@ -678,9 +684,12 @@ local function ScanTrade()
 	if not Skillet.db.realm.tradeSkills[player][tradeID] then
 		Skillet.db.realm.tradeSkills[player][tradeID] = {}
 	end
---	Skillet.db.realm.tradeSkills[player][tradeID].link = link
+--	Skillet.db.realm.tradeSkills[player][tradeID].link = link		-- Classic has no link for the profession
 	Skillet.db.realm.tradeSkills[player][tradeID].rank = rank
 	Skillet.db.realm.tradeSkills[player][tradeID].maxRank = maxRank
+--
+-- Mining and Smelting have a bipolar relationship 
+--
 	if tradeID == MINING then
 		if not Skillet.db.realm.tradeSkills[player][SMELTING] then
 			Skillet.db.realm.tradeSkills[player][SMELTING] = {}
@@ -690,6 +699,9 @@ local function ScanTrade()
 	end
 	local numHeaders = 0
 	local parentGroup
+--
+-- Now actually process each recipe (skill)
+--
 	for i = 1, numSkills, 1 do
 		local _, skillName, skillType, numAvailable, isExpanded, subSpell, extra
 		if Skillet.isCraft then
@@ -703,6 +715,10 @@ local function ScanTrade()
 		--DA.DEBUG(2,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
 		if skillName then
 			if skillType == "header" or skillType == "subheader" then
+--
+-- for headers (and subheaders) define groups and
+-- add a header entry in the skillDB (SavedVariables)
+--
 				numHeaders = numHeaders + 1
 				lastHeader = skillName
 				local groupName
@@ -724,6 +740,11 @@ local function ScanTrade()
 					Skillet:RecipeGroupAddSubGroup(parentGroup, currentGroup, i)
 				end
 			else
+--
+-- In Classic, recipes do not have a numerical ID so
+-- use the name as the id and 
+-- (break everything than assumes it is a number)
+--
 				local recipeID = skillName
 				if currentGroup then
 					Skillet:RecipeGroupAddRecipe(currentGroup, recipeID, i)
@@ -731,12 +752,23 @@ local function ScanTrade()
 					Skillet:RecipeGroupAddRecipe(mainGroup, recipeID, i)
 				end
 --
--- break recipes into lists by profession for ease of sorting
+-- break recipes into lists and tables by profession for ease of sorting
+--
+-- SavedVariables:
+--   skillDB(skillDBstring) fields are separated by "|"
+--   recipeDB (recipeString) list by recipeID of fields separated by " ",
+--     (tools have spaces replaced by "_")
+--   ItemDataAddUsedInRecipe(reagentID, recipeID)  -- add a cross reference for where a particular item is used
+--   ItemDataAddRecipeSource(itemID,recipeID)      -- add a cross reference for the source of particular items
+--
+-- Temporary (data):
+--   skillData is a table
+--   skillIndexLookup contains the (player specific) spellIndex of the recipe
+--   recipeList is a list of "recipe" tables
 --
 				skillData[i] = {}
 				skillData[i].name = skillName
 				skillData[i].id = recipeID
-				skillData[i].noRecipe = noRecipe
 				skillData[i].difficulty = skillType
 				skillData[i].color = skill_style_type[skillType]
 				skillData[i].category = lastHeader
@@ -757,7 +789,7 @@ local function ScanTrade()
 					local cd = GetTradeSkillCooldown(i)
 					if cd then
 						skillData[i].cooldown = cd + time()		-- this is when your cooldown will be up
-						skillDBString = skillDBString.." cd=" .. cd + time()
+						skillDBString = skillDBString.."|cd="..cd + time()
 					end
 				end
 				local numTools = #tools+1
@@ -773,7 +805,7 @@ local function ScanTrade()
 						slot = slot + 1
 					end
 					if toolsAbsent then										-- only point out missing tools
-						skillDBString = skillDBString.." t="..toolString
+						skillDBString = skillDBString.."|t="..toolString
 					end
 				end
 				skillDB[i] = skillDBString
@@ -881,16 +913,28 @@ local function ScanTrade()
 			end
 		end
 	end
-
+--
+-- SkilletMemory is a saved variable snapshot of data tables
+--
 	if DA.deepcopy then
 		SkilletMemory.groupList1 = {}
 		SkilletMemory.groupList1 = DA.deepcopy(Skillet.data.groupList)
 	end
-
+--
+-- all the lists have been built so
+-- use them to collect information based
+-- on the player's inventory
+--
 	Skillet:InventoryScan()
 	Skillet:CalculateCraftableCounts()
 	Skillet:SortAndFilterRecipes()
 	DA.DEBUG(2,"ScanTrade Complete, numSkills= "..tostring(numSkills)..", numHeaders= "..tostring(numHeaders))
+--
+-- return a boolean:
+--   true means we got good data for this profession (skill)
+--   false means there was no data available
+-- Note: Enchanting (the only Craft) has no headers
+--
 	if not Skillet.isCraft and numHeaders == 0 then
 		skillData.scanned = false
 		return false
