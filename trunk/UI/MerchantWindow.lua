@@ -70,7 +70,7 @@ end
 -- you to automatically buy reagents.
 local function update_merchant_buy_button()
 	Skillet:InventoryScan()
-	local list = Skillet:GetShoppingList(Skillet.currentPlayer)
+	local list = Skillet:GetShoppingList(Skillet.currentPlayer, false)
 	if not list or #list == 0 then
 		SkilletMerchantBuyFrame:Hide()
 		return
@@ -96,7 +96,7 @@ local function remove_merchant_buy_button()
 	SkilletMerchantBuyFrame:Hide()
 end
 
--- Updates the merchant frame, it is it visible, this method can be called
+-- Updates the merchant frame, if it is visible, this method can be called
 -- many times
 function Skillet:UpdateMerchantFrame()
 	Skillet:MERCHANT_SHOW()
@@ -143,7 +143,7 @@ end
 -- If at a vendor with the window open, buy anything that they
 -- sell that is required by any queued recipe.
 function Skillet:BuyRequiredReagents()
-	local list = Skillet:GetShoppingList(Skillet.currentPlayer)
+	local list = Skillet:GetShoppingList(Skillet.currentPlayer, false)
 	if #list == 0 then
 		return
 	elseif does_merchant_sell_required_items(list) == false then
@@ -213,18 +213,27 @@ function Skillet:BuyRequiredReagents()
 		message = message .. ": " .. cash
 		self:Print(message)
 	end
+	update_merchant_buy_button()
 	self:InventoryScan()
 	if self:IsShoppingListVisible() then
-		self:UpdateShoppingListWindow()
+		DA.DEBUG(0,"ShoppingList is visible")
+		if SkilletMerchantBuyFrame:IsVisible() then
+			DA.DEBUG(0,"Merchant Buy Button is visible")
+			self:UpdateShoppingListWindow(false)
+		else
+			DA.DEBUG(0,"Merchant Buy Button is not visible")
+			self:HideShoppingList()
+		end
+	else
+		DA.DEBUG(0,"ShoppingList is not visible")
 	end
-	update_merchant_buy_button()
 end
 
 function Skillet:MerchantBuyButton_OnEnter(button)
 	GameTooltip:SetOwner(button, "ANCHOR_BOTTOMRIGHT")
 	GameTooltip:ClearLines()
 	GameTooltip:AddLine(L["Buy Reagents"])
-	local needList = Skillet:GetShoppingList(Skillet.currentPlayer)
+	local needList = Skillet:GetShoppingList(Skillet.currentPlayer, false)
 	local totalCost = 0
 	for i=1,#needList,1 do
 		local itemID = needList[i].id

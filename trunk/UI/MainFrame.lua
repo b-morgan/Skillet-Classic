@@ -816,7 +816,7 @@ function Skillet:UpdateTradeSkillWindow()
 	self:RecipeDifficultyButton_OnShow()
 	SkilletHideUncraftableRecipes:SetChecked(self:GetTradeSkillOption("hideuncraftable"))
 	self:UpdateQueueWindow()
-	self:UpdateShoppingListWindow()
+	self:UpdateShoppingListWindow(false)
 	-- Window Title
 	local tradeName = self:GetTradeName(self.currentTrade)
 	if not tradeName then tradeName = "" end

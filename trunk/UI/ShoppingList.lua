@@ -828,7 +828,7 @@ end
 
 -- Called to update the shopping list window
 function Skillet:UpdateShoppingListWindow(use_cached_recipes)
-	DA.DEBUG(0,"UpdateShoppingListWindow(",use_cached_recipes,")")
+	DA.DEBUG(0,"UpdateShoppingListWindow("..tostring(use_cached_recipes)..")")
 	local num_buttons = 0
 	if not self.shoppingList or not self.shoppingList:IsVisible() then
 		return
@@ -967,6 +967,7 @@ function Skillet:IsShoppingListVisible()
 	if self.shoppingList then
 		return self.shoppingList:IsVisible()
 	end
+	return false
 end
 
 -- Hides the shopping list window
