@@ -142,7 +142,7 @@ local function NOSORT(tradeskill, a, b)
 end
 
 local function SkillIsFilteredOut(skillIndex)
-	--DA.DEBUG(0,"SkillIsFilteredOut("..tostring(skillIndex)..")")
+	--DA.DEBUG(1,"SkillIsFilteredOut("..tostring(skillIndex)..")")
 	local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, skillIndex)
 	--DA.DEBUG(1,"skill= "..DA.DUMP1(skill,1))
 	local recipe = Skillet:GetRecipe(skill.id)
@@ -152,14 +152,18 @@ local function SkillIsFilteredOut(skillIndex)
 		--DA.DEBUG(1,"Detected header")
 		return false
 	end
-		-- are we hiding anything that is trivial (has no chance of giving a skill point)
+--
+-- are we hiding anything that is trivial (has no chance of giving a skill point)
+--
 	if skill_style_type[skill.difficulty] then
 		if skill_style_type[skill.difficulty].level < (Skillet:GetTradeSkillOption("filterLevel") or 4) then
 			--DA.DEBUG(1,"Detected trivial")
 			return true
 		end
 	end
-	-- are we hiding anything that can't be created with the mats on this character?
+--
+-- are we hiding anything that can't be created with the mats on this character?
+--
 	if Skillet:GetTradeSkillOption("hideuncraftable") then
 		if not (skill.numCraftable > 0 and Skillet:GetTradeSkillOption("filterInventory-bag")) and
 		   not (skill.numRecursive > 0 and Skillet:GetTradeSkillOption("filterInventory-crafted")) and
@@ -180,20 +184,21 @@ local function SkillIsFilteredOut(skillIndex)
 --
 -- string search
 --
-	local filtertext = Skillet:GetTradeSkillOption("filtertext")
-	if filtertext and filtertext ~= "" then
-		--DA.DEBUG(1,"Searching filtertext= "..tostring(filtertext))
-		local filter = string.lower(filtertext)
-		local nameOnly = true					-- Classic will do name only for now
+	local searchtext = Skillet:GetTradeSkillOption("searchtext")
+	if searchtext and searchtext ~= "" then
+		--DA.DEBUG(1,"Searching for '"..tostring(searchtext).."'")
+		local filter = string.lower(searchtext)
+		local nameOnly = false
 		if string.sub(filter,1,1) == "!" then
 			filter = string.sub(filter,2)
-			DA.DEBUG(1,"Searching nameOnly")
-			nameOnly = true
+			--DA.DEBUG(1,"Searching nameOnly")
+			nameOnly = false
 		end
 		local word
 		local name = ""
 		local tooltip = _G["SkilletParsingTooltip"]
 		if tooltip == nil then
+			--DA.DEBUG(1,"Creating SkilletParsingTooltip")
 			tooltip = CreateFrame("GameTooltip", "SkilletParsingTooltip", _G["ANCHOR_NONE"], "GameTooltipTemplate")
 			tooltip:SetOwner(WorldFrame, "ANCHOR_NONE");
 		end
@@ -201,19 +206,24 @@ local function SkillIsFilteredOut(skillIndex)
 		if nameOnly then
 			searchText = recipe.name
 		else
+			--DA.DEBUG(1,"Searching name and tooltip")
 			if not Skillet.data.tooltipCache or Skillet.data.tooltipCachedTrade ~= Skillet.currentTrade then
 				Skillet.data.tooltipCachedTrade = Skillet.currentTrade
 				Skillet.data.tooltipCache = {}
 			end
 			if not Skillet.data.tooltipCache[recipeID] then
-				tooltip:SetHyperlink("enchant:"..recipeID)
+				--DA.DEBUG(1,"Setup tooltipCache["..tostring(recipeID).."]")
+				tooltip:SetTradeSkillItem(skillIndex)
 				local tiplines = tooltip:NumLines()
 				for i=1, tiplines, 1 do
+					--DA.DEBUG(1,"Found "..tostring(tiplines).." tiplines")
 					searchText = searchText.. " " .. string.lower(_G["SkilletParsingTooltipTextLeft"..i]:GetText() or " ")
 					searchText = searchText.. " " .. string.lower(_G["SkilletParsingTooltipTextRight"..i]:GetText() or " ")
 				end
+				--DA.DEBUG(1,"Setting searchText")
 				Skillet.data.tooltipCache[recipeID] = searchText
 			else
+				--DA.DEBUG(1,"Using tooltipCache["..tostring(recipeID).."]")
 				searchText = Skillet.data.tooltipCache[recipeID]
 			end
 		end
@@ -317,10 +327,10 @@ function Skillet:SortAndFilterRecipes()
 	local oldLength = #sortedSkillList
 	--DA.DEBUG(1,"oldLength= "..tostring(oldLength))
 	local button_index = 0
-	local filtertext = Skillet:GetTradeSkillOption("filtertext")
+	local searchtext = Skillet:GetTradeSkillOption("searchtext")
 	local groupLabel = Skillet.currentGroupLabel
-	--DA.DEBUG(1,"filtertext="..tostring(filtertext)..", groupLabel="..tostring(groupLabel))
-	if filtertext and filtertext ~= "" or groupLabel == "Flat" then
+	--DA.DEBUG(1,"searchtext="..tostring(searchtext)..", groupLabel="..tostring(groupLabel))
+	if searchtext and searchtext ~= "" or groupLabel == "Flat" then
 		--DA.DEBUG(1,"SortAndFilterRecipes groupLabel= "..tostring(groupLabel))
 		for i=1, numSkills, 1 do
 			local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, i)

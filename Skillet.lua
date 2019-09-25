@@ -89,7 +89,7 @@ local defaults = {
 Skillet.defaultOptions = {
 	["sortmethod"] = "None",
 	["grouping"] = "Blizzard",
-	["filtertext"] = "",
+	["searchtext"] = "",
 	["filterInventory-bag"] = true,
 	["filterInventory-crafted"] = true,
 	["filterInventory-vendor"] = true,
@@ -1589,10 +1589,10 @@ function Skillet:SkilletShowWindow()
 	self:ShowTradeSkillWindow()
 	local searchbox = _G["SkilletSearchBox"]
 	local oldtext = searchbox:GetText()
-	local filterText = self:GetTradeSkillOption("filtertext")
+	local searchText = self:GetTradeSkillOption("searchtext")
 	-- if the text is changed, set the new text (which fires off an update) otherwise just do the update
-	if filterText ~= oldtext then
-		searchbox:SetText(filterText)
+	if searchText ~= oldtext then
+		searchbox:SetText(searchText)
 	else
 		self:UpdateTradeSkillWindow()
 	end
@@ -1774,9 +1774,9 @@ function Skillet:UpdateTradeSkill()
 		self:SetSelectedTrade(new_trade)
 		-- remove any filters currently in place
 		local searchbox = _G["SkilletSearchBox"];
-		local filtertext = self:GetTradeSkillOption("filtertext", self.currentPlayer, new_trade)
+		local searchtext = self:GetTradeSkillOption("searchtext", self.currentPlayer, new_trade)
 		-- this fires off a redraw event, so only change after data has been acquired
-		searchbox:SetText(filtertext);
+		searchbox:SetText(searchtext);
 	end
 	DA.DEBUG(0,"UpdateTradeSkill complete")
 end
@@ -1869,7 +1869,7 @@ end
 -- Updates the text we filter the list of recipes against.
 function Skillet:UpdateSearch(text)
 	DA.DEBUG(0,"UpdateSearch("..tostring(text)..")")
-	self:SetTradeSkillOption("filtertext", text)
+	self:SetTradeSkillOption("searchtext", text)
 	self:SortAndFilterRecipes()
 	self:UpdateTradeSkillWindow()
 end
