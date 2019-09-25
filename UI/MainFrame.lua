@@ -1211,7 +1211,8 @@ function Skillet:SkillButton_OnEnter(button)
 		if altlink and (IsAltKeyDown() or Skillet.isCraft) then
 			tip:SetHyperlink(altlink)
 		elseif link and not Skillet.isCraft then
-			tip:SetHyperlink(link)
+			DA.DEBUG(0,"link= "..DA.PLINK(link))
+			tip:SetHyperlink(link)		-- should this be SetTradeSkillItem(skillIndex)
 		end
 		if IsShiftKeyDown() then
 			if recipe.itemID == 0 then
