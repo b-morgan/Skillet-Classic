@@ -442,6 +442,11 @@ function Skillet:ConfigureRecipeControls()
 		SkilletAdd1Button:Hide()
 		SkilletAdd10Button:Hide()
 		SkilletClearNumButton:Hide()
+		if Skillet.db.profile.enchanting then
+			SkilletEnchantButton:Enable()		-- if DoCraft or a workaround is found
+		else
+			SkilletEnchantButton:Disable()		-- because DoCraft is restricted
+		end
 		SkilletEnchantButton:Show();
 	else
 		SkilletQueueAllButton:Show()
