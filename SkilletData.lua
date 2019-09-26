@@ -251,13 +251,14 @@ function Skillet:CollectRecipeInformation()
 		self.data.skillIndexLookup[player] = {}
 		for trade,skillList in pairs(tradeList) do
 			for i=1,#skillList do
---				local skillData = self:GetSkill(player, trade, i)
 				local skillString = self.db.realm.skillDB[player][trade][i]
 				if skillString then
-					local skillData = string.split("|",skillString)
-					if skillData ~= "header" or skillData ~= "subheader" then
-						local recipeID = string.sub(skillData,2)
-						recipeID = recipeID or "0"
+				DA.DEBUG(0,"skillString= '"..skillString.."'")
+				local skillData = { string.split("@", skillString) }
+				DA.DEBUG(0,"skillData= "..DA.DUMP1(skillData))
+					local skillHeader = { string.split(" ", skillData[1]) }
+					if skillHeader[1] ~= "header" or skillHeader[1] ~= "subheader" then
+						local recipeID = string.sub(skillData[1],2)
 						self.data.skillIndexLookup[player][recipeID] = i
 					end
 				end
@@ -457,15 +458,17 @@ function Skillet:GetSkill(player,trade,index)
 		if not Skillet.data.skillList[player][trade][index] and Skillet.db.realm.skillDB[player][trade][index] then
 			local skillString = Skillet.db.realm.skillDB[player][trade][index]
 			if skillString then
-				--DA.DEBUG(0,"skillString= '"..skillString..'"')
 				local skill = {}
-				local data = { string.split("|",skillString) }
-				if data[1] == "header" or data[1] == "subheader" then
+				DA.DEBUG(0,"skillString= '"..skillString.."'")
+				local skillData = { string.split("@", skillString) }
+				DA.DEBUG(0,"skillData= "..DA.DUMP1(skillData))
+				local skillHeader = { string.split(" ", skillData[1]) }
+				if skillHeader[1] == "header" or skillHeader[1] == "subheader" then
 					skill.id = 0
 					skill.index = index
 				else
-					local difficulty = string.sub(data[1],1,1)
-					local recipeID = string.sub(data[1],2)
+					local difficulty = string.sub(skillData[1],1,1)
+					local recipeID = string.sub(skillData[1],2)
 					skill.id = recipeID
 					skill.index = index
 					skill.difficulty = DifficultyText[difficulty]
@@ -789,7 +792,7 @@ local function ScanTrade()
 					local cd = GetTradeSkillCooldown(i)
 					if cd then
 						skillData[i].cooldown = cd + time()		-- this is when your cooldown will be up
-						skillDBString = skillDBString.."|cd="..cd + time()
+						skillDBString = skillDBString.."@cd="..cd + time()
 					end
 				end
 				local numTools = #tools+1
@@ -805,7 +808,7 @@ local function ScanTrade()
 						slot = slot + 1
 					end
 					if toolsAbsent then										-- only point out missing tools
-						skillDBString = skillDBString.."|t="..toolString
+						skillDBString = skillDBString.."@t="..toolString
 					end
 				end
 				skillDB[i] = skillDBString
