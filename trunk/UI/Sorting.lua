@@ -217,8 +217,18 @@ local function SkillIsFilteredOut(skillIndex)
 				local tiplines = tooltip:NumLines()
 				for i=1, tiplines, 1 do
 					--DA.DEBUG(1,"Found "..tostring(tiplines).." tiplines")
-					searchText = searchText.. " " .. string.lower(_G["SkilletParsingTooltipTextLeft"..i]:GetText() or " ")
-					searchText = searchText.. " " .. string.lower(_G["SkilletParsingTooltipTextRight"..i]:GetText() or " ")
+					searchText = searchText.." "..string.lower(_G["SkilletParsingTooltipTextLeft"..i]:GetText() or " ")
+					searchText = searchText.." "..string.lower(_G["SkilletParsingTooltipTextRight"..i]:GetText() or " ")
+				end
+				if Skillet.db.profile.search_includes_reagents then
+					for i=1, #recipe.reagentData, 1 do
+						local reagent = recipe.reagentData[i]
+						if reagent then
+							local itemName = GetItemInfo(reagent.id) or reagent.id
+							--DA.DEBUG(1,"Adding '"..tostring(itemName).."'")
+							searchText = searchText.." "..string.lower(itemName)
+						end
+					end
 				end
 				--DA.DEBUG(1,"Setting searchText")
 				Skillet.data.tooltipCache[recipeID] = searchText
