@@ -172,7 +172,11 @@ function Skillet:CreateTradeSkillWindow()
 	SkilletStartQueueButton:SetText(L["Process"])
 	SkilletEmptyQueueButton:SetText(L["Clear"])
 	SkilletEnchantButton:SetText(L["Enchant"])
-	SkilletEnchantButton:Disable()					-- set because DoCraft is restricted
+	if Skillet.db.profile.enchanting then
+		SkilletEnchantButton:Enable()		-- if DoCraft or a workaround is found
+	else
+		SkilletEnchantButton:Disable()		-- because DoCraft is restricted
+	end
 	SkilletRecipeNotesButton:SetText(L["Notes"])
 	SkilletRecipeNotesFrameLabel:SetText(L["Notes"])
 	SkilletShoppingListButton:SetText(L["Shopping List"])
@@ -275,7 +279,7 @@ function Skillet:CreateTradeSkillWindow()
 	self:EnableResize(frame, minwidth, SKILLET_MIN_HEIGHT, Skillet.UpdateTradeSkillWindow)
 	-- Set up the sorting methods here
 	self:InitializeSorting()
-	self:ConfigureRecipeControls(false)				-- initial setting
+	self:ConfigureRecipeControls()
 	self.skilletStandaloneQueue=Skillet:CreateStandaloneQueueFrame()
 	self.fullView = true
 	self.saved_full_button_count = 0
@@ -417,10 +421,13 @@ local function hide_button(button, trade, skill, index)
 	button:Hide()
 end
 
-function Skillet:ConfigureRecipeControls(enchant)
-	-- hide UI components that cannot be used for crafts and show that
-	-- that are only applicable to trade skills, as needed
-	if enchant then
+--
+-- hide UI components that cannot be used for crafts and show that
+-- that are only applicable to trade skills, as needed
+--
+function Skillet:ConfigureRecipeControls()
+	DA.DEBUG(0,"ConfigureRecipeControls()")
+	if self.isCraft then
 		SkilletQueueAllButton:Hide()
 		SkilletQueueButton:Hide()
 		SkilletCreateAllButton:Hide()
@@ -529,10 +536,9 @@ function Skillet:TradeButton_OnClick(this,button)
 	local name = this:GetName()
 	local _, player, tradeID = string.split("-", name)
 	tradeID = tonumber(tradeID)
-	local data =  self:GetSkillRanks(player, tradeID)
-	DA.DEBUG(0,"TradeButton_OnClick "..tostring(name).." "..tostring(player).." "..tostring(tradeID))
+	DA.DEBUG(0,"TradeButton_OnClick "..tostring(name).." "..tostring(player).." "..tostring(tradeID)..", button= "..tostring(button))
 	if button == "LeftButton" then
-		if player == self.currentPlayer or (data and data ~= nil) then
+		if player == self.currentPlayer then
 			if self.currentTrade == tradeID and IsShiftKeyDown() then
 				local link = GetTradeSkillListLink();
 				local activeEditBox =  ChatEdit_GetActiveWindow();
@@ -541,35 +547,21 @@ function Skillet:TradeButton_OnClick(this,button)
 				else
 					DA.DEBUG(0, link)
 				end
-			end
-			if player == self.currentPlayer then
+			elseif self.currentTrade ~= tradeID then
 				self:SetTradeSkill(self.currentPlayer, tradeID)
-			else
-				local link = self.db.realm.tradeSkills[player][tradeID].link
-				if link then
-					local _,tradeString
-					_,_,tradeString = string.find(link, "(trade:%d+:%d+:%d+:[0-9a-fA-F]+:[a-zA-Z0-9+/]+)")
-					if tradeString then
-						SetItemRef(tradeString,link,"LeftButton")
-					end
-				end
+				self:UpdateTradeSkillWindow()
 			end
 			this:SetChecked(true)
-		else
+		else	-- player not current
+--
+-- not sure we ever get here in Classic
+--
 			this:SetChecked(false)
 		end
-	else
-		if this:GetChecked() then
-			if IsShiftKeyDown() then
-				DA.DEBUG(0,"Flushing All Data")
-				self:FlushAllData()
-				if player == self.currentPlayer then
-					self:InitializeDatabase(player)
-				end
-			end
-			self:RescanTrade()
-			self:UpdateTradeSkillWindow()
-		end
+	else	-- not LeftButton
+--
+-- not sure what to do here (but FlushAllData was wrong)
+--
 	end
 	GameTooltip:Hide()
 end
@@ -1211,8 +1203,14 @@ function Skillet:SkillButton_OnEnter(button)
 		if altlink and (IsAltKeyDown() or Skillet.isCraft) then
 			tip:SetHyperlink(altlink)
 		elseif link and not Skillet.isCraft then
+			local skillIndex = self.data.skillIndexLookup[self.currentPlayer][skill.recipeID]
 			--DA.DEBUG(0,"link= "..DA.PLINK(link))
-			tip:SetHyperlink(link)		-- should this be SetTradeSkillItem(skillIndex)
+			--DA.DEBUG(0,"recipeID= "..tostring(skill.recipeID)..", itemID= "..tostring(recipe.itemID)..", skillIndex= "..tostring(skillIndex))
+			if skillIndex then
+				tip:SetTradeSkillItem(skillIndex)
+			else
+				tip:SetHyperlink(link)
+			end
 		end
 		if IsShiftKeyDown() then
 			if recipe.itemID == 0 then
@@ -1439,7 +1437,7 @@ local lastUpdateSpellID = nil
 local ARLProfessionInitialized = {}
 -- Updates the details window with information about the currently selected skill
 function Skillet:UpdateDetailsWindow(skillIndex)
-	DA.DEBUG(0,"UpdateDetailsWindow("..tostring(skillIndex)..")")
+	--DA.DEBUG(0,"UpdateDetailsWindow("..tostring(skillIndex)..")")
 	if not skillIndex or skillIndex < 0 then
 		Skillet:HideDetailWindow()
 		return
@@ -1651,16 +1649,18 @@ function Skillet:QueueItemButton_OnClick(this, button)
 		local recipe = self:GetRecipe(recipeID)
 		local tradeID = recipe.tradeID
 		local newSkillIndex = self.data.skillIndexLookup[self.currentPlayer][recipeID]
-		DA.DEBUG(0,"selecting new skill "..tradeID..":"..(newSkillIndex or "nil"))
+		--DA.DEBUG(0,"selecting new skill "..tradeID..":"..(newSkillIndex or "nil"))
 		self:SetTradeSkill(self.currentPlayer, tradeID, newSkillIndex)
-		DA.DEBUG(0,"done selecting new skill")
+		--DA.DEBUG(0,"done selecting new skill")
 	elseif button == "RightButton" then
 		Skillet:SkilletQueueMenu_Show(this)
 	end
 end
 
+--
 -- Updates the window/scroll list displaying queue of items
 -- that are waiting to be crafted.
+--
 function Skillet:UpdateQueueWindow()
 	local queue = self.db.realm.queueData[self.currentPlayer]
 	if not queue then
@@ -1684,16 +1684,22 @@ function Skillet:UpdateQueueWindow()
 	end
 	local button_count = SkilletQueueList:GetHeight() / SKILLET_TRADE_SKILL_HEIGHT
 	button_count = math.floor(button_count)
-	-- Update the scroll frame
+--
+-- Update the scroll frame
+--
 	FauxScrollFrame_Update(SkilletQueueList,				-- frame
 						   numItems,                        -- num items
 						   button_count,                    -- num to display
 						   SKILLET_TRADE_SKILL_HEIGHT)      -- value step (item height)
-	-- Where in the list of skill to start counting.
+--
+-- Where in the list of skill to start counting.
+--
 	local itemOffset = FauxScrollFrame_GetOffset(SkilletQueueList)
 	local width = SkilletQueueList:GetWidth()
-	-- Iterate through all the buttons that make up the scroll window
-	-- and fill then in with data or hide them, as necessary
+--
+-- Iterate through all the buttons that make up the scroll window
+-- and fill then in with data or hide them, as necessary
+--
 	for i=1, button_count, 1 do
 		local itemIndex = i + itemOffset
 		num_queue_buttons = math.max(num_queue_buttons, i)
@@ -1704,7 +1710,9 @@ function Skillet:UpdateQueueWindow()
 		local queueName    = _G[button:GetName() .. "NameText"]
 		local deleteButton = _G[button:GetName() .. "DeleteButton"]
 		button:SetWidth(width)
-		-- Stick this on top of the button we use for displaying queue contents.
+--
+-- Stick this on top of the button we use for displaying queue contents.
+--
 		deleteButton:SetFrameLevel(button:GetFrameLevel() + 1)
 		local fixed_width = countFrame:GetWidth() + deleteButton:GetWidth()
 		fixed_width = width - fixed_width - 10 -- 10 for the padding between items
@@ -1729,7 +1737,9 @@ function Skillet:UpdateQueueWindow()
 			queueCount:Hide()
 		end
 	end
-	-- Hide any of the buttons that we created, but don't need right now
+--
+-- Hide any of the buttons that we created, but don't need right now
+--
 	for i = button_count+1, num_queue_buttons, 1 do
 	   local button = get_queue_button(i)
 	   button:Hide()
@@ -2017,10 +2027,12 @@ function Skillet:SkillButton_NameEditEnable(button)
 end
 
 local lastClick = 0
+--
 -- When one of the skill buttons in the left scroll pane is clicked
+--
 function Skillet:SkillButton_OnClick(button)
 	local mouse = GetMouseButtonClicked()
-	DA.DEBUG(3,"SkillButton_OnClick("..tostring(button).."), "..tostring(mouse))
+	--DA.DEBUG(3,"SkillButton_OnClick("..tostring(button).."), "..tostring(mouse))
 	if (mouse == "LeftButton") then
 		Skillet:QueueManagementToggle(true)
 		if not button.skill.mainGroup then
@@ -2057,10 +2069,12 @@ function Skillet:SkillButton_OnClick(button)
 	end
 end
 
+--
 -- When one of the skill buttons in the left scroll pane is clicked
+--
 function Skillet:SkillExpandButton_OnClick(button)
 	local mouse = GetMouseButtonClicked()
-	DA.DEBUG(3,"SkillExpandButton_OnClick("..tostring(button).."), "..tostring(mouse))
+	--DA.DEBUG(3,"SkillExpandButton_OnClick("..tostring(button).."), "..tostring(mouse))
 	if (mouse=="LeftButton") then
 		if button.group then
 			button.group.expanded = not button.group.expanded
@@ -2075,7 +2089,7 @@ end
 -- will be visible in the skill list (ie, not scrolled off the top/bottom)
 --
 function Skillet:ScrollToSkillIndex(skillIndex)
-	DA.DEBUG(0,"ScrollToSkillIndex("..tostring(skillIndex)..")")
+	--DA.DEBUG(0,"ScrollToSkillIndex("..tostring(skillIndex)..")")
 	if skillIndex == nil then
 		return
 	end
@@ -2113,7 +2127,9 @@ function Skillet:ScrollToSkillIndex(skillIndex)
 	self:UpdateTradeSkillWindow()
 end
 
+--
 -- Go to the previous recipe in the history list.
+--
 function Skillet:GoToPreviousSkill()
 	local entry = table.remove(skillStack)
 	if entry then
@@ -2153,7 +2169,9 @@ function Skillet:getLvlUpChance()
 	end
 end
 
+--
 -- Called when then mouse enters the rank status bar
+--
 function Skillet:RankFrame_OnEnter(button)
 	GameTooltip:SetOwner(button, "ANCHOR_BOTTOMLEFT")
 	local r,g,b = SkilletSkillName:GetTextColor()
@@ -2169,12 +2187,16 @@ function Skillet:RankFrame_OnEnter(button)
 	GameTooltip:Show()
 end
 
--- Called when then mouse enters the rank status bar
+--
+-- Called when then mouse leaves the rank status bar
+--
 function Skillet:RankFrame_OnLeave(button)
 	GameTooltip:Hide()
 end
 
+--
 -- Called when then mouse enters a reagent button
+--
 function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
 	--DA.DEBUG(3,"ReagentButtonOnEnter("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
@@ -2203,7 +2225,9 @@ function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
 	CursorUpdate(button)
 end
 
+--
 -- called then the mouse leaves a reagent button
+--
 function Skillet:ReagentButtonOnLeave(button, skillIndex, reagentIndex)
 	gearTexture:Hide()
 end
@@ -2225,7 +2249,7 @@ end
 
 -- Called when the reagent button is clicked
 function Skillet:ReagentButtonOnClick(button, skillIndex, reagentIndex)
-	DA.DEBUG(0,"ReagentButtonOnClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	--DA.DEBUG(0,"ReagentButtonOnClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	if not self.db.profile.link_craftable_reagents then
 		return
 	end
@@ -2244,7 +2268,9 @@ function Skillet:ReagentButtonOnClick(button, skillIndex, reagentIndex)
 		if not self.recipeMenu then
 			self.recipeMenu = CreateFrame("Frame", "SkilletRecipeMenu", _G["UIParent"], "UIDropDownMenuTemplate")
 		end
-		-- popup with selection if there is more than 1 potential recipe source for the reagent (small prismatic shards, for example)
+--
+-- popup with selection if there is more than 1 potential recipe source for the reagent (small prismatic shards, for example)
+--
 		for p in pairs(skillIndexLookup) do
 			for id in pairs(newRecipeTable) do
 				if skillIndexLookup[p][id] then
@@ -2310,7 +2336,7 @@ end
 --
 function Skillet:StartQueue_OnClick(button)
 	local mouse = GetMouseButtonClicked()
-	DA.DEBUG(0,"StartQueue_OnClick("..tostring(button).."), "..tostring(mouse))
+	--DA.DEBUG(0,"StartQueue_OnClick("..tostring(button).."), "..tostring(mouse))
 	if self.queuecasting then
 		self:CancelCast() -- next update will reset the text
 		button:Disable()
@@ -2323,10 +2349,14 @@ function Skillet:StartQueue_OnClick(button)
 end
 
 local old_CloseSpecialWindows
+--
 -- Called when the trade skill window is shown
+--
 function Skillet:Tradeskill_OnShow()
 	DA.DEBUG(0,"Tradeskill_OnShow()")
-	-- Need to hook this so that hitting [ESC] will close the Skillet window(s).
+--
+-- Need to hook this so that hitting [ESC] will close the Skillet window(s).
+--
 	if not old_CloseSpecialWindows then
 		old_CloseSpecialWindows = CloseSpecialWindows
 		CloseSpecialWindows = function()
@@ -2337,7 +2367,9 @@ function Skillet:Tradeskill_OnShow()
 	DA.DEBUG(0,"Tradeksill_OnShow END")
 end
 
+--
 -- Called when the trade skill window is hidden
+--
 function Skillet:Tradeskill_OnHide()
 end
 
@@ -2591,7 +2623,9 @@ local queueMenuList = {
 	},
 }
 
+--
 -- Called when the skill operators drop down is displayed
+--
 function Skillet:SkilletSkillMenu_Show(button)
 	if not SkilletSkillMenu then
 		SkilletSkillMenu = CreateFrame("Frame", "SkilletSkillMenu", _G["UIParent"], "UIDropDownMenuTemplate")
@@ -2625,7 +2659,7 @@ function Skillet:SkilletQueueMenu_Show(button)
 end
 
 function Skillet:ReAnchorButtons(newFrame)
-	DA.DEBUG(0,"ReAnchorButtons("..tostring(newFrame)..")")
+	--DA.DEBUG(0,"ReAnchorButtons("..tostring(newFrame)..")")
 	SkilletRecipeNotesButton:SetPoint("BOTTOMRIGHT",newFrame,"TOPRIGHT",0,0)
 	SkilletQueueAllButton:SetPoint("TOPLEFT",newFrame,"BOTTOMLEFT",0,-2)
 	SkilletEnchantButton:SetPoint("TOPLEFT",newFrame,"BOTTOMLEFT",0,-2)
@@ -2653,7 +2687,7 @@ function Skillet:ShowReagentDetails()
 end
 
 function Skillet:QueueManagementToggle(showDetails)
-	DA.DEBUG(0,"QueueManagementToggle("..tostring(showDetails)..")")
+	--DA.DEBUG(0,"QueueManagementToggle("..tostring(showDetails)..")")
 	if SkilletQueueManagementParent:IsVisible() or showDetails then
 		Skillet:ShowReagentDetails()
 	else
@@ -2773,7 +2807,9 @@ function Skillet:HideStandaloneQueue()
 	SkilletStandaloneQueue:Hide()
 end
 
+--
 -- Creates and sets up the Standalone Queue Frame
+--
 function Skillet:CreateStandaloneQueueFrame()
 	local frame = SkilletStandaloneQueue
 	if not frame then
@@ -2810,8 +2846,10 @@ function Skillet:CreateStandaloneQueueFrame()
 	titletext:SetTextColor(1,1,1)
 	titletext:SetText("Skillet: " .. L["Queue"])
 
-	-- Ace Window manager library, allows the window position (and size)
-	-- to be automatically saved
+--
+-- Ace Window manager library, allows the window position (and size)
+-- to be automatically saved
+--
 	local standaloneQueueLocation = {
 		prefix = "standaloneQueueLocation_"
 	}
@@ -2819,10 +2857,14 @@ function Skillet:CreateStandaloneQueueFrame()
 	windowManager.RegisterConfig(frame, self.db.profile, standaloneQueueLocation)
 	windowManager.RestorePosition(frame)  -- restores scale also
 	windowManager.MakeDraggable(frame)
-	-- lets play the resize me game!
+--
+-- lets play the resize me game!
+--
 	Skillet:EnableResize(frame, 385, 170, Skillet.UpdateStandaloneQueueWindow)
-	-- so hitting [ESC] will close the window
-	--tinsert(UISpecialFrames, frame:GetName())
+--
+-- so hitting [ESC] will close the window
+--
+	tinsert(UISpecialFrames, frame:GetName())
 	return frame
 end
 

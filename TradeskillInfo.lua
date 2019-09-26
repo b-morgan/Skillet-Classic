@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- the level is returned, otherwise 0 is returned
 --
 -- item can be: itemID or "itemString" or "itemName" or "itemLink"
+--
 function Skillet:GetLevelRequiredToUse(item)
 	if not item then return end
 		local level = select(5, GetItemInfo(item))
@@ -31,10 +32,10 @@ function Skillet:GetLevelRequiredToUse(item)
 end
 
 function Skillet:GetItemIDFromLink(link)	-- works with items or enchants
-	--DA.DEBUG(4,"GetItemIDFromLink("..DA.PLINK(link)..")")
+	--DA.DEBUG(3,"GetItemIDFromLink("..DA.PLINK(link)..")")
 	if (link) then
 		local linktype, id = string.match(link, "|H([^:]+):(%d+)")
-		--DA.DEBUG(4,"linktype= "..tostring(linktype)..", id= "..tostring(id))
+		--DA.DEBUG(3,"linktype= "..tostring(linktype)..", id= "..tostring(id))
 		if id then
 			return tonumber(id);
 		else
@@ -43,7 +44,9 @@ function Skillet:GetItemIDFromLink(link)	-- works with items or enchants
 	end
 end
 
+--
 -- return GetItemInfo and automatically query server if not cached
+--
 function Skillet:GetItemInfo(id)
 	if id then
 		local name = GetItemInfo(id)
@@ -55,7 +58,9 @@ function Skillet:GetItemInfo(id)
 	end
 end
 
+--
 -- Wrapper that calls the correct Get*Info for crafts and trades as appropriate
+--
 function Skillet:GetTradeSkillInfo(skillIndex)
 	local tradeID = self.currentTrade
 	local skill = self:GetSkill(self.currentPlayer, tradeID, skillIndex)
@@ -85,6 +90,7 @@ end
 --     level: from 0 (Poor) to 6 (Artifact).
 --     r, g, b: color code for the items color
 --     hex: hexidecimal representation of the string, as well as "|c" in the beginning.
+--
 function Skillet:GetQualityFromLink(link)
 	if (not link) then return end
 	local color = link:match("(|c%x+)|Hitem:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+|h%[.-%]|h|r")
@@ -97,7 +103,9 @@ function Skillet:GetQualityFromLink(link)
 			end
 		end
 	end
-	-- no match
+--
+-- no match
+--
 end
 
 --
@@ -166,8 +174,10 @@ function Skillet:GetTradeSkillReagentInfo(skillIndex, reagentIndex)
 	end
 end
 
+--
 -- Returns a link for the reagent required to create the specified
 -- item, the index'th reagent required for the item is returned
+--
 function Skillet:GetTradeSkillReagentItemLink(skillIndex, index)
 	if skillIndex and index then
 		local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
@@ -179,12 +189,14 @@ function Skillet:GetTradeSkillReagentItemLink(skillIndex, index)
 		return nil
 end
 
+--
 -- Gets a link to the recipe (not the item creafted by the recipe)
 -- for the current tradeskill
+--
 function Skillet:GetTradeSkillRecipeLink(skillIndex)
 	local recipe, id = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	if recipe and id then
---	DA.DEBUG(0,"get tradeskill recipe link: "..(id or "nil"))
+	--DA.DEBUG(0,"get tradeskill recipe link: "..(id or "nil"))
 		local link = GetSpellLink(id)		
 		return link
 	end
@@ -207,8 +219,10 @@ end
 function Skillet:ExpandTradeSkillSubClass(skillIndex)
 end
 
+--
 -- Gets the trade skill line, and knows how to do the right
 -- thing depending on whether or not this is a craft.
+--
 function Skillet:GetTradeSkillLine()
 	DA.DEBUG(0,"GetTradeSkillLine(), currentTrade= "..tostring(self.currentTrade))
 	if self.currentTrade then
@@ -227,7 +241,9 @@ function Skillet:GetTradeSkillLine()
 	end
 end
 
+--
 -- Returns the number of trade or craft skills
+--
 function Skillet:GetNumTradeSkills()
 	return self:GetNumSkills(self.currentPlayer, self.currentTrade)
 end
