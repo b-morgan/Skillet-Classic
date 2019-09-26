@@ -1457,7 +1457,7 @@ function Skillet:OnEnable()
 --
 	self:RegisterEvent("PLAYER_LOGOUT")
 
-	self:RegisterEvent("ADDON_ACTION_BLOCKED")
+--	self:RegisterEvent("ADDON_ACTION_BLOCKED")
 
 	self.bagsChanged = true
 	self.hideUncraftableRecipes = false
@@ -1478,9 +1478,10 @@ function Skillet:OnEnable()
 end
 
 function Skillet:ADDON_ACTION_BLOCKED()
-	print("|cf0f00000Skillet-Classic|r: Combat lockdown restriction." ..
-								  " Leave combat and try again.")
-	self:HideAllWindows()
+	DA.TRACE("ADDON_ACTION_BLOCKED")
+--	print("|cf0f00000Skillet-Classic|r: Combat lockdown restriction." ..
+--								  " Leave combat and try again.")
+--	self:HideAllWindows()
 end
 
 function Skillet:PLAYER_LOGOUT()
@@ -1615,11 +1616,6 @@ end
 -- Show the tradeskill window, called from TRADE_SKILL_SHOW event, clicking on links, or clicking on guild professions
 --
 function Skillet:SkilletShow()
-	if InCombatLockdown() or UnitAffectingCombat("player") then
-		print("|cf0f00000Skillet-Classic|r: Combat lockdown restriction." ..
-									  " Leave combat and try again.")
-		self:HideAllWindows()
-	end
 	--DA.DEBUG(1,"SkilletShow(), currentTrade= "..tostring(self.currentTrade))
 	self.linkedSkill, self.currentPlayer, self.isGuild = Skillet:IsTradeSkillLinked()
 	if self.linkedSkill then
