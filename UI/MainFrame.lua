@@ -113,6 +113,11 @@ local function get_craftable_counts(skill, numMade)
 end
 
 function Skillet:CreateTradeSkillWindow()
+
+    if Skillet.db.profile.enchanting and not IsAddOnLoaded("Blizzard_CraftUI") then
+       LoadAddOn("Blizzard_CraftUI")
+	end
+
 	-- The SkilletFrame is defined in the file main_frame.xml
 	local frame = SkilletFrame
 	if not frame then
@@ -172,8 +177,13 @@ function Skillet:CreateTradeSkillWindow()
 	SkilletStartQueueButton:SetText(L["Process"])
 	SkilletEmptyQueueButton:SetText(L["Clear"])
 	SkilletEnchantButton:SetText(L["Enchant"])
-	if Skillet.db.profile.enchanting then
-		SkilletEnchantButton:Enable()		-- if DoCraft or a workaround is found
+	if Skillet.db.profile.enchanting and CraftCreateButton then
+		SkilletEnchantButton:Hide() 			-- Hide Original Button
+		CraftCreateButton:SetParent(frame)		-- Set new parent for the blizz button
+		CraftCreateButton:ClearAllPoints()		-- Clear all positions
+--		CraftCreateButton:SetText(L["Enchant"]) -- Set text (should already be set)
+		CraftCreateButton:SetAllPoints(SkilletEnchantButton) -- Copy positions from original button
+--		CraftCreateButton:SetTexture(SkilletEnchantButton)
 	else
 		SkilletEnchantButton:Disable()		-- because DoCraft is restricted
 	end
@@ -442,12 +452,11 @@ function Skillet:ConfigureRecipeControls()
 		SkilletAdd1Button:Hide()
 		SkilletAdd10Button:Hide()
 		SkilletClearNumButton:Hide()
-		if Skillet.db.profile.enchanting then
-			SkilletEnchantButton:Enable()		-- if DoCraft or a workaround is found
+		if Skillet.db.profile.enchanting and CraftCreateButton then
+			CraftCreateButton:Show()
 		else
 			SkilletEnchantButton:Disable()		-- because DoCraft is restricted
 		end
-		SkilletEnchantButton:Show();
 	else
 		SkilletQueueAllButton:Show()
 		SkilletQueueButton:Show()
@@ -463,7 +472,11 @@ function Skillet:ConfigureRecipeControls()
 		SkilletAdd1Button:Show()
 		SkilletAdd10Button:Show()
 		SkilletClearNumButton:Show()
-		SkilletEnchantButton:Hide()
+		if Skillet.db.profile.enchanting and CraftCreateButton then
+			CraftCreateButton:Hide()
+		else
+			SkilletEnchantButton:Hide()
+		end
 	end
 	self:InitRecipeFilterButtons()
 	if self.currentPlayer ~= (UnitName("player")) then				-- only allow processing for the current player
@@ -2674,7 +2687,11 @@ function Skillet:ReAnchorButtons(newFrame)
 	--DA.DEBUG(0,"ReAnchorButtons("..tostring(newFrame)..")")
 	SkilletRecipeNotesButton:SetPoint("BOTTOMRIGHT",newFrame,"TOPRIGHT",0,0)
 	SkilletQueueAllButton:SetPoint("TOPLEFT",newFrame,"BOTTOMLEFT",0,-2)
-	SkilletEnchantButton:SetPoint("TOPLEFT",newFrame,"BOTTOMLEFT",0,-2)
+	if Skillet.db.profile.enchanting and CraftCreateButton then
+		CraftCreateButton:SetPoint("TOPLEFT",newFrame,"BOTTOMLEFT",0,-2)
+	else
+		SkilletEnchantButton:SetPoint("TOPLEFT",newFrame,"BOTTOMLEFT",0,-2)
+	end
 	SkilletQueueButton:SetPoint("TOPRIGHT",newFrame,"BOTTOMRIGHT",0,-2)
 --[[
 -- Do we need to do these as well?
