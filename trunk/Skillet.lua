@@ -2020,6 +2020,9 @@ function Skillet:SetSelectedSkill(skillIndex, wasClicked)
 		self:HideNotesWindow() -- XXX: should this be an update?
 	end
 	self:ConfigureRecipeControls()
+	if Skillet.db.profile.enchanting and self.isCraft and CraftFrame_SetSelection then
+		CraftFrame_SetSelection(skillIndex)
+	end
 	self.selectedSkill = skillIndex
 	self:ScrollToSkillIndex(skillIndex)
 	self:UpdateDetailsWindow(skillIndex)
