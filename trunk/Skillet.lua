@@ -491,7 +491,7 @@ Skillet.options =
 				},
 			},
 		},
- 		config = {
+		config = {
 			type = 'execute',
 			name = L["Config"],
 			desc = L["CONFIGDESC"],
@@ -731,10 +731,71 @@ Skillet.options =
 				Skillet:ConfigureRecipeControls()
 				Skillet:UpdateTradeSkillWindow()
 			end,
-			width = "double",
 			order = 66,
 		},
+--
+-- commands to toggle Blizzard's frames (beats using "/run")
+--
+		btsui = {
+			type = "toggle",
+			name = "B TS UI",
+			desc = "Show/Hide the Blizzard TradeSkill frame",
+			get = function()
+				return Skillet.data.btsui
+			end,
+			set = function(self,value)
+				Skillet.data.btsui = value
+				if value then
+					ShowUIPanel(TradeSkillFrame)
+				else
+					HideUIPanel(TradeSkillFrame)
+				end
+			end,
+			order = 67
+		},
+		bcui = {
+			type = "toggle",
+			name = "B C UI",
+			desc = "Show/Hide the Blizzard Crafting frame",
+			get = function()
+				return Skillet.data.bcui
+			end,
+			set = function(self,value)
+				Skillet.data.bcui = value
+				if value then
+					ShowUIPanel(CraftFrame)
+				else
+					HideUIPanel(CraftFrame)
+				end
+			end,
+			order = 68
+		},
+--
+-- commands to update Skillet's main windows
+--
+		uslw = {
+			type = 'execute',
+			name = "UpdateShoppingListWindow",
+			desc = "Update (Skillet's) Shopping List Window",
+			func = function()
+				Skillet:UpdateShoppingListWindow(false)
+			end,
+			order = 69
+		},
+		utsw = {
+			type = 'execute',
+			name = "UpdateTradeSkillWindow",
+			desc = "Update (Skillet's) TradeSkill Window",
+			func = function()
+				Skillet:UpdateTradeSkillWindow()
+			end,
+			order = 70
+		},
 
+--
+-- commands to manipulate the state of debugging code flags
+-- (See DebugAids.lua)
+--
 		WarnShow = {
 			type = "toggle",
 			name = "WarnShow",
@@ -1003,6 +1064,9 @@ Skillet.options =
 			order = 97
 		},
 
+--
+-- command to reset the position of the major Skillet frames
+--
 		reset = {
 			type = 'execute',
 			name = L["Reset"],
@@ -1042,11 +1106,6 @@ Skillet.options =
 		},
 	}
 }
-
--- replaces the standard bliz frameshow calls with this for supported tradeskills
-local function DoNothing()
-	DA.DEBUG(0,"Do Nothing")
-end
 
 function Skillet:DisableBlizzardFrame()
 	DA.DEBUG(0,"DisableBlizzardFrame()")
@@ -1666,7 +1725,7 @@ function Skillet:SkilletShowWindow()
 	end
 	if not self:RescanTrade() then
 		if TSMAPI_FOUR then
-			DA.CHAT("Conflict between Skillet-Classic and TradeSkillMaster")
+				DA.CHAT("Conflict between Skillet-Classic and TradeSkillMaster")
 		else
 			DA.CHAT("No headers, try again")
 		end
@@ -2129,3 +2188,8 @@ end
 function Skillet:IsActive()
 	return Skillet:IsEnabled()
 end
+
+function Skillet:IsCraft()
+	return Skillet.isCraft
+end
+
