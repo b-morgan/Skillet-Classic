@@ -164,7 +164,7 @@ function Skillet:CreateTradeSkillWindow()
 	label:SetText(L["Search"]);
 
 	SkilletPluginButton:SetText(L["Plugins"])
-	SkilletPluginButton:Hide()						-- remove if there are any Plugins
+	SkilletPluginButton:Hide()
 	SkilletCreateAllButton:SetText(L["Create All"])
 	SkilletQueueAllButton:SetText(L["Queue All"])
 	SkilletCreateButton:SetText(L["Create"])
@@ -747,8 +747,10 @@ function Skillet:PluginButton_OnClick(button)
 	end
 end
 
+--
 -- Updates the trade skill window whenever anything has changed,
 -- number of skills, skill type, skill level, etc
+--
 function Skillet:UpdateTradeSkillWindow()
 	DA.DEBUG(0,"UpdateTradeSkillWindow()")
 	self:NameEditSave()
@@ -777,6 +779,11 @@ function Skillet:UpdateTradeSkillWindow()
 	self:UpdateDetailsWindow(self.selectedSkill)
 	self:UpdateTradeButtons(self.currentPlayer)
 	SkilletIgnoredMatsButton:Show()
+	if SkilletPluginButton and SkilletFrame.added_buttons and #SkilletFrame.added_buttons > 0 then
+		SkilletPluginButton:Show()
+	else
+		SkilletPluginButton:Hide()
+	end
 	if not self.currentTrade then
 --
 -- nothing to see, nothing to update
@@ -2879,4 +2886,23 @@ function Skillet:UpdateStandaloneQueueWindow()
 	end
 	SkilletStandaloneQueue:SetAlpha(self.db.profile.transparency)
 	SkilletStandaloneQueue:SetScale(self.db.profile.scale)
+end
+
+function Skillet:AddButtonToTradeskillWindow(button)
+	if not SkilletFrame.added_buttons then
+		SkilletFrame.added_buttons = {}
+	end
+	button:Hide()
+--
+-- See if this button has already been added ...
+--
+	for i=1, #SkilletFrame.added_buttons, 1 do
+		if SkilletFrame.added_buttons[i] == button then
+			return	-- ... yup
+		end
+	end
+	table.insert(SkilletFrame.added_buttons, button)	-- ... nope
+	if SkilletPluginButton then
+		SkilletPluginButton:Show()
+	end
 end
