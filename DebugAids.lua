@@ -211,7 +211,7 @@ end
 -- Convert a table into a string with line breaks and indents.
 --   if specified, m is the maximum recursion depth.
 function DA.DUMP(o,m,n)
-	if type(o) == 'table' then
+	if o and type(o) == 'table' then
 		if not DA.TableDump then return "{table}" end
 		local s
 		local i = ""
@@ -240,7 +240,7 @@ end
 -- Convert a table into a one line string.
 --   if specified, m is the maximum recursion depth.
 function DA.DUMP1(o,m,n)
-	if type(o) == 'table' then
+	if o and type(o) == 'table' then
 		if not DA.TableDump then return "{table}" end
 		local s
 		if not n then n = 0 end
