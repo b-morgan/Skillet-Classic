@@ -29,8 +29,15 @@ local COLORGRAY =   "|cff808080"
 
 -- min height for Skillet window
 local SKILLET_MIN_HEIGHT = 580
+--
 -- height of the header portion
-local SKILLET_HEADER_HEIGHT = 125		-- 145 if Filter is added under Search
+--
+-- this value reflects the offsets of 
+-- SkilletSkillListParent and SkilletReagentParent
+--   (Y offset is either 110 or 130)
+--   (we really should compute this from those values)
+--
+local SKILLET_HEADER_HEIGHT = 145		-- 125 if Filter is removed under Search
 
 -- min width for skill list window
 local SKILLET_SKILLLIST_MIN_WIDTH = 440
@@ -164,10 +171,13 @@ function Skillet:CreateTradeSkillWindow()
 	titletext:SetShadowColor(0,0,0)
 	titletext:SetShadowOffset(1,-1)
 	titletext:SetTextColor(1,1,1)
-	titletext:SetText(L["Skillet Trade Skills"].." "..Skillet.version);
-	local label = _G["SkilletSearchLabel"];
-	label:SetText(L["Search"]);
-
+	titletext:SetText(L["Skillet Trade Skills"].." "..Skillet.version)
+	local label = _G["SkilletSearchLabel"]
+	label:SetText(L["Search"])
+	local label = _G["SkilletFilterLabel"]
+	label:SetText(L["Filter"])
+--	SkilletFilterDropdown:Hide()	-- Not Implemented Yet
+	SkilletFilterOperations:Hide()		-- Not Implemented Yet
 	SkilletPluginButton:SetText(L["Plugins"])
 	SkilletPluginButton:Hide()
 	SkilletCreateAllButton:SetText(L["Create All"])
@@ -1152,6 +1162,7 @@ end
 -- a recipe in the list of skills
 --
 function Skillet:SkillButton_OnEnter(button)
+	DA.DEBUG(0,"SkillButton_OnEnter("..tostring(button)..")")
 	local id = button:GetID()
 	if not id then
 		return
@@ -1174,6 +1185,7 @@ function Skillet:SkillButton_OnEnter(button)
 		return
 	end
 	local skill = button.skill
+	--DA.DEBUG("skill= "..DA.DUMP1(skill,1))
 	if not skill then
 		button.locked = false
 		return
@@ -1210,6 +1222,7 @@ function Skillet:SkillButton_OnEnter(button)
 --
 -- If not displaying full tooltips you have to press Ctrl to see them
 --
+--[[
 	if IsControlKeyDown() or Skillet.db.profile.display_full_tooltip then
 		local name, link, quality, quantity, altlink, _
 		if recipe.itemID == 0 or not Skillet.db.profile.display_item_tooltip then
@@ -1244,17 +1257,83 @@ function Skillet:SkillButton_OnEnter(button)
 				Skillet:Tooltip_ShowCompareItem(tip, link, "left")
 			end
 		end
+	end
+]]--
+	if Skillet.db.profile.display_full_tooltip or IsControlKeyDown() then
+		local name, link, id, quality, quantity, altlink, _
+		if recipe.itemID == 0 or not Skillet.db.profile.display_item_tooltip then
+			link = GetSpellLink(skill.recipeID)
+			name = GetSpellInfo(link)
+			quality = nil
+			quantity = nil
+			if recipe.itemID ~= 0 then
+				_, altlink = GetItemInfo(recipe.itemID)
+			end
+		else
+			name,link,quality = GetItemInfo(recipe.itemID)
+			altlink = GetSpellLink(skill.recipeID)
+			quantity = recipe.numMade
+		end
+		local skillIndex = self.data.skillIndexLookup[self.currentPlayer][skill.recipeID]
+		DA.DEBUG(0,"recipeID= "..tostring(skill.recipeID)..", itemID= "..tostring(recipe.itemID)..", skillIndex= "..tostring(skillIndex))
+		if Skillet.isCraft then
+--
+-- Craft tooltip is built with special API calls
+--
+			local difficulty = skill.skillData.difficulty
+			DA.DEBUG("skill.skillData= "..DA.DUMP1(skill.skillData,1))
+			local color = Skillet.skill_style_type[skill.skillData.difficulty]
+			DA.DEBUG("difficulty= "..tostring(difficulty)..", color= "..DA.DUMP1(color))
+			if (color) then
+				tip:AddLine(skill.name, color.r, color.g, color.b, false);
+			else
+				tip:AddLine(skill.name, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, false);
+			end
+			if skillIndex then
+				local requiredTotems = BuildColoredListString(GetCraftSpellFocus(skillIndex))
+				if ( requiredTotems ) then
+					tip:AddLine(REQUIRES_LABEL.." "..requiredTotems, 1,1,1, false) -- , NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, false)
+				end
+				tip:AddLine(" ")
+				local desc = GetCraftDescription(skillIndex)
+				if (desc) then
+					tip:AddLine(desc) -- , NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true)
+				end
+			end
+		else
+			if altlink and IsAltKeyDown() then
+				DA.DEBUG(0,"altlink= "..DA.PLINK(altlink))
+				tip:SetHyperlink(altlink)
+			elseif link then
+				DA.DEBUG(0,"link= "..DA.PLINK(link))
+				if skillIndex then
+					tip:SetTradeSkillItem(skillIndex)
+				else
+					tip:SetHyperlink(link)
+				end
+			end
+		end
+		if IsShiftKeyDown() then
+			if recipe.itemID == 0 then
+				Skillet:Tooltip_ShowCompareItem(tip, GetInventoryItemLink("player", recipe.slot), "left")
+			else
+				Skillet:Tooltip_ShowCompareItem(tip, link, "left")
+			end
+		end
 	else
 --
--- Name of the recipe
+-- Just the name of the recipe
 --
-		local color = Skillet.skill_style_type[skill.difficulty]
+		local color = Skillet.skill_style_type[skill.skillData.difficulty]
 		if (color) then
 			tip:AddLine(skill.name, color.r, color.g, color.b, false);
 		else
 			tip:AddLine(skill.name, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, false);
 		end
-	end
+	end		-- Skillet.db.profile.display_full_tooltip
+--
+--	Add Skillet specific information to the tooltip
+--
 	local num, numrecursive, numwvendor, numwalts, numbags, numbank = 0, 0, 0, 0, 0, 0
 	if skill.skillData then
 		num, numrecursive, numwvendor, numwalts = get_craftable_counts(skill.skillData, recipe.numMade)
@@ -1335,21 +1414,41 @@ end
 --
 -- Sets the game tooltip item to the selected skill
 --
-function Skillet:SetTradeSkillToolTip(skillIndex)
-	--DA.DEBUG(2,"SetTradeSkillToolTip("..tostring(skillIndex)..")")
+function Skillet:SetTradeSkillToolTip(button, skillIndex)
+	DA.DEBUG(0,"SetTradeSkillToolTip("..tostring(button)..", "..tostring(skillIndex)..")")
 	GameTooltip:ClearLines()
-	local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
-	if recipe then
-		if recipe.itemID ~= 0 then
---			GameTooltip:SetHyperlink("item:"..recipe.itemID)			-- creates an item, that's more interesting than the recipe
-			GameTooltip:SetTradeSkillItem(skillIndex)
-			if IsShiftKeyDown() then
-				GameTooltip_ShowCompareItem()
-			end
+	if Skillet.isCraft then
+		local craftName, craftSubSpellName, craftType, numAvailable, isExpanded, trainingPointCost, requiredLevel = GetCraftInfo(skillIndex)
+--		local color = Skillet.skill_style_type[craftType]
+		local color = CraftTypeColor[craftType];
+		if (color) then
+			GameTooltip:AddLine(craftName, color.r, color.g, color.b, false);
 		else
-			GameTooltip:SetHyperlink("enchant:"..recipe.spellID)				-- doesn't create an item, just tell us about the recipe
-			if IsShiftKeyDown() then
-				Skillet:Tooltip_ShowCompareItem(GameTooltip, GetInventoryItemLink("player", recipe.slot), "left")
+			GameTooltip:AddLine(craftName, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, false);
+		end
+		if skillIndex then
+			local requiredTotems = BuildColoredListString(GetCraftSpellFocus(skillIndex))
+			if ( requiredTotems ) then
+				GameTooltip:AddLine(REQUIRES_LABEL.." "..requiredTotems, 1,1,1, false)
+			end
+			GameTooltip:AddLine(" ")
+			local desc = GetCraftDescription(skillIndex)
+			if (desc) then
+				GameTooltip:AddLine(desc, 1,1,1, true)
+			end
+		end
+	else
+		local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
+		if recipe then
+			if recipe.itemID ~= 0 then
+				GameTooltip:SetTradeSkillItem(skillIndex)
+				if IsShiftKeyDown() then
+					GameTooltip_ShowCompareItem()
+				end
+			else
+				if IsShiftKeyDown() then
+					Skillet:Tooltip_ShowCompareItem(GameTooltip, GetInventoryItemLink("player", recipe.slot), "left")
+				end
 			end
 		end
 	end

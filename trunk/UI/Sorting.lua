@@ -404,9 +404,11 @@ function Skillet:AddRecipeSorter(text, sorter)
 end
 
 function Skillet:InitializeSorting()
-	-- Default sorting methods
-	-- We don't go through the public API for this as we want our methods
-	-- to appear first in the list, no matter what.
+--
+-- Default sorting methods
+-- We don't go through the public API for this as we want our methods
+-- to appear first in the list, no matter what.
+--
 	table.insert(sorters, 1, {["name"]=L["None"], ["sorter"]=sort_recipe_by_index})
 	table.insert(sorters, 2, {["name"]=L["By Name"], ["sorter"]=sort_recipe_by_name})
 	table.insert(sorters, 3, {["name"]=L["By Difficulty"], ["sorter"]=sort_recipe_by_skill_level})
@@ -444,21 +446,29 @@ function Skillet:InitializeSorting()
 	end)
 end
 
+--
 -- called when the sort drop down is first loaded
+--
 function Skillet:SortDropdown_OnLoad()
 	UIDropDownMenu_Initialize(SkilletSortDropdown, Skillet.SortDropdown_Initialize)
 	SkilletSortDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
-	-- Find out which sort method is selected
+--
+-- Find out which sort method is selected
+--
 	for i=1, #sorters, 1 do
 		if recipe_sort_method == sorters[i].sorter then
 			UIDropDownMenu_SetSelectedID(SkilletSortDropdown, i)
 			break
 		end
 	end
+--
 --	show_sort_toggle()
+--
 end
 
+--
 -- Called when the sort drop down is displayed
+--
 function Skillet:SortDropdown_OnShow()
 	UIDropDownMenu_Initialize(SkilletSortDropdown, Skillet.SortDropdown_Initialize)
 	SkilletSortDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
@@ -471,7 +481,9 @@ function Skillet:SortDropdown_OnShow()
 	show_sort_toggle()
 end
 
+--
 -- The method we use the initialize the sorting drop down.
+--
 function Skillet:SortDropdown_Initialize()
 	recipe_sort_method = NOSORT
 	local info
@@ -495,7 +507,9 @@ function Skillet:SortDropdown_Initialize()
 	-- buttons have not been created yet
 end
 
+--
 -- Called when the user selects an item in the sorting drop down
+--
 function Skillet:SortDropdown_OnClick()
 	UIDropDownMenu_SetSelectedID(SkilletSortDropdown, self:GetID())
 	local entry = sorters[self:GetID()]
@@ -503,5 +517,86 @@ function Skillet:SortDropdown_OnClick()
 	recipe_sort_method = entry.sorter
 	show_sort_toggle()
 	Skillet:SortAndFilterRecipes()
+	Skillet:UpdateTradeSkillWindow()
+end
+
+--
+-- called when the new filter drop down is first loaded
+--
+function Skillet:FilterDropDown_OnLoad()
+	--DA.DEBUG(0,"FilterDropDown_OnLoad()")
+	UIDropDownMenu_Initialize(SkilletFilterDropdown, Skillet.FilterDropDown_Initialize)
+	SkilletFilterDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
+end
+
+--
+-- Called when the new filter drop down is displayed
+--
+function Skillet:FilterDropDown_OnShow()
+	--DA.DEBUG(0,"FilterDropDown_OnShow()")
+	UIDropDownMenu_Initialize(SkilletFilterDropdown, Skillet.FilterDropDown_Initialize)
+	SkilletFilterDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
+	if Skillet.unlearnedRecipes then
+		UIDropDownMenu_SetSelectedID(SkilletFilterDropdown, 2)
+	else
+		UIDropDownMenu_SetSelectedID(SkilletFilterDropdown, 1)
+	end
+end
+
+--
+-- The method we use the initialize the new filter drop down.
+--
+function Skillet:FilterDropDown_Initialize()
+	--DA.DEBUG(0,"FilterDropDown_Initialize()")
+	local info
+	local i = 1
+
+	info = UIDropDownMenu_CreateInfo()
+	info.text = L["None"]
+	info.func = Skillet.FilterDropDown_OnClick
+	info.value = i
+	if self then
+		info.owner = self:GetParent()
+	end
+	UIDropDownMenu_AddButton(info)
+	i = i + 1
+
+--[[
+	info = UIDropDownMenu_CreateInfo()
+	info.text = L["SubClass"]
+	info.func = Skillet.FilterDropDown_OnClick
+	info.value = i
+	if self then
+		info.owner = self:GetParent()
+	end
+	UIDropDownMenu_AddButton(info)
+	i = i + 1
+
+	info = UIDropDownMenu_CreateInfo()
+	info.text = L["Slot"]
+	info.func = Skillet.FilterDropDown_OnClick
+	info.value = i
+	if self then
+		info.owner = self:GetParent()
+	end
+	UIDropDownMenu_AddButton(info)
+	i = i + 1
+]]--
+end
+
+--
+-- Called when the user selects an item in the new filter drop down
+--
+function Skillet:FilterDropDown_OnClick()
+	--DA.DEBUG(0,"FilterDropDown_OnClick()")
+	UIDropDownMenu_SetSelectedID(SkilletFilterDropdown, self:GetID())
+	local index = self:GetID()
+	if index == 1 then
+--		Skillet:SetTradeSkillLearned()
+	elseif index == 2 then
+--		Skillet:SetTradeSkillUnlearned()
+	end
+	Skillet.dataScanned = false
+	Skillet:RescanTrade()
 	Skillet:UpdateTradeSkillWindow()
 end

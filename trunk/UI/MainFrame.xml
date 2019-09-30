@@ -717,7 +717,7 @@
 			</OnLoad>
 			<OnEnter>
 --				GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
---				Skillet:SetTradeSkillToolTip(SkilletFrame.selectedSkill, self:GetID())
+--				Skillet:SetTradeSkillToolTip(self, SkilletFrame.selectedSkill, self:GetID())
 				Skillet:ReagentButtonOnEnter(self, SkilletFrame.selectedSkill, self:GetID())
 --				GameTooltip:Show()
 --				CursorUpdate(self)
@@ -1059,6 +1059,78 @@
 					</Anchor>
 				</Anchors>
 			</Button>
+
+			<!--
+			#
+			# Drop down where users can select the new filter they want to use
+			#
+			-->
+			<Frame name="SkilletFilterDropdown" inherits="UIDropDownMenuTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SkilletSortDropdown" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="6"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="SkilletFilterLabel" inherits="GameFontNormal" text="Filter">
+							<Anchors>
+								<Anchor point="RIGHT" relativeTo="$parent" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="15" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1" g="1" b="1" a="1"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						Skillet:FilterDropDown_OnLoad()
+					</OnLoad>
+					<OnShow>
+						Skillet:FilterDropDown_OnShow()
+					</OnShow>
+				</Scripts>
+			</Frame>
+			<Button name="SkilletFilterOperations">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="SkilletFilterDropdownButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="SkilletFilterText" inherits="GameFontNormalSmall" wordwrap="false" justifyH="LEFT">
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="10" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1" g="1" b="1" a="1"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+				<HighlightTexture file="Interface\Buttons\ButtonHilight-Round" alphaMode="ADD"/>
+				<Scripts>
+					<OnClick>
+						Skillet:InventoryFilterButtons_Hide()
+--						ToggleDropDownMenu(1, nil, SkilletFilterDropDown, self, self:GetWidth(), 0)
+					</OnClick>
+				</Scripts>
+			</Button>
 			<!--
 			#
 			# An edit box where users can type in search text
@@ -1066,12 +1138,12 @@
 			-->
 			<EditBox name="SkilletSearchBox" letters="50" historyLines="0" autoFocus="false">
 				<Size>
-					<AbsDimension x="126" y="20"/>
+					<AbsDimension x="124" y="20"/>
 				</Size>
 				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="SkilletSortDropdown" relativePoint="BOTTOMLEFT">
+					<Anchor point="TOPLEFT" relativeTo="SkilletFilterDropdown" relativePoint="BOTTOMLEFT">
 						<Offset>
-							<AbsDimension x="22" y="4"/>
+							<AbsDimension x="24" y="5"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -1150,7 +1222,7 @@
 				</Scripts>
 				<FontString inherits="ChatFontNormal"/>
 			</EditBox>
-			<Button name="SkilletSearchFilterClear">
+			<Button name="SkilletSearchClear">
 				<Size>
 					<AbsDimension x="32" y="32"/>
 				</Size>
@@ -1172,6 +1244,116 @@
 					</OnClick>
 				</Scripts>
 			</Button>
+<!--
+			<EditBox name="SkilletFilterBox" letters="50" historyLines="0" autoFocus="false">
+				<Size>
+					<AbsDimension x="126" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SkilletSearchBox" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-5" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="10" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+					</Layer>
+					<Layer level="ARTWORK">
+						<FontString name="SkilletFilterLabel" inherits="GameFontNormal" text="Search">
+							<Anchors>
+								<Anchor point="RIGHT" relativeTo="$parent" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="-8" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1" g="1" b="1" a="1"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnterPressed>
+						self:ClearFocus()
+					</OnEnterPressed>
+					<OnEscapePressed>
+						self:ClearFocus()
+					</OnEscapePressed>
+					<OnTextChanged>
+						Skillet:UpdateSearch(self:GetText())
+					</OnTextChanged>
+					<OnEditFocusLost>
+						self:HighlightText(0, 0)
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						if IsAltKeyDown() then
+							self:SetText("")
+						else
+							self:HighlightText()
+						end
+					</OnEditFocusGained>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+			<Button name="SkilletFilterClear">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="SkilletFilterBox" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-8" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\Buttons\CancelButton-Up"/>
+				<PushedTexture file="Interface\Buttons\CancelButton-Down"/>
+				<HighlightTexture file="Interface\Buttons\CancelButton-Highlight" alphaMode="ADD"/>
+				<Scripts>
+					<OnClick>
+						Skillet:InventoryFilterButtons_Hide()
+						SkilletFilterBox:SetText("")
+						SkilletFilterBox:ClearFocus()
+					</OnClick>
+				</Scripts>
+			</Button>
+-->
 			<!--
 			#
 			# A status bar to show how much skill you have in this trade
@@ -1239,7 +1421,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletFrame" relativePoint="TOPLEFT">
 						<Offset>
-							<AbsDimension x="10" y="-110"/>
+							<AbsDimension x="10" y="-130"/>
 						</Offset>
 					</Anchor>
 					<Anchor point="BOTTOM" relativeTo="SkilletFrame" relativePoint="BOTTOM">
@@ -1628,7 +1810,7 @@
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeTo="SkilletFrame" relativePoint="TOPRIGHT">
 						<Offset>
-							<AbsDimension x="-10" y="-110"/>
+							<AbsDimension x="-10" y="-130"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -2128,7 +2310,7 @@
 					<OnEnter>
 						if ( Skillet.selectedSkill ~= -1 ) then
 							GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
-							Skillet:SetTradeSkillToolTip(SkilletFrame.selectedSkill)
+							Skillet:SetTradeSkillToolTip(self, SkilletFrame.selectedSkill)
 							GameTooltip:Show()
 							CursorUpdate(self)
 						end
@@ -2144,7 +2326,7 @@
 						if GameTooltip:IsVisible() and GameTooltip:IsOwned(self) then
 							if ( Skillet.selectedSkill ~= -1 ) then
 								GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
-								Skillet:SetTradeSkillToolTip(SkilletFrame.selectedSkill)
+								Skillet:SetTradeSkillToolTip(self, SkilletFrame.selectedSkill)
 								GameTooltip:Show()
 								CursorUpdate(self)
 							end
