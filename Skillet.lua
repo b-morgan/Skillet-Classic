@@ -62,7 +62,7 @@ local defaults = {
 		display_shopping_list_at_merchant = true,
 		use_blizzard_for_followers = false,				-- not in Classic
 		hide_blizzard_frame = true,						-- primarily for debugging
-		support_crafting = false,						-- support may not be complete
+		support_crafting = true,						-- just in case
 		search_includes_reagents = true,				-- just in case
 		confirm_queue_clear = false,
 		queue_only_view = true,
@@ -1292,7 +1292,6 @@ function Skillet:FlushAllData()
 	Skillet.db.global.recipeDB = {}
 	Skillet.db.global.itemRecipeUsedIn = {}
 	Skillet.db.global.itemRecipeSource = {}
-	Skillet.db.realm.skillDB = {}
 	Skillet.db.realm.tradeSkills = {}
 	Skillet.db.realm.groupDB = {}
 	Skillet.db.realm.queueData = {}
@@ -1312,6 +1311,8 @@ function Skillet:FlushRecipeData()
 	Skillet.db.global.itemRecipeUsedIn = {}
 	Skillet.db.global.itemRecipeSource = {}
 	Skillet.db.realm.skillDB = {}
+	Skillet.db.realm.subClass = {}
+	Skillet.db.realm.invSlot = {}
 end
 
 function Skillet:InitializeDatabase(player)
@@ -1328,6 +1329,18 @@ function Skillet:InitializeDatabase(player)
 		end
 		if not self.db.realm.skillDB[player] then
 			self.db.realm.skillDB[player] = {}
+		end
+		if not self.db.realm.subClass then
+			self.db.realm.subClass = {}
+		end
+		if not self.db.realm.subClass[player] then
+			self.db.realm.subClass[player] = {}
+		end
+		if not self.db.realm.invSlot then
+			self.db.realm.invSlot = {}
+		end
+		if not self.db.realm.invSlot[player] then
+			self.db.realm.invSlot[player] = {}
 		end
 		if not self.db.realm.tradeSkills then
 			self.db.realm.tradeSkills = {}
@@ -1898,9 +1911,14 @@ function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 		self.currentGroup = nil
 		self.currentGroupLabel = self:GetTradeSkillOption("grouping")
 		self:RecipeGroupDropdown_OnShow()
+--
+-- Using English spell names won't work for other locales
+--
 		local spellName = self:GetTradeName(tradeID)
+		local Mining = self:GetTradeName(MINING)
+		local Smelting = self:GetTradeName(SMELTING)
 		DA.DEBUG(0,"cast: "..tostring(spellName))
-		if spellName == "Mining" then spellName = "Smelting" end
+		if spellName == Mining then spellName = Smelting end
 		CastSpellByName(spellName) -- trigger the whole rescan process via a TRADE_SKILL_SHOW or CRAFT_SHOW event
 	end
 	self:SetSelectedSkill(skillIndex, false)
