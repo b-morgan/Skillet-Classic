@@ -325,7 +325,9 @@ function Skillet:ProcessQueue(altMode)
 			local recipeIndex = command.recipeIndex
 			local count = command.count
 			if self.currentTrade ~= tradeID and tradeName then
-				if tradeName == "Mining" then tradeName = "Smelting" end
+				local Mining = self:GetTradeName(MINING)
+				local Smelting = self:GetTradeName(SMELTING)
+				if tradeName == Mining then tradeName = Smelting end
 				Skillet:Print(L["Changing profession to"],tradeName,L["Press Process to continue"])
 				DA.DEBUG(1,"executing CastSpellByName("..tostring(tradeName)..")")
 				self.queuecasting = false
