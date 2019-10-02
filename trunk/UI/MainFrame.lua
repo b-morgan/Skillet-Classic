@@ -129,9 +129,49 @@ local function get_craftable_counts(skill, numMade)
 	return num, numrecursive, numwvendor, numwalts
 end
 
+--
+-- Steal the Enchant button from the CraftUI
+--
+function Skillet:StealEnchantButton()
+	--DA.DEBUG(0,"StealEnchantButton()")
+	SkilletEnchantButton:Hide() 			-- Hide our Button
+	if not Skillet.EnchantOldParent and SkilletFrame and CraftCreateButton then
+		Skillet.EnchantOldParent = CraftCreateButton:GetParent()
+		CraftCreateButton:SetParent(SkilletFrame)		-- Set new parent for the Blizzard button
+	end
+	if not Skillet.EnchantOldPoints and SkilletEnchantButton and CraftCreateButton then
+		local point = {}
+		point[1], point[2], point[3], point[4], point[5] = CraftCreateButton:GetPoint(1)
+		--DA.DEBUG(1,"point= "..DA.DUMP1(point))
+		Skillet.EnchantOldPoints = point
+		CraftCreateButton:ClearAllPoints()		-- Clear all positions
+		CraftCreateButton:SetAllPoints(SkilletEnchantButton) -- Copy positions from our button
+	end
+end
+
+--
+-- Restore the CraftUI Enchant button
+--
+function Skillet:RestoreEnchantButton()
+	--DA.DEBUG(0,"RestoreEnchantButton()")
+	if Skillet.EnchantOldParent and CraftCreateButton then
+		CraftCreateButton:SetParent(Skillet.EnchantOldParent)		-- Restore original Parent
+		Skillet.EnchantOldParent = nil
+	end
+	if Skillet.EnchantOldPoints and CraftCreateButton then
+		local point = Skillet.EnchantOldPoints
+		CraftCreateButton:ClearAllPoints()		-- Clear all positions
+		CraftCreateButton:SetPoint(point[1], point[2], point[3], point[4], point[5])	-- Restore original location
+		Skillet.EnchantOldPoints = nil
+	end
+	SkilletEnchantButton:Disable()			-- Disable our button because DoCraft is restricted
+	SkilletEnchantButton:Show()				-- Show our button
+end
+
 function Skillet:CreateTradeSkillWindow()
 --
--- We are going to steal the Enchant button to avoid DoCraft errors
+-- We are going to steal the Enchant button to avoid DoCraft errors so
+-- load the Blizzard CraftUI so we can mess with it
 --
 	if Skillet.db.profile.enchanting and not IsAddOnLoaded("Blizzard_CraftUI") then
 		LoadAddOn("Blizzard_CraftUI")
@@ -200,15 +240,12 @@ function Skillet:CreateTradeSkillWindow()
 	SkilletStartQueueButton:SetText(L["Process"])
 	SkilletEmptyQueueButton:SetText(L["Clear"])
 	SkilletEnchantButton:SetText(L["Enchant"])
-	if Skillet.db.profile.enchanting and CraftCreateButton then
-		SkilletEnchantButton:Hide() 			-- Hide Original Button
-		CraftCreateButton:SetParent(frame)		-- Set new parent for the blizz button
-		CraftCreateButton:ClearAllPoints()		-- Clear all positions
---		CraftCreateButton:SetText(L["Enchant"]) -- Set text (should already be set)
-		CraftCreateButton:SetAllPoints(SkilletEnchantButton) -- Copy positions from original button
---		CraftCreateButton:SetTexture(SkilletEnchantButton)
-	else
-		SkilletEnchantButton:Disable()		-- because DoCraft is restricted
+--
+-- if Skillet-Classic support for crafts is enabled,
+-- steal the Enchant button from the Blizzard CraftUI
+--
+	if Skillet.db.profile.enchanting then
+		self:StealEnchantButton()
 	end
 	SkilletRecipeNotesButton:SetText(L["Notes"])
 	SkilletRecipeNotesFrameLabel:SetText(L["Notes"])

@@ -129,7 +129,7 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex)
 			--DA.DEBUG(1,"recipe="..DA.DUMP1(recipe))
 			--DA.DEBUG(1,"numCraft="..tostring(numCraft)..", numCraftable="..tostring(numCraftable)..", numCraftVendor="..tostring(numCraftVendor)..", numCraftAlts="..tostring(numCraftAlts))
 --		end
-		local numMade = recipe.numMade
+		local numMade = recipe.numMade or 0
 		return numCraft * numMade, numCraftable * numMade, numCraftVendor * numMade, numCraftAlts * numMade
 	end
 	return 0, 0, 0, 0
