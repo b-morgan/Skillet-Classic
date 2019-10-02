@@ -244,11 +244,6 @@ All data returned from theses methods is to be considered READ-ONLY
 Data Formats
 ============
 
-Reagent = {
-	["numNeeded"] = number
-	["reagentID"] = number
-}
-
 Skill = {
 	["parentIndex"] = number
 	["skillData"] = {table}
@@ -262,7 +257,7 @@ Skill = {
 
 Recipe = {
 	["name"] = string
-	["nummade"] = number (how many this recipe make)
+	["numMade"] = number (how many this recipe make)
 	["vendorOnly"] = boolean
 	["itemID"] = number
 	["tradeID"] = number
@@ -273,4 +268,9 @@ Recipe = {
 		...
 }
 
+Reagent = {
+	["id"] = number (itemID)
+	["name"] = string (name of reagent)
+	["numNeeded"] = number (how many of this reagent needed)
+}
 ]]

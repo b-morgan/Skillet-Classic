@@ -1078,7 +1078,8 @@ function Skillet:UpdateTradeSkillWindow()
 						levelText:SetText(level)
 					end
 				end
-				text = skill.name or ""
+--				text = skill.name or ""
+				text = (self:RecipeNamePrefix(skill, recipe) or "") .. (skill.name or "")
 				if recipe.reagentData and #recipe.reagentData > 0 then
 					local num, numrecursive, numwvendor, numwalts = get_craftable_counts(skill.skillData, recipe.numMade)
 					local cbag = "|cff80ff80" -- green
@@ -1162,7 +1163,7 @@ function Skillet:UpdateTradeSkillWindow()
 				if self.db.profile.enhanced_recipe_display then
 					text = text .. skill_color.alttext;
 				end
-				suffixText:SetText("")
+				suffixText:SetText(self:RecipeNameSuffix(skill, recipe) or "")
 				suffixText:Show()
 				buttonText:SetText(text)
 				buttonText:SetWordWrap(false)
@@ -1671,13 +1672,11 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 	end
 	SkilletSkillIcon:SetNormalTexture(texture)
 	SkilletSkillIcon:Show()
---[[
-	if AuctionFrame and AuctionatorLoaded and self.auctionOpen then
+	if AuctionFrame and AuctionatorLoaded and self.ATRPlugin and self.db.profile.plugins.ATR.enabled and self.auctionOpen then
 		SkilletAuctionatorButton:Show()
 	else
 		SkilletAuctionatorButton:Hide()
 	end
-]]--
 --
 -- How many of these items are produced at one time ..
 --
