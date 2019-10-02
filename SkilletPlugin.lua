@@ -148,9 +148,6 @@ function Skillet:RecipeNamePrefix(skill, recipe)
 				break
 			end
 		end
-	else
---		call the ThirdPartyHooks function and process any returns
-		text = Skillet:GetRecipeNamePrefix(skill, recipe)
 	end
 	return text
 end
@@ -167,9 +164,6 @@ function Skillet:RecipeNameSuffix(skill, recipe)
 				break
 			end
 		end
-	else
---		call the ThirdPartyHooks function and process any returns
-		text = Skillet:GetRecipeNameSuffix(skill, recipe)
 	end
 	return text
 end

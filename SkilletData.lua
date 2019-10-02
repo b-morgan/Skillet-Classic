@@ -413,8 +413,10 @@ function Skillet:GetRecipe(id)
 					local reagentList = { string.split(":",reagentString) }
 					local numReagents = #reagentList / 2
 					for i=1,numReagents do
+						local itemID = tonumber(reagentList[1 + (i-1)*2])
 						Skillet.data.recipeList[id].reagentData[i] = {}
-						Skillet.data.recipeList[id].reagentData[i].id = tonumber(reagentList[1 + (i-1)*2])
+						Skillet.data.recipeList[id].reagentData[i].id = itemID
+						Skillet.data.recipeList[id].reagentData[i].name = GetItemInfo(itemID)
 						Skillet.data.recipeList[id].reagentData[i].numNeeded = tonumber(reagentList[2 + (i-1)*2])
 					end
 				end

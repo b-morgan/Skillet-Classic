@@ -143,7 +143,7 @@ function plugin.RecipeNameSuffix(skill, recipe)
 				value = value * recipe.numMade
 				local matsum = 0
 				for k,v in pairs(recipe.reagentData) do
-					local iprice = TUJMarketValue(v.reagentID)
+					local iprice = TUJMarketValue(v.id)
 					if iprice then
 						matsum = matsum + v.numNeeded * iprice
 					end

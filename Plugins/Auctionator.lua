@@ -115,17 +115,22 @@ function plugin.GetExtraText(skill, recipe)
 				if not reagent then
 					break
 				end
-				local needed = reagent.numNeeded
-				local id = reagent.reagentID
-				local itemName = GetItemInfo(reagent.reagentID) or reagent.reagentID
+				local needed = reagent.numNeeded or 0
+				local id = reagent.id
+				local itemName
+				if id then
+					itemName = GetItemInfo(id)
+				else
+					itemName = tostring(id)
+				end
 				local text
-				if Skillet:VendorSellsReagent(reagent.reagentID) then
-					toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s  |cff808080(%s)|r", reagent.numNeeded, itemName, L["buyable"])
+				if Skillet:VendorSellsReagent(id) then
+					toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s  |cff808080(%s)|r", needed, itemName, L["buyable"])
 					toConcatExtra[#toConcatExtra+1] = ""
 				else
-					local value = ( Atr_GetAuctionBuyout(reagent.reagentID) or 0 ) * reagent.numNeeded
+					local value = ( Atr_GetAuctionBuyout(id) or 0 ) * needed
 					total = total + value
-					toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s", reagent.numNeeded, itemName)
+					toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s", needed, itemName)
 					toConcatExtra[#toConcatExtra+1] = Skillet:FormatMoneyFull(value, true)
 				end
 			end
@@ -141,12 +146,12 @@ function plugin.RecipeNameSuffix(skill, recipe)
 	if recipe then
 		local itemID = recipe.itemID
 		if Atr_GetAuctionBuyout and Skillet.db.profile.plugins.ATR.enabled and itemID then
-			local value = Atr_GetAuctionBuyout(itemID) or 0
+			local value = Atr_GetAuctionBuyout(itemID)
 			if value then
 				value = value * recipe.numMade
 				local matsum = 0
 				for k,v in pairs(recipe.reagentData) do
-					local iprice = Atr_GetAuctionBuyout(v.reagentID)
+					local iprice = Atr_GetAuctionBuyout(v.id)
 					if iprice then
 						matsum = matsum + v.numNeeded * iprice
 					end
@@ -178,13 +183,8 @@ function Skillet:AuctionatorSearch()
 	if not AuctionatorLoaded or not AuctionFrame then
 		return
 	end
-	local ZT = Auctionator.ztt.ZT
 	if not AuctionFrame:IsShown() then
-		if ZT then
-			Atr_Error_Display (ZT("When the Auction House is open\nclicking this button tells Auctionator\nto scan for the item and all its reagents."))
-		else
-			Atr_Error_Display ("When the Auction House is open\nclicking this button tells Auctionator\nto scan for the item and all its reagents.")
-		end
+		Atr_Error_Display ("When the Auction House is open\nclicking this button tells Auctionator\nto scan for the item and all its reagents.")
 		return
 	end
 	local recipe, recipeId = Skillet:GetRecipeDataByTradeIndex(Skillet.currentTrade, Skillet.selectedSkill)
