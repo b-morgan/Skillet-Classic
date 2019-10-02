@@ -1146,7 +1146,8 @@ function Skillet:EnableBlizzardFrame()
 		end
 		self.BlizzardCraftFrame = nil
 		CraftFrame:SetScript("OnHide", Skillet.craftHide)
-		Skillet.craftHide = nil
+		self.craftHide = nil
+		self:RestoreEnchantButton()
 		ShowUIPanel(CraftFrame)
 	end
 end
@@ -1187,7 +1188,7 @@ function Skillet:OnInitialize()
 -- recipes have changed (i.e. different reagent requirements) so
 -- we clear the saved variables recipe data just to be safe.
 --
-	local dataVersion = 4
+	local dataVersion = 5
 	if not self.db.global.dataVersion or self.db.global.dataVersion ~= dataVersion then
 		self.db.global.dataVersion = dataVersion
 		self:FlushAllData()
@@ -1717,6 +1718,9 @@ function Skillet:SkilletShow()
 		if Skillet.db.profile.hide_blizzard_frame then
 			if self.isCraft then
 				HideUIPanel(CraftFrame)
+				if Skillet.db.profile.enchanting then
+					self:StealEnchantButton()
+				end
 			else
 				HideUIPanel(TradeSkillFrame)
 			end
@@ -1724,6 +1728,7 @@ function Skillet:SkilletShow()
 	else
 		self:HideAllWindows()
 		if self.isCraft then
+			self:RestoreEnchantButton()
 			ShowUIPanel(CraftFrame)
 		else
 			ShowUIPanel(TradeSkillFrame)
