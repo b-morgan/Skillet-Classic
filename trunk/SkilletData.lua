@@ -678,14 +678,10 @@ local function ScanTrade()
 	else
 		numSkills = GetNumTradeSkills()
 	end
---
--- Make sure all the data tables exist
---
 	--DA.DEBUG(2,"Scanning Trade "..tostring(profession)..": "..tostring(tradeID).." "..numSkills.." recipes")
-	if not Skillet.data.skillIndexLookup[player] then
-		Skillet.data.skillIndexLookup[player] = {}
-	end
 	local skillDB = Skillet.db.realm.skillDB[player][tradeID]
+	local subClass = Skillet.db.realm.subClass[player][tradeID]
+	local invSlot = Skillet.db.realm.invSlot[player][tradeID]
 	local skillData = Skillet.data.skillList[player][tradeID]
 	local recipeDB = Skillet.db.global.recipeDB
 	if not skillData then
@@ -699,12 +695,6 @@ local function ScanTrade()
 	mainGroup.autoGroup = true
 	Skillet:RecipeGroupClearEntries(mainGroup)
 	local groupList = {}
-	if not Skillet.db.realm.tradeSkills[player] then
-		Skillet.db.realm.tradeSkills[player] = {}
-	end
-	if not Skillet.db.realm.tradeSkills[player][tradeID] then
-		Skillet.db.realm.tradeSkills[player][tradeID] = {}
-	end
 --	Skillet.db.realm.tradeSkills[player][tradeID].link = link		-- Classic has no link for the profession
 	Skillet.db.realm.tradeSkills[player][tradeID].rank = rank
 	Skillet.db.realm.tradeSkills[player][tradeID].maxRank = maxRank
@@ -720,6 +710,8 @@ local function ScanTrade()
 	end
 	local numHeaders = 0
 	local parentGroup
+	local numSubClass = {}
+	local numInvSlot = {}
 --
 -- Now actually process each recipe (skill)
 --
@@ -857,7 +849,46 @@ local function ScanTrade()
 					break
 				end
 				local itemString = "0"
-				if GetItemInfo(itemLink) then
+				local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
+				  itemEquipLoc, itemIcon, itemSellPrice, itemClassID, itemSubClassID, bindType, expacID, itemSetID, 
+				  isCraftingReagent = GetItemInfo(itemLink)
+--[[
+				1. itemName
+				String - The localized name of the item.
+				2. itemLink
+				String - The localized item link of the item.
+				3. itemRarity
+				Number - The quality of the item. The value is 0 to 7, which represents Poor to Heirloom. This appears to include gains from upgrades/bonuses.
+				4. itemLevel
+				Number - The base item level of this item, not including item levels gained from upgrades. Use GetDetailedItemLevelInfo to get the actual current level of the item.
+				5. itemMinLevel
+				Number - The minimum level required to use the item, 0 meaning no level requirement.
+				6. itemType
+				String - The localized type of the item: Armor, Weapon, Quest, Key, etc.
+				7. itemSubType
+				String - The localized sub-type of the item: Enchanting, Cloth, Sword, etc. See itemType.
+				8. itemStackCount
+				Number - How many of the item per stack: 20 for Runecloth, 1 for weapon, 100 for Alterac Ram Hide, etc.
+				9. itemEquipLoc
+				String - The type of inventory equipment location in which the item may be equipped, or "" if it can't be equippable. The string returned is also the name of a global string variable e.g. if "INVTYPE_WEAPONMAINHAND" is returned, _G["INVTYPE_WEAPONMAINHAND"] will be the localized, displayable name of the location.
+				10. itemIcon
+				Number (fileID) - The icon texture for the item.
+				11. itemSellPrice
+				Number - The price, in copper, a vendor is willing to pay for this item, 0 for items that cannot be sold.
+				12. itemClassID
+				Number - This is the numerical value that determines the string to display for 'itemType'.
+				13. itemSubClassID
+				Number - This is the numerical value that determines the string to display for 'itemSubType'
+				14. bindType
+				Number - Item binding type: 0 - none; 1 - on pickup; 2 - on equip; 3 - on use; 4 - quest.
+				15. expacID
+				Number - ?
+				16. itemSetID
+				Number - ?
+				17. isCraftingReagent
+				Boolean - ?
+]]--
+				if itemName then
 					local itemID = Skillet:GetItemIDFromLink(itemLink)
 					local minMade,maxMade
 					if Skillet.isCraft then
@@ -873,6 +904,29 @@ local function ScanTrade()
 						itemString = itemID
 					end
 					Skillet:ItemDataAddRecipeSource(itemID,recipeID) -- add a cross reference for the source of particular items
+--
+-- Our own filter data: subClass, invSlot
+--
+					if itemSubType then
+						if not subClass.name then
+							subClass.name = {}
+						end
+						numSubClass[itemSubType] = (numSubClass[itemSubType] or 0) + 1
+						subClass.name[itemSubType] = numSubClass[itemSubType]
+						subClass[itemID] = itemSubType
+					end
+					if itemEquipLoc then
+						if not invSlot.name then
+							invSlot.name = {}
+						end
+						numInvSlot[itemEquipLoc] = (numInvSlot[itemEquipLoc] or 0) + 1
+						invSlot.name[itemEquipLoc] = numInvSlot[itemEquipLoc]
+						invSlot[itemID] = itemEquipLoc
+					end
+--[[
+--
+-- Not implemented in Classic
+--
 				else
 					recipe.numMade = 1
 					if Skillet.scrollData[recipeID] then
@@ -883,6 +937,7 @@ local function ScanTrade()
 					else
 						recipe.itemID = 0									-- indicates an enchant
 					end
+]]--
 				end
 				local reagentString = "-"
 				local reagentData = {}
@@ -974,17 +1029,51 @@ function Skillet:RescanTrade()
 --
 -- Make sure all the data structures exist
 --
-	if not Skillet.data.skillList[player] then
-		Skillet.data.skillList[player] = {}
-	end
+--	if not Skillet.data.skillList[player] then
+--		Skillet.data.skillList[player] = {}
+--	end
 	if not Skillet.data.skillList[player][tradeID] then
 		Skillet.data.skillList[player][tradeID]={}
 	end
-	if not Skillet.db.realm.skillDB[player] then
-		Skillet.db.realm.skillDB[player] = {}
-	end
+--	if not Skillet.data.skillIndexLookup[player] then
+--		Skillet.data.skillIndexLookup[player] = {}
+--	end
+--	if not Skillet.db.realm.skillDB[player] then
+--		Skillet.db.realm.skillDB[player] = {}
+--	end
 	if not Skillet.db.realm.skillDB[player][tradeID] then
 		Skillet.db.realm.skillDB[player][tradeID] = {}
+	end
+--	if not Skillet.db.realm.tradeSkills[player] then
+--		Skillet.db.realm.tradeSkills[player] = {}
+--	end
+	if not Skillet.db.realm.tradeSkills[player][tradeID] then
+		Skillet.db.realm.tradeSkills[player][tradeID] = {}
+	end
+--
+-- Our own filter data: subClass, invSlot
+--
+--	if not Skillet.db.realm.subClass[player] then
+--		Skillet.db.realm.subClass[player] = {}
+--	end
+	if not Skillet.db.realm.subClass[player][tradeID] then
+		Skillet.db.realm.subClass[player][tradeID] = {}
+	end
+--	if not Skillet.db.realm.invSlot[player] then
+--		Skillet.db.realm.invSlot[player] = {}
+--	end
+	if not Skillet.db.realm.invSlot[player][tradeID] then
+		Skillet.db.realm.invSlot[player][tradeID] = {}
+	end
+--
+-- Reset Blizzard's filters because they will effect what
+-- data gets returned
+--
+	if TradeSkillSubClassDropDown then
+		UIDropDownMenu_SetSelectedID(TradeSkillSubClassDropDown, 1)
+	end
+	if TradeSkillInvSlotDropDown then
+		UIDropDownMenu_SetSelectedID(TradeSkillInvSlotDropDown, 1)
 	end
 --
 -- Now the hard work begins

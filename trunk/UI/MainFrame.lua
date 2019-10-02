@@ -59,13 +59,17 @@ local MINING = 2575
 
 local nonLinkingTrade = { [SMELTING] = true, [53428] = true , [193290] = true }				-- smelting, runeforging, herbalism
 
+--
 -- Stack of previsouly selected skills for use by the
 -- "click on reagent, go to recipe" code and for clicking on Queue'd recipes
 -- stack is stack of tables: { "player", "tradeID", "skillIndex"}
+--
 local skillStack = {}
 local gearTexture
 
+--
 -- Stolen from the Waterfall Ace2 addon.
+--
 local ControlBackdrop  = {
 	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
 	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -84,10 +88,14 @@ local TSMBackdrop = {
 	insets = { left = 3, right = 3, top = 3, bottom = 3 }
 }
 
+--
 -- List of functions that are called before a button is shown
+--
 local pre_show_callbacks = {}
 
+--
 -- List of functions that are called before a button is hidden
+--
 local pre_hide_callbacks = {}
 
 function Skillet:AddPreButtonShowCallback(method)
@@ -102,8 +110,10 @@ function Skillet:AddPreButtonHideCallback(method)
 	table.insert(pre_hide_callbacks, method)
 end
 
+--
 -- Figures out how to display the craftable counts for a recipe.
 -- Returns: num, num_with_vendor, num_with_alts
+--
 local function get_craftable_counts(skill, numMade)
 	--DA.DEBUG(2,"get_craftable_counts, name= "..tostring(skill.name)..", numMade= "..tostring(numMade))
 	--DA.DEBUG(3,"get_craftable_counts, skill= "..DA.DUMP1(skill,1))
@@ -120,12 +130,15 @@ local function get_craftable_counts(skill, numMade)
 end
 
 function Skillet:CreateTradeSkillWindow()
-
-    if Skillet.db.profile.enchanting and not IsAddOnLoaded("Blizzard_CraftUI") then
-       LoadAddOn("Blizzard_CraftUI")
+--
+-- We are going to steal the Enchant button to avoid DoCraft errors
+--
+	if Skillet.db.profile.enchanting and not IsAddOnLoaded("Blizzard_CraftUI") then
+		LoadAddOn("Blizzard_CraftUI")
 	end
-
-	-- The SkilletFrame is defined in the file main_frame.xml
+--
+-- The SkilletFrame is defined in the file MainFrame.xml
+--
 	local frame = SkilletFrame
 	if not frame then
 		return frame
@@ -145,7 +158,9 @@ function Skillet:CreateTradeSkillWindow()
 	end
 	frame:SetBackdropColor(0.1, 0.1, 0.1)
 
-	-- A title bar stolen from the Ace2 Waterfall window.
+--
+-- A title bar stolen from the Ace2 Waterfall window.
+--
 	local r,g,b = 0, 0.7, 0; -- dark green
 	local titlebar = frame:CreateTexture(nil,"BACKGROUND")
 	local titlebar2 = frame:CreateTexture(nil,"BACKGROUND")
@@ -176,8 +191,6 @@ function Skillet:CreateTradeSkillWindow()
 	label:SetText(L["Search"])
 	local label = _G["SkilletFilterLabel"]
 	label:SetText(L["Filter"])
---	SkilletFilterDropdown:Hide()	-- Not Implemented Yet
-	SkilletFilterOperations:Hide()		-- Not Implemented Yet
 	SkilletPluginButton:SetText(L["Plugins"])
 	SkilletPluginButton:Hide()
 	SkilletCreateAllButton:SetText(L["Create All"])
@@ -618,13 +631,13 @@ function Skillet:UpdateTradeButtons(player)
 				end
 			end
 		end
-		DA.DEBUG(3,"tradeLink= "..tostring(tradeLink))
+		--DA.DEBUG(3,"tradeLink= "..tostring(tradeLink))
 		if ranks and tradeID ~= MINING then
 			local spellName, _, spellIcon = GetSpellInfo(tradeID)
 			if tradeID == SMELTING then
 				spellName = GetSpellInfo(MINING)
 			end
-			DA.DEBUG(3,"tradeID= "..tostring(tradeID)..", spellName= "..tostring(spellName))
+			--DA.DEBUG(3,"tradeID= "..tostring(tradeID)..", spellName= "..tostring(spellName))
 			local buttonName = "SkilletFrameTradeButton-"..player.."-"..tradeID
 			local button = _G[buttonName]
 			if not button then
@@ -655,7 +668,7 @@ function Skillet:UpdateTradeButtons(player)
 			end
 			button:Show()
 		else
-			DA.DEBUG(3,"No ranks for tradeID= "..tostring(tradeID)..", tradeName= "..tostring(self.tradeSkillNamesByID[tradeID]))
+			--DA.DEBUG(3,"No ranks for tradeID= "..tostring(tradeID)..", tradeName= "..tostring(self.tradeSkillNamesByID[tradeID]))
 		end
 	end		-- for
 --
@@ -673,7 +686,9 @@ function Skillet:UpdateTradeButtons(player)
 		if not button then
 			button = CreateFrame("Button", buttonName, frame, "SkilletTradeButtonAdditionalTemplate")
 			button:SetID(additionalSpellId)
-			-- no modifier - pure spell
+--
+-- no modifier - pure spell
+--
 			button:SetAttribute("type1", "spell");
 			button:SetAttribute("type2", "macro");
 			button:SetAttribute("alt-type*", "macro");
@@ -703,8 +718,8 @@ function Skillet:UpdateAutoTradeButtons()
 				local additionalSpellId = additionalSpellTab[1]
 				local additionalSpellName = additionalSpellTab[2]
 				local spellName, _, spellIcon = GetSpellInfo(additionalSpellId)
-				DA.DEBUG(3,"tradeID= "..tostring(tradeID)..", additionalSpellId= "..tostring(additionalSpellId)..
-				  ", additionalSpellName= "..tostring(additionalSpellName)..", spellName= "..tostring(spellName))
+				--DA.DEBUG(3,"tradeID= "..tostring(tradeID)..", additionalSpellId= "..tostring(additionalSpellId)..
+				--  ", additionalSpellName= "..tostring(additionalSpellName)..", spellName= "..tostring(spellName))
 				local buttonName = "SkilletDo"..additionalSpellName
 				local buttonAutoName = "SkilletAuto"..additionalSpellName
 				local button = _G[buttonName]
@@ -717,14 +732,14 @@ function Skillet:UpdateAutoTradeButtons()
 				end
 				local macrotext = Skillet:GetAutoTargetMacro(additionalSpellId)
 				if button then
-					DA.DEBUG(3,"SetAttribute for "..tostring(buttonName))
+					--DA.DEBUG(3,"SetAttribute for "..tostring(buttonName))
 					button:SetAttribute("macrotext", macrotext)
 				end
-				DA.DEBUG(3,"SetAttribute for "..tostring(buttonAutoName))
+				--DA.DEBUG(3,"SetAttribute for "..tostring(buttonAutoName))
 				buttonAuto:SetAttribute("macrotext", macrotext)
 			end
 		else
-			DA.DEBUG(3,"tradeID= "..tostring(tradeID).." has no ranks")
+			--DA.DEBUG(3,"tradeID= "..tostring(tradeID).." has no ranks")
 		end
 	end		-- for
 end
@@ -743,6 +758,7 @@ function SkilletPluginDropdown_OnClick(this)
 end
 
 function Skillet:PluginButton_OnClick(button)
+	--DA.DEBUG(0,"PluginButton_OnClick()")
 	if SkilletFrame.added_buttons then
 		for i=1,#SkilletFrame.added_buttons do
 			local oldButton = SkilletFrame.added_buttons[i]
@@ -1162,7 +1178,7 @@ end
 -- a recipe in the list of skills
 --
 function Skillet:SkillButton_OnEnter(button)
-	DA.DEBUG(0,"SkillButton_OnEnter("..tostring(button)..")")
+	--DA.DEBUG(0,"SkillButton_OnEnter("..tostring(button)..")")
 	local id = button:GetID()
 	if not id then
 		return
@@ -1185,7 +1201,7 @@ function Skillet:SkillButton_OnEnter(button)
 		return
 	end
 	local skill = button.skill
-	--DA.DEBUG("skill= "..DA.DUMP1(skill,1))
+	--DA.DEBUG(1,"skill= "..DA.DUMP1(skill,1))
 	if not skill then
 		button.locked = false
 		return
@@ -1200,7 +1216,9 @@ function Skillet:SkillButton_OnEnter(button)
 	buttonName:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
 	local recipe = self:GetRecipe(skill.recipeID) or Skillet.UnknownRecipe
 	if not self.db.profile.show_detailed_recipe_tooltip then
-		-- user does not want the tooltip displayed, it can get a bit big after all
+--
+-- user does not want the tooltip displayed, it can get a bit big after all
+--
 		button.locked = false
 		return
 	end
@@ -1222,43 +1240,6 @@ function Skillet:SkillButton_OnEnter(button)
 --
 -- If not displaying full tooltips you have to press Ctrl to see them
 --
---[[
-	if IsControlKeyDown() or Skillet.db.profile.display_full_tooltip then
-		local name, link, quality, quantity, altlink, _
-		if recipe.itemID == 0 or not Skillet.db.profile.display_item_tooltip then
-			link = GetSpellLink(skill.recipeID)
-			name = GetSpellInfo(link)
-			quality = nil
-			quantity = nil
-			if recipe.itemID ~= 0 then
-				_, altlink = GetItemInfo(recipe.itemID)
-			end
-		else
-			name,link,quality = GetItemInfo(recipe.itemID)
-			altlink = GetSpellLink(skill.recipeID)
-			quantity = recipe.numMade
-		end
-		if altlink and (IsAltKeyDown() or Skillet.isCraft) then
-			tip:SetHyperlink(altlink)
-		elseif link and not Skillet.isCraft then
-			local skillIndex = self.data.skillIndexLookup[self.currentPlayer][skill.recipeID]
-			--DA.DEBUG(0,"link= "..DA.PLINK(link))
-			--DA.DEBUG(0,"recipeID= "..tostring(skill.recipeID)..", itemID= "..tostring(recipe.itemID)..", skillIndex= "..tostring(skillIndex))
-			if skillIndex then
-				tip:SetTradeSkillItem(skillIndex)
-			else
-				tip:SetHyperlink(link)
-			end
-		end
-		if IsShiftKeyDown() then
-			if recipe.itemID == 0 then
-				Skillet:Tooltip_ShowCompareItem(tip, GetInventoryItemLink("player", recipe.slot), "left")
-			else
-				Skillet:Tooltip_ShowCompareItem(tip, link, "left")
-			end
-		end
-	end
-]]--
 	if Skillet.db.profile.display_full_tooltip or IsControlKeyDown() then
 		local name, link, id, quality, quantity, altlink, _
 		if recipe.itemID == 0 or not Skillet.db.profile.display_item_tooltip then
@@ -1275,15 +1256,15 @@ function Skillet:SkillButton_OnEnter(button)
 			quantity = recipe.numMade
 		end
 		local skillIndex = self.data.skillIndexLookup[self.currentPlayer][skill.recipeID]
-		DA.DEBUG(0,"recipeID= "..tostring(skill.recipeID)..", itemID= "..tostring(recipe.itemID)..", skillIndex= "..tostring(skillIndex))
+		--DA.DEBUG(1,"recipeID= "..tostring(skill.recipeID)..", itemID= "..tostring(recipe.itemID)..", skillIndex= "..tostring(skillIndex))
 		if Skillet.isCraft then
 --
 -- Craft tooltip is built with special API calls
 --
 			local difficulty = skill.skillData.difficulty
-			DA.DEBUG("skill.skillData= "..DA.DUMP1(skill.skillData,1))
+			--DA.DEBUG(1,"skill.skillData= "..DA.DUMP1(skill.skillData,1))
 			local color = Skillet.skill_style_type[skill.skillData.difficulty]
-			DA.DEBUG("difficulty= "..tostring(difficulty)..", color= "..DA.DUMP1(color))
+			--DA.DEBUG(1,"difficulty= "..tostring(difficulty)..", color= "..DA.DUMP1(color))
 			if (color) then
 				tip:AddLine(skill.name, color.r, color.g, color.b, false);
 			else
@@ -1292,20 +1273,23 @@ function Skillet:SkillButton_OnEnter(button)
 			if skillIndex then
 				local requiredTotems = BuildColoredListString(GetCraftSpellFocus(skillIndex))
 				if ( requiredTotems ) then
-					tip:AddLine(REQUIRES_LABEL.." "..requiredTotems, 1,1,1, false) -- , NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, false)
+					tip:AddLine(REQUIRES_LABEL.." "..requiredTotems, 1,1,1, false)
 				end
 				tip:AddLine(" ")
 				local desc = GetCraftDescription(skillIndex)
 				if (desc) then
-					tip:AddLine(desc) -- , NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true)
+					tip:AddLine(desc, 1,1,1, true)
 				end
 			end
 		else
+--
+-- TradeSkill tooltip
+--
 			if altlink and IsAltKeyDown() then
-				DA.DEBUG(0,"altlink= "..DA.PLINK(altlink))
+				--DA.DEBUG(1,"altlink= "..DA.PLINK(altlink))
 				tip:SetHyperlink(altlink)
 			elseif link then
-				DA.DEBUG(0,"link= "..DA.PLINK(link))
+				--DA.DEBUG(1,"link= "..DA.PLINK(link))
 				if skillIndex then
 					tip:SetTradeSkillItem(skillIndex)
 				else
@@ -1404,7 +1388,6 @@ function Skillet:SkillButton_OnEnter(button)
 	end
 	local text = string.format("[%s/%s/%s]", L["Inventory"], L["bank"], L["craftable"]) -- match the case sometime
 	tip:AddDoubleLine("\n", text)
---	local text1 = string.format("recipeID= %d",skill.id)
 	local text = string.format("itemID= %d",recipe.itemID)
 	tip:AddDoubleLine("\n", text)
 	tip:Show()
@@ -1415,11 +1398,10 @@ end
 -- Sets the game tooltip item to the selected skill
 --
 function Skillet:SetTradeSkillToolTip(button, skillIndex)
-	DA.DEBUG(0,"SetTradeSkillToolTip("..tostring(button)..", "..tostring(skillIndex)..")")
+	--DA.DEBUG(0,"SetTradeSkillToolTip("..tostring(button)..", "..tostring(skillIndex)..")")
 	GameTooltip:ClearLines()
 	if Skillet.isCraft then
 		local craftName, craftSubSpellName, craftType, numAvailable, isExpanded, trainingPointCost, requiredLevel = GetCraftInfo(skillIndex)
---		local color = Skillet.skill_style_type[craftType]
 		local color = CraftTypeColor[craftType];
 		if (color) then
 			GameTooltip:AddLine(craftName, color.r, color.g, color.b, false);
@@ -1455,7 +1437,7 @@ function Skillet:SetTradeSkillToolTip(button, skillIndex)
 end
 
 function Skillet:SetReagentToolTip(reagentID, numNeeded, numCraftable)
-	--DA.DEBUG(2,"SetReagentToolTip("..tostring(reagentID)..", "..tostring(numNeeded)..", "..tostring(numCraftable)..")")
+	--DA.DEBUG(0,"SetReagentToolTip("..tostring(reagentID)..", "..tostring(numNeeded)..", "..tostring(numCraftable)..")")
 	GameTooltip:ClearLines()
 	GameTooltip:SetHyperlink("item:"..reagentID)
 	if self:VendorSellsReagent(reagentID) then
