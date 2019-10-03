@@ -143,7 +143,7 @@ function Skillet:QueueAppendCommand(command, queueCraftables)
 				end
 			end
 		end
-		reagentsInQueue[recipe.itemID] = (reagentsInQueue[recipe.itemID] or 0) + command.count * recipe.numMade;
+		reagentsInQueue[recipe.itemID] = (reagentsInQueue[recipe.itemID] or 0) + command.count * (recipe.numMade or 0)
 		reagentsChanged[recipe.itemID] = true
 		Skillet:AddToQueue(command)
 		self.visited[command.recipeID] = nil
@@ -194,11 +194,11 @@ function Skillet:RemoveFromQueue(index)
 		if not command.count then
 			command.count = 1
 		end
-		reagentsInQueue[recipe.itemID] = (reagentsInQueue[recipe.itemID] or 0) - recipe.numMade * command.count
+		reagentsInQueue[recipe.itemID] = (reagentsInQueue[recipe.itemID] or 0) - (recipe.numMade or 0) * command.count
 		reagentsChanged[recipe.itemID] = true
 		for i=1,#recipe.reagentData,1 do
 			local reagent = recipe.reagentData[i]
-			reagentsInQueue[reagent.id] = (reagentsInQueue[reagent.id] or 0) + reagent.numNeeded * command.count
+			reagentsInQueue[reagent.id] = (reagentsInQueue[reagent.id] or 0) + (reagent.numNeeded or 0) * command.count
 			reagentsChanged[reagent.id] = true
 		end
 	end
