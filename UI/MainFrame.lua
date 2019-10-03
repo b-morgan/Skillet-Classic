@@ -1288,8 +1288,8 @@ function Skillet:SkillButton_OnEnter(button)
 			if recipe.itemID ~= 0 then
 				_, altlink = GetItemInfo(recipe.itemID)
 			end
-		else
-			name,link,quality = GetItemInfo(recipe.itemID)
+		elseif recipe.itemID and skill.recipeID then
+			name, link, quality = GetItemInfo(recipe.itemID)
 			altlink = GetSpellLink(skill.recipeID)
 			quantity = recipe.numMade
 		end
@@ -1680,7 +1680,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 --
 -- How many of these items are produced at one time ..
 --
-	if recipe.numMade > 1 then
+	if recipe.numMade and recipe.numMade > 1 then
 		SkilletSkillIconCount:SetText(recipe.numMade)
 		SkilletSkillIconCount:Show()
 	else
