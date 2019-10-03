@@ -252,6 +252,7 @@ function Skillet:CreateTradeSkillWindow()
 	SkilletShoppingListButton:SetText(L["Shopping List"])
 	SkilletSortLabel:SetText(L["Sorting"])
 	SkilletGroupLabel:SetText(L["Grouping"])
+	SkilletRecipeGroupOperations:Disable()				-- It is broken in Skillet-Classic
 	SkilletIgnoredMatsButton:SetText(L["Ignored List"])
 	SkilletQueueManagementButton:SetText(L["Queues"])
 	SkilletQueueLoadButton:SetText(L["Load"])
@@ -1279,7 +1280,11 @@ function Skillet:SkillButton_OnEnter(button)
 -- If not displaying full tooltips you have to press Ctrl to see them
 --
 	if Skillet.db.profile.display_full_tooltip or IsControlKeyDown() then
-		local name, link, id, quality, quantity, altlink, _
+		local name, link, id, quality, quantity, altlink, skillIndex, _
+		if skill.recipeID then
+			skillIndex = self.data.skillIndexLookup[self.currentPlayer][skill.recipeID]
+		end
+		--DA.DEBUG(1,"recipeID= "..tostring(skill.recipeID)..", itemID= "..tostring(recipe.itemID)..", skillIndex= "..tostring(skillIndex))
 		if recipe.itemID == 0 or not Skillet.db.profile.display_item_tooltip then
 			link = GetSpellLink(skill.recipeID)
 			name = GetSpellInfo(link)
@@ -1292,9 +1297,10 @@ function Skillet:SkillButton_OnEnter(button)
 			name, link, quality = GetItemInfo(recipe.itemID)
 			altlink = GetSpellLink(skill.recipeID)
 			quantity = recipe.numMade
+		else
+			DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe,1))
+			DA.DEBUG(1,"skill= "..DA.DUMP1(skill,1))
 		end
-		local skillIndex = self.data.skillIndexLookup[self.currentPlayer][skill.recipeID]
-		--DA.DEBUG(1,"recipeID= "..tostring(skill.recipeID)..", itemID= "..tostring(recipe.itemID)..", skillIndex= "..tostring(skillIndex))
 		if Skillet.isCraft then
 --
 -- Craft tooltip is built with special API calls
@@ -1310,7 +1316,7 @@ function Skillet:SkillButton_OnEnter(button)
 			end
 			if skillIndex then
 				local requiredTotems = BuildColoredListString(GetCraftSpellFocus(skillIndex))
-				if ( requiredTotems ) then
+				if requiredTotems then
 					tip:AddLine(REQUIRES_LABEL.." "..requiredTotems, 1,1,1, false)
 				end
 				tip:AddLine(" ")
@@ -1604,14 +1610,16 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		-- Name of the skill
 		SkilletSkillName:SetText(recipe.name)
 		SkilletRecipeNotesButton:Show()
-		if not self.isCraft and recipe.spellID then
-			local orange,yellow,green,gray = self:GetTradeSkillLevels((recipe.itemID>0 and recipe.itemID) or -recipe.spellID)			-- was spellID now is itemID or -spellID
-			SkilletRankFrame.subRanks.green:SetValue(gray)
-			SkilletRankFrame.subRanks.yellow:SetValue(green)
-			SkilletRankFrame.subRanks.orange:SetValue(yellow)
-			SkilletRankFrame.subRanks.red:SetValue(orange)
-			for c,s in pairs(SkilletRankFrame.subRanks) do
-				s:Show()
+		if not self.isCraft then
+			if recipe.spellID and recipe.itemID then
+				local orange,yellow,green,gray = self:GetTradeSkillLevels((recipe.itemID>0 and recipe.itemID) or -recipe.spellID)			-- was spellID now is itemID or -spellID
+				SkilletRankFrame.subRanks.green:SetValue(gray)
+				SkilletRankFrame.subRanks.yellow:SetValue(green)
+				SkilletRankFrame.subRanks.orange:SetValue(yellow)
+				SkilletRankFrame.subRanks.red:SetValue(orange)
+				for c,s in pairs(SkilletRankFrame.subRanks) do
+					s:Show()
+				end
 			end
 		end
 		SkilletDescriptionText:SetText("")

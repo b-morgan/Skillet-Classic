@@ -213,12 +213,28 @@ local function SkillIsFilteredOut(skillIndex)
 			end
 			if not Skillet.data.tooltipCache[recipeID] then
 				--DA.DEBUG(1,"Setup tooltipCache["..tostring(recipeID).."]")
-				tooltip:SetTradeSkillItem(skillIndex)
-				local tiplines = tooltip:NumLines()
-				for i=1, tiplines, 1 do
-					--DA.DEBUG(1,"Found "..tostring(tiplines).." tiplines")
-					searchText = searchText.." "..string.lower(_G["SkilletParsingTooltipTextLeft"..i]:GetText() or " ")
-					searchText = searchText.." "..string.lower(_G["SkilletParsingTooltipTextRight"..i]:GetText() or " ")
+				if Skillet.isCraft then
+					searchText = recipe.name
+					local spellFocus = GetCraftSpellFocus(skillIndex) -- BuildColoredListString(GetCraftSpellFocus(skillIndex))
+					--DA.DEBUG(1,"spellFocus= "..tostring(spellFocus))
+					if spellFocus then
+						searchText = searchText.." "..string.lower(tostring(spellFocus))
+					end
+					local about = GetCraftDescription(skillIndex)
+					--DA.DEBUG(1,"about= "..tostring(about))
+					if about then
+						searchText = searchText.." "..string.lower(tostring(about))
+					end
+				else
+					if skillIndex then
+						tooltip:SetTradeSkillItem(skillIndex)
+						local tiplines = tooltip:NumLines()
+						for i=1, tiplines, 1 do
+							--DA.DEBUG(1,"Found "..tostring(tiplines).." tiplines")
+							searchText = searchText.." "..string.lower(_G["SkilletParsingTooltipTextLeft"..i]:GetText() or " ")
+							searchText = searchText.." "..string.lower(_G["SkilletParsingTooltipTextRight"..i]:GetText() or " ")
+						end
+					end
 				end
 				if Skillet.db.profile.search_includes_reagents then
 					for i=1, #recipe.reagentData, 1 do
