@@ -1689,7 +1689,7 @@ end
 -- Show the tradeskill window, called from TRADE_SKILL_SHOW event, clicking on links, or clicking on guild professions
 --
 function Skillet:SkilletShow()
-	--DA.DEBUG(1,"SkilletShow(), currentTrade= "..tostring(self.currentTrade))
+	--DA.DEBUG(0,"SkilletShow(), currentTrade= "..tostring(self.currentTrade))
 	self.linkedSkill, self.currentPlayer, self.isGuild = Skillet:IsTradeSkillLinked()
 	if self.linkedSkill then
 		if not self.currentPlayer then
@@ -1698,20 +1698,20 @@ function Skillet:SkilletShow()
 	else
 		self.currentPlayer = (UnitName("player"))
 	end
-	local name
+	local name, rank, maxRank
 	if self.isCraft then
-		name = GetCraftDisplaySkillLine()
+		name, rank, maxRank = GetCraftDisplaySkillLine()
 	else
-		name = GetTradeSkillLine()
+		name, rank, maxRank = GetTradeSkillLine()
 	end
-	--DA.DEBUG(1,"name= '"..tostring(name).."'")
+	--DA.DEBUG(0,"name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
 	self.currentTrade = self.tradeSkillIDsByName[name]
 	if not self.linkedSkill and not self.isGuild then
 		self:InitializeDatabase(self.currentPlayer)
 	end 
 	if self:IsSupportedTradeskill(self.currentTrade) then
 		self:InventoryScan()
-		DA.DEBUG(1,"SkilletShow: "..self.currentTrade)
+		--DA.DEBUG(0,"SkilletShow: "..self.currentTrade)
 		self.selectedSkill = nil
 		self.dataScanned = false
 		self:ScheduleTimer("SkilletShowWindow", 0.5)
@@ -1726,6 +1726,8 @@ function Skillet:SkilletShow()
 			end
 		end
 	else
+		--DA.DEBUG(0,"SkilletShow: "..self.currentTrade.." ("..tostring(name)..") is not supported")
+		--DA.DEBUG(0,"tradeSkillIDsByName= "..DA.DUMP(self.tradeSkillIDsByName))
 		self:HideAllWindows()
 		if self.isCraft then
 			self:RestoreEnchantButton()
