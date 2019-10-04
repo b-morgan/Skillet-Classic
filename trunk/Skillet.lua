@@ -1587,10 +1587,10 @@ end
 
 function Skillet:TRADE_SKILL_NAME_UPDATE()
 	DA.TRACE("TRADE_SKILL_NAME_UPDATE")
-	local oldCraft = Skillet.isCraft
+	if not Skillet.tradeShow then return end
 	Skillet.isCraft = false
 	if Skillet.linkedSkill then
-		if oldCraft ~= Skillet.isCraft then
+		if Skillet.lastCraft ~= Skillet.isCraft then
 			Skillet:ConfigureRecipeControls()
 		end
 		Skillet:SkilletShow()
@@ -1599,10 +1599,10 @@ end
 
 function Skillet:TRADE_SKILL_UPDATE()
 	DA.TRACE("TRADE_SKILL_UPDATE")
-	local oldCraft = Skillet.isCraft
+	if not Skillet.tradeShow then return end
 	Skillet.isCraft = false
 	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
-		if oldCraft ~= Skillet.isCraft then
+		if Skillet.lastCraft ~= Skillet.isCraft then
 			Skillet:ConfigureRecipeControls()
 		end
 		Skillet:UpdateTradeSkillWindow()
@@ -1611,10 +1611,10 @@ end
 
 function Skillet:CRAFT_UPDATE()
 	DA.TRACE("CRAFT_UPDATE")
-	local oldCraft = Skillet.isCraft
+	if not Skillet.craftShow then return end
 	Skillet.isCraft = true
 	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
-		if oldCraft ~= Skillet.isCraft then
+		if Skillet.lastCraft ~= Skillet.isCraft then
 			Skillet:ConfigureRecipeControls()
 		end
 		Skillet:AdjustInventory()
@@ -1623,38 +1623,42 @@ end
 
 function Skillet:TRADE_SKILL_CLOSE()
 	DA.TRACE("TRADE_SKILL_CLOSE")
-	if Skillet.ignoreClose then
+	if not Skillet.tradeShow then return end
+--	if Skillet.ignoreClose then
 --		Skillet.ignoreClose = false
-		return
-	end
+--		return
+--	end
 	Skillet:SkilletClose()
+	Skillet.tradeShow = false
 end
 
 function Skillet:CRAFT_CLOSE()
 	DA.TRACE("CRAFT_CLOSE")
-	if Skillet.ignoreClose then
+	if not Skillet.craftShow then return end
+--	if Skillet.ignoreClose then
 --		Skillet.ignoreClose = false
-		return
-	end
+--		return
+--	end
 	Skillet:SkilletClose()
+	Skillet.craftShow = false
 end
 
 function Skillet:TRADE_SKILL_SHOW()
 	DA.TRACE("TRADE_SKILL_SHOW")
-	local oldCraft = Skillet.isCraft
+	Skillet.tradeShow = true
 	Skillet.isCraft = false
-	if oldCraft ~= Skillet.isCraft then
+	if Skillet.lastCraft ~= Skillet.isCraft then
 		Skillet:ConfigureRecipeControls()
-		Skillet.ignoreClose = false
+--		Skillet.ignoreClose = false
 	end
 	Skillet:SkilletShow()
 end
 
 function Skillet:CRAFT_SHOW()
 	DA.TRACE("CRAFT_SHOW")
-	local oldCraft = Skillet.isCraft
+	Skillet.craftShow = true
 	Skillet.isCraft = true
-	if oldCraft ~= Skillet.isCraft then
+	if Skillet.lastCraft ~= Skillet.isCraft then
 		Skillet:ConfigureRecipeControls()
 		Skillet.ignoreClose = false
 	end
@@ -1726,7 +1730,7 @@ function Skillet:SkilletShow()
 	self.currentTrade = self.tradeSkillIDsByName[name]
 	if self:IsSupportedTradeskill(self.currentTrade) then
 		self:InventoryScan()
-		DA.DEBUG(0,"SkilletShow: "..self.currentTrade)
+		DA.DEBUG(0,"SkilletShow: "..self.currentTrade..", name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
 		self.selectedSkill = nil
 		self.dataScanned = false
 		self:ScheduleTimer("SkilletShowWindow", 0.5)
@@ -1786,6 +1790,7 @@ end
 
 function Skillet:SkilletClose()
 	DA.DEBUG(0,"SKILLET CLOSE")
+	self.lastCraft = self.isCraft
 	self:HideAllWindows()
 end
 

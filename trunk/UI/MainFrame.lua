@@ -541,6 +541,7 @@ function Skillet:ConfigureRecipeControls()
 			SkilletEnchantButton:Hide()
 		end
 	end
+	self.lastCraft = self.isCraft		-- save the state of the buttons
 	self:InitRecipeFilterButtons()
 	if self.currentPlayer ~= (UnitName("player")) then				-- only allow processing for the current player
 		SkilletStartQueueButton:Disable()
@@ -649,7 +650,7 @@ end
 
 function Skillet:UpdateTradeButtons(player)
 	DA.DEBUG(3,"UpdateTradeButtons("..tostring(player)..")")
-	if TSMAPI_FOUR then return end		-- Maybe later but for now, these buttons cause more trouble than they are worth.
+--	if TSMAPI_FOUR then return end		-- Maybe later but for now, these buttons cause more trouble than they are worth.
 	local position = 0 -- pixels
 	local tradeSkillList = self.tradeSkillList
 	local frameName = "SkilletFrameTradeButtons-"..player
@@ -747,7 +748,7 @@ end
 
 function Skillet:UpdateAutoTradeButtons()
 	DA.DEBUG(3,"UpdateAutoTradeButtons()")
-	if TSMAPI_FOUR then return end		-- Maybe later but for now, these buttons cause more trouble than they are worth.
+--	if TSMAPI_FOUR then return end		-- Maybe later but for now, these buttons cause more trouble than they are worth.
 	local tradeSkillList = self.tradeSkillList
 	Skillet.AutoButtonsList = {}
 	for i=1,#tradeSkillList,1 do
@@ -1001,7 +1002,7 @@ function Skillet:UpdateTradeSkillWindow()
 			suffixText:SetText("")
 			suffixText:Hide()
 			skillRankBar:Hide()
-			if self.db.profile.display_required_level then
+			if self.db.profile.display_required_level or self.db.profile.display_item_level then
 				levelText:SetWidth(skill.depth*8+20)
 			else
 				levelText:SetWidth(skill.depth*8)
@@ -1082,8 +1083,7 @@ function Skillet:UpdateTradeSkillWindow()
 						end
 						levelText:SetText(level)
 					end
-				end
-				if self.db.profile.display_item_level and recipe.itemID then
+				elseif self.db.profile.display_item_level and recipe.itemID then
 					local level = self:GetItemLevel(recipe.itemID)
 					if level and level > 1 then
 						levelText:SetText(level)
@@ -2478,7 +2478,7 @@ function Skillet:ReagentButtonOnClick(button, skillIndex, reagentIndex)
 end
 
 function Skillet:SkilletFrameForceClose()
-	--DA.DEBUG(0,"SkilletFrameForceClose()")
+	DA.DEBUG(0,"SkilletFrameForceClose()")
 	CloseTradeSkill()
 	return self:HideAllWindows()
 end
