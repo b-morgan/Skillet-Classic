@@ -175,7 +175,7 @@ function Skillet:CreateTradeSkillWindow()
 -- We are going to steal the Enchant button to avoid DoCraft errors so
 -- load the Blizzard CraftUI so we can mess with it
 --
-	if Skillet.db.profile.enchanting and not IsAddOnLoaded("Blizzard_CraftUI") then
+	if Skillet.db.profile.support_crafting and not IsAddOnLoaded("Blizzard_CraftUI") then
 		LoadAddOn("Blizzard_CraftUI")
 	end
 --
@@ -246,7 +246,7 @@ function Skillet:CreateTradeSkillWindow()
 -- if Skillet-Classic support for crafts is enabled,
 -- steal the Enchant button from the Blizzard CraftUI
 --
-	if Skillet.db.profile.enchanting then
+	if Skillet.db.profile.support_crafting then
 		self:StealEnchantButton()
 	end
 	SkilletRecipeNotesButton:SetText(L["Notes"])
@@ -515,7 +515,7 @@ function Skillet:ConfigureRecipeControls()
 		SkilletAdd1Button:Hide()
 		SkilletAdd10Button:Hide()
 		SkilletClearNumButton:Hide()
-		if Skillet.db.profile.enchanting and CraftCreateButton then
+		if Skillet.db.profile.support_crafting and CraftCreateButton then
 			CraftCreateButton:Show()
 		else
 			SkilletEnchantButton:Disable()		-- because DoCraft is restricted
@@ -535,7 +535,7 @@ function Skillet:ConfigureRecipeControls()
 		SkilletAdd1Button:Show()
 		SkilletAdd10Button:Show()
 		SkilletClearNumButton:Show()
-		if Skillet.db.profile.enchanting and CraftCreateButton then
+		if Skillet.db.profile.support_crafting and CraftCreateButton then
 			CraftCreateButton:Hide()
 		else
 			SkilletEnchantButton:Hide()
@@ -1307,8 +1307,8 @@ function Skillet:SkillButton_OnEnter(button)
 			altlink = GetSpellLink(skill.recipeID)
 			quantity = recipe.numMade
 		else
-			DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe,1))
-			DA.DEBUG(1,"skill= "..DA.DUMP1(skill,1))
+			--DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe,1))
+			--DA.DEBUG(1,"skill= "..DA.DUMP1(skill,1))
 		end
 		if Skillet.isCraft then
 --
@@ -2479,7 +2479,11 @@ end
 
 function Skillet:SkilletFrameForceClose()
 	DA.DEBUG(0,"SkilletFrameForceClose()")
-	CloseTradeSkill()
+	if Skillet.isCraft then
+		CloseCraft()
+	else
+		CloseTradeSkill()
+	end
 	return self:HideAllWindows()
 end
 
@@ -2814,7 +2818,7 @@ function Skillet:ReAnchorButtons(newFrame)
 	--DA.DEBUG(0,"ReAnchorButtons("..tostring(newFrame)..")")
 	SkilletRecipeNotesButton:SetPoint("BOTTOMRIGHT",newFrame,"TOPRIGHT",0,0)
 	SkilletQueueAllButton:SetPoint("TOPLEFT",newFrame,"BOTTOMLEFT",0,-2)
-	if Skillet.db.profile.enchanting and CraftCreateButton then
+	if Skillet.db.profile.support_crafting and CraftCreateButton then
 		CraftCreateButton:SetPoint("TOPLEFT",newFrame,"BOTTOMLEFT",0,-2)
 	else
 		SkilletEnchantButton:SetPoint("TOPLEFT",newFrame,"BOTTOMLEFT",0,-2)
