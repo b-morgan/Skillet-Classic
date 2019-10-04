@@ -27,7 +27,9 @@ local L = Skillet.L
 local SMELTING = 2656
 local MINING = 2575
 
+--
 -- a table of tradeskills by id
+--
 local TradeSkillList = {
 	2259,		-- alchemy
 	2018,		-- blacksmithing
@@ -39,14 +41,34 @@ local TradeSkillList = {
 	2550,		-- cooking
 	3273,		-- first aid
 	2842,		-- poisons
-	45357,		-- inscription
-	25229,		-- jewelcrafting
-	53428,		-- runeforging
+--	45357,		-- inscription (not in Classic)
+--	25229,		-- jewelcrafting (not in Classic)
+--	53428,		-- runeforging (not in Classic)
 }
 
+--
+-- a table of crafts by id
+--
 local CraftList = {
 	7411,		-- enchanting (Blizzard has restricted DoCraft(index) to anything but their own UI)
 }
+
+--
+--  a table of locale specific translations by id
+--- needed to fix Blizzard inconsistent translations
+--
+-- [tradeID] = {locale, old, new}
+--   locale is what GetLocale() returns
+--   old is the return from GetSpellInfo(tradeID)
+--   new is the return from GetTradeSkillLine() when the tradeskill / craft is opened
+--
+local TranslateList = {
+	[4036] = {"frFR", "Ingénieur", "Ingénierie"},	-- Engineering
+	[3273] = {"frFR", "Premiers soins", "???"},		-- First Aid
+}
+
+local TradeSkillIDsByName = {}		-- filled in with ids and names for reverse matching (since the same name may have multiple id's based on level)
+local TradeSkillNamesByID = {}		-- filled in with names and ids for reverse matching
 
 Skillet.AdditionalAbilities = {
 	[7411]	= {13262,"Disenchant"},		-- enchanting = disenchant (will disappear because enchanting is disabled)
@@ -57,12 +79,109 @@ Skillet.AdditionalAbilities = {
 	[4036]	= {126462,"Thermal Anvil"},	 -- engineering = thermal anvil (item:87216)
 	[SMELTING]	= {126462,"Thermal Anvil"},	 -- smelting = thermal anvil (item:87216)
 }
-Skillet.AutoButtonsList = {}			-- used before it is filled in MainFrame.lua
-Skillet.TradeSkillAutoTarget = {
+
 --
--- None of these "features" exist in Classic
+-- Checks to see if the current trade is one that we support.
 --
-}
+function Skillet:IsSupportedTradeskill(tradeID)
+	if IsShiftKeyDown() or not tradeID or tradeID == 5419 or tradeID == 53428 then
+		return false
+	end
+	return true
+end
+
+--
+-- Collects generic tradeskill and craft data (id to name and name to id)
+--
+-- self.tradeSkillList contains data from both.
+-- self.skillIsCraft contains boolean (tradeskill or craft)
+-- self.tradeSkillIDsByName contains name to id data
+-- self.tradeSkillNamesByID contains id to name data
+--
+function Skillet:CollectTradeSkillData()
+	DA.DEBUG(0,"CollectTradeSkillData()")
+	self.tradeSkillList = {}
+	self.skillIsCraft = {}
+	for i=1,#TradeSkillList,1 do
+		local id = TradeSkillList[i]
+		local name = GetSpellInfo(id)
+		DA.DEBUG(2,"id= "..tostring(id)..", name= "..tostring(name))
+		if name then
+			table.insert(self.tradeSkillList,id)
+			self.skillIsCraft[id] = false
+			TradeSkillIDsByName[name] = id
+			TradeSkillNamesByID[id] = name
+		end
+	end
+	if self.db.profile.support_crafting then
+		for i=1,#CraftList,1 do
+			local id = CraftList[i]
+			local name = GetSpellInfo(id)
+			DA.DEBUG(2,"id= "..tostring(id)..", name= "..tostring(name))
+			if name then
+				table.insert(self.tradeSkillList,id)
+				self.skillIsCraft[id] = true
+				TradeSkillIDsByName[name] = id
+				TradeSkillNamesByID[id] = name
+			end
+		end
+	end
+	local locale = GetLocale()
+	DA.DEBUG(2,"locale= "..tostring(locale))
+	for id,t in pairs(TranslateList) do
+		local loc = t[1]
+		local old = t[2]
+		local new = t[3]
+		DA.DEBUG(2,"id= "..tostring(id)..", loc= "..tostring(loc)..", old= "..tostring(old)..", new= "..tostring(new))
+		if loc == locale then
+			TradeSkillIDsByName[new] = id
+		end
+	end
+
+	self.tradeSkillIDsByName = TradeSkillIDsByName
+	self.tradeSkillNamesByID = TradeSkillNamesByID
+end
+
+--
+-- this routine collects the basic data (which tradeskills a player has)
+--
+function Skillet:ScanPlayerTradeSkills(player)
+	--DA.DEBUG(0,"ScanPlayerTradeSkills("..tostring(player)..")")
+	if player == self.currentPlayer then -- only for active player
+		if not self.db.realm.tradeSkills[player] then
+			self.db.realm.tradeSkills[player] = {}
+		end
+		local skillRanksData = self.db.realm.tradeSkills[player]
+		if self.tradeSkillList then
+			for i=1,#self.tradeSkillList,1 do
+				local id = self.tradeSkillList[i]
+				local name = GetSpellInfo(id)				-- always returns data
+				if name then
+					local tradeName = GetSpellInfo(name)	-- only returns data if you have this spell in your spellbook
+					if tradeName then
+						--DA.DEBUG(2,"Collecting tradeskill data for: "..tostring(name)..", id= "..tostring(id)..", isCraft= "..tostring(self.skillIsCraft[id]))
+						if not skillRanksData[id] then
+							skillRanksData[id] = {}
+							skillRanksData[id].name = name
+							skillRanksData[id].rank = 0
+							skillRanksData[id].maxRank = 0
+							skillRanksData[id].isCraft = self.skillIsCraft[id]
+						end
+					else
+						--DA.DEBUG(2,"Skipping tradeskill data for: "..tostring(name)..", id= "..tostring(id)..", isCraft= "..tostring(self.skillIsCraft[id]))
+						skillRanksData[id] = nil
+					end
+				end
+			end
+		end
+		if not self.db.realm.faction then
+			self.db.realm.faction = {}
+		end
+		self.db.realm.faction[player] = UnitFactionGroup("player")
+	else
+		DA.DEBUG(0,"Player "..tostring(player).." is not currentPlayer")
+	end
+end
 
 --
 -- Items in this list are ignored because they can cause infinite loops.
@@ -123,6 +242,9 @@ local TradeSkillIgnoredMats	 = {
 }
 Skillet.TradeSkillIgnoredMats = TradeSkillIgnoredMats
 
+--
+-- None of these "features" exist in Classic
+--
 Skillet.scrollData = {
 --[[
 -- Scraped from WoWhead using the following javascript:
@@ -131,33 +253,7 @@ Skillet.scrollData = {
 ]]--
 }
 
-local TradeSkillIDsByName = {}		-- filled in with ids and names for reverse matching (since the same name has multiple id's based on level)
-local TradeSkillNamesByID = {}		-- filled in with names and ids for reverse matching
-
-local DifficultyText = {
-	x = "unknown",
-	o = "optimal",
-	m = "medium",
-	e = "easy",
-	t = "trivial",
-	u = "unavailable",
-}
-local DifficultyChar = {
-	unknown = "x",
-	optimal = "o",
-	medium = "m",
-	easy = "e",
-	trivial = "t",
-	unavailable = "u", 
-}
-local skill_style_type = {
-	["unknown"]			= { r = 1.00, g = 0.00, b = 0.00, level = 5, alttext="???", cstring = "|cffff0000"},
-	["optimal"]			= { r = 1.00, g = 0.50, b = 0.25, level = 4, alttext="+++", cstring = "|cffff8040"},
-	["medium"]			= { r = 1.00, g = 1.00, b = 0.00, level = 3, alttext="++",	cstring = "|cffffff00"},
-	["easy"]			= { r = 0.25, g = 0.75, b = 0.25, level = 2, alttext="+",	cstring = "|cff40c000"},
-	["trivial"]			= { r = 0.60, g = 0.60, b = 0.60, level = 1, alttext="",	cstring = "|cff909090"},
-	["header"]			= { r = 1.00, g = 0.82, b = 0,	  level = 0, alttext="",	cstring = "|cffffc800"},
-	["unavailable"]		= { r = 0.3, g = 0.3, b = 0.3,	  level = 6, alttext="",	cstring = "|cff606060"},
+Skillet.TradeSkillAutoTarget = {
 }
 
 local lastAutoTarget = {}
@@ -190,6 +286,35 @@ function Skillet:GetAutoTargetMacro(additionalSpellId)
 		return "/cast "..(GetSpellInfo(additionalSpellId) or "")
 	end
 end
+--
+--  end of "features" not in Classic
+--
+
+local DifficultyText = {
+	x = "unknown",
+	o = "optimal",
+	m = "medium",
+	e = "easy",
+	t = "trivial",
+	u = "unavailable",
+}
+local DifficultyChar = {
+	unknown = "x",
+	optimal = "o",
+	medium = "m",
+	easy = "e",
+	trivial = "t",
+	unavailable = "u", 
+}
+local skill_style_type = {
+	["unknown"]			= { r = 1.00, g = 0.00, b = 0.00, level = 5, alttext="???", cstring = "|cffff0000"},
+	["optimal"]			= { r = 1.00, g = 0.50, b = 0.25, level = 4, alttext="+++", cstring = "|cffff8040"},
+	["medium"]			= { r = 1.00, g = 1.00, b = 0.00, level = 3, alttext="++",	cstring = "|cffffff00"},
+	["easy"]			= { r = 0.25, g = 0.75, b = 0.25, level = 2, alttext="+",	cstring = "|cff40c000"},
+	["trivial"]			= { r = 0.60, g = 0.60, b = 0.60, level = 1, alttext="",	cstring = "|cff909090"},
+	["header"]			= { r = 1.00, g = 0.82, b = 0,	  level = 0, alttext="",	cstring = "|cffffc800"},
+	["unavailable"]		= { r = 0.3, g = 0.3, b = 0.3,	  level = 6, alttext="",	cstring = "|cff606060"},
+}
 
 --
 -- adds an recipe source for an itemID (recipeID produces itemID)
@@ -271,16 +396,6 @@ function Skillet:CollectRecipeInformation()
 			end
 		end
 	end
-end
-
---
--- Checks to see if the current trade is one that we support.
---
-function Skillet:IsSupportedTradeskill(tradeID)
-	if IsShiftKeyDown() or not tradeID or tradeID == 5419 or tradeID == 53428 then
-		return false
-	end
-	return true
 end
 
 local missingVendorItems = {
@@ -516,87 +631,6 @@ function Skillet:GetSkill(player,trade,index)
 end
 
 --
--- Collects generic tradeskill and craft data (id to name and name to id)
---
--- self.tradeSkillList contains data from both.
--- self.skillIsCraft contains boolean (tradeskill or craft)
--- self.tradeSkillIDsByName contains name to id data
--- self.tradeSkillNamesByID contains id to name data
---
-function Skillet:CollectTradeSkillData()
-	--DA.DEBUG(0,"CollectTradeSkillData()")
-	self.tradeSkillList = {}
-	self.skillIsCraft = {}
-	for i=1,#TradeSkillList,1 do
-		local id = TradeSkillList[i]
-		local name = GetSpellInfo(id)
-		--DA.DEBUG(2,"id= "..tostring(id)..", name= "..tostring(name))
-		if name then
-			table.insert(self.tradeSkillList,id)
-			self.skillIsCraft[id] = false
-			TradeSkillIDsByName[name] = id
-			TradeSkillNamesByID[id] = name
-		end
-	end
-	if self.db.profile.support_crafting then
-		for i=1,#CraftList,1 do
-			local id = CraftList[i]
-			local name = GetSpellInfo(id)
-			--DA.DEBUG(2,"id= "..tostring(id)..", name= "..tostring(name))
-			if name then
-				table.insert(self.tradeSkillList,id)
-				self.skillIsCraft[id] = true
-				TradeSkillIDsByName[name] = id
-				TradeSkillNamesByID[id] = name
-			end
-		end
-	end
-	self.tradeSkillIDsByName = TradeSkillIDsByName
-	self.tradeSkillNamesByID = TradeSkillNamesByID
-end
-
---
--- this routine collects the basic data (which tradeskills a player has)
---
-function Skillet:ScanPlayerTradeSkills(player)
-	--DA.DEBUG(0,"ScanPlayerTradeSkills("..tostring(player)..")")
-	if player == self.currentPlayer then -- only for active player
-		if not self.db.realm.tradeSkills[player] then
-			self.db.realm.tradeSkills[player] = {}
-		end
-		local skillRanksData = self.db.realm.tradeSkills[player]
-		if self.tradeSkillList then
-			for i=1,#self.tradeSkillList,1 do
-				local id = self.tradeSkillList[i]
-				local name = GetSpellInfo(id)				-- always returns data
-				if name then
-					local tradeName = GetSpellInfo(name)	-- only returns data if you have this spell in your spellbook
-					if tradeName then
-						--DA.DEBUG(2,"Collecting tradeskill data for: "..tostring(name)..", id= "..tostring(id)..", isCraft= "..tostring(self.skillIsCraft[id]))
-						if not skillRanksData[id] then
-							skillRanksData[id] = {}
-							skillRanksData[id].name = name
-							skillRanksData[id].rank = 0
-							skillRanksData[id].maxRank = 0
-							skillRanksData[id].isCraft = self.skillIsCraft[id]
-						end
-					else
-						--DA.DEBUG(2,"Skipping tradeskill data for: "..tostring(name)..", id= "..tostring(id)..", isCraft= "..tostring(self.skillIsCraft[id]))
-						skillRanksData[id] = nil
-					end
-				end
-			end
-		end
-		if not self.db.realm.faction then
-			self.db.realm.faction = {}
-		end
-		self.db.realm.faction[player] = UnitFactionGroup("player")
-	else
-		DA.DEBUG(0,"Player "..tostring(player).." is not currentPlayer")
-	end
-end
-
---
 -- takes a profession and a skill index and returns the recipe
 --
 function Skillet:GetRecipeDataByTradeIndex(tradeID, index)
@@ -698,8 +732,10 @@ local function ScanTrade()
 	Skillet:RecipeGroupClearEntries(mainGroup)
 	local groupList = {}
 --	Skillet.db.realm.tradeSkills[player][tradeID].link = link		-- Classic has no link for the profession
+	Skillet.db.realm.tradeSkills[player][tradeID].name = profession
 	Skillet.db.realm.tradeSkills[player][tradeID].rank = rank
 	Skillet.db.realm.tradeSkills[player][tradeID].maxRank = maxRank
+	Skillet.db.realm.tradeSkills[player][tradeID].isCraft = Skillet.isCraft
 --
 -- Mining and Smelting have a bipolar relationship 
 --
@@ -707,6 +743,7 @@ local function ScanTrade()
 		if not Skillet.db.realm.tradeSkills[player][SMELTING] then
 			Skillet.db.realm.tradeSkills[player][SMELTING] = {}
 		end
+		Skillet.db.realm.tradeSkills[player][tradeID].name = "Smelting ("..profession..")"
 		Skillet.db.realm.tradeSkills[player][SMELTING].rank = rank
 		Skillet.db.realm.tradeSkills[player][SMELTING].maxRank = maxRank
 	end

@@ -56,6 +56,7 @@ local defaults = {
 		queue_craftable_reagents = true,
 		queue_glyph_reagents = false,					-- not in Classic
 		display_required_level = false,
+		display_item_level = false,
 		display_shopping_list_at_bank = true,
 		display_shopping_list_at_guildbank = false,		-- not in Classic
 		display_shopping_list_at_auction = true,
@@ -407,11 +408,27 @@ Skillet.options =
 						return Skillet.db.profile.display_required_level
 					end,
 					set = function(self,value)
+						Skillet.db.profile.display_item_level = false
 						Skillet.db.profile.display_required_level = value
 						Skillet:UpdateTradeSkillWindow()
 					end,
 					width = "double",
 					order = 1
+				},
+				display_item_level = {
+					type = "toggle",
+					name = L["DISPLAYITEMLEVELNAME"],
+					desc = L["DISPLAYITEMLEVELDESC"],
+					get = function()
+						return Skillet.db.profile.display_item_level
+					end,
+					set = function(self,value)
+						Skillet.db.profile.display_required_level = false
+						Skillet.db.profile.display_item_level = value
+						Skillet:UpdateTradeSkillWindow()
+					end,
+					width = "double",
+					order = 2
 				},
 				enhanced_recipe_display = {
 					type = "toggle",
@@ -425,7 +442,7 @@ Skillet.options =
 						Skillet:UpdateTradeSkillWindow()
 					end,
 					width = "double",
-					order = 2,
+					order = 3,
 				},
 				confirm_queue_clear = {
 					type = "toggle",
@@ -439,7 +456,7 @@ Skillet.options =
 						Skillet:UpdateTradeSkillWindow()
 					end,
 					width = "double",
-					order = 3,
+					order = 4,
 				},
 				queue_only_view = {
 					type = "toggle",
@@ -453,7 +470,7 @@ Skillet.options =
 						Skillet:UpdateTradeSkillWindow()
 					end,
 					width = "double",
-					order = 4,
+					order = 5,
 				},
 				transparency = {
 					type = "range",
@@ -470,7 +487,7 @@ Skillet.options =
 						Skillet:UpdateStandaloneQueueWindow()
 					end,
 					width = "double",
-					order = 5,
+					order = 10,
 				},
 				scale = {
 					type = "range",
@@ -487,7 +504,7 @@ Skillet.options =
 						Skillet:UpdateStandaloneQueueWindow()
 					end,
 					width = "double",
-					order = 6,
+					order = 11,
 				},
 			},
 		},
@@ -1689,10 +1706,11 @@ end
 -- Show the tradeskill window, called from TRADE_SKILL_SHOW event, clicking on links, or clicking on guild professions
 --
 function Skillet:SkilletShow()
-	--DA.DEBUG(0,"SkilletShow(), currentTrade= "..tostring(self.currentTrade))
+	DA.DEBUG(0,"SkilletShow(), currentTrade= "..tostring(self.currentTrade))
 	self.linkedSkill, self.currentPlayer, self.isGuild = Skillet:IsTradeSkillLinked()
 	if self.linkedSkill then
 		if not self.currentPlayer then
+			DA.DEBUG(0,"Waiting for TRADE_SKILL_NAME_UPDATE")
 			return -- Wait for TRADE_SKILL_NAME_UPDATE
 		end
 	else
@@ -1704,14 +1722,11 @@ function Skillet:SkilletShow()
 	else
 		name, rank, maxRank = GetTradeSkillLine()
 	end
-	--DA.DEBUG(0,"name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
+	DA.DEBUG(0,"name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
 	self.currentTrade = self.tradeSkillIDsByName[name]
-	if not self.linkedSkill and not self.isGuild then
-		self:InitializeDatabase(self.currentPlayer)
-	end 
 	if self:IsSupportedTradeskill(self.currentTrade) then
 		self:InventoryScan()
-		--DA.DEBUG(0,"SkilletShow: "..self.currentTrade)
+		DA.DEBUG(0,"SkilletShow: "..self.currentTrade)
 		self.selectedSkill = nil
 		self.dataScanned = false
 		self:ScheduleTimer("SkilletShowWindow", 0.5)
@@ -1726,8 +1741,8 @@ function Skillet:SkilletShow()
 			end
 		end
 	else
-		--DA.DEBUG(0,"SkilletShow: "..self.currentTrade.." ("..tostring(name)..") is not supported")
-		--DA.DEBUG(0,"tradeSkillIDsByName= "..DA.DUMP(self.tradeSkillIDsByName))
+		DA.DEBUG(0,"SkilletShow: "..self.currentTrade.." ("..tostring(name)..") is not supported")
+		DA.DEBUG(0,"tradeSkillIDsByName= "..DA.DUMP(self.tradeSkillIDsByName))
 		self:HideAllWindows()
 		if self.isCraft then
 			self:RestoreEnchantButton()
@@ -1739,13 +1754,14 @@ function Skillet:SkilletShow()
 end
 
 function Skillet:SkilletShowWindow()
-	--DA.DEBUG(0,"SkilletShowWindow(), (was showing "..tostring(self.currentTrade)..")")
+	DA.DEBUG(0,"SkilletShowWindow(), (was showing "..tostring(self.currentTrade)..")")
 	if IsControlKeyDown() then
 		self.db.realm.skillDB[self.currentPlayer][self.currentTrade] = {}
 	end
 	if not self:RescanTrade() then
 		if TSMAPI_FOUR then
-				DA.CHAT("Conflict between Skillet-Classic and TradeSkillMaster")
+			DA.CHAT("Conflict between Skillet-Classic and TradeSkillMaster")
+			self.db.profile.TSMAPI_FOUR = true
 		else
 			DA.CHAT("No headers, try again")
 		end
@@ -1770,7 +1786,7 @@ function Skillet:SkilletShowWindow()
 end
 
 function Skillet:SkilletClose()
-	--DA.DEBUG(0,"SKILLET CLOSE")
+	DA.DEBUG(0,"SKILLET CLOSE")
 	if self.dataSource == "api" then -- if the skillet system is using the api for data access, then close the skillet window
 		self:HideAllWindows()
 	end
@@ -1982,6 +1998,7 @@ end
 -- Hides the Skillet trade skill window. Does nothing if the window is not visible
 --
 function Skillet:HideTradeSkillWindow()
+	DA.DEBUG(0,"HideTradeSkillWindow()")
 	local closed -- was anything closed by us?
 	local frame = self.tradeSkillFrame
 	if frame and frame:IsVisible() then
@@ -1996,6 +2013,7 @@ end
 -- Hides any and all Skillet windows that are open
 --
 function Skillet:HideAllWindows()
+	DA.DEBUG(0,"HideAllWindows()")
 	local closed -- was anything closed?
 	-- Cancel anything currently being created
 	if self:HideTradeSkillWindow() then

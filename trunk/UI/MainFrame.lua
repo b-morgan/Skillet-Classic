@@ -19,6 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
+Skillet.AutoButtonsList = {}			-- define here because it is used before it is filled
+
 SKILLET_TRADE_SKILL_HEIGHT = 16
 SKILLET_NUM_REAGENT_BUTTONS = 8
 
@@ -498,7 +500,7 @@ end
 --
 function Skillet:ConfigureRecipeControls()
 	DA.DEBUG(0,"ConfigureRecipeControls()")
-	if self.isCraft then
+	if Skillet.isCraft then
 		SkilletQueueAllButton:Hide()
 		SkilletQueueButton:Hide()
 		SkilletCreateAllButton:Hide()
@@ -647,6 +649,7 @@ end
 
 function Skillet:UpdateTradeButtons(player)
 	DA.DEBUG(3,"UpdateTradeButtons("..tostring(player)..")")
+	if TSMAPI_FOUR then return end		-- Maybe later but for now, these buttons cause more trouble than they are worth.
 	local position = 0 -- pixels
 	local tradeSkillList = self.tradeSkillList
 	local frameName = "SkilletFrameTradeButtons-"..player
@@ -744,6 +747,7 @@ end
 
 function Skillet:UpdateAutoTradeButtons()
 	DA.DEBUG(3,"UpdateAutoTradeButtons()")
+	if TSMAPI_FOUR then return end		-- Maybe later but for now, these buttons cause more trouble than they are worth.
 	local tradeSkillList = self.tradeSkillList
 	Skillet.AutoButtonsList = {}
 	for i=1,#tradeSkillList,1 do
@@ -1068,10 +1072,10 @@ function Skillet:UpdateTradeSkillWindow()
 				countText:SetTextColor(skill_color.r, skill_color.g, skill_color.b, textAlpha)
 				buttonExpand:Hide()
 				-- if the item has a minimum level requirement, then print that here
-				if self.db.profile.display_required_level then
+				if self.db.profile.display_required_level and recipe.itemID then
 					local level = self:GetLevelRequiredToUse(recipe.itemID)
 					if level and level > 1 then
-						local _, _, rarity = GetItemInfo("item:"..recipe.itemID)
+						local _, _, rarity = GetItemInfo(recipe.itemID)
 						local r, g, b = GetItemQualityColor(rarity)
 						if r and g and b then
 							levelText:SetTextColor(r, g, b)
@@ -1079,7 +1083,12 @@ function Skillet:UpdateTradeSkillWindow()
 						levelText:SetText(level)
 					end
 				end
---				text = skill.name or ""
+				if self.db.profile.display_item_level and recipe.itemID then
+					local level = self:GetItemLevel(recipe.itemID)
+					if level and level > 1 then
+						levelText:SetText(level)
+					end
+				end
 				text = (self:RecipeNamePrefix(skill, recipe) or "") .. (skill.name or "")
 				if recipe.reagentData and #recipe.reagentData > 0 then
 					local num, numrecursive, numwvendor, numwalts = get_craftable_counts(skill.skillData, recipe.numMade)
