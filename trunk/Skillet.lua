@@ -1710,7 +1710,7 @@ function Skillet:SkilletShow()
 	self.linkedSkill, self.currentPlayer, self.isGuild = Skillet:IsTradeSkillLinked()
 	if self.linkedSkill then
 		if not self.currentPlayer then
-			DA.DEBUG(0,"Waiting for TRADE_SKILL_NAME_UPDATE")
+			--DA.DEBUG(0,"Waiting for TRADE_SKILL_NAME_UPDATE")
 			return -- Wait for TRADE_SKILL_NAME_UPDATE
 		end
 	else
@@ -1722,7 +1722,7 @@ function Skillet:SkilletShow()
 	else
 		name, rank, maxRank = GetTradeSkillLine()
 	end
-	DA.DEBUG(0,"name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
+	--DA.DEBUG(0,"name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
 	self.currentTrade = self.tradeSkillIDsByName[name]
 	if self:IsSupportedTradeskill(self.currentTrade) then
 		self:InventoryScan()
@@ -1782,14 +1782,11 @@ function Skillet:SkilletShowWindow()
 	else
 		self:UpdateTradeSkillWindow()
 	end
-	self.dataSource = "api"
 end
 
 function Skillet:SkilletClose()
 	DA.DEBUG(0,"SKILLET CLOSE")
-	if self.dataSource == "api" then -- if the skillet system is using the api for data access, then close the skillet window
-		self:HideAllWindows()
-	end
+	self:HideAllWindows()
 end
 
 function Skillet:BAG_OPEN(event, bagID) -- Fires when a non-inventory container is opened.
@@ -1929,7 +1926,6 @@ function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 			self.isCraft = self.skillIsCraft[TradeID]
 			self:ConfigureRecipeControls()
 		end
-		self.dataSource = "api"
 		self.dataScanned = false
 		self.currentGroup = nil
 		self.currentGroupLabel = self:GetTradeSkillOption("grouping")

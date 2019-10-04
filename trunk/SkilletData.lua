@@ -63,8 +63,8 @@ local CraftList = {
 --   new is the return from GetTradeSkillLine() when the tradeskill / craft is opened
 --
 local TranslateList = {
-	[4036] = {"frFR", "Ingénieur", "Ingénierie"},	-- Engineering
-	[3273] = {"frFR", "Premiers soins", "???"},		-- First Aid
+	[4036] = {"frFR", "Ingénieur", "Ingénierie"},			-- Engineering
+	[3273] = {"frFR", "Premiers soins", "Secourisme"},		-- First Aid
 }
 
 local TradeSkillIDsByName = {}		-- filled in with ids and names for reverse matching (since the same name may have multiple id's based on level)

@@ -148,9 +148,9 @@ end
 local function SkillIsFilteredOut(skillIndex)
 	DA.DEBUG(1,"SkillIsFilteredOut("..tostring(skillIndex)..")")
 	local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, skillIndex)
-	DA.DEBUG(1,"skill= "..DA.DUMP1(skill,1))
+	--DA.DEBUG(1,"skill= "..DA.DUMP1(skill,1))
 	local recipe = Skillet:GetRecipe(skill.id)
-	DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe,1))
+	--DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe,1))
 	local recipeID = recipe.spellID or 0
 	if recipeID == 0 then
 		DA.DEBUG(1,"Detected header")
@@ -231,6 +231,7 @@ local function SkillIsFilteredOut(skillIndex)
 					end
 				else
 					if skillIndex then
+						DA.DEBUG(1,"skillIndex= "..tostring(skillIndex).." ("..tostring(recipe.name)..")")
 						tooltip:SetTradeSkillItem(skillIndex)
 						local tiplines = tooltip:NumLines()
 						for i=1, tiplines, 1 do
@@ -262,12 +263,12 @@ local function SkillIsFilteredOut(skillIndex)
 			searchText = string.lower(searchText)
 			local wordList = { string.split(" ",filter) }
 			for v,word in pairs(wordList) do
-				DA.DEBUG(2,"word="..tostring(word))
+				--DA.DEBUG(2,"word="..tostring(word))
 				if string.find(searchText, word, 1, true) == nil then
 					DA.DEBUG(2,"not found")
 					return true
 				end
-				DA.DEBUG(2,"found")
+				--DA.DEBUG(2,"found")
 			end
 		end
 	end
@@ -346,16 +347,16 @@ function Skillet:SortAndFilterRecipes()
 	local skillListKey = Skillet.currentPlayer..":"..Skillet.currentTrade..":"..Skillet.currentGroupLabel
 	local numSkills = Skillet:GetNumSkills(Skillet.currentPlayer, Skillet.currentTrade)
 	if not Skillet.data.sortedSkillList then
-		DA.DEBUG(1,"Skillet.data.sortedSkillList = {}")
+		--DA.DEBUG(1,"Skillet.data.sortedSkillList = {}")
 		Skillet.data.sortedSkillList = {}
 	end
 	if not Skillet.data.sortedSkillList[skillListKey] then
-		DA.DEBUG(1,"Skillet.data.sortedSkillList[skillListKey] = {}")
+		--DA.DEBUG(1,"Skillet.data.sortedSkillList[skillListKey] = {}")
 		Skillet.data.sortedSkillList[skillListKey] = {}
 	end
 	local sortedSkillList = Skillet.data.sortedSkillList[skillListKey]
 	local oldLength = #sortedSkillList
-	DA.DEBUG(1,"oldLength= "..tostring(oldLength))
+	--DA.DEBUG(1,"oldLength= "..tostring(oldLength))
 	local button_index = 0
 	local searchtext = Skillet:GetTradeSkillOption("searchtext")
 	local groupLabel = Skillet.currentGroupLabel
@@ -371,7 +372,9 @@ function Skillet:SortAndFilterRecipes()
 						button_index = button_index + 1
 						sortedSkillList[button_index] = {["recipeID"] = skill.id, ["spellID"] = recipe.spellID, ["name"] = recipe.name, ["skillIndex"] = i, ["recipeData"] = recipe, ["skillData"] = skill, ["depth"] = 0}
 					elseif i == Skillet.selectedSkill then
-						--if filtered out and selected - deselect
+--
+--if filtered out and selected - deselect
+--
 						Skillet.selectedSkill = nil
 					end
 				else
@@ -407,7 +410,7 @@ function Skillet:SortAndFilterRecipes()
 			button_index = Skillet:RecipeGroupFlatten(group, 0, sortedSkillList, 0)
 		end
 	end
-	DA.DEBUG(0,"sorted "..button_index.." skills")
+	--DA.DEBUG(0,"sorted "..button_index.." skills")
 	sortedSkillList.count = button_index
 	return button_index
 end
@@ -437,7 +440,9 @@ function Skillet:InitializeSorting()
 	table.insert(sorters, 5, {["name"]=L["By Quality"], ["sorter"]=sort_recipe_by_item_quality})
 	recipe_sort_method = sort_recipe_by_index
 	SkilletSortAscButton:SetScript("OnClick", function()
-		-- clicked the button will toggle sort ascending off
+--
+-- clicked the button will toggle sort ascending off
+--
 		set_sort_desc(true)
 		SkilletSortAscButton:Hide()
 		SkilletSortDescButton:Show()
@@ -451,7 +456,9 @@ function Skillet:InitializeSorting()
 		GameTooltip:Hide()
 	end)
 	SkilletSortDescButton:SetScript("OnClick", function()
-		-- clicked the button will toggle sort descending off
+--
+-- clicked the button will toggle sort descending off
+--
 		set_sort_desc(false)
 		SkilletSortDescButton:Hide()
 		SkilletSortAscButton:Show()
@@ -481,9 +488,6 @@ function Skillet:SortDropdown_OnLoad()
 			break
 		end
 	end
---
---	show_sort_toggle()
---
 end
 
 --
@@ -523,10 +527,6 @@ function Skillet:SortDropdown_Initialize()
 		end
 		UIDropDownMenu_AddButton(info)
 	end
---
--- can't calls show_sort_toggle() here as the sort
--- buttons have not been created yet
---
 end
 
 --
