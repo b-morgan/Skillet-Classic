@@ -39,6 +39,7 @@ Skillet.project = WOW_PROJECT_ID
 local isClassic = WOW_PROJECT_ID == 2
 
 Skillet.isCraft = false			-- true for the Blizzard Craft UI, false for the Blizzard TradeSkill UI
+Skillet.lastCraft = false		-- help events know when to call ConfigureRecipeControls()
 Skillet.ignoreClose = false		-- when switching from the Craft UI to the TradeSkill UI, ignore the other's close.
 
 local nonLinkingTrade = { [2656] = true, [53428] = true }				-- smelting, runeforging
@@ -741,10 +742,10 @@ Skillet.options =
 			name = "Enchanting",
 			desc = "Enable/Disable Enchant button",
 			get = function()
-				return Skillet.db.profile.enchanting
+				return Skillet.db.profile.support_crafting
 			end,
 			set = function(self,value)
-				Skillet.db.profile.enchanting = value
+				Skillet.db.profile.support_crafting = value
 				Skillet:ConfigureRecipeControls()
 				Skillet:UpdateTradeSkillWindow()
 			end,
@@ -1624,10 +1625,10 @@ end
 function Skillet:TRADE_SKILL_CLOSE()
 	DA.TRACE("TRADE_SKILL_CLOSE")
 	if not Skillet.tradeShow then return end
---	if Skillet.ignoreClose then
---		Skillet.ignoreClose = false
---		return
---	end
+	if Skillet.ignoreClose then
+		Skillet.ignoreClose = false
+		return
+	end
 	Skillet:SkilletClose()
 	Skillet.tradeShow = false
 end
@@ -1635,10 +1636,10 @@ end
 function Skillet:CRAFT_CLOSE()
 	DA.TRACE("CRAFT_CLOSE")
 	if not Skillet.craftShow then return end
---	if Skillet.ignoreClose then
---		Skillet.ignoreClose = false
---		return
---	end
+	if Skillet.ignoreClose then
+		Skillet.ignoreClose = false
+		return
+	end
 	Skillet:SkilletClose()
 	Skillet.craftShow = false
 end
@@ -1660,7 +1661,7 @@ function Skillet:CRAFT_SHOW()
 	Skillet.isCraft = true
 	if Skillet.lastCraft ~= Skillet.isCraft then
 		Skillet:ConfigureRecipeControls()
-		Skillet.ignoreClose = false
+--		Skillet.ignoreClose = false
 	end
 	Skillet:SkilletShow()
 end
@@ -1737,7 +1738,7 @@ function Skillet:SkilletShow()
 		if Skillet.db.profile.hide_blizzard_frame then
 			if self.isCraft then
 				HideUIPanel(CraftFrame)
-				if Skillet.db.profile.enchanting then
+				if Skillet.db.profile.support_crafting then
 					self:StealEnchantButton()
 				end
 			else
@@ -1928,7 +1929,7 @@ function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 		local oldTradeID = self.currentTrade
 		if self.skillIsCraft[oldTradeID] ~= self.skillIsCraft[TradeID] then
 			self.ignoreClose = true
-			self.isCraft = self.skillIsCraft[TradeID]
+			self.isCraft = self.skillIsCraft[TradeID]	-- the skill we are going to
 			self:ConfigureRecipeControls()
 		end
 		self.dataScanned = false
@@ -2064,7 +2065,7 @@ function Skillet:SetSelectedSkill(skillIndex, wasClicked)
 		self:HideNotesWindow() -- XXX: should this be an update?
 	end
 	self:ConfigureRecipeControls()
-	if Skillet.db.profile.enchanting and self.isCraft and CraftFrame_SetSelection then
+	if Skillet.db.profile.support_crafting and self.isCraft and CraftFrame_SetSelection then
 		CraftFrame_SetSelection(skillIndex)
 	end
 	self.selectedSkill = skillIndex
