@@ -56,8 +56,6 @@ local function sort_recipe_by_skill_level(tradeskill, a, b)
 		rightDifficulty = skill_style_type[b.skillData.difficulty].level
 	end
 	if leftDifficulty == rightDifficulty then
---		DA.CHAT("a: "..(a.spellID or "nil"))
---		DA.CHAT("b: "..(b.spellID or "nil"))
 		local left = Skillet:GetTradeSkillLevels(a.spellID)
 		local right = Skillet:GetTradeSkillLevels(b.spellID)
 		if left == right then
@@ -88,11 +86,15 @@ local function sort_recipe_by_item_level(tradeskill, a, b)
 	if not left  then  left = 0 end
 	if not right then right = 0 end
 	if left == right then
-		-- same level, try iLevel next
+--
+-- same level, try iLevel next
+--
 		local left = select(4,GetItemInfo(left_r.itemID)) or 0
 		local right = select(4,GetItemInfo(right_r.itemID)) or 0
 		if left == right then
-			-- same level, sort by difficulty
+--
+-- same level, sort by difficulty
+--
 			return sort_recipe_by_skill_level(tradeskill, a, b)
 		else
 			return left > right
@@ -116,7 +118,9 @@ local function sort_recipe_by_item_quality(tradeskill, a, b)
 	if not left  then  left = 0 end
 	if not right then right = 0 end
 	if left == right then
-		-- same level, sort by level required to use
+--
+-- same level, sort by level required to use
+--
 		return sort_recipe_by_item_level(tradeskill, a, b)
 	else
 		return left > right
@@ -142,14 +146,14 @@ local function NOSORT(tradeskill, a, b)
 end
 
 local function SkillIsFilteredOut(skillIndex)
-	--DA.DEBUG(1,"SkillIsFilteredOut("..tostring(skillIndex)..")")
+	DA.DEBUG(1,"SkillIsFilteredOut("..tostring(skillIndex)..")")
 	local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, skillIndex)
-	--DA.DEBUG(1,"skill= "..DA.DUMP1(skill,1))
+	DA.DEBUG(1,"skill= "..DA.DUMP1(skill,1))
 	local recipe = Skillet:GetRecipe(skill.id)
-	--DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe,1))
+	DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe,1))
 	local recipeID = recipe.spellID or 0
 	if recipeID == 0 then
-		--DA.DEBUG(1,"Detected header")
+		DA.DEBUG(1,"Detected header")
 		return false
 	end
 --
@@ -157,7 +161,7 @@ local function SkillIsFilteredOut(skillIndex)
 --
 	if skill_style_type[skill.difficulty] then
 		if skill_style_type[skill.difficulty].level < (Skillet:GetTradeSkillOption("filterLevel") or 4) then
-			--DA.DEBUG(1,"Detected trivial")
+			DA.DEBUG(1,"Detected trivial")
 			return true
 		end
 	end
@@ -169,14 +173,14 @@ local function SkillIsFilteredOut(skillIndex)
 		   not (skill.numRecursive > 0 and Skillet:GetTradeSkillOption("filterInventory-crafted")) and
 		   not (skill.numCraftableVendor > 0 and Skillet:GetTradeSkillOption("filterInventory-vendor")) and
 		   not (skill.numCraftableAlts > 0 and Skillet:GetTradeSkillOption("filterInventory-alts")) then
-			--DA.DEBUG(1,"Detected uncraftable")
+			DA.DEBUG(1,"Detected uncraftable")
 			return true
 		end
 	end
 	if Skillet.recipeFilters then
 		for _,f in pairs(Skillet.recipeFilters) do
 			if f.filterMethod(f.namespace, skillIndex) then
-				--DA.DEBUG(1,"Detected recipeFilter")
+				DA.DEBUG(1,"Detected recipeFilter")
 				return true
 			end
 		end
@@ -186,19 +190,19 @@ local function SkillIsFilteredOut(skillIndex)
 --
 	local searchtext = Skillet:GetTradeSkillOption("searchtext")
 	if searchtext and searchtext ~= "" then
-		--DA.DEBUG(1,"Searching for '"..tostring(searchtext).."'")
+		DA.DEBUG(1,"Searching for '"..tostring(searchtext).."'")
 		local filter = string.lower(searchtext)
 		local nameOnly = false
 		if string.sub(filter,1,1) == "!" then
 			filter = string.sub(filter,2)
-			--DA.DEBUG(1,"Searching nameOnly")
+			DA.DEBUG(1,"Searching nameOnly")
 			nameOnly = false
 		end
 		local word
 		local name = ""
 		local tooltip = _G["SkilletParsingTooltip"]
 		if tooltip == nil then
-			--DA.DEBUG(1,"Creating SkilletParsingTooltip")
+			DA.DEBUG(1,"Creating SkilletParsingTooltip")
 			tooltip = CreateFrame("GameTooltip", "SkilletParsingTooltip", _G["ANCHOR_NONE"], "GameTooltipTemplate")
 			tooltip:SetOwner(WorldFrame, "ANCHOR_NONE");
 		end
@@ -206,22 +210,22 @@ local function SkillIsFilteredOut(skillIndex)
 		if nameOnly then
 			searchText = recipe.name
 		else
-			--DA.DEBUG(1,"Searching name and tooltip")
+			DA.DEBUG(1,"Searching name and tooltip")
 			if not Skillet.data.tooltipCache or Skillet.data.tooltipCachedTrade ~= Skillet.currentTrade then
 				Skillet.data.tooltipCachedTrade = Skillet.currentTrade
 				Skillet.data.tooltipCache = {}
 			end
 			if not Skillet.data.tooltipCache[recipeID] then
-				--DA.DEBUG(1,"Setup tooltipCache["..tostring(recipeID).."]")
+				DA.DEBUG(1,"Setup tooltipCache["..tostring(recipeID).."]")
 				if Skillet.isCraft then
 					searchText = recipe.name
 					local spellFocus = GetCraftSpellFocus(skillIndex) -- BuildColoredListString(GetCraftSpellFocus(skillIndex))
-					--DA.DEBUG(1,"spellFocus= "..tostring(spellFocus))
+					DA.DEBUG(1,"spellFocus= "..tostring(spellFocus))
 					if spellFocus then
 						searchText = searchText.." "..string.lower(tostring(spellFocus))
 					end
 					local about = GetCraftDescription(skillIndex)
-					--DA.DEBUG(1,"about= "..tostring(about))
+					DA.DEBUG(1,"about= "..tostring(about))
 					if about then
 						searchText = searchText.." "..string.lower(tostring(about))
 					end
@@ -230,7 +234,7 @@ local function SkillIsFilteredOut(skillIndex)
 						tooltip:SetTradeSkillItem(skillIndex)
 						local tiplines = tooltip:NumLines()
 						for i=1, tiplines, 1 do
-							--DA.DEBUG(1,"Found "..tostring(tiplines).." tiplines")
+							DA.DEBUG(1,"Found "..tostring(tiplines).." tiplines")
 							searchText = searchText.." "..string.lower(_G["SkilletParsingTooltipTextLeft"..i]:GetText() or " ")
 							searchText = searchText.." "..string.lower(_G["SkilletParsingTooltipTextRight"..i]:GetText() or " ")
 						end
@@ -241,29 +245,29 @@ local function SkillIsFilteredOut(skillIndex)
 						local reagent = recipe.reagentData[i]
 						if reagent then
 							local itemName = GetItemInfo(reagent.id) or reagent.id
-							--DA.DEBUG(1,"Adding '"..tostring(itemName).."'")
+							DA.DEBUG(1,"Adding '"..tostring(itemName).."'")
 							searchText = searchText.." "..string.lower(itemName)
 						end
 					end
 				end
-				--DA.DEBUG(1,"Setting searchText")
+				DA.DEBUG(1,"Setting searchText")
 				Skillet.data.tooltipCache[recipeID] = searchText
 			else
-				--DA.DEBUG(1,"Using tooltipCache["..tostring(recipeID).."]")
+				DA.DEBUG(1,"Using tooltipCache["..tostring(recipeID).."]")
 				searchText = Skillet.data.tooltipCache[recipeID]
 			end
 		end
 		if searchText then 
-			--DA.DEBUG(1,"Searching searchText= "..tostring(searchText))
+			DA.DEBUG(1,"Searching searchText= "..tostring(searchText))
 			searchText = string.lower(searchText)
 			local wordList = { string.split(" ",filter) }
 			for v,word in pairs(wordList) do
-				--DA.DEBUG(2,"word="..tostring(word))
+				DA.DEBUG(2,"word="..tostring(word))
 				if string.find(searchText, word, 1, true) == nil then
-					--DA.DEBUG(2,"not found")
+					DA.DEBUG(2,"not found")
 					return true
 				end
-				--DA.DEBUG(2,"found")
+				DA.DEBUG(2,"found")
 			end
 		end
 	end
@@ -351,13 +355,13 @@ function Skillet:SortAndFilterRecipes()
 	end
 	local sortedSkillList = Skillet.data.sortedSkillList[skillListKey]
 	local oldLength = #sortedSkillList
-	--DA.DEBUG(1,"oldLength= "..tostring(oldLength))
+	DA.DEBUG(1,"oldLength= "..tostring(oldLength))
 	local button_index = 0
 	local searchtext = Skillet:GetTradeSkillOption("searchtext")
 	local groupLabel = Skillet.currentGroupLabel
-	--DA.DEBUG(1,"searchtext="..tostring(searchtext)..", groupLabel="..tostring(groupLabel))
+	DA.DEBUG(1,"searchtext="..tostring(searchtext)..", groupLabel="..tostring(groupLabel))
 	if searchtext and searchtext ~= "" or groupLabel == "Flat" then
-		--DA.DEBUG(1,"SortAndFilterRecipes groupLabel= "..tostring(groupLabel))
+		DA.DEBUG(1,"SortAndFilterRecipes groupLabel= "..tostring(groupLabel))
 		for i=1, numSkills, 1 do
 			local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, i)
 			if skill then
@@ -371,7 +375,7 @@ function Skillet:SortAndFilterRecipes()
 						Skillet.selectedSkill = nil
 					end
 				else
-					--DA.DEBUG(2,"i= "..tostring(i).." is a header")
+					DA.DEBUG(2,"i= "..tostring(i).." is a header")
 				end
 			end
 		end
@@ -392,7 +396,7 @@ function Skillet:SortAndFilterRecipes()
 		end
 	else
 		local group = Skillet:RecipeGroupFind(Skillet.currentPlayer, Skillet.currentTrade, Skillet.currentGroupLabel, Skillet.currentGroup)
-		--DA.DEBUG(1,"current grouping "..Skillet.currentGroupLabel.." "..(Skillet.currentGroup or "nil"))
+		DA.DEBUG(1,"current grouping "..Skillet.currentGroupLabel.." "..(Skillet.currentGroup or "nil"))
 		if recipe_sort_method ~= NOSORT then
 			Skillet:RecipeGroupSort(group, recipe_sort_method, is_sort_desc())
 		end
@@ -519,8 +523,10 @@ function Skillet:SortDropdown_Initialize()
 		end
 		UIDropDownMenu_AddButton(info)
 	end
-	-- can't calls show_sort_toggle() here as the sort
-	-- buttons have not been created yet
+--
+-- can't calls show_sort_toggle() here as the sort
+-- buttons have not been created yet
+--
 end
 
 --
@@ -540,7 +546,7 @@ end
 -- called when the new filter drop down is first loaded
 --
 function Skillet:FilterDropDown_OnLoad()
-	--DA.DEBUG(0,"FilterDropDown_OnLoad()")
+	DA.DEBUG(0,"FilterDropDown_OnLoad()")
 	UIDropDownMenu_Initialize(SkilletFilterDropdown, Skillet.FilterDropDown_Initialize)
 	SkilletFilterDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
 end
@@ -549,7 +555,7 @@ end
 -- Called when the new filter drop down is displayed
 --
 function Skillet:FilterDropDown_OnShow()
-	--DA.DEBUG(0,"FilterDropDown_OnShow()")
+	DA.DEBUG(0,"FilterDropDown_OnShow()")
 	UIDropDownMenu_Initialize(SkilletFilterDropdown, Skillet.FilterDropDown_Initialize)
 	SkilletFilterDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
 	if Skillet.unlearnedRecipes then
@@ -563,7 +569,7 @@ end
 -- The method we use the initialize the new filter drop down.
 --
 function Skillet:FilterDropDown_Initialize()
-	--DA.DEBUG(0,"FilterDropDown_Initialize()")
+	DA.DEBUG(0,"FilterDropDown_Initialize()")
 	local info
 	local i = 1
 
@@ -604,7 +610,7 @@ end
 -- Called when the user selects an item in the new filter drop down
 --
 function Skillet:FilterDropDown_OnClick()
-	--DA.DEBUG(0,"FilterDropDown_OnClick()")
+	DA.DEBUG(0,"FilterDropDown_OnClick()")
 	UIDropDownMenu_SetSelectedID(SkilletFilterDropdown, self:GetID())
 	local index = self:GetID()
 	if index == 1 then

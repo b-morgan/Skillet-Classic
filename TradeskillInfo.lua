@@ -17,18 +17,82 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
--- This file contains all the code I use to access recipe/tradeskill information
+-- This file contains code used to access recipe/tradeskill information
 
+--[[
+--
+-- GetItemInfo(item)
+-- item can be: itemID or "itemString" or "itemName" or "itemLink"
+--
+	1. itemName
+	String - The localized name of the item.
+	2. itemLink
+	String - The localized item link of the item.
+	3. itemRarity
+	Number - The quality of the item. The value is 0 to 7, which represents Poor to Heirloom. This appears to include gains from upgrades/bonuses.
+	4. itemLevel
+	Number - The base item level of this item, not including item levels gained from upgrades. Use GetDetailedItemLevelInfo to get the actual current level of the item.
+	5. itemMinLevel
+	Number - The minimum level required to use the item, 0 meaning no level requirement.
+	6. itemType
+	String - The localized type of the item: Armor, Weapon, Quest, Key, etc.
+	7. itemSubType
+	String - The localized sub-type of the item: Enchanting, Cloth, Sword, etc. See itemType.
+	8. itemStackCount
+	Number - How many of the item per stack: 20 for Runecloth, 1 for weapon, 100 for Alterac Ram Hide, etc.
+	9. itemEquipLoc
+	String - The type of inventory equipment location in which the item may be equipped, or "" if it can't be equippable. The string returned is also the name of a global string variable e.g. if "INVTYPE_WEAPONMAINHAND" is returned, _G["INVTYPE_WEAPONMAINHAND"] will be the localized, displayable name of the location.
+	10. itemIcon
+	Number (fileID) - The icon texture for the item.
+	11. itemSellPrice
+	Number - The price, in copper, a vendor is willing to pay for this item, 0 for items that cannot be sold.
+	12. itemClassID
+	Number - This is the numerical value that determines the string to display for 'itemType'.
+	13. itemSubClassID
+	Number - This is the numerical value that determines the string to display for 'itemSubType'
+	14. bindType
+	Number - Item binding type: 0 - none; 1 - on pickup; 2 - on equip; 3 - on use; 4 - quest.
+	15. expacID
+	Number - ?
+	16. itemSetID
+	Number - ?
+	17. isCraftingReagent
+	Boolean - ?
+]]--
+--
 -- If an item requires a specific level before it can be used, then
 -- the level is returned, otherwise 0 is returned
 --
--- item can be: itemID or "itemString" or "itemName" or "itemLink"
---
 function Skillet:GetLevelRequiredToUse(item)
 	if not item then return end
-		local level = select(5, GetItemInfo(item))
-	if not level then level = 0 end
-	return level
+--  local level = select(5, GetItemInfo(item))
+--	if not level then level = 0 end
+--	return level
+	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
+	  itemEquipLoc, itemIcon, itemSellPrice, itemClassID, itemSubClassID, bindType, expacID, itemSetID, 
+	  isCraftingReagent = GetItemInfo(itemLink)
+	if not itemMinLevel then itemMinLevel = 0 end
+	return itemMinLevel
+end
+
+--
+-- If an item has an item level, then it
+-- is returned, otherwise 0 is returned
+--
+function Skillet:GetItemLevel(item)
+	if not item then return end
+--  local level = select(4, GetItemInfo(item))
+--	if not level then level = 0 end
+--	return level
+	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
+	  itemEquipLoc, itemIcon, itemSellPrice, itemClassID, itemSubClassID, bindType, expacID, itemSetID, 
+	  isCraftingReagent = GetItemInfo(itemLink)
+	if not itemLevel then itemLevel = 0 end
+	if type(itemLevel) ~= "number" then
+		DA.DEBUG(0,"GetItemLevel("..tostring(item)..")= "..tostring(itemLevel))
+		itemLevel = 0
+	end
+	return itemLevel
 end
 
 function Skillet:GetItemIDFromLink(link)	-- works with items or enchants
@@ -41,42 +105,6 @@ function Skillet:GetItemIDFromLink(link)	-- works with items or enchants
 		else
 			return nil
 		end
-	end
-end
-
---
--- return GetItemInfo and automatically query server if not cached
---
-function Skillet:GetItemInfo(id)
-	if id then
-		local name = GetItemInfo(id)
-		if not name then
-			GameTooltip:SetHyperlink("item:"..id)
-			GameTooltip:SetHyperlink("enchant:"..id)
-		end
-		return GetItemInfo(id)
-	end
-end
-
---
--- Wrapper that calls the correct Get*Info for crafts and trades as appropriate
---
-function Skillet:GetTradeSkillInfo(skillIndex)
-	local tradeID = self.currentTrade
-	local skill = self:GetSkill(self.currentPlayer, tradeID, skillIndex)
-	if skill then
-		local id = skill.id
-		local skillName = self:GetRecipeName(id)
-		local difficulty = skill.difficulty
-		if id and id ~= 0 then
-			local recipe = self:GetRecipe(id)
-			local numAvailable = (skill.numCraftable or 0) / (recipe.numMade or 1)
-			return skillName, difficulty, numAvailable, 0	
-		else
-			return skillName, "header", 0, 1
-		end
-	else
-		return nil, nil, nil, nil
 	end
 end
 
@@ -114,7 +142,7 @@ end
 function Skillet:GetTradeName(tradeID)
 	--DA.DEBUG(2,"GetTradeName("..tostring(tradeID)..")")
 	local tradeNameT,tradeNameS
-	tradeNameT = self.tradeSkillNamesByID[tradeID]
+	tradeNameT = Skillet.tradeSkillNamesByID[tradeID]
 	tradeNameS = GetSpellInfo(tradeID)
 	--DA.DEBUG(2,"tradeNameT= "..tostring(tradeNameT)..", tradeNameS= "..tostring(tradeNameS))
 	if not tradeNameT then
