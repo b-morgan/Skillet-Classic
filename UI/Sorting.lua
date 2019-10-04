@@ -265,7 +265,7 @@ local function SkillIsFilteredOut(skillIndex)
 			for v,word in pairs(wordList) do
 				--DA.DEBUG(2,"word="..tostring(word))
 				if string.find(searchText, word, 1, true) == nil then
-					DA.DEBUG(2,"not found")
+					--DA.DEBUG(2,"not found")
 					return true
 				end
 				--DA.DEBUG(2,"found")

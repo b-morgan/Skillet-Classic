@@ -70,7 +70,10 @@ function Skillet:GetLevelRequiredToUse(item)
 --	return level
 	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
 	  itemEquipLoc, itemIcon, itemSellPrice, itemClassID, itemSubClassID, bindType, expacID, itemSetID, 
-	  isCraftingReagent = GetItemInfo(itemLink)
+	  isCraftingReagent = GetItemInfo(item)
+--
+-- is the return value OK?
+--
 	if not itemMinLevel then itemMinLevel = 0 end
 	return itemMinLevel
 end
@@ -86,7 +89,10 @@ function Skillet:GetItemLevel(item)
 --	return level
 	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
 	  itemEquipLoc, itemIcon, itemSellPrice, itemClassID, itemSubClassID, bindType, expacID, itemSetID, 
-	  isCraftingReagent = GetItemInfo(itemLink)
+	  isCraftingReagent = GetItemInfo(item)
+--
+-- is the return value OK?
+--
 	if not itemLevel then itemLevel = 0 end
 	if type(itemLevel) ~= "number" then
 		DA.DEBUG(0,"GetItemLevel("..tostring(item)..")= "..tostring(itemLevel))
