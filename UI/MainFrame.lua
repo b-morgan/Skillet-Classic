@@ -2478,16 +2478,9 @@ function Skillet:ReagentButtonOnClick(button, skillIndex, reagentIndex)
 end
 
 function Skillet:SkilletFrameForceClose()
-	if self.dataSource == "api" then
-		CloseTradeSkill()
-		self.dataSource = "none"
-		self:HideAllWindows()
-		return true
-	else
-		CloseTradeSkill()
-		local x = self:HideAllWindows()
-		return x
-	end
+	--DA.DEBUG(0,"SkilletFrameForceClose()")
+	CloseTradeSkill()
+	return self:HideAllWindows()
 end
 
 --
