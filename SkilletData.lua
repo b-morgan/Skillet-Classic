@@ -50,6 +50,7 @@ local TradeSkillList = {
 -- a table of crafts by id
 --
 local CraftList = {
+	5149,		-- beast training
 	7411,		-- enchanting (Blizzard has restricted DoCraft(index) to anything but their own UI)
 }
 

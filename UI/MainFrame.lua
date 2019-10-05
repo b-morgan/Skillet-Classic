@@ -2961,7 +2961,7 @@ function Skillet:StandaloneQueueClose()
 end
 
 function Skillet:HideStandaloneQueue()
-	if not self.skilletStandalonQueue or not self.skilletStandalonQueue:IsVisible() then
+	if not self.skilletStandaloneQueue or not self.skilletStandaloneQueue:IsVisible() then
 		return
 	end
 	SkilletStandaloneQueue:Hide()
@@ -3029,7 +3029,7 @@ function Skillet:CreateStandaloneQueueFrame()
 end
 
 function Skillet:UpdateStandaloneQueueWindow()
-	if not self.skilletStandalonQueue or not self.skilletStandalonQueue:IsVisible() then
+	if not self.skilletStandaloneQueue or not self.skilletStandaloneQueue:IsVisible() then
 		return
 	end
 	SkilletStandaloneQueue:SetAlpha(self.db.profile.transparency)

@@ -1746,14 +1746,20 @@ function Skillet:SkilletShow()
 			end
 		end
 	else
-		DA.DEBUG(0,"SkilletShow: "..self.currentTrade.." ("..tostring(name)..") is not supported")
-		DA.DEBUG(0,"tradeSkillIDsByName= "..DA.DUMP(self.tradeSkillIDsByName))
-		self:HideAllWindows()
-		if self.isCraft then
-			self:RestoreEnchantButton()
-			ShowUIPanel(CraftFrame)
-		else
-			ShowUIPanel(TradeSkillFrame)
+--
+-- give Hunter Beast Training a pass
+-- for everything else bring up the appropriate Blizzard UI
+--
+		if self.castSpellID ~= 5149 then
+			DA.DEBUG(0,"SkilletShow: "..tostring(self.currentTrade).." ("..tostring(name)..") is not supported")
+			DA.DEBUG(0,"tradeSkillIDsByName= "..DA.DUMP(self.tradeSkillIDsByName))
+			self:HideAllWindows()
+			if self.isCraft then
+				self:RestoreEnchantButton()
+				ShowUIPanel(CraftFrame)
+			else
+				ShowUIPanel(TradeSkillFrame)
+			end
 		end
 	end
 end
@@ -2000,7 +2006,6 @@ end
 -- Hides the Skillet trade skill window. Does nothing if the window is not visible
 --
 function Skillet:HideTradeSkillWindow()
-	DA.DEBUG(0,"HideTradeSkillWindow()")
 	local closed -- was anything closed by us?
 	local frame = self.tradeSkillFrame
 	if frame and frame:IsVisible() then
@@ -2015,7 +2020,7 @@ end
 -- Hides any and all Skillet windows that are open
 --
 function Skillet:HideAllWindows()
-	DA.DEBUG(0,"HideAllWindows()")
+	--DA.DEBUG(0,"HideAllWindows()")
 	local closed -- was anything closed?
 	-- Cancel anything currently being created
 	if self:HideTradeSkillWindow() then

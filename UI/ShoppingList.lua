@@ -138,7 +138,7 @@ local function createShoppingListFrame(self)
 end
 
 function Skillet:ShoppingListButton_OnEnter(button)
-	local name, link, quality = self:GetItemInfo(button.id)
+	local name, link, quality = GetItemInfo(button.id)
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 	GameTooltip:SetHyperlink(link)
 	GameTooltip:Show()
