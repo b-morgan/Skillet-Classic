@@ -331,7 +331,7 @@ function Skillet:ProcessQueue(altMode)
 				Skillet:Print(L["Changing profession to"],tradeName,L["Press Process to continue"])
 				DA.DEBUG(1,"executing CastSpellByName("..tostring(tradeName)..")")
 				self.queuecasting = false
-				self.changingtrade = tradeID
+				self.changingTrade = tradeID
 				CastSpellByName(tradeName)					-- switch professions
 				self:QueueMoveToTop(qpos)		-- will this fix the changing profession loop?
 				return
@@ -442,73 +442,82 @@ end
 
 function Skillet:UNIT_SPELLCAST_START(event, unit, castGUID, spellID)
 	DA.TRACE("UNIT_SPELLCAST_START("..tostring(unit)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
-	spell = GetSpellInfo(spellID)
-	DA.TRACE("spell= "..tostring(spell)..", processingSpell= "..tostring(self.processingSpell))
+	self.castSpellID = spellID
+	self.castSpellName = GetSpellInfo(spellID)
+	DA.TRACE("spellName= "..tostring(self.castSpellName)..", processingSpell= "..tostring(self.processingSpell))
 end
 
 function Skillet:UNIT_SPELLCAST_SUCCEEDED(event, unit, castGUID, spellID)
-	DA.TRACE("UNIT_SPELLCAST_SUCCEEDED("..tostring(unit)..", "..tostring(castGUID)..", "..tostring(spell)..")")
-	spell = GetSpellInfo(spellID)
-	DA.TRACE("spell= "..tostring(spell)..", processingSpell= "..tostring(self.processingSpell))
+	DA.TRACE("UNIT_SPELLCAST_SUCCEEDED("..tostring(unit)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
+	self.castSpellID = spellID
+	self.castSpellName = GetSpellInfo(spellID)
+	DA.TRACE("spellName= "..tostring(self.castSpellName)..", processingSpell= "..tostring(self.processingSpell))
 	if unit == "player" then
-		if self.processingSpell and self.processingSpell == spell or self.changingtrade then
-			Skillet:ContinueCast(spell)
+		if self.processingSpell and self.processingSpell == self.castSpellName or self.changingTrade then
+			Skillet:ContinueCast(self.castSpellName)
 		end
 	end
 end
 
 function Skillet:UNIT_SPELLCAST_FAILED(event, unit, castGUID, spellID)
-	DA.DEBUG(0,"UNIT_SPELLCAST_FAILED("..tostring(unit)..", "..tostring(castGUID)..", "..tostring(spell)..")")
-	spell = GetSpellInfo(spellID)
-	DA.DEBUG(0,"spell= "..tostring(spell)..", processingSpell= "..tostring(self.processingSpell))
-	if unit == "player" and self.processingSpell and self.processingSpell == spell then
-		Skillet:StopCast(spell,false)
+	DA.TRACE("UNIT_SPELLCAST_FAILED("..tostring(unit)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
+	self.castSpellID = spellID
+	self.castSpellName = GetSpellInfo(spellID)
+	DA.TRACE("spellName= "..tostring(self.castSpellName)..", processingSpell= "..tostring(self.processingSpell))
+	if unit == "player" and self.processingSpell and self.processingSpell == self.castSpellName then
+		Skillet:StopCast(Skillet.castSpellName,false)
 	end
 end
 
 function Skillet:UNIT_SPELLCAST_FAILED_QUIET(event, unit, castGUID, spellID)
-	DA.TRACE("UNIT_SPELLCAST_FAILED_QUIET("..tostring(unit)..", "..tostring(castGUID)..", "..tostring(spell)..")")
-	spell = GetSpellInfo(spellID)
-	DA.TRACE("spell= "..tostring(spell)..", processingSpell= "..tostring(self.processingSpell))
-	if unit == "player" and self.processingSpell and self.processingSpell == spell then
-		Skillet:StopCast(spell,false)
+	DA.TRACE("UNIT_SPELLCAST_FAILED_QUIET("..tostring(unit)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
+	self.castSpellID = spellID
+	self.castSpellName = GetSpellInfo(spellID)
+	DA.TRACE("spellName= "..tostring(self.castSpellName)..", processingSpell= "..tostring(self.processingSpell))
+	if unit == "player" and self.processingSpell and self.processingSpell == self.castSpellName then
+		Skillet:StopCast(self.castSpellName,false)
 	end
 end
 
 function Skillet:UNIT_SPELLCAST_INTERRUPTED(event, unit, castGUID, spellID)
-	DA.TRACE("UNIT_SPELLCAST_INTERRUPTED("..tostring(unit)..", "..tostring(castGUID)..", "..tostring(spell)..")")
-	spell = GetSpellInfo(spellID)
-	DA.TRACE("spell= "..tostring(spell)..", processingSpell= "..tostring(self.processingSpell))
-	if unit == "player" and self.processingSpell and self.processingSpell == spell then
-		Skillet:StopCast(spell,false)
+	DA.TRACE("UNIT_SPELLCAST_INTERRUPTED("..tostring(unit)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
+	self.castSpellID = spellID
+	self.castSpellName = GetSpellInfo(spellID)
+	DA.TRACE("spellName= "..tostring(self.castSpellName)..", processingSpell= "..tostring(self.processingSpell))
+	if unit == "player" and self.processingSpell and self.processingSpell == self.castSpellName then
+		Skillet:StopCast(self.castSpellName,false)
 	end
 end
 
 function Skillet:UNIT_SPELLCAST_DELAYED(event, unit, sGUID, spellID)
-	DA.TRACE("UNIT_SPELLCAST_DELAYED("..tostring(unit)..", "..tostring(castGUID)..", "..tostring(spell)..")")
-	spell = GetSpellInfo(spellID)
-	DA.TRACE("spell= "..tostring(spell)..", processingSpell= "..tostring(self.processingSpell))
+	DA.TRACE("UNIT_SPELLCAST_DELAYED("..tostring(unit)..", "..tostring(sGUID)..", "..tostring(spellID)..")")
+	self.castSpellID = spellID
+	self.castSpellName = GetSpellInfo(spellID)
+	DA.TRACE("spellName= "..tostring(self.castSpellName)..", processingSpell= "..tostring(self.processingSpell))
 end
 
 function Skillet:UNIT_SPELLCAST_STOP(event, unit, sGUID, spellID)
-	DA.TRACE("UNIT_SPELLCAST_STOP("..tostring(unit)..", "..tostring(castGUID)..", "..tostring(spell)..")")
-	spell = GetSpellInfo(spellID)
-	DA.TRACE("spell= "..tostring(spell)..", processingSpell= "..tostring(self.processingSpell))
-	if unit == "player" and self.processingSpell and self.processingSpell == spell then
-		Skillet:StopCast(spell,true)
+	DA.TRACE("UNIT_SPELLCAST_STOP("..tostring(unit)..", "..tostring(sGUID)..", "..tostring(spellID)..")")
+	self.castSpellID = spellID
+	self.castSpellName = GetSpellInfo(spellID)
+	DA.TRACE("spellName= "..tostring(self.castSpellName)..", processingSpell= "..tostring(self.processingSpell))
+	if unit == "player" and self.processingSpell and self.processingSpell == self.castSpellName then
+		Skillet:StopCast(self.castSpellName,true)
 	end
 end
 
 function Skillet:UNIT_SPELLCAST_CHANNEL_START(event, unit, sGUID, spellID)
-	DA.TRACE("UNIT_SPELLCAST_CHANNEL_START("..tostring(unit)..", "..tostring(castGUID)..", "..tostring(spell)..")")
-	spell = GetSpellInfo(spellID)
-	DA.TRACE("spell= "..tostring(spell)..", processingSpell= "..tostring(self.processingSpell))
+	DA.TRACE("UNIT_SPELLCAST_CHANNEL_START("..tostring(unit)..", "..tostring(sGUID)..", "..tostring(spellID)..")")
+	self.castSpellID = spellID
+	self.castSpellName = GetSpellInfo(spellID)
+	DA.TRACE("spellName= "..tostring(self.castSpellName)..", processingSpell= "..tostring(self.processingSpell))
 end
 
-function Skillet:UNIT_SPELLCAST_CHANNEL_STOP(event, unit, sGUID, spellID)
-	DA.TRACE("UNIT_SPELLCAST_CHANNEL_STOP("..tostring(unit)..", "..tostring(castGUID)..", "..tostring(spell)..")")
-	spell = GetSpellInfo(spellID)
-	DA.TRACE("spell= "..tostring(spell)..", processingSpell= "..tostring(self.processingSpell))
+function Skillet:UNIT_SPELLCAST_CHANNEL_STOP(event, unit, sGUID, sGUID)
+	DA.TRACE("UNIT_SPELLCAST_CHANNEL_STOP("..tostring(unit)..", "..tostring(sGUID)..", "..tostring(sGUID)..")")
+	self.castSpellID = spellID
+	self.castSpellName = GetSpellInfo(spellID)
+	DA.TRACE("spellName= "..tostring(self.castSpellName)..", processingSpell= "..tostring(self.processingSpell))
 end
 
 function Skillet:UI_ERROR_MESSAGE(event, errorType, message)
@@ -521,8 +530,8 @@ end
 
 function Skillet:ContinueCast(spell)
 	DA.DEBUG(0,"ContinueCast("..tostring(spell)..")")
-	if self.changingtrade then			-- contains the tradeID we are changing to
-		self.changingtrade = nil
+	if self.changingTrade then			-- contains the tradeID we are changing to
+		self.changingTrade = nil
 		Skillet:SkilletShow()			-- seems to let DoTradeSkill know we have changed
 	else
 		self:AdjustInventory()
