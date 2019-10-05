@@ -1606,7 +1606,7 @@ function Skillet:TRADE_SKILL_UPDATE()
 		if Skillet.lastCraft ~= Skillet.isCraft then
 			Skillet:ConfigureRecipeControls()
 		end
-		Skillet:UpdateTradeSkillWindow()
+		Skillet:AdjustInventory()
 	end
 end
 
