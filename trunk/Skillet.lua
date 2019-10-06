@@ -1165,7 +1165,7 @@ function Skillet:EnableBlizzardFrame()
 		self.BlizzardCraftFrame = nil
 		CraftFrame:SetScript("OnHide", Skillet.craftHide)
 		self.craftHide = nil
-		self:RestoreEnchantButton()
+		self:RestoreEnchantButton(true)
 		ShowUIPanel(CraftFrame)
 	end
 end
@@ -1652,17 +1652,25 @@ function Skillet:TRADE_SKILL_SHOW()
 		Skillet:ConfigureRecipeControls()
 --		Skillet.ignoreClose = false
 	end
+	SkilletEnchantButton:Hide()				-- Hide our button
 	Skillet:SkilletShow()
 end
 
 function Skillet:CRAFT_SHOW()
 	DA.TRACE("CRAFT_SHOW")
+	if Skillet.castSpellID == 5149 then 
+		Skillet:RestoreEnchantButton(false)
+		return
+	else
+		Skillet:StealEnchantButton()
+	end
 	Skillet.craftShow = true
 	Skillet.isCraft = true
 	if Skillet.lastCraft ~= Skillet.isCraft then
 		Skillet:ConfigureRecipeControls()
 --		Skillet.ignoreClose = false
 	end
+	SkilletEnchantButton:Show()				-- Show our button
 	Skillet:SkilletShow()
 end
 
@@ -1755,7 +1763,7 @@ function Skillet:SkilletShow()
 			DA.DEBUG(0,"tradeSkillIDsByName= "..DA.DUMP(self.tradeSkillIDsByName))
 			self:HideAllWindows()
 			if self.isCraft then
-				self:RestoreEnchantButton()
+				self:RestoreEnchantButton(true)
 				ShowUIPanel(CraftFrame)
 			else
 				ShowUIPanel(TradeSkillFrame)
@@ -1798,6 +1806,9 @@ end
 function Skillet:SkilletClose()
 	DA.DEBUG(0,"SKILLET CLOSE")
 	self.lastCraft = self.isCraft
+	if self.isCraft then
+		self:RestoreEnchantButton(false)
+	end
 	self:HideAllWindows()
 end
 

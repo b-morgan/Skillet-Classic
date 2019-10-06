@@ -135,7 +135,7 @@ end
 -- Steal the Enchant button from the CraftUI
 --
 function Skillet:StealEnchantButton()
-	--DA.DEBUG(0,"StealEnchantButton()")
+	DA.DEBUG(0,"StealEnchantButton()")
 	SkilletEnchantButton:Hide() 			-- Hide our Button
 	if not Skillet.EnchantOldParent and SkilletFrame and CraftCreateButton then
 		Skillet.EnchantOldParent = CraftCreateButton:GetParent()
@@ -154,8 +154,8 @@ end
 --
 -- Restore the CraftUI Enchant button
 --
-function Skillet:RestoreEnchantButton()
-	--DA.DEBUG(0,"RestoreEnchantButton()")
+function Skillet:RestoreEnchantButton(show)
+	DA.DEBUG(0,"RestoreEnchantButton("..tostring(show)..")")
 	if Skillet.EnchantOldParent and CraftCreateButton then
 		CraftCreateButton:SetParent(Skillet.EnchantOldParent)		-- Restore original Parent
 		Skillet.EnchantOldParent = nil
@@ -167,7 +167,11 @@ function Skillet:RestoreEnchantButton()
 		Skillet.EnchantOldPoints = nil
 	end
 	SkilletEnchantButton:Disable()			-- Disable our button because DoCraft is restricted
-	SkilletEnchantButton:Show()				-- Show our button
+	if show then
+		SkilletEnchantButton:Show()				-- Show our button
+	else
+		SkilletEnchantButton:Hide()				-- Hide our button
+	end
 end
 
 function Skillet:CreateTradeSkillWindow()
@@ -242,13 +246,6 @@ function Skillet:CreateTradeSkillWindow()
 	SkilletStartQueueButton:SetText(L["Process"])
 	SkilletEmptyQueueButton:SetText(L["Clear"])
 	SkilletEnchantButton:SetText(L["Enchant"])
---
--- if Skillet-Classic support for crafts is enabled,
--- steal the Enchant button from the Blizzard CraftUI
---
-	if Skillet.db.profile.support_crafting then
-		self:StealEnchantButton()
-	end
 	SkilletRecipeNotesButton:SetText(L["Notes"])
 	SkilletRecipeNotesFrameLabel:SetText(L["Notes"])
 	SkilletShoppingListButton:SetText(L["Shopping List"])
@@ -361,7 +358,7 @@ function Skillet:CreateTradeSkillWindow()
 end
 
 function Skillet:InitRecipeFilterButtons()
-	local lastButton = SkilletRecipeDifficultyButton
+	local lastButton = SkilletExpandAllButton
 	if self.recipeFilters then
 		for name, filter in pairs(self.recipeFilters) do
 			local newButton = filter.initMethod(filter.namespace)
