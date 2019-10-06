@@ -177,6 +177,9 @@ local function SkillIsFilteredOut(skillIndex)
 			return true
 		end
 	end
+--
+--	call any external recipe filters
+--
 	if Skillet.recipeFilters then
 		for _,f in pairs(Skillet.recipeFilters) do
 			if f.filterMethod(f.namespace, skillIndex) then

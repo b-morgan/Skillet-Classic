@@ -71,6 +71,7 @@ DebugAids.lua
 #### Plugins
 Plugins\BeanCounter.lua
 Plugins\Auctionator.lua
+Plugins\BootyBayGazette.lua
 #### Addons not ported to Classic
 ## Plugins\AckisRecipeList.lua
 ## Plugins\TradeSkillInfo.lua
