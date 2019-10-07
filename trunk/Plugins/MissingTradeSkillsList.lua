@@ -76,16 +76,14 @@ function plugin.OnInitialize()
 					MTSLUI_ToggleButton:SetPoint(plugin.oldPoint[1], plugin.oldPoint[2], plugin.oldPoint[3], plugin.oldPoint[4], plugin.oldPoint[5])
 					plugin.movedMTSL = false
 				else
-					if not plugin.oldPoint then
-						plugin.oldPoint = {}
-						plugin.oldPoint[1], plugin.oldPoint[2], plugin.oldPoint[3], plugin.oldPoint[4], plugin.oldPoint[5] = MTSLUI_ToggleButton:GetPoint(1)
-						plugin.newPoint = {}
-						plugin.newPoint[1] = plugin.oldPoint[1]
-						plugin.newPoint[2] = SkilletPluginButton
-						plugin.newPoint[3] = plugin.oldPoint[3]
-						plugin.newPoint[4] = plugin.oldPoint[4]
-						plugin.newPoint[5] = plugin.oldPoint[5]
-					end
+					plugin.oldPoint = {}
+					plugin.oldPoint[1], plugin.oldPoint[2], plugin.oldPoint[3], plugin.oldPoint[4], plugin.oldPoint[5] = MTSLUI_ToggleButton:GetPoint(1)
+					plugin.newPoint = {}
+					plugin.newPoint[1] = plugin.oldPoint[1]
+					plugin.newPoint[2] = SkilletPluginButton
+					plugin.newPoint[3] = plugin.oldPoint[3]
+					plugin.newPoint[4] = 0
+					plugin.newPoint[5] = 4
 					MTSLUI_ToggleButton:SetParent(SkilletPluginButton)
 					MTSLUI_ToggleButton:SetPoint(plugin.newPoint[1], plugin.newPoint[2], plugin.newPoint[3], plugin.newPoint[4], plugin.newPoint[5])
 					plugin.movedMTSL = true
