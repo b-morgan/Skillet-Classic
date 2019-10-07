@@ -1683,10 +1683,10 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		SkilletRequirementText:Hide()
 		SkilletRequirementLabel:Hide()
 	end
-	if recipe.itemID ~= 0 then
-		texture = GetItemIcon(recipe.itemID)
+	if Skillet.isCraft then
+		texture = GetCraftIcon(skillIndex)
 	else
-		texture = "Interface\\Icons\\Spell_Holy_GreaterHeal"		-- standard enchant icon
+		texture = GetItemIcon(recipe.itemID)
 	end
 	SkilletSkillIcon:SetNormalTexture(texture)
 	SkilletSkillIcon:Show()
