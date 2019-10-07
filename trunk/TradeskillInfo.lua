@@ -164,11 +164,16 @@ end
 --
 function Skillet:GetTradeSkillItemLink(index)
 	local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, index)
-		if recipe then
-		local _, link = GetItemInfo(recipe.itemID)
+	local _, link
+	if recipe then
+		if self.isCraft then
+			link = GetCraftItemLink(index)
+		else
+			_, link = GetItemInfo(recipe.itemID)
+		end
 		return link
 	end
-		return nil
+	return nil
 end
 
 function Skillet:GetNumTradeSkills(tradeOverride, playerOverride)

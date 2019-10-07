@@ -178,6 +178,12 @@ local function SkillIsFilteredOut(skillIndex)
 		end
 	end
 --
+--	call our internal recipe filter
+--
+	if Skillet:RecipeFilter(skillIndex) then
+		return true
+	end
+--
 --	call any external recipe filters
 --
 	if Skillet.recipeFilters then
@@ -402,9 +408,9 @@ function Skillet:SortAndFilterRecipes()
 		end
 	else
 		local group = Skillet:RecipeGroupFind(Skillet.currentPlayer, Skillet.currentTrade, Skillet.currentGroupLabel, Skillet.currentGroup)
-		DA.DEBUG(1,"current grouping "..Skillet.currentGroupLabel.." "..(Skillet.currentGroup or "nil"))
+		DA.DEBUG(1,"current grouping "..tostring(Skillet.currentGroupLabel).." "..(Skillet.currentGroup or "nil"))
 		if recipe_sort_method ~= NOSORT then
-			Skillet:RecipeGroupSort(group, recipe_sort_method, is_sort_desc())
+			Skillet:RecipeGroupSort(group, recipe_sort_method, is_sort_desc(), 1)
 		end
 		if Skillet.currentGroup then
 			Skillet:RecipeGroupInitFlatten(group, sortedSkillList)
@@ -412,6 +418,7 @@ function Skillet:SortAndFilterRecipes()
 		else
 			button_index = Skillet:RecipeGroupFlatten(group, 0, sortedSkillList, 0)
 		end
+		DA.DEBUG(0,"sorted "..tostring(button_index).." skills in "..tostring(Skillet.currentGroupLabel))
 	end
 	--DA.DEBUG(0,"sorted "..button_index.." skills")
 	sortedSkillList.count = button_index
@@ -542,86 +549,5 @@ function Skillet:SortDropdown_OnClick()
 	recipe_sort_method = entry.sorter
 	show_sort_toggle()
 	Skillet:SortAndFilterRecipes()
-	Skillet:UpdateTradeSkillWindow()
-end
-
---
--- called when the new filter drop down is first loaded
---
-function Skillet:FilterDropDown_OnLoad()
-	DA.DEBUG(0,"FilterDropDown_OnLoad()")
-	UIDropDownMenu_Initialize(SkilletFilterDropdown, Skillet.FilterDropDown_Initialize)
-	SkilletFilterDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
-end
-
---
--- Called when the new filter drop down is displayed
---
-function Skillet:FilterDropDown_OnShow()
-	DA.DEBUG(0,"FilterDropDown_OnShow()")
-	UIDropDownMenu_Initialize(SkilletFilterDropdown, Skillet.FilterDropDown_Initialize)
-	SkilletFilterDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
-	if Skillet.unlearnedRecipes then
-		UIDropDownMenu_SetSelectedID(SkilletFilterDropdown, 2)
-	else
-		UIDropDownMenu_SetSelectedID(SkilletFilterDropdown, 1)
-	end
-end
-
---
--- The method we use the initialize the new filter drop down.
---
-function Skillet:FilterDropDown_Initialize()
-	DA.DEBUG(0,"FilterDropDown_Initialize()")
-	local info
-	local i = 1
-
-	info = UIDropDownMenu_CreateInfo()
-	info.text = L["None"]
-	info.func = Skillet.FilterDropDown_OnClick
-	info.value = i
-	if self then
-		info.owner = self:GetParent()
-	end
-	UIDropDownMenu_AddButton(info)
-	i = i + 1
-
---[[
-	info = UIDropDownMenu_CreateInfo()
-	info.text = L["SubClass"]
-	info.func = Skillet.FilterDropDown_OnClick
-	info.value = i
-	if self then
-		info.owner = self:GetParent()
-	end
-	UIDropDownMenu_AddButton(info)
-	i = i + 1
-
-	info = UIDropDownMenu_CreateInfo()
-	info.text = L["Slot"]
-	info.func = Skillet.FilterDropDown_OnClick
-	info.value = i
-	if self then
-		info.owner = self:GetParent()
-	end
-	UIDropDownMenu_AddButton(info)
-	i = i + 1
-]]--
-end
-
---
--- Called when the user selects an item in the new filter drop down
---
-function Skillet:FilterDropDown_OnClick()
-	DA.DEBUG(0,"FilterDropDown_OnClick()")
-	UIDropDownMenu_SetSelectedID(SkilletFilterDropdown, self:GetID())
-	local index = self:GetID()
-	if index == 1 then
---		Skillet:SetTradeSkillLearned()
-	elseif index == 2 then
---		Skillet:SetTradeSkillUnlearned()
-	end
-	Skillet.dataScanned = false
-	Skillet:RescanTrade()
 	Skillet:UpdateTradeSkillWindow()
 end

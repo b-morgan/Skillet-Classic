@@ -17,9 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
+--
 -- recursive reagent craftability check
 -- not considering alts
 -- does consider queued recipes
+--
 function Skillet:InventoryReagentCraftability(reagentID, playerOverride)
 	--DA.DEBUG(2,"InventoryReagentCraftability("..tostring(reagentID)..", "..tostring(playerOverride)..") -- "..tostring((GetItemInfo(reagentID))))
 	if self.visited[reagentID] then
@@ -70,9 +72,11 @@ function Skillet:InventoryReagentCraftability(reagentID, playerOverride)
 	return numCrafted
 end
 
+--
 -- recipe iteration check: calculate how many times a recipe can be iterated with materials available
 -- (not to be confused with the reagent craftability which is designed to determine how many 
 -- craftable reagents are available for recipe iterations)
+--
 function Skillet:InventorySkillIterations(tradeID, skillIndex)
 	--DA.DEBUG(1,"InventorySkillIterations("..tostring(tradeID)..", "..tostring(skillIndex)..")")
 	local player = Skillet.currentPlayer
@@ -136,7 +140,7 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex)
 end
 
 function Skillet:InventoryScan()
-	DA.DEBUG(0,"InventoryScan()")
+	--DA.DEBUG(1,"InventoryScan()")
 	if self.linkedSkill or self.isGuild then
 		return
 	end
@@ -185,6 +189,7 @@ function Skillet:InventoryScan()
 end
 
 function Skillet:GetInventory(player, reagentID)
+	--DA.DEBUG(0,"GetInventory("..tostring(player)..", "..tostring(reagentID)..")")
 	local numCanUse
 	if player and reagentID then
 		if player == self.currentPlayer then			-- UnitName("player")
@@ -208,6 +213,7 @@ function Skillet:GetInventory(player, reagentID)
 end
 
 function Skillet:AuctionScan()
+	--DA.DEBUG(0,"AuctionScan()")
 	local player = Skillet.currentPlayer
 	local auctionData = {}
 	for i = 1, GetNumAuctionItems("owner") do

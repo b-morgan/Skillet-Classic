@@ -81,6 +81,7 @@ Plugins\MissingTradeSkillsList.lua
 #### UI files
 UI\Utils.lua
 UI\Sorting.lua
+UI\Filtering.lua
 UI\QueueMgt.lua
 UI\MainFrame.lua
 UI\MainFrame.xml
