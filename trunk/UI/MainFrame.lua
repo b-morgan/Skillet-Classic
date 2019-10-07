@@ -136,18 +136,20 @@ end
 --
 function Skillet:StealEnchantButton()
 	DA.DEBUG(0,"StealEnchantButton()")
-	SkilletEnchantButton:Hide() 			-- Hide our Button
-	if not Skillet.EnchantOldParent and SkilletFrame and CraftCreateButton then
-		Skillet.EnchantOldParent = CraftCreateButton:GetParent()
-		CraftCreateButton:SetParent(SkilletFrame)		-- Set new parent for the Blizzard button
-	end
-	if not Skillet.EnchantOldPoints and SkilletEnchantButton and CraftCreateButton then
-		local point = {}
-		point[1], point[2], point[3], point[4], point[5] = CraftCreateButton:GetPoint(1)
-		--DA.DEBUG(1,"point= "..DA.DUMP1(point))
-		Skillet.EnchantOldPoints = point
-		CraftCreateButton:ClearAllPoints()		-- Clear all positions
-		CraftCreateButton:SetAllPoints(SkilletEnchantButton) -- Copy positions from our button
+	if Skillet.db.profile.support_crafting then
+		SkilletEnchantButton:Hide() 			-- Hide our Button
+		if not Skillet.EnchantOldParent and SkilletFrame and CraftCreateButton then
+			Skillet.EnchantOldParent = CraftCreateButton:GetParent()
+			CraftCreateButton:SetParent(SkilletFrame)		-- Set new parent for the Blizzard button
+		end
+		if not Skillet.EnchantOldPoints and SkilletEnchantButton and CraftCreateButton then
+			local point = {}
+			point[1], point[2], point[3], point[4], point[5] = CraftCreateButton:GetPoint(1)
+			--DA.DEBUG(1,"point= "..DA.DUMP1(point))
+			Skillet.EnchantOldPoints = point
+			CraftCreateButton:ClearAllPoints()		-- Clear all positions
+			CraftCreateButton:SetAllPoints(SkilletEnchantButton) -- Copy positions from our button
+		end
 	end
 end
 
@@ -156,21 +158,23 @@ end
 --
 function Skillet:RestoreEnchantButton(show)
 	DA.DEBUG(0,"RestoreEnchantButton("..tostring(show)..")")
-	if Skillet.EnchantOldParent and CraftCreateButton then
-		CraftCreateButton:SetParent(Skillet.EnchantOldParent)		-- Restore original Parent
-		Skillet.EnchantOldParent = nil
-	end
-	if Skillet.EnchantOldPoints and CraftCreateButton then
-		local point = Skillet.EnchantOldPoints
-		CraftCreateButton:ClearAllPoints()		-- Clear all positions
-		CraftCreateButton:SetPoint(point[1], point[2], point[3], point[4], point[5])	-- Restore original location
-		Skillet.EnchantOldPoints = nil
-	end
-	SkilletEnchantButton:Disable()			-- Disable our button because DoCraft is restricted
-	if show then
-		SkilletEnchantButton:Show()				-- Show our button
-	else
-		SkilletEnchantButton:Hide()				-- Hide our button
+	if Skillet.db.profile.support_crafting then
+		if Skillet.EnchantOldParent and CraftCreateButton then
+			CraftCreateButton:SetParent(Skillet.EnchantOldParent)		-- Restore original Parent
+			Skillet.EnchantOldParent = nil
+		end
+		if Skillet.EnchantOldPoints and CraftCreateButton then
+			local point = Skillet.EnchantOldPoints
+			CraftCreateButton:ClearAllPoints()		-- Clear all positions
+			CraftCreateButton:SetPoint(point[1], point[2], point[3], point[4], point[5])	-- Restore original location
+			Skillet.EnchantOldPoints = nil
+		end
+		SkilletEnchantButton:Disable()			-- Disable our button because DoCraft is restricted
+		if show then
+			SkilletEnchantButton:Show()				-- Show our button
+		else
+			SkilletEnchantButton:Hide()				-- Hide our button
+		end
 	end
 end
 
