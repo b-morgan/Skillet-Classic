@@ -2605,24 +2605,23 @@ local skillMenuGroup = {
 	},
 }
 local skillMenuList = {
+--[[
 	{
 		text = "Link Recipe",
 		func = function()
---[[
 					local spellLink = GetTradeSkillRecipeLink(Skillet.menuButton:GetID())	-- find a replacement API call
 					if (ChatEdit_GetLastActiveWindow():IsVisible() or WIM_EditBoxInFocus ~= nil) then
 						ChatEdit_InsertLink(spellLink)
 					else
 						DA.DEBUG(0, spellLink)
 					end
-]]--
 				end,
 	},
 	{
 		text = "Add to Ignore Materials",
 		func = function()
 					local index = Skillet.menuButton:GetID()
-					local spellLink = GetTradeSkillRecipeLink(index)
+					local spellLink = GetTradeSkillItemLink(index)
 					local recipeID = Skillet:GetItemIDFromLink(spellLink)
 					DA.DEBUG(0, tostring(index)..", "..tostring(spellLink)..", "..tostring(recipeID))
 					Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeID] = spellLink
@@ -2635,6 +2634,7 @@ local skillMenuList = {
 		text = "",
 		disabled = true,
 	},
+]]--
 	{
 		text = "New Group",
 		hasArrow = true,

@@ -66,29 +66,39 @@ local function update_merchant_inventory()
 	end
 end
 
+--
 -- Inserts/updates a button in the merchant frame that allows
 -- you to automatically buy reagents.
+-- returns true if the button is displayed
+-- returns false if the button is hidden
+--
 local function update_merchant_buy_button()
 	Skillet:InventoryScan()
 	local list = Skillet:GetShoppingList(Skillet.currentPlayer, false)
 	if not list or #list == 0 then
+		DA.DEBUG(0,"ShoppingList is empty")
 		SkilletMerchantBuyFrame:Hide()
-		return
+		return false
 	elseif does_merchant_sell_required_items(list) == false then
+		DA.DEBUG(0,"Merchant does not sell required items")
 		SkilletMerchantBuyFrame:Hide()
-		return
+		return false
 	end
 	if Skillet.db.profile.display_shopping_list_at_merchant then
+		DA.DEBUG(0,"Shopping List should be displayed")
 		Skillet:DisplayShoppingList(false)
 	end
 	if SkilletMerchantBuyFrame:IsVisible() then
+		DA.DEBUG(0,"Merchant Buy Button should already be there")
 		-- already inserted the button
-		return
+		return true
 	end
+	DA.DEBUG(0,"Create and show the Merchant Buy Button")
 	SkilletMerchantBuyFrameButton:SetText(L["Reagents"]);
 	SkilletMerchantBuyFrame:SetPoint("TOPLEFT", "MerchantFrame", "TOPLEFT" , 60, -28) -- May need to be adjusted for each WoW build
 	SkilletMerchantBuyFrame:SetFrameStrata("HIGH");
 	SkilletMerchantBuyFrame:Show();
+	return true
 end
 
 -- Removes the merchant buy button
@@ -143,6 +153,7 @@ end
 -- If at a vendor with the window open, buy anything that they
 -- sell that is required by any queued recipe.
 function Skillet:BuyRequiredReagents()
+	--DA.DEBUG(0,"BuyRequiredReagents()")
 	local list = Skillet:GetShoppingList(Skillet.currentPlayer, false)
 	if #list == 0 then
 		return
@@ -213,16 +224,26 @@ function Skillet:BuyRequiredReagents()
 		message = message .. ": " .. cash
 		self:Print(message)
 	end
-	update_merchant_buy_button()
-	self:InventoryScan()
+--	update_merchant_buy_button()
+--
+-- delay updating windows until the transaction is complete
+--
+	self.merchantUpdateRequired = true
+	self:ScheduleTimer("MerchantUpdateWindows", 0.5)
+end
+
+function Skillet:MerchantUpdateWindows()
+	--DA.DEBUG(0,"MerchantUpdateWindows()")
+	self.merchantUpdateRequired = false
+	local visible = update_merchant_buy_button()
 	if self:IsShoppingListVisible() then
 		DA.DEBUG(0,"ShoppingList is visible")
-		if SkilletMerchantBuyFrame:IsVisible() then
-			DA.DEBUG(0,"Merchant Buy Button is visible")
-			self:UpdateShoppingListWindow(false)
-		else
+		self:UpdateShoppingListWindow(false)
+		if not visible then
 			DA.DEBUG(0,"Merchant Buy Button is not visible")
 			self:HideShoppingList()
+		else
+			DA.DEBUG(0,"Merchant Buy Button is visible")
 		end
 	else
 		DA.DEBUG(0,"ShoppingList is not visible")

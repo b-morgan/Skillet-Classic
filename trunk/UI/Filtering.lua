@@ -21,26 +21,62 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
 --
 -- internal recipe filter
--- filter this recipe based on the filters selected in the Filter dropdown
 --
+-- filter this recipe based on the values selected in the filter dropdown
+--
+-- most of the work has already been done and is stored in:
+--   subClass = Skillet.db.realm.subClass[player][tradeID]
+--   invSlot = Skillet.db.realm.invSlot[player][tradeID]
+-- indexed by itemID with the choices stored in a table:
+--   Skillet.db.realm.subClass[player][tradeID].name
+--   Skillet.db.realm.invSlot[player][tradeID].name
+--
+-- the filter dropdown will offer the choices in the name table
+-- and will set two global variables:
+--   Skillet.db.realm.subClass[player][tradeID].selected
+--   Skillet.db.realm.invSlot[player][tradeID].selected
+--
+--[[
+	["invSlot"] = {
+		["player"] = {
+			[2550] = {
+				[4343] = "INVTYPE_LEGS",
+				["name"] = {
+					[""] = 13,
+					["INVTYPE_BODY"] = 4,
+					["INVTYPE_FEET"] = 2,
+					["INVTYPE_LEGS"] = 2,
+					["INVTYPE_CLOAK"] = 2,
+					["INVTYPE_BAG"] = 1,
+				},
+	["subClass"] = {
+		["player"] = {
+			[2550] = {
+				[4343] = "Cloth",
+				["name"] = {
+					["Bag"] = 1,
+					["Cloth"] = 12,
+				},
+]]--
+
 function Skillet:RecipeFilter(skillIndex)
 	DA.DEBUG(1,"RecipeFilter("..tostring(skillIndex)..")")
 	local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, skillIndex)
 	--DA.DEBUG(1,"skill= "..DA.DUMP1(skill,1))
 	local recipe = Skillet:GetRecipe(skill.id)
 	--DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe,1))
---
--- this test should not be needed 
---
-	local recipeID = recipe.spellID or 0
-	if recipeID == 0 then
-		DA.DEBUG(1,"Detected header")
+	local subClass = Skillet.db.realm.subClass[Skillet.currentPlayer][Skillet.currentTrade]
+	local invSlot = Skillet.db.realm.invSlot[Skillet.currentPlayer][Skillet.currentTrade]
+	local itemID = recipe.itemID
+	DA.DEBUG(1,"RecipeFilter: itemID= "..tostring(itemID)..", subClass= "..tostring(subClass[itemID])..", invSlot= "..tostring(invSlot[itemID]))
+	DA.DEBUG(1,"RecipeFilter: subClass.selected= "..tostring(subClass.selected)..", invSlot.selected= "..tostring(invSlot.selected))
+	if not ItemID and not subClass.selected and not invSlot.selected then
 		return false
 	end
---
--- no filters detected
---
-return false
+	if subClass[itemID] == subClass.selected or invSlot[itemID] == invSlot.selected then
+		return true
+	end
+	return false
 end
 
 --

@@ -243,8 +243,8 @@ local function SkillIsFilteredOut(skillIndex)
 						DA.DEBUG(1,"skillIndex= "..tostring(skillIndex).." ("..tostring(recipe.name)..")")
 						tooltip:SetTradeSkillItem(skillIndex)
 						local tiplines = tooltip:NumLines()
+						DA.DEBUG(1,"Found "..tostring(tiplines).." tiplines")
 						for i=1, tiplines, 1 do
-							DA.DEBUG(1,"Found "..tostring(tiplines).." tiplines")
 							searchText = searchText.." "..string.lower(_G["SkilletParsingTooltipTextLeft"..i]:GetText() or " ")
 							searchText = searchText.." "..string.lower(_G["SkilletParsingTooltipTextRight"..i]:GetText() or " ")
 						end
@@ -352,9 +352,9 @@ end
 -- if no sorting, then headers will be included
 --
 function Skillet:SortAndFilterRecipes()
-	DA.DEBUG(0,"SortAndFilterRecipes()")
 	local skillListKey = Skillet.currentPlayer..":"..Skillet.currentTrade..":"..Skillet.currentGroupLabel
 	local numSkills = Skillet:GetNumSkills(Skillet.currentPlayer, Skillet.currentTrade)
+	DA.DEBUG(0,"SortAndFilterRecipes(), numSkills= "..tostring(numSkills)..", skillListKey= "..tostring(skillListKey))
 	if not Skillet.data.sortedSkillList then
 		--DA.DEBUG(1,"Skillet.data.sortedSkillList = {}")
 		Skillet.data.sortedSkillList = {}
@@ -365,13 +365,16 @@ function Skillet:SortAndFilterRecipes()
 	end
 	local sortedSkillList = Skillet.data.sortedSkillList[skillListKey]
 	local oldLength = #sortedSkillList
-	--DA.DEBUG(1,"oldLength= "..tostring(oldLength))
 	local button_index = 0
 	local searchtext = Skillet:GetTradeSkillOption("searchtext")
 	local groupLabel = Skillet.currentGroupLabel
 	DA.DEBUG(1,"searchtext="..tostring(searchtext)..", groupLabel="..tostring(groupLabel))
 	if searchtext and searchtext ~= "" or groupLabel == "Flat" then
-		DA.DEBUG(1,"SortAndFilterRecipes groupLabel= "..tostring(groupLabel))
+--	DA.DEBUG(1,"groupLabel="..tostring(groupLabel))
+--	if groupLabel == "Flat" or groupLabel == "Blizzard" then
+--
+-- no prep necessary, just loop through the list and filter or search as directed
+--
 		for i=1, numSkills, 1 do
 			local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, i)
 			if skill then
@@ -382,7 +385,7 @@ function Skillet:SortAndFilterRecipes()
 						sortedSkillList[button_index] = {["recipeID"] = skill.id, ["spellID"] = recipe.spellID, ["name"] = recipe.name, ["skillIndex"] = i, ["recipeData"] = recipe, ["skillData"] = skill, ["depth"] = 0}
 					elseif i == Skillet.selectedSkill then
 --
---if filtered out and selected - deselect
+-- if filtered out and selected - deselect
 --
 						Skillet.selectedSkill = nil
 					end
@@ -390,7 +393,12 @@ function Skillet:SortAndFilterRecipes()
 					DA.DEBUG(2,"i= "..tostring(i).." is a header")
 				end
 			end
-		end
+		end	-- for
+		DA.DEBUG(1,"numSkills= "..tostring(numSkills)..", oldLength= "..tostring(oldLength)..", button_index= "..tostring(button_index))
+--
+-- if the last result was larger than this result,
+-- get rid of the extra old results.
+--
 		if oldLength > button_index then
 			while oldLength > button_index do
 				sortedSkillList[oldLength] = nil
@@ -406,22 +414,37 @@ function Skillet:SortAndFilterRecipes()
 				return recipe_sort_method(Skillet.currentTrade, b, a)
 			end)
 		end
+		DA.DEBUG(1,"sorted "..button_index.." skills")
 	else
+--
+-- A custom group
+--
 		local group = Skillet:RecipeGroupFind(Skillet.currentPlayer, Skillet.currentTrade, Skillet.currentGroupLabel, Skillet.currentGroup)
-		DA.DEBUG(1,"current grouping "..tostring(Skillet.currentGroupLabel).." "..(Skillet.currentGroup or "nil"))
+		DA.DEBUG(1,"current grouping "..tostring(Skillet.currentGroupLabel).." "..tostring(Skillet.currentGroup))
 		if recipe_sort_method ~= NOSORT then
-			Skillet:RecipeGroupSort(group, recipe_sort_method, is_sort_desc(), 1)
+			local level = 1
+			Skillet:RecipeGroupSort(group, recipe_sort_method, is_sort_desc(), level)
 		end
+		local depth, index = 1, 1
 		if Skillet.currentGroup then
 			Skillet:RecipeGroupInitFlatten(group, sortedSkillList)
-			button_index = Skillet:RecipeGroupFlatten(group, 1, sortedSkillList, 1)
+			depth, index = 1, 1
 		else
-			button_index = Skillet:RecipeGroupFlatten(group, 0, sortedSkillList, 0)
+			depth, index = 0, 0
 		end
-		DA.DEBUG(0,"sorted "..tostring(button_index).." skills in "..tostring(Skillet.currentGroupLabel))
+--
+-- RecipeGroupFlatten(group, depth, list, index)
+--
+--   does filtering (only if the skillIndex is correct) and sorting
+--   but not searching
+--
+		button_index = Skillet:RecipeGroupFlatten(group, depth, sortedSkillList, index)
+		DA.DEBUG(1,"sorted "..tostring(button_index).." skills in "..tostring(Skillet.currentGroupLabel))
 	end
-	--DA.DEBUG(0,"sorted "..button_index.." skills")
 	sortedSkillList.count = button_index
+--
+-- (none of the current callers use the return value)
+--
 	return button_index
 end
 
