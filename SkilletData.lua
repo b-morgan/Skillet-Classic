@@ -725,8 +725,6 @@ local function ScanTrade()
 	end
 	--DA.DEBUG(2,"Scanning Trade "..tostring(profession)..": "..tostring(tradeID).." "..numSkills.." recipes")
 	local skillDB = Skillet.db.realm.skillDB[player][tradeID]
-	local subClass = Skillet.db.realm.subClass[player][tradeID]
-	local invSlot = Skillet.db.realm.invSlot[player][tradeID]
 	local skillData = Skillet.data.skillList[player][tradeID]
 	local recipeDB = Skillet.db.global.recipeDB
 	if not skillData then
@@ -758,8 +756,13 @@ local function ScanTrade()
 	end
 	local numHeaders = 0
 	local parentGroup
+--
+-- data needed for filtering
+--
 	local numSubClass = {}
 	local numInvSlot = {}
+	Skillet.db.realm.subClass[player][tradeID] = {}
+	Skillet.db.realm.invSlot[player][tradeID] = {}
 --
 -- Now actually process each recipe (skill)
 --
@@ -956,22 +959,22 @@ local function ScanTrade()
 -- Our own filter data: subClass, invSlot
 --
 					if itemSubType then
-						if not subClass.name then
-							subClass.name = {}
-							subClass.selected = "None"
+						if not Skillet.db.realm.subClass[player][tradeID].name then
+							Skillet.db.realm.subClass[player][tradeID].name = {}
+							Skillet.db.realm.subClass[player][tradeID].selected = "None"
 						end
 						numSubClass[itemSubType] = (numSubClass[itemSubType] or 0) + 1
-						subClass.name[itemSubType] = numSubClass[itemSubType]
-						subClass[itemID] = itemSubType
+						Skillet.db.realm.subClass[player][tradeID].name[itemSubType] = numSubClass[itemSubType]
+						Skillet.db.realm.subClass[player][tradeID][itemID] = itemSubType
 					end
 					if itemEquipLoc then
-						if not invSlot.name then
-							invSlot.name = {}
-							invSlot.selected = "None"
+						if not Skillet.db.realm.invSlot[player][tradeID].name then
+							Skillet.db.realm.invSlot[player][tradeID].name = {}
+							Skillet.db.realm.invSlot[player][tradeID].selected = "None"
 						end
 						numInvSlot[itemEquipLoc] = (numInvSlot[itemEquipLoc] or 0) + 1
-						invSlot.name[itemEquipLoc] = numInvSlot[itemEquipLoc]
-						invSlot[itemID] = itemEquipLoc
+						Skillet.db.realm.invSlot[player][tradeID].name[itemEquipLoc] = numInvSlot[itemEquipLoc]
+						Skillet.db.realm.invSlot[player][tradeID][itemID] = itemEquipLoc
 					end
 --[[
 --
