@@ -559,12 +559,20 @@ end
 function Skillet:GetNumSkills(player, trade)
 	--DA.DEBUG(3,"GetNumSkills("..tostring(player)..", "..tostring(trade).."), tradeName= "..tostring(self.tradeSkillNamesByID[trade]))
 	local r
-	if not Skillet.db.realm.skillDB[player] then
-		r = 0
-	elseif not Skillet.db.realm.skillDB[player][trade] then
-		r = 0
+	if player == self.currentPlayer and trade == self.currentTrade then
+		if Skillet.isCraft then
+			r = GetNumCrafts()
+		else
+			r = GetNumTradeSkills()
+		end
 	else
-		r = #Skillet.db.realm.skillDB[player][trade]
+		if not Skillet.db.realm.skillDB[player] then
+			r = 0
+		elseif not Skillet.db.realm.skillDB[player][trade] then
+			r = 0
+		else
+			r = #Skillet.db.realm.skillDB[player][trade]
+		end
 	end
 	--DA.DEBUG(3,"GetNumSkills= "..tostring(r))
 	return r
@@ -950,6 +958,7 @@ local function ScanTrade()
 					if itemSubType then
 						if not subClass.name then
 							subClass.name = {}
+							subClass.selected = "None"
 						end
 						numSubClass[itemSubType] = (numSubClass[itemSubType] or 0) + 1
 						subClass.name[itemSubType] = numSubClass[itemSubType]
@@ -958,6 +967,7 @@ local function ScanTrade()
 					if itemEquipLoc then
 						if not invSlot.name then
 							invSlot.name = {}
+							invSlot.selected = "None"
 						end
 						numInvSlot[itemEquipLoc] = (numInvSlot[itemEquipLoc] or 0) + 1
 						invSlot.name[itemEquipLoc] = numInvSlot[itemEquipLoc]

@@ -84,6 +84,21 @@ plugin.options =
 			end,
 			order = 4
 		},
+		buyablePrices = {
+			type = "toggle",
+			name = "buyablePrices",
+			desc = "Show AH prices for buyable reagents",
+			get = function()
+				return Skillet.db.profile.plugins.ATR.buyablePrices
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.ATR.buyablePrices = value
+				if value then
+					Skillet.db.profile.plugins.ATR.buyablePrices = value
+				end
+			end,
+			order = 5
+		},
 	},
 }
 
@@ -124,18 +139,23 @@ function plugin.GetExtraText(skill, recipe)
 					itemName = tostring(id)
 				end
 				local text
+				local value = ( Atr_GetAuctionBuyout(id) or 0 ) * needed
 				if Skillet:VendorSellsReagent(id) then
 					toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s  |cff808080(%s)|r", needed, itemName, L["buyable"])
-					toConcatExtra[#toConcatExtra+1] = ""
+					if Skillet.db.profile.plugins.ATR.buyablePrices then
+						toConcatExtra[#toConcatExtra+1] = Skillet:FormatMoneyFull(value, true)
+					else
+						toConcatExtra[#toConcatExtra+1] = ""
+						value = 0
+					end
 				else
-					local value = ( Atr_GetAuctionBuyout(id) or 0 ) * needed
-					total = total + value
 					toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s", needed, itemName)
 					toConcatExtra[#toConcatExtra+1] = Skillet:FormatMoneyFull(value, true)
 				end
+				total = total + value
 			end
-			label = label .. "\n" .. table.concat(toConcatLabel,"\n") .. "\n   " .. L["Reagents"] .. ":\n"
-			extra_text =  extra_text .. "\n" .. table.concat(toConcatExtra,"\n") .. "\n" .. Skillet:FormatMoneyFull(total, true) .. "\n"
+			label = label .. "\n\n" .. table.concat(toConcatLabel,"\n") .. "\n   " .. L["Reagents"] .. ":\n"
+			extra_text =  extra_text .. "\n\n" .. table.concat(toConcatExtra,"\n") .. "\n" .. Skillet:FormatMoneyFull(total, true) .. "\n"
 		end
 	end
 	return label, extra_text

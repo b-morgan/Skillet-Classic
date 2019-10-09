@@ -521,11 +521,11 @@ function Skillet:UNIT_SPELLCAST_CHANNEL_STOP(event, unit, sGUID, sGUID)
 end
 
 function Skillet:UI_ERROR_MESSAGE(event, errorType, message)
-	DA.DEBUG(0,"UI_ERROR_MESSAGE("..tostring(message)..")")
+	DA.TRACE("UI_ERROR_MESSAGE("..tostring(message)..")")
 end
 
 function Skillet:UI_INFO_MESSAGE(event, errorType, message)
-	DA.DEBUG(0,"UI_INFO_MESSAGE("..tostring(message)..")")
+	DA.TRACE("UI_INFO_MESSAGE("..tostring(message)..")")
 end
 
 function Skillet:ContinueCast(spell)
