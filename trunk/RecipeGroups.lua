@@ -379,7 +379,7 @@ end
 
 local abort = false
 function Skillet:RecipeGroupSort(group, sortMethod, desc, level)
-	DA.DEBUG(3,"RecipeGroupSort("..tostring(group.name)..", "..tostring(sortMethod)..", "..tostring(desc)..", "..tostring(level)..")")
+	--DA.DEBUG(3,"RecipeGroupSort("..tostring(group.name)..", "..tostring(sortMethod)..", "..tostring(desc)..", "..tostring(level)..")")
 	--DA.DEBUG(4,"group= "..DA.DUMP1(group,1))
 	level = level + 1
 	if level > 10 or abort then
@@ -387,7 +387,7 @@ function Skillet:RecipeGroupSort(group, sortMethod, desc, level)
 		return
 	end
 	if group then
-		DA.DEBUG(5,"group.entries= "..DA.DUMP(group.entries,1))
+		--DA.DEBUG(5,"group.entries= "..DA.DUMP(group.entries,1))
 		for v, entry in pairs(group.entries) do
 			if entry.subGroup and entry.subGroup ~= group then
 				self:RecipeGroupSort(entry.subGroup, sortMethod, desc, level)
@@ -409,7 +409,7 @@ function Skillet:RecipeGroupSort(group, sortMethod, desc, level)
 end
 
 function Skillet:RecipeGroupInitFlatten(group, list)
-	DA.DEBUG(3,"RecipeGroupInitFlatten("..tostring(group.name)..", "..tostring(list)..")")
+	--DA.DEBUG(3,"RecipeGroupInitFlatten("..tostring(group.name)..", "..tostring(list)..")")
 	--DA.DEBUG(4,"group= "..DA.DUMP1(group,1))
 	--DA.DEBUG(4,"list= "..DA.DUMP1(list,1))
 	if group and list then
@@ -420,14 +420,14 @@ function Skillet:RecipeGroupInitFlatten(group, list)
 		newSkill.expanded = true
 		newSkill.depth = 0
 		newSkill.parent = group.parent
-		DA.DEBUG(4,"newSkill= "..DA.DUMP1(newSkill,1))
+		--DA.DEBUG(5,"newSkill= "..DA.DUMP1(newSkill,1))
 		list[1] = newSkill
 	end
 end
 
 Skillet.subGroupSeen = {}
 function Skillet:RecipeGroupFlatten(group, depth, list, index)
-	DA.DEBUG(3,"RecipeGroupFlatten("..tostring(group.name)..", "..tostring(depth)..", "..tostring(list.name)..", "..tostring(index)..")")
+	--DA.DEBUG(3,"RecipeGroupFlatten("..tostring(group.name)..", "..tostring(depth)..", "..tostring(list.name)..", "..tostring(index)..")")
 	--DA.DEBUG(4,"group= "..DA.DUMP1(group,1))
 	--DA.DEBUG(4,"list= "..DA.DUMP1(list,1))
 	local num = 0
@@ -439,7 +439,7 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index)
 		end
 		for v, entry in pairs(group.entries) do
 			if entry.subGroup then
-				DA.DEBUG(5,"Have a subGroup= "..tostring(entry.subGroup))
+				--DA.DEBUG(5,"Have a subGroup= "..tostring(entry.subGroup))
 				local newSkill = entry
 				local inSub = 0
 				newSkill.depth = depth
@@ -454,19 +454,19 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index)
 					inSub = self:RecipeGroupFlatten(entry.subGroup, depth+1, list, num+index)
 				end
 				if inSub == 0 and entry.subGroup.expanded then -- empty group - remove the header
-					DA.DEBUG(5,"Empty subGroup, removing header")
+					--DA.DEBUG(5,"Empty subGroup, removing header")
 					table.remove(list, num + index)
 					num = num - 1
 				else
-					DA.DEBUG(5,"subGroup has "..tostring(inSub).." entries")
+					--DA.DEBUG(5,"subGroup has "..tostring(inSub).." entries")
 					num = num + inSub
 				end
 			else
-				DA.DEBUG(5,"No subGroup")
+				--DA.DEBUG(5,"No subGroup")
 				local skillData = self:GetSkill(self.currentPlayer, self.currentTrade, entry.skillIndex)
 				local recipe = self:GetRecipe(entry.recipeID)
 				if skillData then
-					DA.DEBUG(5,"Have skillData= "..tostring(skillData))
+					--DA.DEBUG(5,"Have skillData= "..tostring(skillData))
 --
 -- apply (a subset of) filtering
 --
@@ -521,7 +521,7 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index)
 						list[num + index] = newSkill
 					end
 				else
-					DA.DEBUG(5,"No skillData")
+					--DA.DEBUG(5,"No skillData")
 				end
 			end
 		end

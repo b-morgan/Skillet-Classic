@@ -74,23 +74,27 @@ function Skillet:RecipeFilter(skillIndex)
 --
 -- not initialized yet
 --
+		--DA.DEBUG(1,"RecipeFilter: not initialized yet")
 		return false
 	end
 	if subClass.selected == "None" and invSlot.selected == "None" then
 --
 -- not filtering anything
 --
+		--DA.DEBUG(1,"RecipeFilter: not filtering anything")
 		return false
 	end
 	if subClass[itemID] == subClass.selected or invSlot[itemID] == invSlot.selected then
 --
 -- filtering active, return only items that meet the criteria
 --
+		--DA.DEBUG(1,"RecipeFilter: filtering active, item met the criteria")
 		return false
 	end
 --
 -- filtering active, item did not meet the criteria
 --
+	--DA.DEBUG(1,"RecipeFilter: filtering active, item did not meet the criteria")
 	return true
 end
 
@@ -151,7 +155,7 @@ function Skillet:FilterDropDown_Initialize()
 	if subClass.name then
 		for n,c in pairs(subClass.name) do
 			info = UIDropDownMenu_CreateInfo()
-			info.text = n
+			info.text = "    "..(n or "")
 			info.func = Skillet.FilterDropDown_OnClick
 			info.value = index
 			info.arg1 = n
@@ -178,7 +182,7 @@ function Skillet:FilterDropDown_Initialize()
 	if invSlot.name then
 		for n,c in pairs(invSlot.name) do
 			info = UIDropDownMenu_CreateInfo()
-			info.text = _G[n]
+			info.text = "    "..(_G[n] or "")
 			info.func = Skillet.FilterDropDown_OnClick
 			info.value = index
 			info.arg1 = "None"
@@ -198,10 +202,8 @@ end
 function Skillet:FilterDropDown_OnClick(arg1,arg2)
 	--DA.DEBUG(0,"FilterDropDown_OnClick("..tostring(arg1)..", "..tostring(arg2)..")")
 	UIDropDownMenu_SetSelectedID(SkilletFilterDropdown, self:GetID())
-	local subClass = Skillet.db.realm.subClass[Skillet.currentPlayer][Skillet.currentTrade]
-	local invSlot = Skillet.db.realm.invSlot[Skillet.currentPlayer][Skillet.currentTrade]
-	subClass.selected = arg1
-	invSlot.selected = arg2
+	Skillet.db.realm.subClass[Skillet.currentPlayer][Skillet.currentTrade].selected = arg1
+	Skillet.db.realm.invSlot[Skillet.currentPlayer][Skillet.currentTrade].selected = arg2
 	Skillet.dataScanned = false
 	Skillet:RescanTrade()
 	Skillet:UpdateTradeSkillWindow()
