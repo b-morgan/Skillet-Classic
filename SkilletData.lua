@@ -761,8 +761,6 @@ local function ScanTrade()
 --
 	local numSubClass = {}
 	local numInvSlot = {}
-	Skillet.db.realm.subClass[player][tradeID] = {}
-	Skillet.db.realm.invSlot[player][tradeID] = {}
 --
 -- Now actually process each recipe (skill)
 --
