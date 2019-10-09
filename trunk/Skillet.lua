@@ -1170,7 +1170,9 @@ function Skillet:EnableBlizzardFrame()
 	end
 end
 
+--
 -- Called when the addon is loaded
+--
 function Skillet:OnInitialize()
 	if not SkilletDBPC then
 		SkilletDBPC = {}
@@ -1189,34 +1191,44 @@ function Skillet:OnInitialize()
 	DA.DebugProfile = SkilletProfile
 	self.db = AceDB:New("SkilletDB", defaults)
 
+--
 -- Clean up obsolete data
+--
 	if self.db.global.cachedGuildbank then
 		self.db.global.cachedGuildbank = nil
 	end
 
--- Clean up if database is stale 
-	local _,wowBuild,_,wowVersion = GetBuildInfo();
-	self.wowBuild = wowBuild
-	self.wowVersion = wowVersion
 --
 -- Change the dataVersion when code changes obsolete 
 -- the current saved variables database.
+--
+-- Change the recipeVersion when code changes obsolete 
+-- the recipe specific saved variables database.
 --
 -- When Blizzard releases a new build, there's a chance that
 -- recipes have changed (i.e. different reagent requirements) so
 -- we clear the saved variables recipe data just to be safe.
 --
 	local dataVersion = 5
+	local recipeVersion = 1
+	local _,wowBuild,_,wowVersion = GetBuildInfo();
+	self.wowBuild = wowBuild
+	self.wowVersion = wowVersion
 	if not self.db.global.dataVersion or self.db.global.dataVersion ~= dataVersion then
 		self.db.global.dataVersion = dataVersion
 		self:FlushAllData()
+	elseif not self.db.global.recipeVersion or self.db.global.recipeVersion ~= recipeVersion then
+		self.db.global.recipeVersion = recipeVersion
+		self:FlushRecipeData()
 	elseif not self.db.global.wowBuild or self.db.global.wowBuild ~= self.wowBuild then
 		self.db.global.wowBuild = self.wowBuild
 		self.db.global.wowVersion = self.wowVersion -- actually TOC version
 		self:FlushRecipeData()
 	end
 
+--
 -- Initialize global data
+--
 	if not self.db.global.recipeDB then
 		self.db.global.recipeDB = {}
 	end
@@ -1236,7 +1248,9 @@ function Skillet:OnInitialize()
 	end
 ]]--
 
+--
 -- Hook default tooltips
+--
 	local tooltipsToHook = { ItemRefTooltip, GameTooltip, ShoppingTooltip1, ShoppingTooltip2 };
 	for _, tooltip in pairs(tooltipsToHook) do
 		if tooltip and tooltip:HasScript("OnTooltipSetItem") then
