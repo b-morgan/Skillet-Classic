@@ -809,6 +809,23 @@ Skillet.options =
 			end,
 			order = 70
 		},
+		customgroups = {
+			type = "toggle",
+			name = "CustomGroups",
+			desc = "Enable / Disable Custom Groups button",
+			get = function()
+				return Skillet.data.customgroups
+			end,
+			set = function(self,value)
+				Skillet.data.customgroups = value
+				if value then
+					SkilletRecipeGroupOperations:Enable()
+				else
+					SkilletRecipeGroupOperations:Disable()
+				end
+			end,
+			order = 71
+		},
 
 --
 -- commands to manipulate the state of debugging code flags
@@ -1322,14 +1339,8 @@ end
 
 function Skillet:FlushAllData()
 	Skillet.data = {}
-	Skillet.db.global.recipeDB = {}
-	Skillet.db.global.itemRecipeUsedIn = {}
-	Skillet.db.global.itemRecipeSource = {}
 	Skillet.db.realm.tradeSkills = {}
-	Skillet.db.realm.groupDB = {}
-	Skillet.db.realm.queueData = {}
 	Skillet.db.realm.auctionData = {}
-	Skillet.db.realm.reagentsInQueue = {}
 	Skillet.db.realm.inventoryData = {}
 	Skillet.db.realm.bagData = {}
 	Skillet.db.realm.bagDetails = {}
@@ -1343,6 +1354,10 @@ function Skillet:FlushRecipeData()
 	Skillet.db.global.recipeDB = {}
 	Skillet.db.global.itemRecipeUsedIn = {}
 	Skillet.db.global.itemRecipeSource = {}
+	Skillet.db.realm.queueData = {}
+	Skillet.db.realm.reagentsInQueue = {}
+	Skillet.db.realm.groupDB = {}
+	Skillet.db.realm.groupSN = {}
 	Skillet.db.realm.skillDB = {}
 	Skillet.db.realm.subClass = {}
 	Skillet.db.realm.invSlot = {}
@@ -1356,6 +1371,9 @@ function Skillet:InitializeDatabase(player)
 	if player then
 		if not self.db.realm.groupDB then
 			self.db.realm.groupDB = {}
+		end
+		if not self.db.realm.groupSN then
+			self.db.realm.groupSN = {}
 		end
 		if not self.db.realm.skillDB then
 			self.db.realm.skillDB = {}

@@ -95,7 +95,7 @@ end
 --
 -- returns the newly created group record
 --
-local serial = 0
+
 function Skillet:RecipeGroupNew(player, tradeID, label, name)
 	DA.DEBUG(3,"RecipeGroupNew("..tostring(player)..", "..tostring(tradeID)..", "..tostring(label)..", "..tostring(name)..")")
 	local existingGroup = self:RecipeGroupFind(player, tradeID, label, name)
@@ -106,13 +106,17 @@ function Skillet:RecipeGroupNew(player, tradeID, label, name)
 		DA.DEBUG(5,"new group "..(name or OVERALL_PARENT_GROUP_NAME))
 		local newGroup = {}
 		local key = player..":"..tradeID..":"..label
+		local skey = player..":"..tradeID
+		if not self.db.realm.groupSN[skey] then
+			self.db.realm.groupSN[skey] = 0
+		end
 		newGroup.expanded = true
 		newGroup.key = key
 		newGroup.name = name or OVERALL_PARENT_GROUP_NAME
 		newGroup.entries = {}
-		newGroup.skillIndex = serial
+		newGroup.groupIndex = self.db.realm.groupSN[skey]
 		newGroup.locked = nil
-		serial = serial + 1
+		self.db.realm.groupSN[skey] = self.db.realm.groupSN[skey] + 1
 		if not self.data.groupList then
 			self.data.groupList = {}
 		end
@@ -150,14 +154,14 @@ function Skillet:RecipeGroupCopy(s, d, noDB)
 	--DA.DEBUG(4,"d= "..DA.DUMP1(d,1))
 	if s and d then
 		local player, tradeID, label = string.split(":", d.key)
-		d.skillIndex = s.skillIndex
+		d.groupIndex = s.groupIndex
 		d.expanded = s.expanded
 		d.entries = {}
 			for i=1,#s.entries do
 			if s.entries[i].subGroup then
 				local newGroup = self:RecipeGroupNew(player, tradeID, label, s.entries[i].name)
 				self:RecipeGroupCopy(s.entries[i].subGroup, newGroup, noDB)
-				self:RecipeGroupAddSubGroup(d, newGroup, s.entries[i].skillIndex, noDB)
+				self:RecipeGroupAddSubGroup(d, newGroup, s.entries[i].groupIndex, noDB)
 			else
 				self:RecipeGroupAddRecipe(d, s.entries[i].recipeID, s.entries[i].skillIndex, noDB)
 			end
@@ -197,8 +201,8 @@ function Skillet:RecipeGroupAddRecipe(group, recipeID, skillIndex, noDB)
 	end
 end
 
-function Skillet:RecipeGroupAddSubGroup(group, subGroup, skillIndex, noDB)
-	DA.DEBUG(3,"RecipeGroupAddSubGroup("..tostring(group.name)..", "..tostring(subGroup.name)..", "..tostring(skillIndex)..", "..tostring(noDB)..")")
+function Skillet:RecipeGroupAddSubGroup(group, subGroup, groupID, noDB)
+	DA.DEBUG(3,"RecipeGroupAddSubGroup("..tostring(group.name)..", "..tostring(subGroup.name)..", "..tostring(groupID)..", "..tostring(noDB)..")")
 	--DA.DEBUG(4,"group= "..DA.DUMP1(group,1))
 	--DA.DEBUG(4,"subGroup= "..DA.DUMP1(subGroup,1))
 	if group and subGroup then
@@ -212,17 +216,17 @@ function Skillet:RecipeGroupAddSubGroup(group, subGroup, skillIndex, noDB)
 		if not currentEntry then
 			local newEntry = {}
 			subGroup.parent = group
-			subGroup.skillIndex = skillIndex
+			subGroup.groupIndex = groupID
 			newEntry.subGroup = subGroup
-			newEntry.skillIndex = skillIndex
+			newEntry.groupIndex = groupID
 			newEntry.name = subGroup.name
 			newEntry.parent = group
 			table.insert(group.entries, newEntry)
 		else
 			subGroup.parent = group
-			subGroup.skillIndex = skillIndex
+			subGroup.groupIndex = groupID
 			currentEntry.subGroup = subGroup
-			currentEntry.skillIndex = skillIndex
+			currentEntry.groupIndex = groupID
 			currentEntry.name = subGroup.name
 			currentEntry.parent = group
 		end
@@ -415,7 +419,7 @@ function Skillet:RecipeGroupInitFlatten(group, list)
 	if group and list then
 		local newSkill = {}
 		newSkill.name = group.name
-		newSkill.skillIndex = group.skillIndex
+		newSkill.groupIndex = group.groupIndex
 		newSkill.subGroup = group
 		newSkill.expanded = true
 		newSkill.depth = 0
@@ -541,12 +545,12 @@ function Skillet:RecipeGroupConstructDBString(group)
 		local player, tradeID, label = string.split(":",key)
 		tradeID = tonumber(tradeID)
 		if not self.data.groupList[player][tradeID][label].autoGroup then
-			local groupString = group.skillIndex
+			local groupString = group.groupIndex
 			for v,entry in pairs(group.entries) do
 				if not entry.subGroup then
-					groupString = groupString..":"..entry.recipeID
+					groupString = groupString..":'"..entry.recipeID
 				else
-					groupString = groupString..":g"..entry.skillIndex	--entry.subGroup.name
+					groupString = groupString..":g"..entry.groupIndex	--entry.subGroup.name
 					self:RecipeGroupConstructDBString(entry.subGroup)
 				end
 			end
@@ -598,19 +602,23 @@ end
 function Skillet:RecipeGroupDeconstructDBStrings()
 	DA.DEBUG(3,"RecipeGroupDeconstructDBStrings()")
 	local groupNames = {}
-	local serial = 1
 	for key, groupList in pairs(self.db.realm.groupDB) do
 		local player, tradeID, label = string.split(":", key)
+		local skey = player..":"..tradeID
+		if not self.db.realm.groupSN[skey] then
+			self.db.realm.groupSN[skey] = 1
+		end
 		tradeID = tonumber(tradeID)
 		if player == self.currentPlayer and tradeID == self.currentTrade and self.data.skillIndexLookup then
 			self:InitGroupList(player, tradeID, label)
 			for name,list in pairs(groupList) do
 				local group = self:RecipeGroupNew(player, tradeID, label, name)
 				local groupContents = { string.split(":",list) }
-				local groupIndex = tonumber(groupContents[1]) or serial
-				serial = serial + 1
-				group.skillIndex = groupIndex
-				groupNames[groupIndex] = name
+				local groupID = tonumber(groupContents[1]) or tonumber(self.db.realm.groupSN[skey])
+				self.db.realm.groupSN[skey] = self.db.realm.groupSN[skey] + 1
+				group.groupIndex = groupID
+				group.name = name
+				groupNames[groupID] = name
 			end
 		end
 	end
@@ -620,27 +628,29 @@ function Skillet:RecipeGroupDeconstructDBStrings()
 		if player == self.currentPlayer and tradeID == self.currentTrade and self.data.skillIndexLookup then
 			for name,list in pairs(groupList) do
 				local group = self:RecipeGroupFind(player, tradeID, label, name)
-				local groupIndex = group.skillIndex
+				local groupIndex = group.groupIndex
 				if not group.initialized then
 					group.initialized = true
 					local groupContents = { string.split(":",list) }
 					DA.DEBUG(5,groupContents)
 					for j=2,#groupContents do
 						local recipeID = groupContents[j]
-						if not tonumber(recipeID) then
-							local id = tonumber(string.sub(recipeID,2))
+						if string.sub(recipeID,1,1) == "g" then
+							local id = string.sub(recipeID,2)
 							local subGroup = self:RecipeGroupFind(player, tradeID, label, groupNames[id])
 							if subGroup then
-								self:RecipeGroupAddSubGroup(group, subGroup, subGroup.skillIndex, true)
+								self:RecipeGroupAddSubGroup(group, subGroup, subGroup.groupIndex, true)
 							end
-						else
-							recipeID = tonumber(recipeID)
+						elseif string.sub(recipeID,1,1) == "'" then
+							recipeID = string.sub(recipeID,2)
 							DA.DEBUG(5,recipeID)
 							local skillIndex = self.data.skillIndexLookup[player][recipeID]
 							if skillIndex then 
 								DA.DEBUG(5,"adding recipe "..recipeID.." to "..group.name.."/"..player..":"..skillIndex)
 								self:RecipeGroupAddRecipe(group, recipeID, skillIndex, true)
 							end
+						else
+							DA.DEBUG(3,"Serious problem with "..tostring(recipeID))
 						end
 					end
 				end
@@ -784,13 +794,16 @@ end
 function Skillet:RecipeGroupOpNew()
 	DA.DEBUG(3,"RecipeGroupOpNew()")
 	local label = "Custom"
-	local serial = 1
 	local player = Skillet.currentPlayer
 	local tradeID = Skillet.currentTrade
 	local groupList = Skillet.data.groupList
+	local skey = player..":"..tradeID
+	if not Skillet.db.realm.groupSN[skey] then
+		Skillet.db.realm.groupSN[skey] = 1
+	end
 	while groupList[player][tradeID][label] do
-		serial = serial + 1
-		label = "Custom "..serial
+		Skillet.db.realm.groupSN[skey] = Skillet.db.realm.groupSN[skey] + 1
+		label = "Custom "..Skillet.db.realm.groupSN[skey]
 	end
 	local newMain = Skillet:RecipeGroupNew(player, tradeID, label)
 	Skillet:RecipeGroupConstructDBString(newMain)
@@ -805,13 +818,16 @@ end
 function Skillet:RecipeGroupOpCopy()
 	DA.DEBUG(3,"RecipeGroupOpCopy()")
 	local label = "Custom"
-	local serial = 1
 	local player = Skillet.currentPlayer
 	local tradeID = Skillet.currentTrade
 	local groupList = Skillet.data.groupList
+	local skey = player..":"..tradeID
+	if not Skillet.db.realm.groupSN[skey] then
+		Skillet.db.realm.groupSN[skey] = 1
+	end
 	while groupList[player][tradeID][label] do
-		serial = serial + 1
-		label = "Custom "..serial
+		Skillet.db.realm.groupSN[skey] = Skillet.db.realm.groupSN[skey] + 1
+		label = "Custom "..Skillet.db.realm.groupSN[skey]
 	end
 	local newMain = Skillet:RecipeGroupNew(player, tradeID, label)
 	local oldMain = Skillet:RecipeGroupFind(player, tradeID, Skillet.currentGroupLabel)
@@ -877,7 +893,7 @@ end
 
 function Skillet:RecipeGroupDump(group)
 	if group then
-		local groupString = group.key.."/"..group.name.."="..group.skillIndex
+		local groupString = group.key.."/"..group.name.."="..group.groupIndex
 		for v,entry in pairs(group.entries) do
 			if not entry.subGroup then
 				groupString = groupString..":"..entry.recipeID

@@ -737,7 +737,7 @@ local function ScanTrade()
 	mainGroup.locked = true
 	mainGroup.autoGroup = true
 	Skillet:RecipeGroupClearEntries(mainGroup)
-	local groupList = {}
+	Skillet.groupList = {}
 --	Skillet.db.realm.tradeSkills[player][tradeID].link = link		-- Classic has no link for the profession
 	Skillet.db.realm.tradeSkills[player][tradeID].name = profession
 	Skillet.db.realm.tradeSkills[player][tradeID].rank = rank
@@ -784,11 +784,11 @@ local function ScanTrade()
 				numHeaders = numHeaders + 1
 				lastHeader = skillName
 				local groupName
-				if groupList[skillName] then
-					groupList[skillName] = groupList[skillName]+1
-					groupName = skillName.." "..groupList[skillName]
+				if Skillet.groupList[skillName] then
+					Skillet.groupList[skillName] = Skillet.groupList[skillName] + 1
+					groupName = skillName.." "..Skillet.groupList[skillName]
 				else
-					groupList[skillName] = 1
+					Skillet.groupList[skillName] = 1
 					groupName = skillName
 				end
 				skillDB[i] = "header "..skillName
