@@ -255,7 +255,7 @@ function Skillet:CreateTradeSkillWindow()
 	SkilletShoppingListButton:SetText(L["Shopping List"])
 	SkilletSortLabel:SetText(L["Sorting"])
 	SkilletGroupLabel:SetText(L["Grouping"])
-	SkilletRecipeGroupOperations:Disable()				-- It is broken in Skillet-Classic
+--	SkilletRecipeGroupOperations:Disable()				-- It is broken in Skillet-Classic
 	SkilletIgnoredMatsButton:SetText(L["Ignored List"])
 	SkilletQueueManagementButton:SetText(L["Queues"])
 	SkilletQueueLoadButton:SetText(L["Load"])
@@ -1034,7 +1034,7 @@ function Skillet:UpdateTradeSkillWindow()
 			end
 			if skill.subGroup then
 				if SkillButtonNameEdit.originalButton ~= buttonText then
-					local _, _, _, _, _, _,_,showProgressBar, currentRank,maxRank,startingRank  = GetTradeSkillInfo(skillIndex)
+--					local _, _, _, _, _, _,_,showProgressBar, currentRank, maxRank, startingRank  = GetTradeSkillInfo(skillIndex)
 					buttonText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, textAlpha)
 					countText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, textAlpha)
 					local expanded = skill.subGroup.expanded
@@ -1045,7 +1045,12 @@ function Skillet:UpdateTradeSkillWindow()
 						buttonExpand:SetNormalTexture("Interface\\Addons\\Skillet-Classic\\Icons\\expand_arrow_closed.tga")
 						buttonExpand:SetHighlightTexture("Interface\\Addons\\Skillet-Classic\\Icons\\expand_arrow_closed.tga")
 					end
-					local name = skill.name.." ("..#skill.subGroup.entries..")"
+					local name
+					if skill.subGroup.entries then
+						name = skill.name.." ("..#skill.subGroup.entries..")"
+					else
+						name = skill.name.." (0)"
+					end
 					buttonText:SetText(name)      -- THIS IS A HEADER SO DON'T TRY TO USE THE RECIPE ID!
 					button:SetID(skillIndex or 0)
 					buttonExpand.group = skill.subGroup
@@ -1053,6 +1058,7 @@ function Skillet:UpdateTradeSkillWindow()
 					button:UnlockHighlight() -- headers never get highlighted
 					buttonExpand:Show()
 					local rankBarWidth = 0
+--[[
 					if ( showProgressBar ) then
 						skillRankBar:Show();
 						skillRankBar:SetMinMaxValues(startingRank,maxRank);
@@ -1062,6 +1068,7 @@ function Skillet:UpdateTradeSkillWindow()
 						skillRankBar.Rank:SetText(currentRank.."/"..maxRank);
 						rankBarWidth = 60;
 					end
+]]--
 					local button_width = button:GetTextWidth()
 					show_button(button, self.currentTrade, skillIndex, i)
 				end
@@ -2594,6 +2601,7 @@ local skillMenuSelection = {
 		func = function() Skillet:SkillButton_SetAllSelections(false) Skillet:UpdateTradeSkillWindow() end,
 	},
 }
+--[[
 local skillMenuGroup = {
 	{
 		text = "Empty Group",
@@ -2604,6 +2612,7 @@ local skillMenuGroup = {
 		func = function() Skillet:SkillButton_MakeGroup() end,
 	},
 }
+]]--
 local skillMenuList = {
 --[[
 	{
@@ -2635,11 +2644,13 @@ local skillMenuList = {
 		disabled = true,
 	},
 ]]--
+--[[
 	{
 		text = "New Group",
 		hasArrow = true,
 		menuList = skillMenuGroup,
 	},
+]]--
 	{
 		text = "Selection",
 		hasArrow = true,
@@ -2671,11 +2682,13 @@ local headerMenuList = {
 		text = "",
 		disabled = true,
 	},
+--[[
 	{
 		text = "New Group",
 		hasArrow = true,
 		menuList = skillMenuGroup,
 	},
+]]--
 	{
 		text = "Selection",
 		hasArrow = true,
@@ -2699,11 +2712,13 @@ local headerMenuList = {
 	},
 }
 local headerMenuListMainGroup = {
+--[[
 	{
 		text = "New Group",
 		hasArrow = true,
 		menuList = skillMenuGroup,
 	},
+]]--
 	{
 		text = "Selection",
 		hasArrow = true,
@@ -2727,10 +2742,12 @@ local headerMenuListMainGroup = {
 	},
 }
 local skillMenuListHidden = {
+--[[
 {		text = "New Group",
 		hasArrow = true,
 		menuList = skillMenuGroup,
 	},
+]]--
 	{
 		text = "Selection",
 		hasArrow = true,
