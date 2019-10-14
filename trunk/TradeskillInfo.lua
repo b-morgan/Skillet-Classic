@@ -228,20 +228,6 @@ function Skillet:GetTradeSkillReagentItemLink(skillIndex, index)
 		return nil
 end
 
---
--- Gets a link to the recipe (not the item creafted by the recipe)
--- for the current tradeskill
---
-function Skillet:GetTradeSkillRecipeLink(skillIndex)
-	local recipe, id = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
-	if recipe and id then
-	--DA.DEBUG(0,"get tradeskill recipe link: "..(id or "nil"))
-		local link = GetSpellLink(id)		
-		return link
-	end
-	return nil
-end
-
 function Skillet:GetTradeSkillTools(skillIndex)
 	local skill = self:GetSkill(self.currentPlayer, self.currentTrade, skillIndex)
 		if skill then

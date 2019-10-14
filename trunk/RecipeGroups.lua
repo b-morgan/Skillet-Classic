@@ -760,8 +760,9 @@ function Skillet:RecipeGroupIsLocked()
 	local answer
 	if self.currentGroupLabel == "Flat" or self.currentGroupLabel == "Blizzard" then
 		answer = true 
+	else
+		answer = Skillet:GetTradeSkillOption(self.currentGroupLabel.."-locked")
 	end
-	answer = Skillet:GetTradeSkillOption(self.currentGroupLabel.."-locked")
 	DA.DEBUG(3,"RecipeGroupIsLocked()= "..tostring(answer))
 	return answer
 end

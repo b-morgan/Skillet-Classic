@@ -42,9 +42,9 @@
 	</Layers>
 </Frame>
 
-<Frame name="SkilletIgnoreListItemButtonTemplate_RecipeLink" hidden="false" virtual="true">
+<Frame name="SkilletIgnoreListItemButtonTemplate_RecipeTrade" hidden="false" virtual="true">
 	<Size>
-		<AbsDimension x="90" y="16"/>
+		<AbsDimension x="30" y="16"/>
 	</Size>
 	<Layers>
 		<Layer level="OVERLAY">
@@ -63,7 +63,7 @@
 
 <Frame name="SkilletIgnoreListItemButtonTemplate_RecipeID" hidden="false" virtual="true">
 	<Size>
-		<AbsDimension x="30" y="16"/>
+		<AbsDimension x="270" y="16"/>
 	</Size>
 	<Layers>
 		<Layer level="OVERLAY">
@@ -94,7 +94,7 @@
 				</Anchor>
 			</Anchors>
 		</Frame>
-		 <Frame name="$parentRecipeID" inherits="SkilletIgnoreListItemButtonTemplate_RecipeID">
+		 <Frame name="$parentRecipeTrade" inherits="SkilletIgnoreListItemButtonTemplate_RecipeTrade">
 			<Anchors>
 				<Anchor point="LEFT" relativeTo="$parentPlayer" relativePoint="RIGHT">
 					<Offset>
@@ -103,9 +103,9 @@
 				</Anchor>
 			</Anchors>
 		</Frame>
-		 <Frame name="$parentRecipeLink" inherits="SkilletIgnoreListItemButtonTemplate_RecipeLink">
+		 <Frame name="$parentRecipeID" inherits="SkilletIgnoreListItemButtonTemplate_RecipeID">
 			<Anchors>
-				<Anchor point="LEFT" relativeTo="$parentRecipeID" relativePoint="RIGHT">
+				<Anchor point="LEFT" relativeTo="$parentRecipeTrade" relativePoint="RIGHT">
 					<Offset>
 						<AbsDimension x="0" y="0"/>
 					</Offset>

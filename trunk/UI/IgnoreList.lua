@@ -58,6 +58,8 @@ local function createIgnoreListFrame(self)
 		return nil
 	end
 	if TSMAPI_FOUR then
+		frame:SetFrameStrata("TOOLTIP")
+	else
 		frame:SetFrameStrata("HIGH")
 	end
 	frame:SetBackdrop(FrameBackdrop)
@@ -86,7 +88,7 @@ local function createIgnoreListFrame(self)
 	titletext:SetShadowColor(0,0,0)
 	titletext:SetShadowOffset(1,-1)
 	titletext:SetTextColor(1,1,1)
-	titletext:SetText("Skillet: Ignored Materials")
+	titletext:SetText("Skillet-Classic: Ignored Recipes")
 
 	-- The frame enclosing the scroll list needs a border and a background .....
 	local backdrop = SkilletIgnoreListParent
@@ -108,14 +110,14 @@ local function createIgnoreListFrame(self)
 	windowManager.RestorePosition(frame)  -- restores scale also
 	windowManager.MakeDraggable(frame)
 	-- lets play the resize me game!
-	Skillet:EnableResize(frame, 180,150, Skillet.UpdateIgnoreListWindow)
+	Skillet:EnableResize(frame, 380,150, Skillet.UpdateIgnoreListWindow)
 	-- so hitting [ESC] will close the window
 	tinsert(UISpecialFrames, frame:GetName())
 	return frame
 end
 
 function Skillet:GetIgnoreList(player)
-	DA.DEBUG(0,"GetIgnoreList(",player,")")
+	DA.DEBUG(0,"GetIgnoreList("..tostring(player)..")")
 	local list = {}
 	local playerList
 	if player then
@@ -126,14 +128,14 @@ function Skillet:GetIgnoreList(player)
 			table.insert(playerList, player)
 		end
 	end
-	DA.DEBUG(0,"Ignored Mats list for: "..(player or "all players"))
+	DA.DEBUG(0,"Ignored List for: "..(player or "all players"))
 	for i=1,#playerList,1 do
 		local player = playerList[i]
 		local userIgnoredMats = self.db.realm.userIgnoredMats[player]
 		DA.DEBUG(1,"player: "..player)
 		if userIgnoredMats then
-			for id,link in pairs(userIgnoredMats) do
-				local entry = { ["player"] = player, ["id"] = id, ["link"] = link }
+			for id,trade in pairs(userIgnoredMats) do
+				local entry = { ["player"] = player, ["trade"] = trade, ["id"] = id }
 				table.insert(list, entry)
 			end
 		end
@@ -142,7 +144,7 @@ function Skillet:GetIgnoreList(player)
 end
 
 function Skillet:DeleteIgnoreEntry(index, player, id)
-	DA.DEBUG(0,"DeleteIgnoreEntry(",index,", ",player,", ",id,")")
+	local print=("DeleteIgnoreEntry("..tostring(index)..", "..tostring(player)..", "..tostring(id)..")")
 	table.remove(self.cachedIgnoreList,index)
 	self.db.realm.userIgnoredMats[player][id] = nil
 	self:UpdateIgnoreListWindow()
@@ -150,7 +152,7 @@ function Skillet:DeleteIgnoreEntry(index, player, id)
 end
 
 function Skillet:ClearIgnoreList(player)
-	DA.DEBUG(0,"ClearIgnoreList(",player,")")
+	DA.DEBUG(0,"ClearIgnoreList("..tostring(player)..")")
 	local playerList
 	if player then
 		playerList = { player }
@@ -195,34 +197,36 @@ function Skillet:UpdateIgnoreListWindow()
 		local button = get_button(i)
 		local player = _G[button:GetName() .. "Player"]
 		local playerText = _G[button:GetName() .. "PlayerText"]
-		local rlink = _G[button:GetName() .. "RecipeLink"]
-		local rlinkText = _G[button:GetName() .. "RecipeLinkText"]
+		local rtrade = _G[button:GetName() .. "RecipeTrade"]
+		local rtradeText = _G[button:GetName() .. "RecipeTradeText"]
 		local rid = _G[button:GetName() .. "RecipeID"]
 		local ridText = _G[button:GetName() .. "RecipeIDText"]
 		button:SetWidth(width)
 		player:SetWidth(width * 0.2-10)
 		playerText:SetWidth(width * 0.2-10)
-		rlink:SetWidth(width * 0.6-10)
-		rlinkText:SetWidth(width * 0.6-10)
-		rlinkText:SetWordWrap(false)
-		rid:SetWidth(width * 0.2-10)
-		ridText:SetWidth(width * 0.2-10)
+		playerText:SetWordWrap(false)
+		rtrade:SetWidth(width * 0.3-10)
+		rtradeText:SetWidth(width * 0.3-10)
+		rtradeText:SetWordWrap(false)
+		rid:SetWidth(width * 0.5-10)
+		ridText:SetWidth(width * 0.5-10)
 		if itemIndex <= numItems then
 			playerText:SetText(self.cachedIgnoreList[itemIndex]["player"])
-			rlinkText:SetText(self.cachedIgnoreList[itemIndex]["link"])
+			rtradeText:SetText(self.tradeSkillNamesByID[self.cachedIgnoreList[itemIndex]["trade"]])
 			ridText:SetText(self.cachedIgnoreList[itemIndex]["id"])
 			button.index = itemIndex
 			button.player = self.cachedIgnoreList[itemIndex]["player"]
-			button.id = tonumber(self.cachedIgnoreList[itemIndex]["id"])
+			button.trade = self.cachedIgnoreList[itemIndex]["trade"]
+			button.id = self.cachedIgnoreList[itemIndex]["id"]
 			button:Show()
 			player:Show()
-			rlink:Show()
+			rtrade:Show()
 			rid:Show()
 		else
 			button.id = nil
 			button:Hide()
 			player:Hide()
-			rlink:Hide()
+			rtrade:Hide()
 			rid:Hide()
 		end
 	end
@@ -244,14 +248,14 @@ end
 -- Functions to show and hide the Ignorelist
 --
 function Skillet:DisplayIgnoreList()
-	DA.DEBUG(0,"DisplayIgnoreList()")
 	if not self.ignoreList then
 		self.ignoreList = createIgnoreListFrame(self)
 	end
 	local frame = self.ignoreList
 	if not frame:IsVisible() then
-		DA.DEBUG(0,"wants to show Ignore list")
 		frame:Show()
+	else
+		frame:Hide()
 	end
 	self:UpdateIgnoreListWindow()
 end
