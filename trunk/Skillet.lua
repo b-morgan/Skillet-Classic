@@ -1255,6 +1255,9 @@ function Skillet:OnInitialize()
 	if not self.db.global.itemRecipeUsedIn then
 		self.db.global.itemRecipeUsedIn = {}
 	end
+	if not self.db.global.MissingVendorItems then
+		self:InitializeMissingVendorItems()
+	end
 --
 -- Classic doesn't have a Guild Bank
 -- Currently this only effects ShoppingList.lua
@@ -1361,6 +1364,24 @@ function Skillet:FlushRecipeData()
 	Skillet.db.realm.skillDB = {}
 	Skillet.db.realm.subClass = {}
 	Skillet.db.realm.invSlot = {}
+end
+
+--
+-- MissingVendorItem entries can be a string when bought with gold
+-- or a table when bought with an alternate currency
+-- table entries are {name, quantity, currencyName, currencyID, currencyCount}
+--
+function Skillet:InitializeMissingVendorItems()
+	self.db.global.MissingVendorItems = {
+		[30817] = "Simple Flour",
+		[4539]  = "Goldenbark Apple",
+		[17035] = "Stranglethorn Seed",
+		[17034] = "Maple Seed",
+		[4399]	= "Wooden Stock",
+		[3857]	= "Coal",
+		[52188] = "Jeweler's Setting",
+		[38682] = "Enchanting Vellum",
+	}
 end
 
 function Skillet:InitializeDatabase(player)
@@ -1613,8 +1634,19 @@ function Skillet:PLAYER_LOGOUT()
 -- Make a copy of the in memory data for debugging. Note: DeepCopy.lua needs to be added to the .toc
 --
 	if DA.deepcopy then
-		self.data.sortedSkillList = {"Removed"} -- This table is huge so don't save it unless needed.
-		SkilletMemory = DA.deepcopy(self.data)
+		self.data.sortedSkillList = {"Removed"}	-- This table is huge so don't save it unless needed.
+--		SkilletMemory = DA.deepcopy(self.data)	-- Everything else
+--
+-- For RecipeGroups debugging:
+--
+		local tradeID, rest
+		for tradeID in pairs(self.db.realm.tradeSkills[self.currentPlayer]) do
+			DA.DEBUG(0,"tradeID= "..tostring(tradeID))
+			if self.data.groupList[self.currentPlayer][tradeID] then
+				self.data.groupList[self.currentPlayer][tradeID]["Blizzard"] = {"Removed"}
+			end
+		end
+		SkilletMemory = DA.deepcopy(self.data.groupList) -- minus all the group "Blizzard" stuff
 	end
 end
 
@@ -1844,12 +1876,12 @@ function Skillet:SkilletClose()
 	self:HideAllWindows()
 end
 
-function Skillet:BAG_OPEN(event, bagID) -- Fires when a non-inventory container is opened.
-	DA.TRACE("BAG_OPEN( "..tostring(bagID).." )") -- We don't really care
+function Skillet:BAG_OPEN(event, bagID)				-- Fires when a non-inventory container is opened.
+	DA.TRACE("BAG_OPEN( "..tostring(bagID).." )")	-- We don't really care
 end
 
-function Skillet:BAG_CLOSED(event, bagID)        -- Fires when the whole bag is removed from 
-	DA.TRACE("BAG_CLOSED( "..tostring(bagID).." )") -- inventory or bank. We don't really care. 
+function Skillet:BAG_CLOSED(event, bagID)			-- Fires when the whole bag is removed from 
+	DA.TRACE("BAG_CLOSED( "..tostring(bagID).." )")	-- inventory or bank. We don't really care. 
 end
 
 function Skillet:UNIT_INVENTORY_CHANGED(event, unit)
@@ -1911,7 +1943,7 @@ end
 function Skillet:BAG_UPDATE(event, bagID)
 	DA.TRACE("BAG_UPDATE( "..bagID.." )")
 	if bagID >= 0 and bagID <= 4 then
-		self.bagsChanged = true -- an inventory bag update, do nothing until BAG_UPDATE_DELAYED.
+		self.bagsChanged = true				-- an inventory bag update, do nothing until BAG_UPDATE_DELAYED.
 	end
 	if UnitAffectingCombat("player") then
 		return
@@ -1925,15 +1957,21 @@ function Skillet:BAG_UPDATE(event, bagID)
 	end
 	if showing then
 		if bagID == -1 or bagID >= 5 then
-			-- a bank update, process it in ShoppingList.lua
+--
+-- a bank update, process it in ShoppingList.lua
+--
 			Skillet:BANK_UPDATE(event,bagID) -- Looks like an event but its not.
 		end
 	end
 	if MerchantFrame and MerchantFrame:IsVisible() then
-		-- may need to update the button on the merchant frame window ...
+--
+-- may need to update the button on the merchant frame window ...
+--
 		self:UpdateMerchantFrame()
 	end
-	-- Most of the shoppingList code is in ShoppingList.lua
+--
+-- Most of the shoppingList code is in ShoppingList.lua
+--
 	if self.shoppingList and self.shoppingList:IsVisible() then
 		Skillet:InventoryScan()
 		Skillet:UpdateShoppingListWindow(true)

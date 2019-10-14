@@ -351,16 +351,16 @@ end
 -- currently selected tradekskill and sorting method
 -- if no sorting, then headers will be included
 --
-function Skillet:SortAndFilterRecipes()
+function Skillet:SortAndFilterRecipes() -- SAFR: 
 	local skillListKey = Skillet.currentPlayer..":"..Skillet.currentTrade..":"..Skillet.currentGroupLabel
 	local numSkills = Skillet:GetNumSkills(Skillet.currentPlayer, Skillet.currentTrade)
-	DA.DEBUG(0,"SortAndFilterRecipes(), numSkills= "..tostring(numSkills)..", skillListKey= "..tostring(skillListKey))
+	DA.DEBUG(0,"SortAndFilterRecipes(), skillListKey= "..tostring(skillListKey))
 	if not Skillet.data.sortedSkillList then
-		--DA.DEBUG(1,"Skillet.data.sortedSkillList = {}")
+		--DA.DEBUG(1,"SAFR: Skillet.data.sortedSkillList = {}")
 		Skillet.data.sortedSkillList = {}
 	end
 	if not Skillet.data.sortedSkillList[skillListKey] then
-		--DA.DEBUG(1,"Skillet.data.sortedSkillList[skillListKey] = {}")
+		--DA.DEBUG(1,"SAFR: Skillet.data.sortedSkillList[skillListKey] = {}")
 		Skillet.data.sortedSkillList[skillListKey] = {}
 	end
 	local sortedSkillList = Skillet.data.sortedSkillList[skillListKey]
@@ -368,9 +368,9 @@ function Skillet:SortAndFilterRecipes()
 	local button_index = 0
 	local searchtext = Skillet:GetTradeSkillOption("searchtext")
 	local groupLabel = Skillet.currentGroupLabel
-	DA.DEBUG(1,"searchtext="..tostring(searchtext)..", groupLabel="..tostring(groupLabel))
+	DA.DEBUG(1,"SAFR: searchtext="..tostring(searchtext)..", groupLabel="..tostring(groupLabel))
 	if searchtext and searchtext ~= "" or groupLabel == "Flat" then
---	DA.DEBUG(1,"groupLabel="..tostring(groupLabel))
+--	DA.DEBUG(1,"SAFR: groupLabel="..tostring(groupLabel))
 --	if groupLabel == "Flat" or groupLabel == "Blizzard" then
 --
 -- no prep necessary, just loop through the list and filter or search as directed
@@ -390,11 +390,11 @@ function Skillet:SortAndFilterRecipes()
 						Skillet.selectedSkill = nil
 					end
 				else
-					DA.DEBUG(2,"i= "..tostring(i).." is a header")
+					DA.DEBUG(2,"SAFR: i= "..tostring(i).." is a header")
 				end
 			end
 		end	-- for
-		DA.DEBUG(1,"numSkills= "..tostring(numSkills)..", oldLength= "..tostring(oldLength)..", button_index= "..tostring(button_index))
+		DA.DEBUG(1,"SAFR: numSkills= "..tostring(numSkills)..", oldLength= "..tostring(oldLength)..", button_index= "..tostring(button_index))
 --
 -- if the last result was larger than this result,
 -- get rid of the extra old results.
@@ -414,16 +414,15 @@ function Skillet:SortAndFilterRecipes()
 				return recipe_sort_method(Skillet.currentTrade, b, a)
 			end)
 		end
-		DA.DEBUG(1,"sorted "..button_index.." skills")
+		DA.DEBUG(1,"SAFR: sorted "..button_index.." skills")
 	else
 --
 -- A custom group
 --
 		local group = Skillet:RecipeGroupFind(Skillet.currentPlayer, Skillet.currentTrade, Skillet.currentGroupLabel, Skillet.currentGroup)
-		DA.DEBUG(1,"current grouping "..tostring(Skillet.currentGroupLabel).." "..tostring(Skillet.currentGroup))
+		DA.DEBUG(1,"SAFR: current grouping "..tostring(Skillet.currentGroupLabel).." "..tostring(Skillet.currentGroup))
 		if recipe_sort_method ~= NOSORT then
-			local level = 1
-			Skillet:RecipeGroupSort(group, recipe_sort_method, is_sort_desc(), level)
+			Skillet:RecipeGroupSort(group, recipe_sort_method, is_sort_desc())
 		end
 		local depth, index = 1, 1
 		if Skillet.currentGroup then
@@ -434,12 +433,11 @@ function Skillet:SortAndFilterRecipes()
 		end
 --
 -- RecipeGroupFlatten(group, depth, list, index)
---
 --   does filtering (only if the skillIndex is correct) and sorting
 --   but not searching
 --
 		button_index = Skillet:RecipeGroupFlatten(group, depth, sortedSkillList, index)
-		DA.DEBUG(1,"sorted "..tostring(button_index).." skills in "..tostring(Skillet.currentGroupLabel))
+		DA.DEBUG(1,"SAFR: sorted "..tostring(button_index).." skills in "..tostring(Skillet.currentGroupLabel))
 	end
 	sortedSkillList.count = button_index
 --
@@ -541,7 +539,7 @@ end
 --
 -- The method we use the initialize the sorting drop down.
 --
-function Skillet:SortDropdown_Initialize()
+function Skillet.SortDropdown_Initialize(menuFrame,level)
 	recipe_sort_method = NOSORT
 	local info
 	local i = 0

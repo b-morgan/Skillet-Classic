@@ -15,6 +15,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
+--
+-- Includes changes from GuardsmanBogo
+--
+
 Skillet.ATRPlugin = {}
 
 local plugin = Skillet.ATRPlugin
@@ -99,13 +103,64 @@ plugin.options =
 			end,
 			order = 5
 		},
+		useVendorCalc = {
+			type = "toggle",
+			name = "useVendorCalc",
+			desc = "Show calculated cost from vendor sell price for buyable reagents",
+			get = function()
+				return Skillet.db.profile.plugins.ATR.useVendorCalc
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.ATR.useVendorCalc = value
+				if value then
+					Skillet.db.profile.plugins.ATR.useVendorCalc = value
+				end
+			end,
+			order = 6
+		},
+		buyFactor = {
+			type = "range",
+			name = "buyFactor",
+			desc = "Multiply vendor sell price by this to get calculated buy price",
+			min = 1, max = 10, step = 1, isPercent = false,
+			get = function()
+				return Skillet.db.profile.plugins.ATR.buyFactor
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.ATR.buyFactor = value
+				Skillet:UpdateTradeSkillWindow()
+			end,
+			width = "double",
+			order = 10
+		},
+		markup = {
+			type = "range",
+			name = "Markup %",
+			min = 0, max = 2, step = 0.01, isPercent = true,
+			get = function()
+				return Skillet.db.profile.plugins.ATR.markup
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.ATR.markup = value
+			end,
+			width = "double",
+			order = 11,
+		},
 	},
 }
+
+--
+-- Until we can figure out how to get defaults into the "range" variables above
+--
+local buyFactorDef = 4
+local markupDef = 1.05
 
 function plugin.OnInitialize()
 	if not Skillet.db.profile.plugins.ATR then
 		Skillet.db.profile.plugins.ATR = {}
 		Skillet.db.profile.plugins.ATR.enabled = true
+		Skillet.db.profile.plugins.ATR.buyFactor = buyFactorDef
+		Skillet.db.profile.plugins.ATR.markup = markupDef
 	end
 	Skillet:AddPluginOptions(plugin.options)
 end
@@ -140,22 +195,32 @@ function plugin.GetExtraText(skill, recipe)
 				end
 				local text
 				local value = ( Atr_GetAuctionBuyout(id) or 0 ) * needed
+				local buyFactor = Skillet.db.profile.plugins.ATR.buyFactor or buyFactorDef
 				if Skillet:VendorSellsReagent(id) then
 					toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s  |cff808080(%s)|r", needed, itemName, L["buyable"])
 					if Skillet.db.profile.plugins.ATR.buyablePrices then
+						if Skillet.db.profile.plugins.ATR.useVendorCalc then
+							value = ( Atr_GetSellValue(id) or 0 ) * needed * buyFactor
+						end
 						toConcatExtra[#toConcatExtra+1] = Skillet:FormatMoneyFull(value, true)
 					else
-						toConcatExtra[#toConcatExtra+1] = ""
 						value = 0
+						toConcatExtra[#toConcatExtra+1] = ""
 					end
 				else
-					toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s", needed, itemName)
 					toConcatExtra[#toConcatExtra+1] = Skillet:FormatMoneyFull(value, true)
+					toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s", needed, itemName)
 				end
 				total = total + value
 			end
-			label = label .. "\n\n" .. table.concat(toConcatLabel,"\n") .. "\n   " .. L["Reagents"] .. ":\n"
-			extra_text =  extra_text .. "\n\n" .. table.concat(toConcatExtra,"\n") .. "\n" .. Skillet:FormatMoneyFull(total, true) .. "\n"
+			if Skillet.db.profile.plugins.ATR.useVendorCalc then
+				local markup = Skillet.db.profile.plugins.ATR.markup or markupDef
+				label = label .. "\n\n" .. table.concat(toConcatLabel,"\n") .. "\n   " .. L["Reagents"] .." * ".. markup * 100 .."%:\n"
+				extra_text =  extra_text .. "\n\n" .. table.concat(toConcatExtra,"\n") .. "\n" .. Skillet:FormatMoneyFull(total * markup, true) .. "\n"
+			else
+				label = label .. "\n\n" .. table.concat(toConcatLabel,"\n") .. "\n   " .. L["Reagents"] .. ":\n"
+				extra_text =  extra_text .. "\n\n" .. table.concat(toConcatExtra,"\n") .. "\n" .. Skillet:FormatMoneyFull(total, true) .. "\n"
+			end
 		end
 	end
 	return label, extra_text

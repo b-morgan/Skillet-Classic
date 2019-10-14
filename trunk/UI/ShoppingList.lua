@@ -102,8 +102,10 @@ local function createShoppingListFrame(self)
 	SkilletShowQueuesInItemOrder:SetChecked(Skillet.db.char.item_order)
 	SkilletShowQueuesMergeItemsText:SetText(L["Merge items"])
 	SkilletShowQueuesMergeItems:SetChecked(Skillet.db.char.merge_items)
+--[[
 	SkilletShowQueuesIncludeGuildText:SetText(L["Include guild"])
 	SkilletShowQueuesIncludeGuild:SetChecked(Skillet.db.char.include_guild)
+]]--
 	-- Button to retrieve items needed from the bank
 	SkilletShoppingListRetrieveButton:SetText(L["Retrieve"])
 
@@ -168,8 +170,15 @@ function Skillet:ClearShoppingList(player)
 	self:UpdateTradeSkillWindow()
 end
 
+--
+-- In Classic, there is no guildbank
+--
+--[[
 function Skillet:GetShoppingList(player, includeGuildbank)
 	--DA.DEBUG(0,"GetShoppingList("..tostring(player)..", "..tostring(includeGuildbank)..")")
+]]--
+function Skillet:GetShoppingList(player)
+	--DA.DEBUG(0,"GetShoppingList("..tostring(player)..")")
 	self:InventoryScan()
 --[[
 	if not Skillet.db.global.cachedGuildbank then
@@ -190,11 +199,11 @@ function Skillet:GetShoppingList(player, includeGuildbank)
 	--DA.DEBUG(0,"shopping list for: "..(player or "all players"))
 	local usedInventory = {}  -- only use the items from each player once
 	local curPlayer = self.currentPlayer
-	local usedGuild = {}
 	if not usedInventory[curPlayer] then
 		usedInventory[curPlayer] = {}
 	end
 --[[
+	local usedGuild = {}
 	local curGuild = GetGuildInfo("player")
 	if curGuild and not cachedGuildbank[curGuild] then
 		cachedGuildbank[curGuild] = {}
@@ -260,12 +269,18 @@ function Skillet:GetShoppingList(player, includeGuildbank)
 	return list
 end
 
+--
+-- In Classic, there is no guildbank
+--
 local function cache_list(self)
 	local name = nil
 	if not Skillet.db.char.include_alts then
 		name = Skillet.currentPlayer
 	end
+--[[
 	self.cachedShoppingList = self:GetShoppingList(name, Skillet.db.char.include_guild)
+]]--
+	self.cachedShoppingList = self:GetShoppingList(name)
 end
 
 local function indexBank()

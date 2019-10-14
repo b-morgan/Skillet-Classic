@@ -399,17 +399,10 @@ function Skillet:CollectRecipeInformation()
 	end
 end
 
-local missingVendorItems = {
-	[30817] = true,				-- simple flour
-	[4539] = true,				-- Goldenbark Apple
-	[17035] = true,				-- Stranglethorn seed
-	[17034] = true,				-- Maple seed
-	[52188] = true,				-- Jeweler's Setting
-	[4399]	= true,				-- Wooden Stock
-	[38682] = true,				-- Enchanting Vellum
-	[3857]	= true,				-- Coal
-}
-
+--[[
+--
+-- Inscription 
+--
 local topink = 113111				-- Warbinder's Ink
 local specialVendorItems = {
 	[37101] = {1, topink},			--Ivory Ink
@@ -428,45 +421,13 @@ local specialVendorItems = {
 	[61981] = {10, topink},			--Inferno Ink
 	[79255] = {10, topink},			--Starlight Ink
 }
-
-function Skillet:VendorItemAvailable(itemID)
-	if specialVendorItems[itemID] then
-		local divider = specialVendorItems[itemID][1]
-		local currency = specialVendorItems[itemID][2]
-		local reagentAvailability = self:GetInventory(self.currentPlayer, currency)
-		local reagentAvailableAlts = 0
-		for alt in pairs(self.db.realm.inventoryData) do
-			if alt ~= self.currentPlayer then
-				local altBoth = self:GetInventory(alt, currency)
-				reagentAvailableAlts = reagentAvailableAlts + (altBoth or 0)
-			end
-		end
-		return math.floor(reagentAvailability / divider), math.floor(reagentAvailableAlts / divider)
-	else
-		return 100000, 100000
-	end
-end
-
+]]--
 --
--- queries for vendor info for a particular itemID
+-- No special items in Classic (yet)
 --
-function Skillet:VendorSellsReagent(itemID)
---
--- Check our local data first
---
-	if missingVendorItems[itemID] or specialVendorItems[itemID] then
-		return true
-	end
---
--- Check the LibPeriodicTable data next
---
-	if PT then
-		if itemID ~= 0 and PT:ItemInSet(itemID,"Tradeskill.Mat.BySource.Vendor") then
-			return true
-		end
-	end
-	return false
-end
+local specialVendorItems = {
+}
+Skillet.SpecialVendorItems = specialVendorItems
 
 --
 -- resets the blizzard tradeskill search filters just to make sure no other addon has monkeyed with them
@@ -494,14 +455,14 @@ function Skillet:GetRecipe(id)
 		end
 		if Skillet.db.global.recipeDB[id] then
 			local recipeString = Skillet.db.global.recipeDB[id]
-			DA.DEBUG(3,"recipeString= "..tostring(recipeString))
+			--DA.DEBUG(3,"recipeString= "..tostring(recipeString))
 			local tradeID, itemString, reagentString, toolString = string.split(" ",recipeString)
 			local itemID, numMade = 0, 1
 			local slot = nil
 			if itemString then
 				if itemString ~= "0" then
 					local a, b = string.split(":",itemString)
-					DA.DEBUG(3,"itemString a= "..tostring(a)..", b= "..tostring(b))
+					--DA.DEBUG(3,"itemString a= "..tostring(a)..", b= "..tostring(b))
 					if a ~= "0" then
 						itemID, numMade = a,b
 					else
