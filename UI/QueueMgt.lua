@@ -32,7 +32,7 @@ function Skillet:QueueLoadDropdown_OnShow()
 	end
 end
 
-function Skillet:SkilletQueueLoadDropdown_Initialize()
+function Skillet.SkilletQueueLoadDropdown_Initialize(menuFrame,level)
 	local info
 	local i=1
 	info = UIDropDownMenu_CreateInfo()

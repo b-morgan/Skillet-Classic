@@ -258,10 +258,10 @@
 		</Button>
 
 		<!--
-			#
-			# Check boxes for various recipe filtering options.
-			#
-			-->
+		#
+		# Check boxes for various recipe filtering options.
+		#
+		-->
 		<CheckButton name="SkilletShowQueuesFromAllAlts" inherits="SkilletShoppingListCheckButtonTemplate">
 			<Anchors>
 				<Anchor point="BOTTOMRIGHT" relativeTo="SkilletShoppingList" relativePoint="BOTTOMRIGHT">
@@ -278,6 +278,10 @@
 			</Scripts>
 		</CheckButton>
 
+		<!--
+		#
+		#  In Classic, there is no guildbank.
+		#
 		<CheckButton name="SkilletShowQueuesIncludeGuild" inherits="SkilletShoppingListCheckButtonTemplate">
 			<Anchors>
 				<Anchor point="BOTTOMRIGHT" relativeTo="SkilletShoppingList" relativePoint="BOTTOMRIGHT">
@@ -293,6 +297,7 @@
 				</OnClick>
 			</Scripts>
 		</CheckButton>
+		-->
 
 		<CheckButton name="SkilletShowQueuesInItemOrder" inherits="SkilletShoppingListCheckButtonTemplate2">
 			<Anchors>

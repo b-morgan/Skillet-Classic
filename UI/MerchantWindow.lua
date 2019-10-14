@@ -54,12 +54,60 @@ local function update_merchant_inventory()
 		for i=1, count, 1 do
 			local link = GetMerchantItemLink(i)
 			if link then
-				local name, texture, price, quantity, numAvailable, isUsable = GetMerchantItemInfo(i)
+				local itemCount, itemTexture, itemValue, itemLink, currencyName, currencyID
+				local id = Skillet:GetItemIDFromLink(link)
+				local name, texture, price, quantity, numAvailable, isUsable, extendedCost = GetMerchantItemInfo(i)
+				if extendedCost then
+					itemCount = GetMerchantItemCostInfo(i)
+					if itemCount > 0 then
+						--DA.DEBUG(2,"itemCount for "..tostring(name).." ("..tostring(id)..")= "..tostring(itemCount))
+						itemTexture, itemValue, itemLink, currencyName = GetMerchantItemCostItem(i, 1)
+						if itemLink then
+							currencyName = GetItemInfo(itemLink)
+							currencyID = Skillet:GetItemIDFromLink(itemLink)
+						else
+							currencyID = -1 * tonumber(Skillet.currencyIDsByName[currencyName] or 0)
+						end
+						--DA.DEBUG(2,"Currency for "..tostring(name).." ("..tostring(id)..")= "..tostring(currencyName).." x "..tostring(itemValue))
+					end
+				end
 				if numAvailable == -1  then
 					local id = Skillet:GetItemIDFromLink(link)
-					merchant_inventory[id] = {}					-- TODO: record this info if PT doesn't already have it
+					merchant_inventory[id] = {}
 					merchant_inventory[id].price = price
 					merchant_inventory[id].stack = quantity
+					if Skillet.db.global.itemRecipeUsedIn[id] then		-- if this item is used in any recipes we know about then
+						if not Skillet:VendorSellsReagent(id) then		-- if its not a known vendor item then
+							if Skillet.db.global.MissingVendorItems[id] then
+								--DA.DEBUG(1,"updating "..tostring(name).." ("..tostring(id)..")")
+							else
+								--DA.DEBUG(1,"adding "..tostring(name).." ("..tostring(id)..")")
+							end
+							if itemCount and itemCount > 0 then
+								Skillet.db.global.MissingVendorItems[id] = {name or true, quantity, currencyName, currencyID, itemValue}		-- add it to our table
+							else
+								Skillet.db.global.MissingVendorItems[id] = name or true		-- add it to our table
+							end
+						else
+							--DA.DEBUG(1,"known "..tostring(name).." ("..tostring(id)..")")
+							if type(Skillet.db.global.MissingVendorItems[id]) == "table" then
+								if #Skillet.db.global.MissingVendorItems[id] ~= 5 then
+									Skillet.db.global.MissingVendorItems[id] = "Fix Me"
+								end
+							end
+						end
+						if Skillet.db.global.MissingVendorItems[id] then
+							if itemCount and itemCount > 0 and type(Skillet.db.global.MissingVendorItems[id]) ~= "table" then
+								--DA.DEBUG(1,"converting "..tostring(name).." ("..tostring(id)..")")
+								Skillet.db.global.MissingVendorItems[id] = {name or true, quantity, currencyName, currencyID, itemValue}		-- convert it
+							elseif PT then
+								if id~=0 and PT:ItemInSet(id,"Tradeskill.Mat.BySource.Vendor") then
+									--DA.DEBUG(1,"removing "..tostring(name).." ("..tostring(id)..")")
+									Skillet.db.global.MissingVendorItems[id] = nil		-- remove it from our table
+								end
+							end
+						end
+					end
 				end
 			end
 		end
@@ -106,8 +154,10 @@ local function remove_merchant_buy_button()
 	SkilletMerchantBuyFrame:Hide()
 end
 
+--
 -- Updates the merchant frame, if it is visible, this method can be called
 -- many times
+--
 function Skillet:UpdateMerchantFrame()
 	Skillet:MERCHANT_SHOW()
 end
@@ -136,22 +186,28 @@ function Skillet:MERCHANT_SHOW()
 	end
 end
 
+--
 -- Merchant window updated
+--
 function Skillet:MERCHANT_UPDATE()
 	if Skillet.db.profile.vendor_buy_button or Skillet.db.profile.vendor_auto_buy then
 		update_merchant_inventory()
 	end
 end
 
+--
 -- Merchant window closed
+--
 function Skillet:MERCHANT_CLOSED()
 	remove_merchant_buy_button()
 	merchant_inventory = {}
 	self.autoPurchaseComplete = nil
 end
 
+--
 -- If at a vendor with the window open, buy anything that they
 -- sell that is required by any queued recipe.
+--
 function Skillet:BuyRequiredReagents()
 	--DA.DEBUG(0,"BuyRequiredReagents()")
 	local list = Skillet:GetShoppingList(Skillet.currentPlayer, false)
@@ -173,7 +229,9 @@ function Skillet:BuyRequiredReagents()
 			local name, texture, price, quantity, numAvailable, isUsable = GetMerchantItemInfo(i)
 			if numAvailable == -1 then
 				local id = self:GetItemIDFromLink(link)
-				-- OK, lets see if we need it.
+--
+-- OK, lets see if we need it.
+--
 				local count = 0
 				for j=1,#list,1 do
 					if list[j].id == id then
@@ -186,8 +244,10 @@ function Skillet:BuyRequiredReagents()
 					local itemstobuy = math.ceil(count/quantity);
 					if(stackSize == nil) then
 						for l=1, count, 1 do
-							-- XXX: need some error checking here in case the
-							-- poor user runs out of money.
+--
+-- XXX: need some error checking here in case the
+-- poor user runs out of money.
+--
 							BuyMerchantItem(i,1)
 						end
 					else
@@ -196,14 +256,18 @@ function Skillet:BuyRequiredReagents()
 						local resttobuy          = math.ceil(count-(fullstackstobuy*stackSize));
 						if fullstackstobuy > 0 then
 							for l=1,fullstackstobuy,1 do
-								-- XXX: need some error checking here in case the
-								-- poor user runs out of money.
+--
+-- XXX: need some error checking here in case the
+-- poor user runs out of money.
+--
 								BuyMerchantItem(i,stackSize);
 							end
 						end
 						if resttobuy > 0 then
-							-- XXX: need some error checking here in case the
-							-- poor user runs out of money.
+--
+-- XXX: need some error checking here in case the
+-- poor user runs out of money.
+--
 							BuyMerchantItem(i,resttobuy);
 						end
 					end
@@ -224,12 +288,13 @@ function Skillet:BuyRequiredReagents()
 		message = message .. ": " .. cash
 		self:Print(message)
 	end
+--
 --	update_merchant_buy_button()
 --
 -- delay updating windows until the transaction is complete
 --
 	self.merchantUpdateRequired = true
-	self:ScheduleTimer("MerchantUpdateWindows", 0.5)
+	self:ScheduleTimer("MerchantUpdateWindows", 0.8)
 end
 
 function Skillet:MerchantUpdateWindows()

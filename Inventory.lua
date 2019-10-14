@@ -212,6 +212,67 @@ function Skillet:GetInventory(player, reagentID)
 	return 0, 0		-- have, make
 end
 
+-- queries for vendor info for a particular itemID
+function Skillet:VendorSellsReagent(itemID)
+	--DA.DEBUG(0,"VendorSellsReagent("..tostring(itemID)..")")
+	if self.db.global.MissingVendorItems[itemID] then
+		if type(self.db.global.MissingVendorItems[itemID]) == 'table' then
+			if Skillet.db.profile.use_altcurrency_vendor_items then
+				return true
+			end
+		else
+			return true
+		end
+	end
+-- Check the LibPeriodicTable data next
+	if PT then
+		if itemID~=0 and PT:ItemInSet(itemID,"Tradeskill.Mat.BySource.Vendor") then
+			return true
+		end
+	end
+	return false
+end
+
+-- returns the number of items that can be bought limited by the amount of currency available
+function Skillet:VendorItemAvailable(itemID)
+	--DA.DEBUG(0,"VendorItemAvailable("..tostring(itemID)..")")
+	local _, divider, currency, currencyAvailable
+	local currencyAvailableAlts = 0
+	if self.SpecialVendorItems[itemID] then
+		divider = self.SpecialVendorItems[itemID][1]
+		currency = self.SpecialVendorItems[itemID][2]
+		currencyAvailable = self:GetInventory(self.currentPlayer, currency)
+		for alt in pairs(self.db.realm.inventoryData) do
+			if alt ~= self.currentPlayer then
+				local altBoth = self:GetInventory(alt, currency)
+				currencyAvailableAlts = currencyAvailableAlts + (altBoth or 0)
+			end
+		end
+		return math.floor(currencyAvailable / divider), math.floor(currencyAvailableAlts / divider)
+	elseif self.db.global.MissingVendorItems[itemID] then
+		local MissingVendorItem = self.db.global.MissingVendorItems[itemID]
+		if type(MissingVendorItem) == 'table' then	-- table entries are {name, quantity, currencyName, currencyID, currencyCount}
+			if Skillet.db.profile.use_altcurrency_vendor_items then
+				--DA.DEBUG(1,"MissingVendorItem="..DA.DUMP1(MissingVendorItem))
+				if MissingVendorItem[4] > 0 then
+					currencyAvailable = self:GetInventory(self.currentPlayer, MissingVendorItem[4])
+				else
+					_, currencyAvailable = GetCurrencyInfo(-1 * MissingVendorItem[4])
+				end
+				--DA.DEBUG(1,"currencyAvailable="..tostring(currencyAvailable))
+-- compute how many this player can buy with alternate currency and return 0 for alts
+				return math.floor(MissingVendorItem[2] * currencyAvailable / (MissingVendorItem[5] or 1)), 0
+			else
+				return 0, 0		-- vendor sells item for an alternate currency and we are ignoring it.
+			end
+		else
+			return 100000, 100000	-- vendor sells item for gold, price is not available so assume lots of gold
+		end
+	else
+		return 100000, 100000	-- vendor sells item for gold, price is not available so assume lots of gold
+	end
+end
+
 function Skillet:AuctionScan()
 	--DA.DEBUG(0,"AuctionScan()")
 	local player = Skillet.currentPlayer

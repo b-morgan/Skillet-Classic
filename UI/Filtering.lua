@@ -121,7 +121,7 @@ end
 --
 -- The method we use the initialize the new filter drop down.
 --
-function Skillet:FilterDropDown_Initialize()
+function Skillet.FilterDropDown_Initialize(menuFrame,level)
 	--DA.DEBUG(0,"FilterDropDown_Initialize()")
 	local player, tradeID = Skillet.currentPlayer, Skillet.currentTrade
 	if not player or not tradeID then return end
