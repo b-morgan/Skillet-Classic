@@ -128,12 +128,21 @@ function Skillet:QueueAppendCommand(command, queueCraftables)
 						local skillIndex = skillIndexLookup[recipeSourceID]
 						DA.DEBUG(1,"skillIndex= "..tostring(skillIndex))
 						if skillIndex then
-							command.complex = true						-- identify that this queue has craftable reagent requirements
+--
+-- identify that this queue has craftable reagent requirements
+--
+							command.complex = true
 							local recipeSource = Skillet:GetRecipe(recipeSourceID)
 							local newCount = math.ceil((need - have)/recipeSource.numMade)
 							local newCommand = self:QueueCommandIterate(recipeSourceID, newCount)
 							newCommand.level = (command.level or 0) + 1
-							-- do not add items from transmutation - this can create weird loops
+--
+-- do not add items from transmutation - this can create weird loops
+-- do not add items the user wants ignored
+--
+							DA.DEBUG(1,"recipeSourceID= "..tostring(recipeSourceID)..
+							  ", TradeSkillIgnoredMats= "..tostring(Skillet.TradeSkillIgnoredMats[recipeSourceID])..
+							  ", userIgnoredMats= "..tostring(Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeSourceID]))
 							if not Skillet.TradeSkillIgnoredMats[recipeSourceID] and 
 							  not Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeSourceID] then
 								self:QueueAppendCommand(newCommand, queueCraftables, true)

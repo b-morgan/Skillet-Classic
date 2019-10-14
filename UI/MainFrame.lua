@@ -2622,6 +2622,10 @@ end
 --
 local skillMenuSelection = {
 	{
+		text = "skillMenuSelection",
+		isTitle = true,
+	},
+	{
 		text = L["Select All"],
 		func = function() Skillet:SkillButton_SetAllSelections(true) Skillet:UpdateTradeSkillWindow() end,
 	},
@@ -2630,7 +2634,12 @@ local skillMenuSelection = {
 		func = function() Skillet:SkillButton_SetAllSelections(false) Skillet:UpdateTradeSkillWindow() end,
 	},
 }
+
 local skillMenuGroup = {
+	{
+		text = "skillMenuGroup",
+		isTitle = true,
+	},
 	{
 		text = L["Empty Group"],
 		func = function() Skillet:SkillButton_NewGroup() end,
@@ -2640,30 +2649,20 @@ local skillMenuGroup = {
 		func = function() Skillet:SkillButton_MakeGroup() end,
 	},
 }
+
 local skillMenuIgnore = {
 	{
-		text = "Add Recipe to Ignored List",
-		disabled = true,
-		func = function()
-					local index = Skillet.menuButton:GetID()
-					local spellLink = GetTradeSkillItemLink(index)
-					local recipeID = Skillet:GetItemIDFromLink(spellLink)
-					DA.DEBUG(0, tostring(index)..", "..tostring(spellLink)..", "..tostring(recipeID))
-					Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeID] = spellLink
-					if Skillet.ignoreList and Skillet.ignoreList:IsVisible() then
-						Skillet:UpdateIgnoreListWindow()
-					end
-				end,
+		text = "skillMenuIgnore",
+		isTitle = true,
 	},
 	{
-		text = "Add Reagents to Ignored List",
-		disabled = true,
+		text = "Add Recipe to Ignored List",
 		func = function()
 					local index = Skillet.menuButton:GetID()
-					local spellLink = GetTradeSkillItemLink(index)
-					local recipeID = Skillet:GetItemIDFromLink(spellLink)
-					DA.DEBUG(0, tostring(index)..", "..tostring(spellLink)..", "..tostring(recipeID))
-					Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeID] = spellLink
+					local skillDB = Skillet.db.realm.skillDB[Skillet.currentPlayer][Skillet.currentTrade][index]
+					local recipeID = string.sub(skillDB,2)
+					local print=(tostring(index)..", "..tostring(skillDB)..", "..tostring(recipeID))
+					Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeID] = Skillet.currentTrade
 					if Skillet.ignoreList and Skillet.ignoreList:IsVisible() then
 						Skillet:UpdateIgnoreListWindow()
 					end
@@ -2671,35 +2670,24 @@ local skillMenuIgnore = {
 	},
 	{
 		text = "Remove Recipe from Ignored List",
-		disabled = true,
 		func = function()
 					local index = Skillet.menuButton:GetID()
-					local spellLink = GetTradeSkillItemLink(index)
-					local recipeID = Skillet:GetItemIDFromLink(spellLink)
-					DA.DEBUG(0, tostring(index)..", "..tostring(spellLink)..", "..tostring(recipeID))
-					Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeID] = spellLink
-					if Skillet.ignoreList and Skillet.ignoreList:IsVisible() then
-						Skillet:UpdateIgnoreListWindow()
-					end
-				end,
-	},
-	{
-		text = "Remove Reagents from Ignored List",
-		disabled = true,
-		func = function()
-					local index = Skillet.menuButton:GetID()
-					local spellLink = GetTradeSkillItemLink(index)
-					local recipeID = Skillet:GetItemIDFromLink(spellLink)
-					DA.DEBUG(0, tostring(index)..", "..tostring(spellLink)..", "..tostring(recipeID))
-					Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeID] = spellLink
+					local skillDB = Skillet.db.realm.skillDB[Skillet.currentPlayer][Skillet.currentTrade][index]
+					local recipeID = string.sub(skillDB,2)
+					local print=(tostring(index)..", "..tostring(skillDB)..", "..tostring(recipeID))
+					Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeID] = nil
 					if Skillet.ignoreList and Skillet.ignoreList:IsVisible() then
 						Skillet:UpdateIgnoreListWindow()
 					end
 				end,
 	},
 }
+
 local skillMenuList = {
---[[
+	{
+		text = "skillMenuList",
+		isTitle = true,
+	},
 	{
 		text = L["New Group"],
 		hasArrow = true,
@@ -2709,7 +2697,6 @@ local skillMenuList = {
 		text = "-----",
 		isTitle = true,
 	},
-]]--
 	{
 		text = L["Selection"],
 		hasArrow = true,
@@ -2737,7 +2724,37 @@ local skillMenuList = {
 		menuList = skillMenuIgnore,
 	},
 }
+
+local skillMenuListLocked = {
+	{
+		text = "skillMenuListLocked",
+		isTitle = true,
+	},
+	{
+		text = L["Selection"],
+		hasArrow = true,
+		menuList = skillMenuSelection,
+	},
+	{
+		text = L["Copy"],
+		func = function() Skillet:SkillButton_CopySelected() end,
+	},
+	{
+		text = "-----",
+		isTitle = true,
+	},
+	{
+		text = "Ignore",
+		hasArrow = true,
+		menuList = skillMenuIgnore,
+	},
+}
+
 local headerMenuList = {
+	{
+		text = "headerMenuList",
+		isTitle = true,
+	},
 	{
 		text = L["Rename Group"],
 		func = function() Skillet:SkillButton_NameEditEnable(Skillet.menuButton) end,
@@ -2769,13 +2786,28 @@ local headerMenuList = {
 		func = function() Skillet:SkillButton_PasteSelected(Skillet.menuButton) end,
 	},
 }
+
 local headerMenuListLocked = {
+	{
+		text = "headerMenuListLocked",
+		isTitle = true,
+	},
+	{
+		text = L["Selection"],
+		hasArrow = true,
+		menuList = skillMenuSelection,
+	},
 	{
 		text = L["Copy"],
 		func = function() Skillet:SkillButton_CopySelected() end,
 	},
 }
+
 local headerMenuListMainGroup = {
+	{
+		text = "headerMenuListMainGroup",
+		isTitle = true,
+	},
 	{
 		text = L["New Group"],
 		hasArrow = true,
@@ -2803,7 +2835,17 @@ local headerMenuListMainGroup = {
 		func = function() Skillet:SkillButton_PasteSelected(Skillet.menuButton) end,
 	},
 }
+
 local headerMenuListMainGroupLocked = {
+	{
+		text = "headerMenuListMainGroupLocked",
+		isTitle = true,
+	},
+	{
+		text = L["Selection"],
+		hasArrow = true,
+		menuList = skillMenuSelection,
+	},
 	{
 		text = L["Copy"],
 		func = function() Skillet:SkillButton_CopySelected() end,
@@ -2819,6 +2861,7 @@ function Skillet:SkilletSkillMenu_Show(button)
 	end
 	local x, y = GetCursorPosition()
 	local uiScale = UIParent:GetEffectiveScale()
+	local locked = self:RecipeGroupIsLocked()
 	self.menuButton = button
 	if button.skill.subGroup then
 		if button.skill.mainGroup then
