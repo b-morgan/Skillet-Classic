@@ -643,19 +643,9 @@ function Skillet:TradeButton_OnClick(this,button)
 				end
 			elseif self.currentTrade ~= tradeID then
 				self:SetTradeSkill(self.currentPlayer, tradeID)
-				self:UpdateTradeSkillWindow()
 			end
 			this:SetChecked(true)
-		else	-- player not current
---
--- not sure we ever get here in Classic
---
-			this:SetChecked(false)
 		end
-	else	-- not LeftButton
---
--- not sure what to do here (but FlushAllData was wrong)
---
 	end
 	GameTooltip:Hide()
 end
@@ -854,10 +844,6 @@ function Skillet:UpdateTradeSkillWindow()
 	end
 	local skillListKey = self.currentPlayer..":"..self.currentTrade..":"..self.currentGroupLabel
 	local numTradeSkills = 0
-	if not self.dataScanned then
-		self.dataScanned = self:RescanTrade()
-		self:SortAndFilterRecipes()
-	end
 	if not self.data.sortedSkillList[skillListKey] then
 		numTradeSkills = self:SortAndFilterRecipes()
 		if not numTradeSkills or numTradeSkills < 1 then
@@ -2238,7 +2224,7 @@ function Skillet:SkillButton_OnClick(button)
 						if not button.skill.selected then
 							self:SkillButton_ClearSelections()
 						end
-						self:SetSelectedSkill(button:GetID(), true)
+						self:SetSelectedSkill(button:GetID())
 						button.skill.selected = true
 					else
 						if button.skill.selected and not self:RecipeGroupIsLocked() then
@@ -2538,12 +2524,12 @@ function Skillet:StartQueue_OnClick(button)
 	self:UpdateQueueWindow()
 end
 
-local old_CloseSpecialWindows
 --
 -- Called when the trade skill window is shown
 --
+local old_CloseSpecialWindows
 function Skillet:Tradeskill_OnShow()
-	DA.DEBUG(0,"Tradeskill_OnShow()")
+	--DA.DEBUG(0,"Tradeskill_OnShow()")
 --
 -- Need to hook this so that hitting [ESC] will close the Skillet window(s).
 --
@@ -2554,7 +2540,6 @@ function Skillet:Tradeskill_OnShow()
 			return self:SkilletFrameForceClose() or found
 		end
 	end
-	DA.DEBUG(0,"Tradeksill_OnShow END")
 end
 
 --
