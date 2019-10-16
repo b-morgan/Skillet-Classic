@@ -18,9 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
 --
---	DA.DEBUG(3,			-- is used to track function calls
+--	--DA.DEBUG(3,			-- is used to track function calls
 --	--DA.DEBUG(4,		-- is used to expand function call tables
---	DA.DEBUG(5,			-- is used to display data within a function
+--	--DA.DEBUG(5,			-- is used to display data within a function
 --
 --	comment all three for production
 --	uncomment 0 and 2 for debugging
@@ -46,7 +46,7 @@ local skillLevel = {
 }
 
 function Skillet:RecipeGroupRename(oldName, newName)
-	DA.DEBUG(3,"RecipeGroupRename("..tostring(oldName)..", "..tostring(newName)..")")
+	--DA.DEBUG(3,"RecipeGroupRename("..tostring(oldName)..", "..tostring(newName)..")")
 	if self.data.groupList[self.currentPlayer][self.currentTrade][oldName] then
 		self.data.groupList[self.currentPlayer][self.currentTrade][newName] = self.data.groupList[self.currentPlayer][self.currentTrade][oldName]
 		self.data.groupList[self.currentPlayer][self.currentTrade][oldName] = nil
@@ -62,7 +62,7 @@ function Skillet:RecipeGroupRename(oldName, newName)
 end
 
 function Skillet:RecipeGroupFind(player, tradeID, label, name)
-	DA.DEBUG(3,"RecipeGroupFind("..tostring(player)..", "..tostring(tradeID)..", "..tostring(label)..", "..tostring(name)..")")
+	--DA.DEBUG(3,"RecipeGroupFind("..tostring(player)..", "..tostring(tradeID)..", "..tostring(label)..", "..tostring(name)..")")
 	if player and tradeID and label then
 		local groupList = self.data.groupList
 		if groupList and groupList[player] and groupList[player][tradeID] and groupList[player][tradeID][label] then
@@ -72,7 +72,7 @@ function Skillet:RecipeGroupFind(player, tradeID, label, name)
 end
 
 function Skillet:RecipeGroupFindRecipe(group, recipeID)
-	DA.DEBUG(3,"RecipeGroupFindRecipe("..tostring(group.name)..", "..tostring(recipeID)..")")
+	--DA.DEBUG(3,"RecipeGroupFindRecipe("..tostring(group.name)..", "..tostring(recipeID)..")")
 	--DA.DEBUG(4,"group= "..DA.DUMP1(group,1))
 	if group then
 		local entries = group.entries
@@ -97,13 +97,13 @@ end
 --
 local serial = 0
 function Skillet:RecipeGroupNew(player, tradeID, label, name)
-	DA.DEBUG(3,"RecipeGroupNew("..tostring(player)..", "..tostring(tradeID)..", "..tostring(label)..", "..tostring(name)..")")
+	--DA.DEBUG(3,"RecipeGroupNew("..tostring(player)..", "..tostring(tradeID)..", "..tostring(label)..", "..tostring(name)..")")
 	local existingGroup = self:RecipeGroupFind(player, tradeID, label, name)
 	if existingGroup then
-		DA.DEBUG(5,"RecipeGroupNew: group "..existingGroup.key.."/"..existingGroup.name.." exists")
+		--DA.DEBUG(5,"RecipeGroupNew: group "..existingGroup.key.."/"..existingGroup.name.." exists")
 		return existingGroup
 	else
-		DA.DEBUG(5,"RecipeGroupNew: new group "..(name or OVERALL_PARENT_GROUP_NAME)..", "..tostring(label))
+		--DA.DEBUG(5,"RecipeGroupNew: new group "..(name or OVERALL_PARENT_GROUP_NAME)..", "..tostring(label))
 		local newGroup = {}
 		local key = player..":"..tradeID..":"..label
 		newGroup.expanded = true
@@ -123,12 +123,12 @@ end
 -- Note: this function is recursive
 --
 function Skillet:RecipeGroupClearEntries(group, level)
-	DA.DEBUG(3,"RecipeGroupClearEntries("..tostring(group.name)..", "..tostring(level)..")")
+	--DA.DEBUG(3,"RecipeGroupClearEntries("..tostring(group.name)..", "..tostring(level)..")")
 	--DA.DEBUG(4,"group= "..DA.DUMP1(group,1))
 	if not level then level = 1 end
 	level = level + 1
 	if group then
-		DA.DEBUG(5,"#group.entries= "..tostring(#group.entries))
+		--DA.DEBUG(5,"#group.entries= "..tostring(#group.entries))
 		for i=1,#group.entries do
 			if group.entries[i].subGroup then
 				self:RecipeGroupClearEntries(group.entries[i].subGroup, level)
@@ -142,7 +142,7 @@ end
 -- Note: this function is recursive
 --
 function Skillet:RecipeGroupCopy(s, d, noDB, level)
-	DA.DEBUG(3,"RecipeGroupCopy("..tostring(s.name)..", "..tostring(d.name)..", "..tostring(noDB)..", "..tostring(level)..")")
+	--DA.DEBUG(3,"RecipeGroupCopy("..tostring(s.name)..", "..tostring(d.name)..", "..tostring(noDB)..", "..tostring(level)..")")
 	--DA.DEBUG(4,"s= "..DA.DUMP1(s,1))
 	--DA.DEBUG(4,"d= "..DA.DUMP1(d,1))
 	if not level then level = 1 end
@@ -165,7 +165,7 @@ function Skillet:RecipeGroupCopy(s, d, noDB, level)
 end
 
 function Skillet:RecipeGroupAddRecipe(group, recipeID, skillIndex, noDB)
-	DA.DEBUG(3,"RecipeGroupAddRecipe("..tostring(group.name)..", "..tostring(recipeID)..", "..tostring(skillIndex)..", "..tostring(noDB)..")")
+	--DA.DEBUG(3,"RecipeGroupAddRecipe("..tostring(group.name)..", "..tostring(recipeID)..", "..tostring(skillIndex)..", "..tostring(noDB)..")")
 	--DA.DEBUG(4,"group= "..DA.DUMP1(group,1))
 	if group and recipeID then
 		local currentEntry
@@ -199,7 +199,7 @@ function Skillet:RecipeGroupAddRecipe(group, recipeID, skillIndex, noDB)
 end
 
 function Skillet:RecipeGroupAddSubGroup(group, subGroup, groupID, noDB)
-	DA.DEBUG(3,"RecipeGroupAddSubGroup("..tostring(group.name)..", "..tostring(subGroup.name)..", "..tostring(groupID)..", "..tostring(noDB)..")")
+	--DA.DEBUG(3,"RecipeGroupAddSubGroup("..tostring(group.name)..", "..tostring(subGroup.name)..", "..tostring(groupID)..", "..tostring(noDB)..")")
 	--DA.DEBUG(4,"group= "..DA.DUMP1(group,1))
 	--DA.DEBUG(4,"subGroup= "..DA.DUMP1(subGroup,1))
 	if group and subGroup then
@@ -242,7 +242,7 @@ end
 -- Note: this function is recursive
 --
 function Skillet:RecipeGroupPasteEntry(entry, group, level)
-	DA.DEBUG(3,"RecipeGroupPasteEntry("..tostring(entry.name)..", "..tostring(group.name)..", "..tostring(level)..")")
+	--DA.DEBUG(3,"RecipeGroupPasteEntry("..tostring(entry.name)..", "..tostring(group.name)..", "..tostring(level)..")")
 	--DA.DEBUG(4,"entry= "..DA.DUMP1(entry,1))
 	--DA.DEBUG(4,"group= "..DA.DUMP1(group,1))
 	if not level then level = 1 end
@@ -251,20 +251,20 @@ function Skillet:RecipeGroupPasteEntry(entry, group, level)
 		local player = self.currentPlayer
 		local tradeID = self.currentTrade
 		local label = self.currentGroupLabel
-		DA.DEBUG(5,"RecipeGroupPasteEntry: paste "..entry.name.." into "..group.name)
+		--DA.DEBUG(5,"RecipeGroupPasteEntry: paste "..entry.name.." into "..group.name)
 		local parentGroup = group
 		if entry.subGroup then
 			if entry.subGroup == group then
-				DA.DEBUG(5,"RecipeGroupPasteEntry: entry.subGroup is equal to group= "..tostring(group.name))
+				--DA.DEBUG(5,"RecipeGroupPasteEntry: entry.subGroup is equal to group= "..tostring(group.name))
 				return
 			end
 			local newName, newIndex = self:RecipeGroupNewName(group.key, entry.name)
 			local newGroup = self:RecipeGroupNew(player, tradeID, label, newName)
 			self:RecipeGroupAddSubGroup(parentGroup, newGroup, newIndex)
 			if entry.subGroup.entries then
-				DA.DEBUG(5,"RecipeGroupPasteEntry: "..tostring(entry.subGroup.name) .. " " .. #entry.subGroup.entries)
+				--DA.DEBUG(5,"RecipeGroupPasteEntry: "..tostring(entry.subGroup.name) .. " " .. #entry.subGroup.entries)
 				for i=1,#entry.subGroup.entries do
-					DA.DEBUG(5,"RecipeGroupPasteEntry: "..tostring(entry.subGroup.entries[i].name) .. ", " .. newGroup.name)
+					--DA.DEBUG(5,"RecipeGroupPasteEntry: "..tostring(entry.subGroup.entries[i].name) .. ", " .. newGroup.name)
 					self:RecipeGroupPasteEntry(entry.subGroup.entries[i], newGroup, level)
 				end
 			end
@@ -274,19 +274,19 @@ function Skillet:RecipeGroupPasteEntry(entry, group, level)
 --
 			local newIndex = self.data.skillIndexLookup[player][entry.recipeID]
 			if not newIndex then
-				DA.DEBUG(3,"RecipeGroupPasteEntry: add new skillDB entry= "..tostring(entry.recipeID))
+				--DA.DEBUG(3,"RecipeGroupPasteEntry: add new skillDB entry= "..tostring(entry.recipeID))
 				newIndex = #self.db.realm.skillDB[player][tradeID] + 1
 				self.db.realm.skillDB[player][tradeID][newIndex] = "x:"..entry.recipeID
 			end
 			self:RecipeGroupAddRecipe(parentGroup, entry.recipeID, newIndex)
 		end
 	else
-		DA.DEBUG(5,"RecipeGroupPasteEntry: failed entry and group and entry.parent ~= group ")
+		--DA.DEBUG(5,"RecipeGroupPasteEntry: failed entry and group and entry.parent ~= group ")
 	end
 end
 
 function Skillet:RecipeGroupMoveEntry(entry, group)
-	DA.DEBUG(3,"RecipeGroupMoveEntry("..tostring(entry.name)..", "..tostring(group.name)..")")
+	--DA.DEBUG(3,"RecipeGroupMoveEntry("..tostring(entry.name)..", "..tostring(group.name)..")")
 	--DA.DEBUG(4,"entry= "..DA.DUMP1(entry,1))
 	--DA.DEBUG(4,"group= "..DA.DUMP1(group,1))
 	if entry and group and entry.parent ~= group then
@@ -318,7 +318,7 @@ end
 -- Note: this function is recursive
 --
 function Skillet:RecipeGroupDeleteGroup(group, level)
-	DA.DEBUG(3,"RecipeGroupDeleteGroup("..tostring(group.name)..", "..tostring(level)..")")
+	--DA.DEBUG(3,"RecipeGroupDeleteGroup("..tostring(group.name)..", "..tostring(level)..")")
 	--DA.DEBUG(4,"group= "..DA.DUMP1(group,1))
 	if not level then level = 1 end
 	level = level + 1
@@ -334,7 +334,7 @@ function Skillet:RecipeGroupDeleteGroup(group, level)
 end
 
 function Skillet:RecipeGroupDeleteEntry(entry)
-	DA.DEBUG(3,"RecipeGroupDeleteEntry("..tostring(entry.name)..")")
+	--DA.DEBUG(3,"RecipeGroupDeleteEntry("..tostring(entry.name)..")")
 	--DA.DEBUG(4,"entry= "..DA.DUMP1(entry,1))
 	if entry then
 		local entryGroup = entry.parent
@@ -355,7 +355,7 @@ function Skillet:RecipeGroupDeleteEntry(entry)
 end
 
 function Skillet:RecipeGroupNewName(key, name)
-	DA.DEBUG(3,"RecipeGroupNewName("..tostring(key)..", "..tostring(name)..")")
+	--DA.DEBUG(3,"RecipeGroupNewName("..tostring(key)..", "..tostring(name)..")")
 	local index = 1
 	if key and name then
 		local player, tradeID, label = string.split(":", key)
@@ -373,12 +373,12 @@ function Skillet:RecipeGroupNewName(key, name)
 			name = tempName..suffix
 		end
 	end
-	DA.DEBUG(3,"RecipeGroupNewName: name= "..tostring(name)..", index= "..tostring(index))
+	--DA.DEBUG(3,"RecipeGroupNewName: name= "..tostring(name)..", index= "..tostring(index))
 	return name, index
 end
 
 function Skillet:RecipeGroupRenameEntry(entry, name)
-	DA.DEBUG(3,"RecipeGroupRenameEntry("..tostring(entry.name)..", "..tostring(name)..")")
+	--DA.DEBUG(3,"RecipeGroupRenameEntry("..tostring(entry.name)..", "..tostring(name)..")")
 	--DA.DEBUG(4,"entry= "..DA.DUMP1(entry,1))
 	if entry and name then
 		local key = entry.parent.key
@@ -403,12 +403,12 @@ end
 -- Note: this function is recursive
 --
 function Skillet:RecipeGroupSort(group, sortMethod, desc, level)
-	--DA.DEBUG(3,"RecipeGroupSort("..tostring(group.name)..", "..tostring(sortMethod)..", "..tostring(desc)..", "..tostring(level)..")")
+	----DA.DEBUG(3,"RecipeGroupSort("..tostring(group.name)..", "..tostring(sortMethod)..", "..tostring(desc)..", "..tostring(level)..")")
 	--DA.DEBUG(4,"group= "..DA.DUMP1(group,1))
 	if not level then level = 1 end
 	level = level + 1
 	if group then
-		--DA.DEBUG(5,"group.entries= "..DA.DUMP1(group.entries,1))
+		----DA.DEBUG(5,"group.entries= "..DA.DUMP1(group.entries,1))
 		for v, entry in pairs(group.entries) do
 			if entry.subGroup and entry.subGroup ~= group then
 				self:RecipeGroupSort(entry.subGroup, sortMethod, desc, level)
@@ -429,7 +429,7 @@ function Skillet:RecipeGroupSort(group, sortMethod, desc, level)
 end
 
 function Skillet:RecipeGroupInitFlatten(group, list)
-	--DA.DEBUG(3,"RecipeGroupInitFlatten("..tostring(group.name)..", "..tostring(list)..")")
+	----DA.DEBUG(3,"RecipeGroupInitFlatten("..tostring(group.name)..", "..tostring(list)..")")
 	--DA.DEBUG(4,"group= "..DA.DUMP1(group,1))
 	--DA.DEBUG(4,"list= "..DA.DUMP1(list,1))
 	if group and list then
@@ -440,7 +440,7 @@ function Skillet:RecipeGroupInitFlatten(group, list)
 		newSkill.expanded = true
 		newSkill.depth = 0
 --		if newSkill.parent ~= group.parent then newSkill.parent = group.parent end -- newSkill.parent = group.parent
-		--DA.DEBUG(5,"newSkill= "..DA.DUMP1(newSkill,1))
+		----DA.DEBUG(5,"newSkill= "..DA.DUMP1(newSkill,1))
 		newSkill.parent = group.parent
 		list[1] = newSkill
 	end
@@ -450,7 +450,7 @@ end
 -- Note: this function is recursive
 --
 function Skillet:RecipeGroupFlatten(group, depth, list, index, level)
-	--DA.DEBUG(3,"RecipeGroupFlatten("..tostring(group.name)..", "..tostring(depth)..", "..tostring(list.name)..", "..tostring(index)..", "..tostring(level)..")")
+	----DA.DEBUG(3,"RecipeGroupFlatten("..tostring(group.name)..", "..tostring(depth)..", "..tostring(list.name)..", "..tostring(index)..", "..tostring(level)..")")
 	--DA.DEBUG(4,"group= "..DA.DUMP1(group,1))
 	--DA.DEBUG(4,"list= "..DA.DUMP1(list,1))
 	if not level then level = 1 end
@@ -459,7 +459,7 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index, level)
 	if group and list then
 		for v, entry in pairs(group.entries) do
 			if entry.subGroup then
-				--DA.DEBUG(5,"RecipeGroupFlatten: Have a subGroup= "..tostring(entry.subGroup))
+				----DA.DEBUG(5,"RecipeGroupFlatten: Have a subGroup= "..tostring(entry.subGroup))
 				local newSkill = entry
 				local inSub = 0
 				newSkill.depth = depth
@@ -475,11 +475,11 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index, level)
 				end
 				num = num + inSub
 			else
-				--DA.DEBUG(5,"RecipeGroupFlatten: No subGroup")
+				----DA.DEBUG(5,"RecipeGroupFlatten: No subGroup")
 				local skillData = self:GetSkill(self.currentPlayer, self.currentTrade, entry.skillIndex)
 				local recipe = self:GetRecipe(entry.recipeID)
 				if skillData then
-					--DA.DEBUG(5,"RecipeGroupFlatten: Have skillData= "..tostring(skillData))
+					----DA.DEBUG(5,"RecipeGroupFlatten: Have skillData= "..tostring(skillData))
 --
 -- apply (a subset of) filtering
 --
@@ -493,7 +493,7 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index, level)
 -- are we hiding anything that can't be created with the mats on this character?
 --
 					if Skillet:GetTradeSkillOption("hideuncraftable") then
-						DA.DEBUG(5,"name="..tostring(skillData.name)..", numCraftable="..tostring(skillData.numCraftable)..", numRecursive="..tostring(skillData.numRecursive)..", numCraftableVendor="..tostring(skillData.numCraftableVendor)..", numCraftableAlts="..tostring(skillData.numCraftableAlts))
+						--DA.DEBUG(5,"name="..tostring(skillData.name)..", numCraftable="..tostring(skillData.numCraftable)..", numRecursive="..tostring(skillData.numRecursive)..", numCraftableVendor="..tostring(skillData.numCraftableVendor)..", numCraftableAlts="..tostring(skillData.numCraftableAlts))
 						if not (skillData.numCraftable and skillData.numCraftable > 0 and Skillet:GetTradeSkillOption("filterInventory-bag")) and
 						   not (skillData.numRecursive and skillData.numRecursive > 0 and Skillet:GetTradeSkillOption("filterInventory-crafted")) and
 						   not (skillData.numCraftableVendor and skillData.numCraftableVendor > 0 and Skillet:GetTradeSkillOption("filterInventory-vendor")) and
@@ -534,7 +534,7 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index, level)
 						list[num + index] = newSkill
 					end
 				else
-					--DA.DEBUG(5,"No skillData")
+					----DA.DEBUG(5,"No skillData")
 				end
 			end
 		end
@@ -549,7 +549,7 @@ end
 -- Note: this function is recursive
 --
 function Skillet:ConstructDBString(group, level)
-	DA.DEBUG(3,"ConstructDBString("..tostring(group.name)..", "..tostring(level)..")")
+	--DA.DEBUG(3,"ConstructDBString("..tostring(group.name)..", "..tostring(level)..")")
 	--DA.DEBUG(4,"CDBS: group= "..DA.DUMP1(group,1))
 	if not level then level = 1 end
 	level = level + 1
@@ -570,21 +570,21 @@ function Skillet:ConstructDBString(group, level)
 			if not self.db.realm.groupDB[key] then
 				self.db.realm.groupDB[key] = {}
 			end
-			DA.DEBUG(5,"CDBS: groupString= "..tostring(groupString))
+			--DA.DEBUG(5,"CDBS: groupString= "..tostring(groupString))
 			self.db.realm.groupDB[key][group.name] = groupString
 		end
 	end
 end
 
 function Skillet:PruneList(player)
-	DA.DEBUG(3,"PruneList()")
+	--DA.DEBUG(3,"PruneList()")
 	if self.data.groupList then
 		local perPlayerList = self.data.groupList[player]
 		for trade, perTradeList in pairs(perPlayerList) do
 			for label, perLabelList in pairs(perTradeList) do
 				for name, group in pairs(perLabelList) do
 					if type(group) == "table" and name ~= OVERALL_PARENT_GROUP_NAME and group.parent == nil then
-						DA.DEBUG(5,"PruneList: Pruning "..tostring(group.name)..", groupIndex= "..tostring(group.groupIndex))
+						--DA.DEBUG(5,"PruneList: Pruning "..tostring(group.name)..", groupIndex= "..tostring(group.groupIndex))
 						perLabelList[name] = nil
 						if self.db.realm.groupDB and self.db.realm.groupDB[player..":"..trade..":"..label] then
 							self.db.realm.groupDB[player..":"..trade..":"..label][name] = nil
@@ -597,7 +597,7 @@ function Skillet:PruneList(player)
 end
 
 function Skillet:InitGroupList(player, tradeID, label)
-	DA.DEBUG(3,"InitGroupList("..tostring(player)..", "..tostring(tradeID)..", "..tostring(label)..")")
+	--DA.DEBUG(3,"InitGroupList("..tostring(player)..", "..tostring(tradeID)..", "..tostring(label)..")")
 	if not self.data.groupList then
 		self.data.groupList = {}
 	end
@@ -613,7 +613,7 @@ function Skillet:InitGroupList(player, tradeID, label)
 end
 
 function Skillet:DeconstructDBStrings() -- DDBS(1): DDBS(2)
-	DA.DEBUG(3,"DeconstructDBStrings()")
+	--DA.DEBUG(3,"DeconstructDBStrings()")
 --
 -- first pass, find all the defined groups
 --
@@ -626,7 +626,7 @@ function Skillet:DeconstructDBStrings() -- DDBS(1): DDBS(2)
 		if player == self.currentPlayer and tradeID == self.currentTrade then
 			self:InitGroupList(player, tradeID, label)
 			for name,list in pairs(groupList) do
-				DA.DEBUG(5,"DDBS(1): name= "..tostring(name)..", list= "..tostring(list))
+				--DA.DEBUG(5,"DDBS(1): name= "..tostring(name)..", list= "..tostring(list))
 				local group = self:RecipeGroupNew(player, tradeID, label, name)
 				local groupContents = { string.split(":",list) }
 --				local groupID = groupContents[1] or serial
@@ -646,35 +646,35 @@ function Skillet:DeconstructDBStrings() -- DDBS(1): DDBS(2)
 		tradeID = tonumber(tradeID)
 		if player == self.currentPlayer and tradeID == self.currentTrade and self.data.skillIndexLookup then
 			for name,list in pairs(groupList) do
-				DA.DEBUG(5,"DDBS(2): name= "..tostring(name)..", list= "..tostring(list))
+				--DA.DEBUG(5,"DDBS(2): name= "..tostring(name)..", list= "..tostring(list))
 				local group = self:RecipeGroupFind(player, tradeID, label, name)
 				local groupIndex = group.groupIndex
 				if not group.initialized then
 					group.initialized = true
 					local groupContents = { string.split(":",list) }
-					DA.DEBUG(5,"DDBS(2): groupContents= "..DA.DUMP1(groupContents))
+					--DA.DEBUG(5,"DDBS(2): groupContents= "..DA.DUMP1(groupContents))
 					for j=2,#groupContents do
 						local recipeID = groupContents[j]
 						if string.sub(recipeID,1,1) == "g" then
 --							local id = string.sub(recipeID,2)
 							local id = tonumber(string.sub(recipeID,2))
-							DA.DEBUG(5,"DDBS(2): id= "..tostring(id))
+							--DA.DEBUG(5,"DDBS(2): id= "..tostring(id))
 --							local subGroup = self:RecipeGroupFind(player, tradeID, label, groupContents[1])
 							local subGroup = self:RecipeGroupFind(player, tradeID, label, groupNames[id])
 							if subGroup then
-								DA.DEBUG(5,"DDBS(2): adding subGroup "..tostring(groupContents[1]))
+								--DA.DEBUG(5,"DDBS(2): adding subGroup "..tostring(groupContents[1]))
 								self:RecipeGroupAddSubGroup(group, subGroup, subGroup.groupIndex, true)
 							end
 						elseif string.sub(recipeID,1,1) == "'" then
 							recipeID = string.sub(recipeID,2)
-							DA.DEBUG(5,"DDBS(2): recipeID= "..tostring(recipeID))
+							--DA.DEBUG(5,"DDBS(2): recipeID= "..tostring(recipeID))
 							local skillIndex = self.data.skillIndexLookup[player][recipeID]
 							if skillIndex then 
-								DA.DEBUG(5,"DDBS(2): adding recipe "..recipeID.." to "..group.name.."/"..player..":"..skillIndex)
+								--DA.DEBUG(5,"DDBS(2): adding recipe "..recipeID.." to "..group.name.."/"..player..":"..skillIndex)
 								self:RecipeGroupAddRecipe(group, recipeID, skillIndex, true)
 							end
 						else
-							DA.DEBUG(3,"DDBS(2): Serious problem with "..tostring(recipeID))
+							--DA.DEBUG(3,"DDBS(2): Serious problem with "..tostring(recipeID))
 						end
 					end
 				end
@@ -688,7 +688,7 @@ end
 -- Called when the grouping drop down is displayed
 --
 function Skillet:RecipeGroupDropdown_OnShow()
-	--DA.DEBUG(3,"RecipeGroupDropdown_OnShow()")
+	----DA.DEBUG(3,"RecipeGroupDropdown_OnShow()")
 	UIDropDownMenu_Initialize(SkilletRecipeGroupDropdown, Skillet.RecipeGroupDropdown_Initialize)
 	SkilletRecipeGroupDropdown.displayMode = "MENU"
 	Skillet:DeconstructDBStrings()
@@ -701,7 +701,7 @@ end
 -- The method we use the initialize the grouping drop down.
 --
 function Skillet.RecipeGroupDropdown_Initialize(menuFrame,level)
-	DA.DEBUG(3,"RecipeGroupDropdown_Initialize("..tostring(menuFrame)..", "..tostring(level)..")")
+	--DA.DEBUG(3,"RecipeGroupDropdown_Initialize("..tostring(menuFrame)..", "..tostring(level)..")")
 	if level == 1 then  -- group labels
 		local entry = {}
 		entry.text = "Flat"
@@ -747,7 +747,7 @@ end
 -- Called when the user selects an item in the sorting drop down
 --
 function Skillet:RecipeGroupSelect(menuFrame,label)
-	DA.DEBUG(3,"RecipeGroupSelect("..tostring(menuFrame)..", "..tostring(label)..")")
+	--DA.DEBUG(3,"RecipeGroupSelect("..tostring(menuFrame)..", "..tostring(label)..")")
 	Skillet:SetTradeSkillOption("grouping", label)
 	Skillet.currentGroupLabel = label
 	Skillet.currentGroup = nil
@@ -763,12 +763,12 @@ function Skillet:RecipeGroupIsLocked()
 	else
 		answer = Skillet:GetTradeSkillOption(self.currentGroupLabel.."-locked")
 	end
-	DA.DEBUG(3,"RecipeGroupIsLocked()= "..tostring(answer))
+	--DA.DEBUG(3,"RecipeGroupIsLocked()= "..tostring(answer))
 	return answer
 end
 
 function Skillet:ToggleTradeSkillOptionDropDown(option)
-	DA.DEBUG(3,"RecipeGroupOperations_OnClick("..tostring(option)..")")
+	--DA.DEBUG(3,"RecipeGroupOperations_OnClick("..tostring(option)..")")
 	self:ToggleTradeSkillOption(option)
 	self:RecipeGroupDropdown_OnShow()
 	self:SortAndFilterRecipes()
@@ -779,7 +779,7 @@ end
 -- Called when the grouping operators drop down is displayed
 --
 function Skillet:RecipeGroupOperations_OnClick(this)
-	DA.DEBUG(3,"RecipeGroupOperations_OnClick("..tostring(this)..")")
+	--DA.DEBUG(3,"RecipeGroupOperations_OnClick("..tostring(this)..")")
 	if not RecipeGroupOpsMenu then
 		RecipeGroupOpsMenu = CreateFrame("Frame", "RecipeGroupOpsMenu", _G["UIParent"], "UIDropDownMenuTemplate")
 	end
@@ -791,7 +791,7 @@ end
 -- The method we use the initialize the group ops drop down.
 --
 function SkilletRecipeGroupOpsMenu_Init(menuFrame,level)
-	DA.DEBUG(3,"SkilletRecipeGroupOpsMenu_Init("..tostring(menuFrame)..", "..tostring(label)..")")
+	--DA.DEBUG(3,"SkilletRecipeGroupOpsMenu_Init("..tostring(menuFrame)..", "..tostring(label)..")")
 	if level == 1 then
 		local entry = {}
 		local null = {}
@@ -821,7 +821,7 @@ function SkilletRecipeGroupOpsMenu_Init(menuFrame,level)
 end
 
 function Skillet:RecipeGroupOpNew()
-	DA.DEBUG(3,"RecipeGroupOpNew()")
+	--DA.DEBUG(3,"RecipeGroupOpNew()")
 	local label = "Custom"
 --	local serial = 1
 	local player = Skillet.currentPlayer
@@ -852,7 +852,7 @@ function Skillet:RecipeGroupOpNew()
 end
 
 function Skillet:RecipeGroupOpCopy()
-	DA.DEBUG(3,"RecipeGroupOpCopy()")
+	--DA.DEBUG(3,"RecipeGroupOpCopy()")
 	local label = "Custom"
 	local player = Skillet.currentPlayer
 	local tradeID = Skillet.currentTrade
@@ -874,7 +874,7 @@ function Skillet:RecipeGroupOpCopy()
 end
 
 function Skillet:GroupNameEditSave()
-	DA.DEBUG(3,"GroupNameEditSave()")
+	--DA.DEBUG(3,"GroupNameEditSave()")
 	local newName = GroupButtonNameEdit:GetText()
 	Skillet:RecipeGroupRename(Skillet.currentGroupLabel, newName)
 	GroupButtonNameEdit:Hide()
@@ -884,7 +884,7 @@ function Skillet:GroupNameEditSave()
 end
 
 function Skillet:RecipeGroupOpRename()
-	DA.DEBUG(3,"RecipeGroupOpRename()")
+	--DA.DEBUG(3,"RecipeGroupOpRename()")
 	if not Skillet:RecipeGroupIsLocked() then
 		GroupButtonNameEdit:SetText(Skillet.currentGroupLabel)
 		GroupButtonNameEdit:SetParent(SkilletRecipeGroupDropdownText:GetParent())
@@ -898,7 +898,7 @@ function Skillet:RecipeGroupOpRename()
 end
 
 function Skillet:RecipeGroupOpLock()
-	DA.DEBUG(3,"RecipeGroupOpLock()")
+	--DA.DEBUG(3,"RecipeGroupOpLock()")
 	local label = Skillet.currentGroupLabel
 	if label ~= "Blizzard" and label ~= "Flat" then
 		Skillet:ToggleTradeSkillOption(label.."-locked")
@@ -906,7 +906,7 @@ function Skillet:RecipeGroupOpLock()
 end
 
 function Skillet:RecipeGroupOpDelete()
-	DA.DEBUG(3,"RecipeGroupOpDelete()")
+	--DA.DEBUG(3,"RecipeGroupOpDelete()")
 	if not Skillet:RecipeGroupIsLocked() then
 		local player = Skillet.currentPlayer
 		local tradeID = Skillet.currentTrade
@@ -941,7 +941,7 @@ end
 -- Note: this function is recursive
 --
 function Skillet:RecipeGroupDump(group, level)
-	--DA.DEBUG(3,"RecipeGroupDump("..tostring(group.name)..", "..tostring(level)..")")
+	----DA.DEBUG(3,"RecipeGroupDump("..tostring(group.name)..", "..tostring(level)..")")
 	if not level then level = 1 end
 	level = level + 1
 	if group then
@@ -954,8 +954,8 @@ function Skillet:RecipeGroupDump(group, level)
 				self:RecipeGroupDump(entry.subGroup, level)
 			end
 		end
-		DA.DEBUG(5,groupString)
+		--DA.DEBUG(5,groupString)
 	else
-		DA.DEBUG(5,"no match")
+		--DA.DEBUG(5,"no match")
 	end
 end
