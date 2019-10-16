@@ -140,7 +140,7 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex)
 end
 
 function Skillet:InventoryScan()
-	--DA.DEBUG(1,"InventoryScan()")
+	DA.DEBUG(0,"InventoryScan()")
 	if self.linkedSkill or self.isGuild then
 		return
 	end

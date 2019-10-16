@@ -1227,7 +1227,7 @@ function Skillet:OnInitialize()
 -- we clear the saved variables recipe data just to be safe.
 --
 	local dataVersion = 5
-	local recipeVersion = 1
+	local recipeVersion = 2
 	local _,wowBuild,_,wowVersion = GetBuildInfo();
 	self.wowBuild = wowBuild
 	self.wowVersion = wowVersion
@@ -1963,19 +1963,6 @@ function Skillet:BAG_UPDATE(event, bagID)
 			Skillet:BANK_UPDATE(event,bagID) -- Looks like an event but its not.
 		end
 	end
-	if MerchantFrame and MerchantFrame:IsVisible() then
---
--- may need to update the button on the merchant frame window ...
---
-		self:UpdateMerchantFrame()
-	end
---
--- Most of the shoppingList code is in ShoppingList.lua
---
-	if self.shoppingList and self.shoppingList:IsVisible() then
-		Skillet:InventoryScan()
-		Skillet:UpdateShoppingListWindow(true)
-	end
 end
 
 --
@@ -2004,6 +1991,26 @@ function Skillet:BAG_UPDATE_DELAYED(event)
 		end
 	end
 ]]--
+	local scanned = false
+	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
+		Skillet:InventoryScan()
+		scanned = true
+		Skillet:UpdateTradeSkillWindow()
+	end
+	if Skillet.shoppingList and Skillet.shoppingList:IsVisible() then
+		if not scanned then
+			Skillet:InventoryScan()
+			scanned = true
+		end
+		Skillet:UpdateShoppingListWindow(false)
+	end
+	if MerchantFrame and MerchantFrame:IsVisible() then
+		if not scanned then
+			Skillet:InventoryScan()
+			scanned = true
+		end
+		self:UpdateMerchantFrame()
+	end
 end
 
 function Skillet:SetTradeSkill(player, tradeID, skillIndex)
