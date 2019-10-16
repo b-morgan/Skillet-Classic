@@ -900,49 +900,6 @@
 			</Button>
 			<!--
 			#
-			# A button to link the current trade skill
-			# (doesn't work on Classic)
-			#
-			<Button name="SkilletTradeSkillLinkButton">
-				<Size>
-					<AbsDimension x="32" y="16"/>
-				</Size>
-				<Anchors>
-					<Anchor point="RIGHT" relativeTo="SkilletShowOptionsButton" relativePoint="LEFT">
-						<Offset>
-							<AbsDimension x="-5" y="-6"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						local activeEditBox =  ChatEdit_GetActiveWindow()
-						if activeEditBox then
-							local link=GetTradeSkillListLink()
-							if (not ChatEdit_InsertLink(link) ) then
-								assert(activeEditBox:GetName(), "Failed to add tradeskill link")
-							end
-						end
-					</OnClick>
-					<OnEnter>
-						GameTooltip:SetOwner(self,"ANCHOR_TOPLEFT")
-						GameTooltip:SetText(LINK_TRADESKILL_TOOLTIP, nil, nil, nil, nil, true)
-						GameTooltip:Show()
-					</OnEnter>
-					<OnLeave>
-						GameTooltip:Hide()
-					</OnLeave>
-				</Scripts>
-				<NormalTexture file="Interface\TradeSkillFrame\UI-TradeSkill-LinkButton">
-					<TexCoords left="0" right="1.0" top="0" bottom="0.5"/>
-				</NormalTexture>
-				<HighlightTexture file="Interface\TradeSkillFrame\UI-TradeSkill-LinkButton" alphaMode="ADD">
-					<TexCoords left="0" right="1.0" top="0.5" bottom="1.0"/>
-				</HighlightTexture>
-			</Button>
-			-->
-			<!--
-			#
 			# Drop down where users can select the grouping method they want to use
 			#
 			-->
@@ -1209,116 +1166,6 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-<!--
-			<EditBox name="SkilletFilterBox" letters="50" historyLines="0" autoFocus="false">
-				<Size>
-					<AbsDimension x="126" y="20"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="SkilletSearchBox" relativePoint="BOTTOMLEFT">
-						<Offset>
-							<AbsDimension x="0" y="-4"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Layers>
-					<Layer level="BACKGROUND">
-						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
-							<Size>
-								<AbsDimension x="8" y="20"/>
-							</Size>
-							<Anchors>
-								<Anchor point="TOPLEFT">
-									<Offset>
-										<AbsDimension x="-5" y="0"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
-						</Texture>
-						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
-							<Size>
-								<AbsDimension x="8" y="20"/>
-							</Size>
-							<Anchors>
-								<Anchor point="RIGHT">
-									<Offset>
-										<AbsDimension x="0" y="0"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
-						</Texture>
-						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
-							<Size>
-								<AbsDimension x="10" y="20"/>
-							</Size>
-							<Anchors>
-								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
-								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
-							</Anchors>
-							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
-						</Texture>
-					</Layer>
-					<Layer level="ARTWORK">
-						<FontString name="SkilletFilterLabel" inherits="GameFontNormal" text="Search">
-							<Anchors>
-								<Anchor point="RIGHT" relativeTo="$parent" relativePoint="LEFT">
-									<Offset>
-										<AbsDimension x="-8" y="0"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-							<Color r="1" g="1" b="1" a="1"/>
-						</FontString>
-					</Layer>
-				</Layers>
-				<Scripts>
-					<OnEnterPressed>
-						self:ClearFocus()
-					</OnEnterPressed>
-					<OnEscapePressed>
-						self:ClearFocus()
-					</OnEscapePressed>
-					<OnTextChanged>
-						Skillet:UpdateSearch(self:GetText())
-					</OnTextChanged>
-					<OnEditFocusLost>
-						self:HighlightText(0, 0)
-					</OnEditFocusLost>
-					<OnEditFocusGained>
-						if IsAltKeyDown() then
-							self:SetText("")
-						else
-							self:HighlightText()
-						end
-					</OnEditFocusGained>
-				</Scripts>
-				<FontString inherits="ChatFontNormal"/>
-			</EditBox>
-			<Button name="SkilletFilterClear">
-				<Size>
-					<AbsDimension x="32" y="32"/>
-				</Size>
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="SkilletFilterBox" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="-8" y="-2"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<NormalTexture file="Interface\Buttons\CancelButton-Up"/>
-				<PushedTexture file="Interface\Buttons\CancelButton-Down"/>
-				<HighlightTexture file="Interface\Buttons\CancelButton-Highlight" alphaMode="ADD"/>
-				<Scripts>
-					<OnClick>
-						Skillet:InventoryFilterButtons_Hide()
-						SkilletFilterBox:SetText("")
-						SkilletFilterBox:ClearFocus()
-					</OnClick>
-				</Scripts>
-			</Button>
--->
 			<!--
 			#
 			# A status bar to show how much skill you have in this trade
@@ -2895,6 +2742,7 @@
 			</OnShow>
 			<OnHide>
 				PlaySound(SOUNDKIT.IG_BACKPACK_CLOSE) -- "igBackPackClose"
+				Skillet:Tradeskill_OnHide()
 				self:EnableKeyboard(false)
 			</OnHide>
 			<OnUpdate>

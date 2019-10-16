@@ -394,7 +394,7 @@ function Skillet:SortAndFilterRecipes() -- SAFR:
 				end
 			end
 		end	-- for
-		DA.DEBUG(1,"SAFR: numSkills= "..tostring(numSkills)..", oldLength= "..tostring(oldLength)..", button_index= "..tostring(button_index))
+		--DA.DEBUG(1,"SAFR: numSkills= "..tostring(numSkills)..", oldLength= "..tostring(oldLength)..", button_index= "..tostring(button_index))
 --
 -- if the last result was larger than this result,
 -- get rid of the extra old results.
@@ -414,13 +414,13 @@ function Skillet:SortAndFilterRecipes() -- SAFR:
 				return recipe_sort_method(Skillet.currentTrade, b, a)
 			end)
 		end
-		DA.DEBUG(1,"SAFR: sorted "..button_index.." skills")
+		--DA.DEBUG(1,"SAFR: sorted "..button_index.." skills")
 	else
 --
 -- A custom group
 --
 		local group = Skillet:RecipeGroupFind(Skillet.currentPlayer, Skillet.currentTrade, Skillet.currentGroupLabel, Skillet.currentGroup)
-		DA.DEBUG(1,"SAFR: current grouping "..tostring(Skillet.currentGroupLabel).." "..tostring(Skillet.currentGroup))
+		--DA.DEBUG(1,"SAFR: current grouping "..tostring(Skillet.currentGroupLabel).." "..tostring(Skillet.currentGroup))
 		if recipe_sort_method ~= NOSORT then
 			Skillet:RecipeGroupSort(group, recipe_sort_method, is_sort_desc())
 		end
@@ -437,7 +437,7 @@ function Skillet:SortAndFilterRecipes() -- SAFR:
 --   but not searching
 --
 		button_index = Skillet:RecipeGroupFlatten(group, depth, sortedSkillList, index)
-		DA.DEBUG(1,"SAFR: sorted "..tostring(button_index).." skills in "..tostring(Skillet.currentGroupLabel))
+		--DA.DEBUG(1,"SAFR: sorted "..tostring(button_index).." skills in "..tostring(Skillet.currentGroupLabel))
 	end
 	sortedSkillList.count = button_index
 --

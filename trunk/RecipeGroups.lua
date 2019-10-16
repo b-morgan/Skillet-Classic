@@ -403,12 +403,12 @@ end
 -- Note: this function is recursive
 --
 function Skillet:RecipeGroupSort(group, sortMethod, desc, level)
-	----DA.DEBUG(3,"RecipeGroupSort("..tostring(group.name)..", "..tostring(sortMethod)..", "..tostring(desc)..", "..tostring(level)..")")
+	--DA.DEBUG(3,"RecipeGroupSort("..tostring(group.name)..", "..tostring(sortMethod)..", "..tostring(desc)..", "..tostring(level)..")")
 	--DA.DEBUG(4,"group= "..DA.DUMP1(group,1))
 	if not level then level = 1 end
 	level = level + 1
 	if group then
-		----DA.DEBUG(5,"group.entries= "..DA.DUMP1(group.entries,1))
+		--DA.DEBUG(5,"group.entries= "..DA.DUMP1(group.entries,1))
 		for v, entry in pairs(group.entries) do
 			if entry.subGroup and entry.subGroup ~= group then
 				self:RecipeGroupSort(entry.subGroup, sortMethod, desc, level)
@@ -429,7 +429,7 @@ function Skillet:RecipeGroupSort(group, sortMethod, desc, level)
 end
 
 function Skillet:RecipeGroupInitFlatten(group, list)
-	----DA.DEBUG(3,"RecipeGroupInitFlatten("..tostring(group.name)..", "..tostring(list)..")")
+	--DA.DEBUG(3,"RecipeGroupInitFlatten("..tostring(group.name)..", "..tostring(list)..")")
 	--DA.DEBUG(4,"group= "..DA.DUMP1(group,1))
 	--DA.DEBUG(4,"list= "..DA.DUMP1(list,1))
 	if group and list then
@@ -440,7 +440,7 @@ function Skillet:RecipeGroupInitFlatten(group, list)
 		newSkill.expanded = true
 		newSkill.depth = 0
 --		if newSkill.parent ~= group.parent then newSkill.parent = group.parent end -- newSkill.parent = group.parent
-		----DA.DEBUG(5,"newSkill= "..DA.DUMP1(newSkill,1))
+		--DA.DEBUG(5,"newSkill= "..DA.DUMP1(newSkill,1))
 		newSkill.parent = group.parent
 		list[1] = newSkill
 	end
@@ -450,7 +450,7 @@ end
 -- Note: this function is recursive
 --
 function Skillet:RecipeGroupFlatten(group, depth, list, index, level)
-	----DA.DEBUG(3,"RecipeGroupFlatten("..tostring(group.name)..", "..tostring(depth)..", "..tostring(list.name)..", "..tostring(index)..", "..tostring(level)..")")
+	--DA.DEBUG(3,"RecipeGroupFlatten("..tostring(group.name)..", "..tostring(depth)..", "..tostring(list.name)..", "..tostring(index)..", "..tostring(level)..")")
 	--DA.DEBUG(4,"group= "..DA.DUMP1(group,1))
 	--DA.DEBUG(4,"list= "..DA.DUMP1(list,1))
 	if not level then level = 1 end
@@ -459,7 +459,7 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index, level)
 	if group and list then
 		for v, entry in pairs(group.entries) do
 			if entry.subGroup then
-				----DA.DEBUG(5,"RecipeGroupFlatten: Have a subGroup= "..tostring(entry.subGroup))
+				--DA.DEBUG(5,"RecipeGroupFlatten: Have a subGroup= "..tostring(entry.subGroup))
 				local newSkill = entry
 				local inSub = 0
 				newSkill.depth = depth
@@ -475,11 +475,11 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index, level)
 				end
 				num = num + inSub
 			else
-				----DA.DEBUG(5,"RecipeGroupFlatten: No subGroup")
+				--DA.DEBUG(5,"RecipeGroupFlatten: No subGroup")
 				local skillData = self:GetSkill(self.currentPlayer, self.currentTrade, entry.skillIndex)
 				local recipe = self:GetRecipe(entry.recipeID)
 				if skillData then
-					----DA.DEBUG(5,"RecipeGroupFlatten: Have skillData= "..tostring(skillData))
+					--DA.DEBUG(5,"RecipeGroupFlatten: Have skillData= "..tostring(skillData))
 --
 -- apply (a subset of) filtering
 --
@@ -534,7 +534,7 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index, level)
 						list[num + index] = newSkill
 					end
 				else
-					----DA.DEBUG(5,"No skillData")
+					--DA.DEBUG(5,"No skillData")
 				end
 			end
 		end
@@ -688,7 +688,7 @@ end
 -- Called when the grouping drop down is displayed
 --
 function Skillet:RecipeGroupDropdown_OnShow()
-	----DA.DEBUG(3,"RecipeGroupDropdown_OnShow()")
+	--DA.DEBUG(3,"RecipeGroupDropdown_OnShow()")
 	UIDropDownMenu_Initialize(SkilletRecipeGroupDropdown, Skillet.RecipeGroupDropdown_Initialize)
 	SkilletRecipeGroupDropdown.displayMode = "MENU"
 	Skillet:DeconstructDBStrings()
@@ -941,7 +941,7 @@ end
 -- Note: this function is recursive
 --
 function Skillet:RecipeGroupDump(group, level)
-	----DA.DEBUG(3,"RecipeGroupDump("..tostring(group.name)..", "..tostring(level)..")")
+	--DA.DEBUG(3,"RecipeGroupDump("..tostring(group.name)..", "..tostring(level)..")")
 	if not level then level = 1 end
 	level = level + 1
 	if group then

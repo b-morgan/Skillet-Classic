@@ -1227,7 +1227,7 @@ function Skillet:OnInitialize()
 -- we clear the saved variables recipe data just to be safe.
 --
 	local dataVersion = 5
-	local recipeVersion = 2
+	local recipeVersion = 3
 	local _,wowBuild,_,wowVersion = GetBuildInfo();
 	self.wowBuild = wowBuild
 	self.wowVersion = wowVersion
@@ -1717,7 +1717,9 @@ function Skillet:TRADE_SKILL_SHOW()
 --		Skillet.ignoreClose = false
 	end
 	SkilletEnchantButton:Hide()				-- Hide our button
-	Skillet:SkilletShow()
+	if not Skillet.changingTrade then		-- wait for UNIT_SPELLCAST_SUCCEEDED
+		Skillet:SkilletShow()
+	end
 end
 
 function Skillet:CRAFT_SHOW()
@@ -1735,7 +1737,9 @@ function Skillet:CRAFT_SHOW()
 --		Skillet.ignoreClose = false
 	end
 	SkilletEnchantButton:Show()				-- Show our button
-	Skillet:SkilletShow()
+	if not Skillet.changingTrade then		-- wait for UNIT_SPELLCAST_SUCCEEDED
+		Skillet:SkilletShow()
+	end
 end
 
 function Skillet:SPELLS_CHANGED()
@@ -1838,8 +1842,11 @@ function Skillet:SkilletShow()
 	end
 end
 
+--
+-- Only called from SkilletShow() after a short delay
+--
 function Skillet:SkilletShowWindow()
-	DA.DEBUG(0,"SkilletShowWindow(), tradeID= "..tostring(self.currentTrade))
+	DA.DEBUG(0,"SkilletShowWindow(), currentTrade= "..tostring(self.currentTrade)..", scanInProgress= "..tostring(scanInProgress))
 	if IsControlKeyDown() then
 		self.db.realm.skillDB[self.currentPlayer][self.currentTrade] = {}
 	end
@@ -2015,6 +2022,39 @@ function Skillet:BAG_UPDATE_DELAYED(event)
 	end
 end
 
+--
+-- Make sure profession changes are spaced out
+--
+function Skillet:DelayChange()
+	Skillet.delayChange = false
+	if Skillet.needChange then
+		Skillet.needChange = false
+		Skillet:ChangeTradeSkill(Skillet.changingTrade, Skillet.changingName)
+	end
+end
+
+--
+-- Change to a different profession but
+-- not more often than once every .5 seconds
+--
+function Skillet:ChangeTradeSkill(tradeID, tradeName)
+	DA.DEBUG(0,"SetTradeSkill("..tostring(tradeID)..", "..tostring(tradeName)..")")
+	if not Skillet.delayChange then
+		DA.DEBUG(1,"ChangeTradeSkill: executing CastSpellByName("..tostring(tradeName)..")")
+		CastSpellByName(tradeName) -- trigger the whole rescan process via a TRADE_SKILL_SHOW or CRAFT_SHOW event
+		Skillet.changingTrade = tradeID
+		Skillet.changingName = tradeName
+		Skillet.delayChange = true
+		Skillet:ScheduleTimer("DelayChange", 0.5)
+	else
+		DA.DEBUG(1,"ChangeTradeSkill: waiting for callback")
+		Skillet.needChange = true
+	end
+end
+
+--
+-- Either change to a different profession or change the currently selected recipe
+--
 function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 	DA.DEBUG(0,"SetTradeSkill("..tostring(player)..", "..tostring(tradeID)..", "..tostring(skillIndex)..")")
 	if player ~= self.currentPlayer then
@@ -2028,47 +2068,22 @@ function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 			self.isCraft = self.skillIsCraft[TradeID]	-- the skill we are going to
 			self:ConfigureRecipeControls()
 		end
-		self.dataScanned = false
+		self.currentTrade = nil
+		self.selectedSkill = nil
 		self.currentGroup = nil
-		self.currentGroupLabel = self:GetTradeSkillOption("grouping")
-		self:RecipeGroupDropdown_OnShow()
+		self:HideNotesWindow()
 --
 -- Using English spell names won't work for other locales
 --
-		local spellName = self:GetTradeName(tradeID)
+		local tradeName = self:GetTradeName(tradeID)
 		local Mining = self:GetTradeName(MINING)
 		local Smelting = self:GetTradeName(SMELTING)
 		DA.DEBUG(0,"cast: "..tostring(spellName))
-		if spellName == Mining then spellName = Smelting end
-		CastSpellByName(spellName) -- trigger the whole rescan process via a TRADE_SKILL_SHOW or CRAFT_SHOW event
+		if tradeName == Mining then tradeName = Smelting end
+		self:ChangeTradeSkill(tradeID, tradeName)
+	else
+		self:SetSelectedSkill(skillIndex, false)
 	end
-	self:SetSelectedSkill(skillIndex, false)
-end
-
---
--- Updates the tradeskill window, if the current trade has changed.
---
-function Skillet:UpdateTradeSkill()
-	DA.DEBUG(0,"UpdateTradeSkill()")
-	local trade_changed = false
-	local new_trade = self:GetTradeSkillLine()
-	if not self.currentTrade and new_trade then
-		trade_changed = true
-	elseif self.currentTrade ~= new_trade then
-		trade_changed = true
-	end
-	if true or trade_changed then
-		self:HideNotesWindow();
-		self.sortedRecipeList = {}
-		-- And start the update sequence through the rest of the mod
-		self:SetSelectedTrade(new_trade)
-		-- remove any filters currently in place
-		local searchbox = _G["SkilletSearchBox"];
-		local searchtext = self:GetTradeSkillOption("searchtext", self.currentPlayer, new_trade)
-		-- this fires off a redraw event, so only change after data has been acquired
-		searchbox:SetText(searchtext);
-	end
-	DA.DEBUG(0,"UpdateTradeSkill complete")
 end
 
 --
@@ -2139,25 +2154,20 @@ function Skillet:ShowOptions()
 end
 
 --
--- Notes when a new trade has been selected
---
-function Skillet:SetSelectedTrade(newTrade)
-	DA.DEBUG(0,"SetSelectedTrade("..tostring(newTrade)..")")
-	self.currentTrade = newTrade;
-	self:SetSelectedSkill(nil, false)
-end
-
---
 -- Sets the specific trade skill that the user wants to see details on.
 --
-function Skillet:SetSelectedSkill(skillIndex, wasClicked)
-	--DA.DEBUG(0,"SetSelectedSkill("..tostring(skillIndex)..", "..tostring(wasClicked)..")")
+function Skillet:SetSelectedSkill(skillIndex)
+	--DA.DEBUG(0,"SetSelectedSkill("..tostring(skillIndex)..")")
 	if not skillIndex then
-		-- no skill selected
+--
+-- no skill selected
+--
 		self:HideNotesWindow()
 	elseif self.selectedSkill and self.selectedSkill ~= skillIndex then
-		-- new skill selected
-		self:HideNotesWindow() -- XXX: should this be an update?
+--
+-- new skill selected
+--
+		self:HideNotesWindow()
 	end
 	self:ConfigureRecipeControls()
 	if Skillet.db.profile.support_crafting and self.isCraft and CraftFrame_SetSelection then
