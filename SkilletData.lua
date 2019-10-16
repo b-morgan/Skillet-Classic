@@ -997,7 +997,12 @@ local function ScanTrade()
 				if #tools then
 					recipeString = recipeString.." "..toolString
 				end
-				recipeDB[recipeID] = recipeString
+				if not recipeDB[recipeID] then
+					recipeDB[recipeID] = recipeString
+				elseif recipeDB[recipeID] ~= recipeString then
+					DA.DEBUG(0,"ScanTrade: replacing '"..tostring(recipeDB[recipeID]).."' with '"..tostring(recipeString).."'")
+					recipeDB[recipeID] = recipeString
+				end
 			end
 		end
 	end
