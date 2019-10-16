@@ -1822,7 +1822,7 @@ function Skillet:SkilletShow()
 -- give Hunter Beast Training a pass
 -- for everything else bring up the appropriate Blizzard UI
 --
-		if self.castSpellID ~= 5149 then
+		if not IsShiftKeyDown() or self.castSpellID ~= 5149 then
 			DA.DEBUG(0,"SkilletShow: "..tostring(self.currentTrade).." ("..tostring(name)..") is not supported")
 			DA.DEBUG(0,"tradeSkillIDsByName= "..DA.DUMP(self.tradeSkillIDsByName))
 			self:HideAllWindows()
@@ -1837,7 +1837,7 @@ function Skillet:SkilletShow()
 end
 
 function Skillet:SkilletShowWindow()
-	DA.DEBUG(0,"SkilletShowWindow(), (was showing "..tostring(self.currentTrade)..")")
+	DA.DEBUG(0,"SkilletShowWindow(), tradeID= "..tostring(self.currentTrade))
 	if IsControlKeyDown() then
 		self.db.realm.skillDB[self.currentPlayer][self.currentTrade] = {}
 	end
