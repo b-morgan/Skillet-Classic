@@ -1098,6 +1098,17 @@ Skillet.options =
 			end,
 			order = 97
 		},
+		DebugMark = {
+			type = 'input',
+			name = "DebugMark",
+			desc = "Adds a comment to logs",
+			get = function()
+			end,
+			set = function(self,value)
+				DA.MARK(value)
+			end,
+			order = 98
+		},
 
 --
 -- command to reset the position of the major Skillet frames
