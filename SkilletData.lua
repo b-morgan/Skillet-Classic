@@ -541,9 +541,21 @@ end
 
 function Skillet:GetSkillRanks(player, trade)
 	--DA.DEBUG(3,"GetSkillRanks("..tostring(player)..", "..tostring(trade)..")")
+	local name, rank, maxRank
 	if player and trade then
-		if Skillet.db.realm.tradeSkills[player] then
-			return Skillet.db.realm.tradeSkills[player][trade]
+		if player == self.currentPlayer and trade == self.currentTrade then
+			if self.isCraft then
+				name, rank, maxRank = GetCraftDisplaySkillLine()
+			else
+				name, rank, maxRank = GetTradeSkillLine()
+			end
+			if self.db.realm.tradeSkills[player] and self.db.realm.tradeSkills[player][trade] then
+				self.db.realm.tradeSkills[player][trade].rank = rank
+				self.db.realm.tradeSkills[player][trade].maxRank = maxRank
+			end
+		end
+		if self.db.realm.tradeSkills[player] then
+			return self.db.realm.tradeSkills[player][trade]
 		end
 	end
 end

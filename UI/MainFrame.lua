@@ -411,22 +411,6 @@ function Skillet:ResetTradeSkillWindow()
 	 end
 end
 
--- Something has changed in the tradeskills, and the window needs to be updated
-function Skillet:TradeSkillRank_Updated()
-	DA.DEBUG(0,"TradeSkillRank_Updated")
-	local _, rank, maxRank = self:GetTradeSkillLine();
-	if rank and maxRank then
-		SkilletRankFrame:SetMinMaxValues(0, maxRank);
-		SkilletRankFrame:SetValue(rank);
-		SkilletRankFrameSkillRank:SetText(rank.."/"..maxRank);
-		for c,s in pairs(SkilletRankFrame.subRanks) do
-			s:SetMinMaxValues(0, maxRank)
-		end
-		SkilletRankFrame.subRanks.gray:SetValue(maxRank)
-	end
-	DA.DEBUG(0,"TradeSkillRank_Updated over")
-end
-
 -- Called when the list of skills is scrolled
 function Skillet:SkillList_OnScroll()
 	Skillet:UpdateTradeSkillWindow()
@@ -878,7 +862,6 @@ function Skillet:UpdateTradeSkillWindow()
 --
 	SkilletShoppingListButton:Show()
 	SkilletFrame:SetAlpha(self.db.profile.transparency)
-	SkilletFrame:SetScale(self.db.profile.scale)
 	local uiScale = SkilletFrame:GetEffectiveScale()
 	local width = SkilletFrame:GetWidth() - 20 -- for padding.
 	local height = SkilletFrame:GetHeight()
