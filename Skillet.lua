@@ -2183,6 +2183,9 @@ function Skillet:SetSelectedSkill(skillIndex)
 	self:ConfigureRecipeControls()
 	if Skillet.db.profile.support_crafting and self.isCraft and CraftFrame_SetSelection then
 		CraftFrame_SetSelection(skillIndex)
+		if CraftFrame:IsVisible() then
+			CraftFrame_Update()
+		end
 	end
 	self.selectedSkill = skillIndex
 	self:ScrollToSkillIndex(skillIndex)
