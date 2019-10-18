@@ -683,7 +683,7 @@ local function ScanTrade()
 	if numSkills then
 		for i = 1, numSkills do
 			local skillName, skillType, numAvailable, isExpanded = GetTradeSkillInfo(i)
-			--DA.DEBUG(2,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
+			--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
 			if skillType == "header" or skillType == "subheader" then
 				if not isExpanded then
 					ExpandTradeSkillSubClass(i)
@@ -694,7 +694,7 @@ local function ScanTrade()
 	if numCrafts then
 		for i = 1, numCrafts do
 			local skillName, skillType, numAvailable, isExpanded = GetCraftInfo(i)
-			--DA.DEBUG(2,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
+			--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
 			if skillType == "header" or skillType == "subheader" then
 				if not isExpanded then
 					ExpandCraftSubClass(i)
@@ -703,7 +703,7 @@ local function ScanTrade()
 		end
 	numSkills = numCrafts		-- just one loop variable needed
 	end
-	--DA.DEBUG(2,"Scanning Trade "..tostring(profession)..": "..tostring(tradeID).." "..numSkills.." recipes")
+	--DA.DEBUG(2,"ScanTrade: "..tostring(profession)..": "..tostring(tradeID).." "..numSkills.." recipes")
 	local skillDB = Skillet.db.realm.skillDB[player][tradeID]
 	local recipeDB = Skillet.db.global.recipeDB
 	local skillData = Skillet.data.skillList[player][tradeID]
@@ -744,17 +744,31 @@ local function ScanTrade()
 --
 -- Now actually process each recipe (skill)
 --
-	for i = 1, numSkills, 1 do
+	local s = 1
+--	if Skillet.isCraft then
+--		s = 0
+--	end
+	for i = s, numSkills, 1 do
 		local _, skillName, skillType, numAvailable, isExpanded, subSpell, extra
 		if Skillet.isCraft then
 --
+-- If needed (by uncommenting three lines above), 
+-- Skillet-Classic can insert a fake header for Crafts
+--
+			if i == 0 then
+				skillName = "Enchanting"
+				skillType = "header"
+				isExpanded = true
+			else
+--
 -- GetCraftInfo() returns are: craftName, craftSubSpellName, craftType, numAvailable, isExpanded, trainingPointCost, requiredLevel
 --
-			skillName, _, skillType, numAvailable, isExpanded = GetCraftInfo(i)
+				skillName, _, skillType, numAvailable, isExpanded = GetCraftInfo(i)
+			end
 		else
 			skillName, skillType, numAvailable, isExpanded = GetTradeSkillInfo(i)
 		end
-		--DA.DEBUG(2,"i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
+		--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
 		if skillName then
 			if skillType == "header" or skillType == "subheader" then
 --
@@ -874,19 +888,21 @@ local function ScanTrade()
 					itemLink = GetTradeSkillItemLink(i)
 				end
 				if not itemLink then
-					DA.DEBUG(0,"break caused by no itemLink")
+					DA.DEBUG(0,"ScanTrade: break caused by no itemLink")
 					break
 				end
 				local itemString = "0"
-				local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
-				  itemEquipLoc, itemIcon, itemSellPrice, itemClassID, itemSubClassID, bindType, expacID, itemSetID, 
-				  isCraftingReagent = GetItemInfo(itemLink)
+				local itemName
+				if not Skillet.isCraft then
+					itemName = GetItemInfo(itemLink)
+				else
+					itemName = "e"..tostring(Skillet:GetItemIDFromLink(itemLink))
+				end
 				if itemName then
-					local itemID = Skillet:GetItemIDFromLink(itemLink)
-					local minMade,maxMade
-					if Skillet.isCraft then
-						minMade,maxMade = GetCraftNumMade(i)
-					else
+					local itemID, linkType = Skillet:GetItemIDFromLink(itemLink)
+					--DA.DEBUG(0,"ScanTrade: itemID= "..tostring(itemID)..", linkType= "..tostring(linkType))
+					local minMade,maxMade = 1, 1
+					if not Skillet.isCraft then
 						minMade,maxMade = GetTradeSkillNumMade(i)
 					end
 					recipe.itemID = itemID
@@ -942,7 +958,7 @@ local function ScanTrade()
 				else
 					numReagents = GetTradeSkillNumReagents(i)
 				end
-				--DA.DEBUG(2,"i= "..tostring(i)..", numReagents= "..tostring(numReagents))
+				--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", numReagents= "..tostring(numReagents))
 				for j=1, numReagents, 1 do
 					local reagentName, _, numNeeded
 					if Skillet.isCraft then
@@ -950,7 +966,7 @@ local function ScanTrade()
 					else
 						reagentName, _, numNeeded = GetTradeSkillReagentInfo(i,j)
 					end
-					--DA.DEBUG(2,"i= "..tostring(i)..", j= "..tostring(j)..", reagentName= "..tostring(reagentName)..", numNeeded= "..tostring(numNeeded))
+					--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", j= "..tostring(j)..", reagentName= "..tostring(reagentName)..", numNeeded= "..tostring(numNeeded))
 					local reagentID = 0
 					if reagentName then
 						local reagentLink
@@ -959,7 +975,7 @@ local function ScanTrade()
 						else
 							reagentLink = GetTradeSkillReagentItemLink(i,j)
 						end
-						--DA.DEBUG(2,"reagentLink= "..DA.PLINK(reagentLink))
+						--DA.DEBUG(2,"ScanTrade: reagentLink= "..DA.PLINK(reagentLink))
 						reagentID = Skillet:GetItemIDFromLink(reagentLink)
 					else
 						gotNil = true
