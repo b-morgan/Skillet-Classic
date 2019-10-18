@@ -140,7 +140,7 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex)
 end
 
 function Skillet:InventoryScan()
-	DA.DEBUG(0,"InventoryScan()")
+	--DA.DEBUG(0,"InventoryScan()")
 	if self.linkedSkill or self.isGuild then
 		return
 	end
@@ -174,11 +174,15 @@ function Skillet:InventoryScan()
 	self.visited = {} -- this is a simple infinite loop avoidance scheme: basically, don't visit the same node twice
 	if inventoryData then
 		self.db.realm.inventoryData[player] = inventoryData
-		-- now calculate the craftability of these same reagents
+--
+-- now calculate the craftability of these same reagents
+--
 		for reagentID,inventory in pairs(inventoryData) do
 			self:InventoryReagentCraftability(reagentID)
 		end
-		-- remove any reagents that don't show up in our inventory
+--
+-- remove any reagents that don't show up in our inventory
+--
 		for reagentID,inventory in pairs(inventoryData) do
 			if inventoryData[reagentID] == 0 or inventoryData[reagentID] == "0" or inventoryData[reagentID] == "0 0" then
 				inventoryData[reagentID] = nil
@@ -212,7 +216,9 @@ function Skillet:GetInventory(player, reagentID)
 	return 0, 0		-- have, make
 end
 
+--
 -- queries for vendor info for a particular itemID
+--
 function Skillet:VendorSellsReagent(itemID)
 	--DA.DEBUG(0,"VendorSellsReagent("..tostring(itemID)..")")
 	if self.db.global.MissingVendorItems[itemID] then
@@ -224,7 +230,9 @@ function Skillet:VendorSellsReagent(itemID)
 			return true
 		end
 	end
+--
 -- Check the LibPeriodicTable data next
+--
 	if PT then
 		if itemID~=0 and PT:ItemInSet(itemID,"Tradeskill.Mat.BySource.Vendor") then
 			return true
@@ -233,7 +241,9 @@ function Skillet:VendorSellsReagent(itemID)
 	return false
 end
 
+--
 -- returns the number of items that can be bought limited by the amount of currency available
+--
 function Skillet:VendorItemAvailable(itemID)
 	--DA.DEBUG(0,"VendorItemAvailable("..tostring(itemID)..")")
 	local _, divider, currency, currencyAvailable
@@ -260,7 +270,9 @@ function Skillet:VendorItemAvailable(itemID)
 					_, currencyAvailable = GetCurrencyInfo(-1 * MissingVendorItem[4])
 				end
 				--DA.DEBUG(1,"currencyAvailable="..tostring(currencyAvailable))
+--
 -- compute how many this player can buy with alternate currency and return 0 for alts
+--
 				return math.floor(MissingVendorItem[2] * currencyAvailable / (MissingVendorItem[5] or 1)), 0
 			else
 				return 0, 0		-- vendor sells item for an alternate currency and we are ignoring it.
