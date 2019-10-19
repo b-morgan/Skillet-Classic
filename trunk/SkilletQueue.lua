@@ -21,21 +21,25 @@ local L = Skillet.L
 
 Skillet.reagentsChanged = {}
 
+--
 -- iterates through a list of reagentIDs and recalculates craftability
+--
 function Skillet:AdjustInventory()
 	DA.DEBUG(0,"AdjustInventory()")
-	-- update queue for faster response time
+--
+-- update queue for faster response time
+--
 	if self.reagentsChanged then
 		for id,v in pairs(self.reagentsChanged) do
 			self:InventoryReagentCraftability(id)
 		end
 	end
 	self.reagentsChanged = {}
-	self.dataScanned = false
 	Skillet:ScanQueuedReagents()
 	Skillet:InventoryScan()
 	self:CalculateCraftableCounts()
 	self:UpdateQueueWindow()
+	self.dataScanned = false
 	self:UpdateTradeSkillWindow()
 end
 

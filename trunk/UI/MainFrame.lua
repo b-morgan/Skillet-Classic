@@ -828,6 +828,10 @@ function Skillet:UpdateTradeSkillWindow()
 	end
 	local skillListKey = self.currentPlayer..":"..self.currentTrade..":"..self.currentGroupLabel
 	local numTradeSkills = 0
+	if not self.dataScanned then
+		self.dataScanned = self:RescanTrade()
+		self:SortAndFilterRecipes()
+	end
 	if not self.data.sortedSkillList[skillListKey] then
 		numTradeSkills = self:SortAndFilterRecipes()
 		if not numTradeSkills or numTradeSkills < 1 then
@@ -1334,7 +1338,7 @@ function Skillet:SkillButton_OnEnter(button)
 --
 			if altlink and IsAltKeyDown() then
 				--DA.DEBUG(1,"altlink= "..DA.PLINK(altlink))
-				tip:SetHyperlink(altlink)
+--				tip:SetHyperlink(altlink)
 			elseif link then
 				--DA.DEBUG(1,"link= "..DA.PLINK(link))
 				if skillIndex then
