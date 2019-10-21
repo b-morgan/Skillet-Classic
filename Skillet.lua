@@ -1284,18 +1284,10 @@ function Skillet:OnInitialize()
 --
 	local tooltipsToHook = { ItemRefTooltip, GameTooltip, ShoppingTooltip1, ShoppingTooltip2 };
 	for _, tooltip in pairs(tooltipsToHook) do
-		if tooltip and tooltip:HasScript("OnTooltipSetItem") then
-			if tooltip:GetScript("OnTooltipSetItem") then
-				local oldOnTooltipSetItem = tooltip:GetScript("OnTooltipSetItem")
-				tooltip:SetScript("OnTooltipSetItem", function(tooltip)
-					oldOnTooltipSetItem(tooltip)
-					Skillet:AddItemNotesToTooltip(tooltip)
-				end)
-			else
-				tooltip:SetScript("OnTooltipSetItem", function(tooltip)
-					Skillet:AddItemNotesToTooltip(tooltip)
-				end)
-			end
+		if tooltip then
+			tooltip:HookScript("OnTooltipSetItem", function(tooltip)
+				Skillet:AddItemNotesToTooltip(tooltip)
+			end)
 		end
 	end
 	local acecfg = LibStub("AceConfig-3.0")
