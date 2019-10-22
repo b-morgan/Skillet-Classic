@@ -626,7 +626,24 @@ function Skillet:TradeButton_OnClick(this,button)
 					DA.DEBUG(0, link)
 				end
 			elseif self.currentTrade ~= tradeID then
-				self:SetTradeSkill(self.currentPlayer, tradeID)
+				if self.skillIsCraft[self.currentTrade] ~= self.skillIsCraft[tradeID] then
+					self.changingTrade = tradeID
+					self.changingName = self.tradeSkillNamesByID[tradeID]
+					local buttonName = "SkilletFrameTradeButton-"..player.."-"..self.currentTrade
+					local button = _G[buttonName]
+					if button then
+						button:SetChecked(false)
+					end
+					if self.isCraft then
+						CloseCraft()
+					else
+						CloseTradeSkill()
+					end
+					self:HideAllWindows()
+					StaticPopup_Show("SKILLET_CONTINUE_CHANGE")
+				else
+					self:SetTradeSkill(self.currentPlayer, tradeID)
+				end
 			end
 			this:SetChecked(true)
 		end
