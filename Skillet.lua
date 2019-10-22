@@ -1337,6 +1337,19 @@ function Skillet:OnInitialize()
 	end
 	Skillet.FixBugs = Skillet.db.profile.FixBugs
 
+StaticPopupDialogs["SKILLET_CONTINUE_CHANGE"] = {
+	text = "Skillet-Classic\nPress "..OKAY.." to continue changing professions",
+	button1 = OKAY,
+	OnAccept = function( self )
+		Skillet:ContinueChange()
+		return
+	end,
+	timeout = 0,
+	exclusive = 1,
+	whileDead = 1,
+	hideOnEscape = 1
+};
+
 --
 -- Now do the character initialization
 --
@@ -1656,7 +1669,6 @@ end
 function Skillet:TRADE_SKILL_NAME_UPDATE()
 	DA.TRACE("TRADE_SKILL_NAME_UPDATE")
 	if not Skillet.tradeShow then return end
-	Skillet.isCraft = false
 	if Skillet.linkedSkill then
 		if Skillet.lastCraft ~= Skillet.isCraft then
 			Skillet:ConfigureRecipeControls()
@@ -1668,7 +1680,6 @@ end
 function Skillet:TRADE_SKILL_UPDATE()
 	DA.TRACE("TRADE_SKILL_UPDATE")
 	if not Skillet.tradeShow then return end
-	Skillet.isCraft = false
 	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
 		if Skillet.lastCraft ~= Skillet.isCraft then
 			Skillet:ConfigureRecipeControls()
@@ -1680,7 +1691,6 @@ end
 function Skillet:CRAFT_UPDATE()
 	DA.TRACE("CRAFT_UPDATE")
 	if not Skillet.craftShow then return end
-	Skillet.isCraft = true
 	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
 		if Skillet.lastCraft ~= Skillet.isCraft then
 			Skillet:ConfigureRecipeControls()
@@ -1697,6 +1707,7 @@ function Skillet:TRADE_SKILL_CLOSE()
 		return
 	end
 	Skillet:SkilletClose()
+	Skillet.hideTradeSkillFrame = nil
 	Skillet.tradeShow = false
 end
 
@@ -1708,11 +1719,16 @@ function Skillet:CRAFT_CLOSE()
 		return
 	end
 	Skillet:SkilletClose()
+	Skillet.hideCraftFrame = nil
 	Skillet.craftShow = false
 end
 
 function Skillet:TRADE_SKILL_SHOW()
 	DA.TRACE("TRADE_SKILL_SHOW")
+	if Skillet.hideTradeSkillFrame then
+		HideUIPanel(TradeSkillFrame)
+		Skillet.hideTradeSkillFrame = nil
+	end
 	Skillet.tradeShow = true
 	Skillet.isCraft = false
 	if Skillet.lastCraft ~= Skillet.isCraft then
@@ -1733,8 +1749,13 @@ function Skillet:CRAFT_SHOW()
 	else
 		Skillet:StealEnchantButton()
 	end
+	if Skillet.hideCraftFrame then
+		HideUIPanel(CraftFrame)
+		Skillet.hideCraftFrame = nil
+	end
 	Skillet.craftShow = true
 	Skillet.isCraft = true
+	Skillet.hideCraftFrame = true
 	if Skillet.lastCraft ~= Skillet.isCraft then
 		Skillet:ConfigureRecipeControls()
 --		Skillet.ignoreClose = false
@@ -1794,7 +1815,7 @@ function Skillet:SkilletShow()
 	self.linkedSkill, self.currentPlayer, self.isGuild = Skillet:IsTradeSkillLinked()
 	if self.linkedSkill then
 		if not self.currentPlayer then
-			--DA.DEBUG(0,"Waiting for TRADE_SKILL_NAME_UPDATE")
+			DA.DEBUG(0,"Waiting for TRADE_SKILL_NAME_UPDATE")
 			return -- Wait for TRADE_SKILL_NAME_UPDATE
 		end
 	else
@@ -1810,18 +1831,28 @@ function Skillet:SkilletShow()
 	self.currentTrade = self.tradeSkillIDsByName[name]
 	if self:IsSupportedTradeskill(self.currentTrade) then
 		self:InventoryScan()
-		DA.DEBUG(0,"SkilletShow: "..self.currentTrade..", name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
+		--DA.DEBUG(0,"SkilletShow: "..self.currentTrade..", name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
 		self.selectedSkill = nil
 		self.dataScanned = false
 		self:ScheduleTimer("SkilletShowWindow", 0.5)
 		if Skillet.db.profile.hide_blizzard_frame then
 			if self.isCraft then
+				--DA.DEBUG(0,"HideUIPanel(CraftFrame)")
+				Skillet.hideCraftFrame = true
 				HideUIPanel(CraftFrame)
+				if Skillet.tradeShow then
+					CloseTradeSkill()
+				end
 				if Skillet.db.profile.support_crafting then
 					self:StealEnchantButton()
 				end
 			else
+				--DA.DEBUG(0,"HideUIPanel(TradeSkillFrame)")
+				Skillet.hideTradeSkillFrame = true
 				HideUIPanel(TradeSkillFrame)
+				if Skillet.craftShow then
+					CloseCraft()
+				end
 			end
 		end
 	else
@@ -2041,7 +2072,7 @@ end
 -- not more often than once every .5 seconds
 --
 function Skillet:ChangeTradeSkill(tradeID, tradeName)
-	DA.DEBUG(0,"SetTradeSkill("..tostring(tradeID)..", "..tostring(tradeName)..")")
+	DA.DEBUG(0,"ChangeTradeSkill("..tostring(tradeID)..", "..tostring(tradeName)..")")
 	if not Skillet.delayChange then
 		DA.DEBUG(1,"ChangeTradeSkill: executing CastSpellByName("..tostring(tradeName)..")")
 		CastSpellByName(tradeName) -- trigger the whole rescan process via a TRADE_SKILL_SHOW or CRAFT_SHOW event
@@ -2055,6 +2086,12 @@ function Skillet:ChangeTradeSkill(tradeID, tradeName)
 	end
 end
 
+function Skillet:ContinueChange()
+	DA.DEBUG(0,"ContinueChange()")
+	self.isCraft = self.skillIsCraft[Skillet.changingTrade]
+	self.currentTrade = Skillet.changingTrade
+	Skillet:ChangeTradeSkill(Skillet.changingTrade, Skillet.changingName)
+end
 --
 -- Either change to a different profession or change the currently selected recipe
 --
