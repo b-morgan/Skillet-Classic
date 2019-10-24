@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
-local PT = LibStub("LibPeriodicTable-3.1")
 local L = Skillet.L
 
 --
@@ -56,7 +55,7 @@ local CraftList = {
 
 --
 --  a table of locale specific translations by id
---- needed to fix Blizzard inconsistent translations
+-- needed to fix Blizzard inconsistent translations
 --
 -- [tradeID] = {locale, old, new}
 --   locale is what GetLocale() returns
@@ -66,6 +65,8 @@ local CraftList = {
 local TranslateList = {
 	[4036] = {"frFR", "Ingénieur", "Ingénierie"},			-- Engineering
 	[3273] = {"frFR", "Premiers soins", "Secourisme"},		-- First Aid
+	[2108] = {"esES", "Peletería", "Marroquinería"},		-- leatherworking
+	[3908] = {"esES", "Sastrería", "Costura"},				-- tailoring
 }
 
 local TradeSkillIDsByName = {}		-- filled in with ids and names for reverse matching (since the same name may have multiple id's based on level)

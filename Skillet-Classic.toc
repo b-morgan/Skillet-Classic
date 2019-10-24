@@ -54,6 +54,7 @@ Locale\Locale-zhTW.lua
 
 #### Main files
 Skillet.lua
+SkilletOptions.lua
 SkilletData.lua
 SkilletARL.lua
 TradeskillInfo.lua

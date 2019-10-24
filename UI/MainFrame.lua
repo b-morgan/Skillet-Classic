@@ -171,14 +171,19 @@ function Skillet:RestoreEnchantButton(show)
 	DA.DEBUG(0,"RestoreEnchantButton("..tostring(show)..")")
 	if Skillet.db.profile.support_crafting then
 		if Skillet.EnchantOldParent and CraftCreateButton then
+			--DA.DEBUG(1,"RestoreEnchantButton: have EnchantOldParent")
 			CraftCreateButton:SetParent(Skillet.EnchantOldParent)		-- Restore original Parent
 			Skillet.EnchantOldParent = nil
 		end
 		if Skillet.EnchantOldPoints and CraftCreateButton then
+			--DA.DEBUG(1,"RestoreEnchantButton: have EnchantOldPoints")
 			local point = Skillet.EnchantOldPoints
 			CraftCreateButton:ClearAllPoints()		-- Clear all positions
 			CraftCreateButton:SetPoint(point[1], point[2], point[3], point[4], point[5])	-- Restore original location
 			Skillet.EnchantOldPoints = nil
+		end
+		if CraftCreateButton then
+			CraftCreateButton:Show()
 		end
 		SkilletEnchantButton:Disable()			-- Disable our button because DoCraft is restricted
 		if show then
@@ -1646,7 +1651,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		SkilletRecipeNotesButton:Show()
 		if not self.isCraft then
 			if recipe.spellID and recipe.itemID then
-				local orange,yellow,green,gray = self:GetTradeSkillLevels((recipe.itemID>0 and recipe.itemID) or -recipe.spellID)			-- was spellID now is itemID or -spellID
+				local orange,yellow,green,gray = self:GetTradeSkillLevels((recipe.itemID>0 and recipe.itemID) or -recipe.spellID)	-- was spellID now is itemID or -spellID
 				SkilletRankFrame.subRanks.green:SetValue(gray)
 				SkilletRankFrame.subRanks.yellow:SetValue(green)
 				SkilletRankFrame.subRanks.orange:SetValue(yellow)
