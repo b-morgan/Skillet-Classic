@@ -876,20 +876,18 @@ function Skillet:UpdateTradeSkillWindow()
 	self:UpdateDetailsWindow(self.selectedSkill)
 	self:UpdateTradeButtons(self.currentPlayer)
 	SkilletIgnoredMatsButton:Show()
+--
+-- Plugin button only shows if any plugins have registered
+--
 	if SkilletPluginButton and SkilletFrame.added_buttons and #SkilletFrame.added_buttons > 0 then
 		SkilletPluginButton:Show()
 	else
 		SkilletPluginButton:Hide()
 	end
-	if not self.currentTrade then
 --
--- nothing to see, nothing to update
+-- If any plugins have registered an Update function, call it now
 --
-		self:SetSelectedSkill(nil)
-		self.skillMainSelection = nil
-		DA.DEBUG(3,"leaving early, no trade")
-		return
-	end
+	self:UpdatePlugins()
 --
 -- shopping list button always shown
 --
@@ -1616,7 +1614,9 @@ function Skillet:HideDetailWindow()
 	SkilletAuctionatorButton:Hide()
 	SkilletHighlightFrame:Hide()
 	SkilletFrame.selectedSkill = -1;
-	-- Always want these set.
+--
+-- Always want these set.
+--
 	SkilletItemCountInputBox:SetText("1");
 	for i=1, SKILLET_NUM_REAGENT_BUTTONS, 1 do
 		local button = _G["SkilletReagent"..i]
@@ -1629,9 +1629,10 @@ function Skillet:HideDetailWindow()
 	end
 end
 
-local lastUpdateSpellID = nil
-local ARLProfessionInitialized = {}
+--
 -- Updates the details window with information about the currently selected skill
+--
+local lastUpdateSpellID = nil
 function Skillet:UpdateDetailsWindow(skillIndex)
 	--DA.DEBUG(0,"UpdateDetailsWindow("..tostring(skillIndex)..")")
 	if not skillIndex or skillIndex < 0 then
@@ -1653,7 +1654,9 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 	local recipe = Skillet.UnknownRecipe
 	if skill then
 		recipe = self:GetRecipe(skill.id) or Skillet.UnknownRecipe
-		-- Name of the skill
+--
+-- Name of the skill
+--
 		SkilletSkillName:SetText(recipe.name)
 		SkilletRecipeNotesButton:Show()
 		if not self.isCraft then
@@ -1678,7 +1681,9 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 			SkilletDescriptionText:SetMaxLines(4)	-- don't let the text get too big.
 			SkilletDescriptionText:SetText(description)
 		end
-		-- Whether or not it is on cooldown.
+--
+-- Whether or not it is on cooldown.
+--
 		SkilletSkillCooldown:SetText("")
 		if not Skillet.isCraft then
 			local _, _, _, _, _, _, _, _, _, _, _, displayAsUnavailable, unavailableString = GetTradeSkillInfo(skillIndex)
@@ -1699,7 +1704,9 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		recipe = Skillet.UnknownRecipe
 		SkilletSkillName:SetText("unknown")
 	end
-	-- Are special tools needed for this skill?
+--
+-- Are special tools needed for this skill?
+--
 	if recipe.tools then
 		local toolList = {}
 		for i=1,#recipe.tools do

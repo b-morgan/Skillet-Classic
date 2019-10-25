@@ -100,14 +100,12 @@ function plugin.OnInitialize()
 end
 
 --
--- adds nothing but this function is needed to get the plugin registered
+-- This function is called within the Skillet:UpdateTradeSkillWindow function
 --
-function plugin.GetExtraText(skill, recipe)
-	local label, extra_text
-	if not skill or not recipe then return end
-	label=""
-	extra_text = ""
-	return label, extra_text
+function plugin.Update()
+	if MTSLUI_TOGGLE_BUTTON and MTSLUI_TOGGLE_BUTTON.Show then
+		MTSLUI_TOGGLE_BUTTON:Show()
+	end
 end
 
-Skillet:RegisterDisplayDetailPlugin("MTSLPlugin")		-- we have a GetExtraText function
+Skillet:RegisterUpdatePlugin("MTSLPlugin")		-- we have an Update function
