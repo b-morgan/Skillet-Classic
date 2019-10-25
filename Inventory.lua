@@ -97,7 +97,9 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex)
 				local reagentAvailableAlts = 0
 				reagentAvailable, reagentCraftable = self:GetInventory(player, reagentID)
 				numCraft = math.min(numCraft, math.floor(reagentAvailable/numNeeded))
-				numCraftable = math.min(numCraftable, math.floor(reagentCraftable/numNeeded))
+				if reagentCraftable > 0 then
+					numCraftable = math.min(numCraftable, math.floor(reagentCraftable/numNeeded))
+				end
 				for alt in pairs(self.db.realm.inventoryData) do
 					if alt ~= player then
 						local altBoth = self:GetInventory(alt, reagentID)
@@ -199,7 +201,8 @@ function Skillet:GetInventory(player, reagentID)
 		if player == self.currentPlayer then			-- UnitName("player")
 			numCanUse = GetItemCount(reagentID,false)	-- In Classic just bags
 		end
-		if self.db.realm.inventoryData[player] and self.db.realm.inventoryData[player][reagentID] then 
+		if self.db.realm.inventoryData[player] and self.db.realm.inventoryData[player][reagentID] then
+			--DA.DEBUG(1,"inventoryData= "..tostring(self.db.realm.inventoryData[player][reagentID]))
 			local data = { string.split(" ", self.db.realm.inventoryData[player][reagentID]) }
 			if numCanUse and data[1] and tonumber(numCanUse) ~= tonumber(data[1]) then
 				DA.DEBUG(0,"inventoryData is stale")

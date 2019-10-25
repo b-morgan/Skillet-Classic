@@ -128,8 +128,8 @@ end
 -- Returns: num, num_with_vendor, num_with_alts
 --
 local function get_craftable_counts(skill, numMade)
-	--DA.DEBUG(2,"get_craftable_counts, name= "..tostring(skill.name)..", numMade= "..tostring(numMade))
-	--DA.DEBUG(3,"get_craftable_counts, skill= "..DA.DUMP1(skill,1))
+	--DA.DEBUG(2,"get_craftable_counts: name= "..tostring(skill.name)..", numMade= "..tostring(numMade))
+	--DA.DEBUG(3,"get_craftable_counts: skill= "..DA.DUMP1(skill,1))
 	local factor = 1
 	if Skillet.db.profile.show_craft_counts then
 		factor = numMade or 1
@@ -271,18 +271,19 @@ function Skillet:CreateTradeSkillWindow()
 	SkilletShoppingListButton:SetText(L["Shopping List"])
 	SkilletSortLabel:SetText(L["Sorting"])
 	SkilletGroupLabel:SetText(L["Grouping"])
---	SkilletRecipeGroupOperations:Disable()				-- It is broken in Skillet-Classic
 	SkilletIgnoredMatsButton:SetText(L["Ignored List"])
 	SkilletQueueManagementButton:SetText(L["Queues"])
 	SkilletQueueLoadButton:SetText(L["Load"])
 	SkilletQueueDeleteButton:SetText(L["Delete"])
 	SkilletQueueSaveButton:SetText(L["Save"])
 	SkilletQueueOnlyButton:SetText(">")
-
-	-- Always want these visible.
+--
+-- Always want these visible.
+--
 	SkilletItemCountInputBox:SetText("1");
-
-	-- Progression status bar
+--
+-- Progression status bar
+--
 	SkilletRankFrame:SetStatusBarColor(0.2, 0.2, 1.0, 1.0)
 	SkilletRankFrameBackground:SetVertexColor(0.0, 0.0, 0.5, 0.2)
 	if not SkilletRankFrame.subRanks then
@@ -308,29 +309,33 @@ function Skillet:CreateTradeSkillWindow()
 	SkilletFrameEmptySpace:SetPoint("TOPLEFT",SkilletSkillListParent,"TOPLEFT")
 	SkilletFrameEmptySpace:SetPoint("BOTTOMRIGHT",SkilletSkillListParent,"BOTTOMRIGHT")
 	SkilletFrameEmptySpace:Show()
-
-	-- The frame enclosing the scroll list needs a border and a background .....
+--
+-- The frame enclosing the scroll list needs a border and a background .....
+--
 	local backdrop = SkilletSkillListParent
 	backdrop:SetBackdrop(ControlBackdrop)
 	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
 	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
 	backdrop:SetResizable(true)
-
-	-- Frame enclosing the reagent list
+--
+-- Frame enclosing the reagent list
+--
 	backdrop = SkilletReagentParent
 	backdrop:SetBackdrop(ControlBackdrop)
 	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
 	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
 	backdrop:SetResizable(true)
-
-	-- Frame enclosing the queue
+--
+-- Frame enclosing the queue
+--
 	backdrop = SkilletQueueParent
 	backdrop:SetBackdrop(ControlBackdrop)
 	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
 	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
 	backdrop:SetResizable(true)
-
-	-- frame enclosing the pop out notes panel
+--
+-- frame enclosing the pop out notes panel
+--
 	backdrop = SkilletRecipeNotesFrame
 	backdrop:SetBackdrop(ControlBackdrop)
 	backdrop:SetBackdropColor(0.1, 0.1, 0.1)
@@ -351,8 +356,10 @@ function Skillet:CreateTradeSkillWindow()
 	gearTexture:SetTexture("Interface\\Icons\\Trade_Engineering")
 	gearTexture:SetHeight(16)
 	gearTexture:SetWidth(16)
-	-- Ace Window manager library, allows the window position (and size)
-	-- to be automatically saved
+--
+-- Ace Window manager library, allows the window position (and size)
+-- to be automatically saved
+--
 	local tradeSkillLocation = {
 		prefix = "tradeSkillLocation_"
 	}
@@ -360,14 +367,18 @@ function Skillet:CreateTradeSkillWindow()
 	windowManager.RegisterConfig(frame, self.db.profile, tradeSkillLocation)
 	windowManager.RestorePosition(frame)  -- restores scale also
 	windowManager.MakeDraggable(frame)
-	-- lets play the resize me game!
+--
+-- lets play the resize me game!
+--
 	minwidth = SKILLET_SKILLLIST_MIN_WIDTH
 	minwidth = minwidth +                  -- minwidth of scroll button
 			   20 +                        -- padding between sroll and detail
 			   SKILLET_REAGENT_MIN_WIDTH + -- reagent window (fixed width)
 			   10                          -- padding about window borders
 	self:EnableResize(frame, minwidth, SKILLET_MIN_HEIGHT, Skillet.UpdateTradeSkillWindow)
-	-- Set up the sorting methods here
+--
+-- Set up the sorting methods here
+--
 	self:InitializeSorting()
 	self:ConfigureRecipeControls()
 	self.skilletStandaloneQueue=Skillet:CreateStandaloneQueueFrame()
@@ -392,12 +403,13 @@ function Skillet:InitRecipeFilterButtons()
 	end
 end
 
+--
 -- Resets all the sorting and filtering info for the window
 -- This is called when the window has changed enough that
 -- sorting or filtering may need to be updated.
+--
 function Skillet:ResetTradeSkillWindow()
 	Skillet:SortDropdown_OnShow()
-	-- Reset all the added buttons so that they look OK.
 	local buttons = SkilletFrame.added_buttons
 	if buttons then
 		local last_button = SkilletPluginButton
@@ -416,12 +428,16 @@ function Skillet:ResetTradeSkillWindow()
 	 end
 end
 
+--
 -- Called when the list of skills is scrolled
+--
 function Skillet:SkillList_OnScroll()
 	Skillet:UpdateTradeSkillWindow()
 end
 
+--
 -- Called when the list of queued items is scrolled
+--
 function Skillet:QueueList_OnScroll()
 	Skillet:UpdateQueueWindow()
 end
@@ -469,8 +485,10 @@ local function get_recipe_button(i)
 	return button, buttonDrag
 end
 
+--
 -- shows a recipe button (in the scrolling list) after doing the
 -- required callbacks.
+--
 local function show_button(button, trade, skill, index)
 	for i=1, #pre_show_callbacks, 1 do
 		local new_button = pre_show_callbacks[i](button, trade, skill, index)
@@ -482,8 +500,10 @@ local function show_button(button, trade, skill, index)
 	button:Show()
 end
 
+--
 -- hides a recipe button (in the scrolling list) after doing the
 -- required callbacks.
+--
 local function hide_button(button, trade, skill, index)
 	for i=1, #pre_hide_callbacks, 1 do
 		local new_button = pre_hide_callbacks[i](button, trade, skill, index)
@@ -516,9 +536,8 @@ function Skillet:ConfigureRecipeControls()
 		SkilletAdd1Button:Hide()
 		SkilletAdd10Button:Hide()
 		SkilletClearNumButton:Hide()
-		if Skillet.db.profile.support_crafting and CraftCreateButton then
-			CraftCreateButton:Show()
-		else
+		SkilletEnchantButton:Show()
+		if not Skillet.db.profile.support_crafting then
 			SkilletEnchantButton:Disable()		-- because DoCraft is restricted
 		end
 	else
@@ -536,15 +555,14 @@ function Skillet:ConfigureRecipeControls()
 		SkilletAdd1Button:Show()
 		SkilletAdd10Button:Show()
 		SkilletClearNumButton:Show()
-		if Skillet.db.profile.support_crafting and CraftCreateButton then
-			CraftCreateButton:Hide()
-		else
-			SkilletEnchantButton:Hide()
-		end
+		SkilletEnchantButton:Hide()
 	end
 	self.lastCraft = self.isCraft		-- save the state of the buttons
 	self:InitRecipeFilterButtons()
-	if self.currentPlayer ~= (UnitName("player")) then				-- only allow processing for the current player
+	if self.currentPlayer ~= (UnitName("player")) then
+--
+-- disable processing because this is not the current player
+--
 		SkilletStartQueueButton:Disable()
 		SkilletCreateAllButton:Disable()
 		SkilletCreateButton:Disable()
@@ -553,17 +571,6 @@ function Skillet:ConfigureRecipeControls()
 		SkilletCreateAllButton:Enable()
 		SkilletCreateButton:Enable()
 	end
-end
-
-function Skillet:PlayerSelect_OnEnter(button)
---[[ (Blizzard removed required functionality in 5.4)
-	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
-	GameTooltip:ClearLines()
-	local player = _G[button:GetName().."Text"]:GetText()
-	GameTooltip:AddLine(player,1,1,1)
-	GameTooltip:AddLine("Click to select a different character",.7,.7,.7)
-	GameTooltip:Show()
-]]--
 end
 
 function Skillet:RecipeDifficultyButton_OnShow()
