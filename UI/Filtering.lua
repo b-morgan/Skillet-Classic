@@ -36,29 +36,6 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 --   Skillet.db.realm.subClass[player][tradeID].selected
 --   Skillet.db.realm.invSlot[player][tradeID].selected
 --
---[[
-	["invSlot"] = {
-		["player"] = {
-			[2550] = {
-				[4343] = "INVTYPE_LEGS",
-				["name"] = {
-					[""] = 13,
-					["INVTYPE_BODY"] = 4,
-					["INVTYPE_FEET"] = 2,
-					["INVTYPE_LEGS"] = 2,
-					["INVTYPE_CLOAK"] = 2,
-					["INVTYPE_BAG"] = 1,
-				},
-	["subClass"] = {
-		["player"] = {
-			[2550] = {
-				[4343] = "Cloth",
-				["name"] = {
-					["Bag"] = 1,
-					["Cloth"] = 12,
-				},
-]]--
-
 function Skillet:RecipeFilter(skillIndex)
 	--DA.DEBUG(1,"RecipeFilter("..tostring(skillIndex)..")")
 	local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, skillIndex)
