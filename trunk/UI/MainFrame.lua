@@ -2626,16 +2626,23 @@ end
 --
 -- Easymenus for the left (recipe) side
 --
+--  The internal name of the menus are only
+--  shown in alpha releases. Lines similar to the 
+--  following could be added for additional clarity:
+--		tooltipWhileDisabled = 1,
+--		tooltipOnButton = 1,
+--		tooltipTitle = L["Selection functions"],
+--		tooltipText = L["Internal Menu Name"],
+--
+
 local skillMenuSelection = {
+--@alpha@
 	{
 		text = "skillMenuSelection",
 		isTitle = true,
 		notCheckable = true,
-		tooltipWhileDisabled = 1,
-		tooltipOnButton = 1,
-		tooltipTitle = L["Internal Menu Name"],
-		tooltipText = L["Selection functions"],
 	},
+--@end-alpha@
 	{
 		text = L["Select All"],
 		func = function() Skillet:SkillButton_SetAllSelections(true) Skillet:UpdateTradeSkillWindow() end,
@@ -2647,15 +2654,13 @@ local skillMenuSelection = {
 }
 
 local skillMenuGroup = {
+--@alpha@
 	{
 		text = "skillMenuGroup",
 		isTitle = true,
 		notCheckable = true,
-		tooltipWhileDisabled = 1,
-		tooltipOnButton = 1,
-		tooltipTitle = L["Internal Menu Name"],
-		tooltipText = L["Group functions"],
 	},
+--@end-alpha@
 	{
 		text = L["Empty Group"],
 		func = function() Skillet:SkillButton_NewGroup() end,
@@ -2667,16 +2672,13 @@ local skillMenuGroup = {
 }
 
 local skillMenuIgnore = {
+--@alpha@
 	{
 		text = "skillMenuIgnore",
 		isTitle = true,
 		notCheckable = true,
-		tooltipWhileDisabled = 1,
-		tooltipOnButton = 1,
-		tooltipOnButton = 1,
-		tooltipTitle = L["Internal Menu Name"],
-		tooltipText = L["Ignore List functions"],
 	},
+--@end-alpha@
 	{
 		text = L["Add Recipe to Ignored List"],
 		func = function()
@@ -2706,15 +2708,13 @@ local skillMenuIgnore = {
 }
 
 local skillMenuList = {
+--@alpha@
 	{
 		text = "skillMenuList",
 		isTitle = true,
 		notCheckable = true,
-		tooltipWhileDisabled = 1,
-		tooltipOnButton = 1,
-		tooltipTitle = L["Internal Menu Name"],
-		tooltipText = L["Recipe functions"],
 	},
+--@end-alpha@
 	{
 		text = L["New Group"],
 		hasArrow = true,
@@ -2755,15 +2755,13 @@ local skillMenuList = {
 }
 
 local skillMenuListLocked = {
+--@alpha@
 	{
 		text = "skillMenuListLocked",
 		isTitle = true,
 		notCheckable = true,
-		tooltipWhileDisabled = 1,
-		tooltipOnButton = 1,
-		tooltipTitle = L["Internal Menu Name"],
-		tooltipText = L["Recipe functions (locked)"],
 	},
+--@end-alpha@
 	{
 		text = L["Selection"],
 		hasArrow = true,
@@ -2786,15 +2784,13 @@ local skillMenuListLocked = {
 }
 
 local headerMenuList = {
+--@alpha@
 	{
 		text = "headerMenuList",
 		isTitle = true,
 		notCheckable = true,
-		tooltipWhileDisabled = 1,
-		tooltipOnButton = 1,
-		tooltipTitle = L["Internal Menu Name"],
-		tooltipText = L["Header functions"],
 	},
+--@end-alpha@
 	{
 		text = L["Rename Group"],
 		func = function() Skillet:SkillButton_NameEditEnable(Skillet.menuButton) end,
@@ -2829,15 +2825,13 @@ local headerMenuList = {
 }
 
 local headerMenuListLocked = {
+--@alpha@
 	{
 		text = "headerMenuListLocked",
 		isTitle = true,
 		notCheckable = true,
-		tooltipWhileDisabled = 1,
-		tooltipOnButton = 1,
-		tooltipTitle = L["Internal Menu Name"],
-		tooltipText = L["Header functions (locked)"],
 	},
+--@end-alpha@
 	{
 		text = L["Selection"],
 		hasArrow = true,
@@ -2850,15 +2844,13 @@ local headerMenuListLocked = {
 }
 
 local headerMenuListMainGroup = {
+--@alpha@
 	{
 		text = "headerMenuListMainGroup",
 		isTitle = true,
 		notCheckable = true,
-		tooltipWhileDisabled = 1,
-		tooltipOnButton = 1,
-		tooltipTitle = L["Internal Menu Name"],
-		tooltipText = L["Complete List functions"],
 	},
+--@end-alpha@
 	{
 		text = L["New Group"],
 		hasArrow = true,
@@ -2889,15 +2881,13 @@ local headerMenuListMainGroup = {
 }
 
 local headerMenuListMainGroupLocked = {
+--@alpha@
 	{
 		text = "headerMenuListMainGroupLocked",
 		isTitle = true,
 		notCheckable = true,
-		tooltipWhileDisabled = 1,
-		tooltipOnButton = 1,
-		tooltipTitle = L["Internal Menu Name"],
-		tooltipText = L["Complete List functions (locked)"],
 	},
+--@end-alpha@
 	{
 		text = L["Selection"],
 		hasArrow = true,
