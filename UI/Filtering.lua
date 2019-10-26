@@ -204,5 +204,6 @@ function Skillet:FilterDropDown_OnClick(arg1,arg2)
 	UIDropDownMenu_SetSelectedID(SkilletFilterDropdown, self:GetID())
 	Skillet.db.realm.subClass[Skillet.currentPlayer][Skillet.currentTrade].selected = arg1
 	Skillet.db.realm.invSlot[Skillet.currentPlayer][Skillet.currentTrade].selected = arg2
+	Skillet.dataScanned = false
 	Skillet:UpdateTradeSkillWindow()
 end

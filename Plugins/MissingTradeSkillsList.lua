@@ -103,8 +103,10 @@ end
 -- This function is called within the Skillet:UpdateTradeSkillWindow function
 --
 function plugin.Update()
-	if MTSLUI_TOGGLE_BUTTON and MTSLUI_TOGGLE_BUTTON.Show then
-		MTSLUI_TOGGLE_BUTTON:Show()
+	if MTSLUI_ToggleButton and not MTSLUI_ToggleButton:IsVisible() then
+		if MTSLUI_TOGGLE_BUTTON and MTSLUI_TOGGLE_BUTTON.Show then
+			MTSLUI_TOGGLE_BUTTON:Show()
+		end
 	end
 end
 
