@@ -123,7 +123,7 @@ your own in as sane a fashion as possible.
 --
 
 --
--- The following three functions, RecipeNamePrefix, RecipeNameSuffix, and GetExtraText are
+-- The following four functions, RecipeNamePrefix, RecipeNameSuffix, Update, and GetExtraText are
 -- documented here but are used by plugins written like those in the Skillet\Plugins folder.
 --
 --== function plugin.RecipeNamePrefix(skill, recipe) ==
@@ -148,12 +148,21 @@ your own in as sane a fashion as possible.
 -- to determine if it's a craft. This avoid having to localize the tradeskill name just to
 -- see if it is a craft or a tradeskill.
 --
--- Refer to the notes at the top of this file for how to hook this method.
---
 -- @param skill table containing name of the currently selected tradeskill (see documentation below)
 -- @param recipe table containing the index and ID of the currently selected recipe (see documentation below)
 --
 -- @return text string (right side)
+--
+--== function plugin.Update() ==
+--
+-- A function called by the UpdateTradeSkillWindow function to do any plugin specific 
+-- SkilletFrame updates. 
+--
+-- This will be called for both crafts and tradeskills, you can use Skillet:IsCraft()
+-- to determine if it's a craft. This avoids having to localize the tradeskill name just to
+-- see if it is a craft or a tradeskill.
+--
+-- @return is ignored
 --
 --== function plugin.GetExtraText(skill, recipe) ==
 --
@@ -164,8 +173,6 @@ your own in as sane a fashion as possible.
 -- This will be called for both crafts and tradeskills, you can use Skillet:IsCraft()
 -- to determine if it's a craft. This avoids having to localize the tradeskill name just to
 -- see if it is a craft or a tradeskill.
---
--- Refer to the notes at the top of this file for how to hook this method.
 --
 -- @param skill table containing name of the currently selected tradeskill (need to add documentation below)
 -- @param recipe table containing the index and ID of the currently selected recipe (need to update documentation below)

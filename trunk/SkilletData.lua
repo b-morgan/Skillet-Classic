@@ -702,7 +702,10 @@ local function ScanTrade()
 				end
 			end
 		end
-	numSkills = numCrafts		-- just one loop variable needed
+--
+-- From here on, just one loop variable needed
+--
+	numSkills = numCrafts
 	end
 	--DA.DEBUG(2,"ScanTrade: "..tostring(profession)..": "..tostring(tradeID).." "..numSkills.." recipes")
 	local skillDB = Skillet.db.realm.skillDB[player][tradeID]
@@ -882,7 +885,10 @@ local function ScanTrade()
 						toolString = toolString..":"..string.gsub(tools[t]," ", "_")
 					end
 				end
-				local itemLink
+				local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType
+				local itemStackCount, itemEquipLoc, itemIcon, itemSellPrice, itemClassID, itemSubClassID
+				local bindType, expacID, itemSetID, isCraftingReagent
+				local itemString = "0"
 				if Skillet.isCraft then
 					itemLink = GetCraftItemLink(i)
 				else
@@ -892,10 +898,10 @@ local function ScanTrade()
 					DA.DEBUG(0,"ScanTrade: break caused by no itemLink")
 					break
 				end
-				local itemString = "0"
-				local itemName
 				if not Skillet.isCraft then
-					itemName = GetItemInfo(itemLink)
+					itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
+					  itemStackCount, itemEquipLoc, itemIcon, itemSellPrice, itemClassID, itemSubClassID,
+					  bindType, expacID, itemSetID, isCraftingReagent = GetItemInfo(itemLink)
 				else
 					itemName = "e"..tostring(Skillet:GetItemIDFromLink(itemLink))
 				end
