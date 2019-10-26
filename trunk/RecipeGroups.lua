@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
+local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
+
 --
 --	--DA.DEBUG(3,			-- is used to track function calls
 --	--DA.DEBUG(4,		-- is used to expand function call tables
