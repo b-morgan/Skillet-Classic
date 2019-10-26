@@ -704,7 +704,7 @@ function Skillet.RecipeGroupDropdown_Initialize(menuFrame,level)
 	--DA.DEBUG(3,"RecipeGroupDropdown_Initialize("..tostring(menuFrame)..", "..tostring(level)..")")
 	if level == 1 then  -- group labels
 		local entry = {}
-		entry.text = "Flat"
+		entry.text = L["Flat"]
 		entry.value = "Flat"
 		entry.func = Skillet.RecipeGroupSelect
 		entry.arg1 = Skillet
@@ -720,7 +720,11 @@ function Skillet.RecipeGroupDropdown_Initialize(menuFrame,level)
 			local numGroupsAdded = 0
 			if Skillet.data.groupList[Skillet.currentPlayer][Skillet.currentTrade] then
 				for labelName, groupData in pairs(Skillet.data.groupList[Skillet.currentPlayer][Skillet.currentTrade]) do
-					entry.text = labelName
+					if labelName == "Blizzard" then
+						entry.text = L["Blizzard"]
+					else
+						entry.text = labelName
+					end
 					entry.value = labelName
 					entry.func = Skillet.RecipeGroupSelect
 					entry.arg1 = Skillet
@@ -797,23 +801,23 @@ function SkilletRecipeGroupOpsMenu_Init(menuFrame,level)
 		local null = {}
 		null.text = ""
 		null.disabled = true
-		entry.text = "New"
+		entry.text = L["New"]
 		entry.value = "New"
 		entry.func = Skillet.RecipeGroupOpNew
 		UIDropDownMenu_AddButton(entry)
-		entry.text = "Copy"
+		entry.text = L["Copy"]
 		entry.value = "Copy"
 		entry.func = Skillet.RecipeGroupOpCopy
 		UIDropDownMenu_AddButton(entry)
-		entry.text = "Rename"
+		entry.text = L["Rename"]
 		entry.value = "Rename"
 		entry.func = Skillet.RecipeGroupOpRename
 		UIDropDownMenu_AddButton(entry)
-		entry.text = "Lock/Unlock"
+		entry.text = L["Lock/Unlock"]
 		entry.value = "Lock/Unlock"
 		entry.func = Skillet.RecipeGroupOpLock
 		UIDropDownMenu_AddButton(entry)
-		entry.text = "Delete"
+		entry.text = L["Delete"]
 		entry.value = "Delete"
 		entry.func = Skillet.RecipeGroupOpDelete
 		UIDropDownMenu_AddButton(entry)

@@ -59,6 +59,7 @@ local SKILLET_SKILLLIST_MIN_WIDTH = 440
 local SKILLET_REAGENT_MIN_WIDTH = 280
 local SKILLET_REAGENT_MAX_WIDTH = 320
 local SKILLET_REAGENT_MIN_HEIGHT = 300
+local reagent_height
 
 -- min width of count text
 local SKILLET_COUNT_MIN_WIDTH = 100
@@ -347,11 +348,6 @@ function Skillet:CreateTradeSkillWindow()
 	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
 	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
 	backdrop:SetResizable(true)
-	backdrop = SkilletViewCraftersParent
-	backdrop:SetBackdrop(ControlBackdrop)
-	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
-	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
-	backdrop:SetResizable(true)
 	gearTexture = SkilletReagentParent:CreateTexture(nil, "OVERLAY")
 	gearTexture:SetTexture("Interface\\Icons\\Trade_Engineering")
 	gearTexture:SetHeight(16)
@@ -536,6 +532,7 @@ function Skillet:ConfigureRecipeControls()
 		SkilletAdd1Button:Hide()
 		SkilletAdd10Button:Hide()
 		SkilletClearNumButton:Hide()
+		SkilletQueueOnlyButton:Hide()
 		SkilletEnchantButton:Show()
 		if not Skillet.db.profile.support_crafting then
 			SkilletEnchantButton:Disable()		-- because DoCraft is restricted
@@ -555,6 +552,7 @@ function Skillet:ConfigureRecipeControls()
 		SkilletAdd1Button:Show()
 		SkilletAdd10Button:Show()
 		SkilletClearNumButton:Show()
+		SkilletQueueOnlyButton:Show()
 		SkilletEnchantButton:Hide()
 	end
 	self.lastCraft = self.isCraft		-- save the state of the buttons
@@ -596,7 +594,7 @@ function Skillet:TradeButton_OnEnter(button)
 		local rank, maxRank = data.rank, data.maxRank
 		GameTooltip:AddLine("["..tostring(rank).."/"..tostring(maxRank).."]",0,1,0)
 		if tradeID == self.currentTrade then
-			GameTooltip:AddLine("shift-click to link")
+			GameTooltip:AddLine(L["shift-click to link"])
 		end
 		local buttonIcon = _G[button:GetName().."Icon"]
 		local r,g,b = buttonIcon:GetVertexColor()
@@ -893,11 +891,12 @@ function Skillet:UpdateTradeSkillWindow()
 --
 	SkilletShoppingListButton:Show()
 	SkilletFrame:SetAlpha(self.db.profile.transparency)
+	SkilletFrame:SetScale(self.db.profile.scale)
 	local uiScale = SkilletFrame:GetEffectiveScale()
 	local width = SkilletFrame:GetWidth() - 20 -- for padding.
 	local height = SkilletFrame:GetHeight()
 	local reagent_width = width / 2
-	local reagent_height = SKILLET_REAGENT_MIN_HEIGHT + ((height - SKILLET_MIN_HEIGHT) * 2) / 3
+	reagent_height = SKILLET_REAGENT_MIN_HEIGHT + ((height - SKILLET_MIN_HEIGHT) * 2) / 3
 	--DA.DEBUG(0,"fullView="..tostring(self.fullView)..", reagent_height="..tostring(reagent_height))
 	if not self.fullView then
 		reagent_height = SKILLET_REAGENT_MIN_HEIGHT + height - SKILLET_MIN_HEIGHT + 85
@@ -911,7 +910,6 @@ function Skillet:UpdateTradeSkillWindow()
 	SkilletReagentParent:SetWidth(reagent_width)
 	SkilletReagentParent:SetHeight(reagent_height)
 	SkilletQueueManagementParent:SetWidth(reagent_width)
-	SkilletViewCraftersParent:SetWidth(reagent_width)
 	local width = SkilletFrame:GetWidth() - reagent_width - 20 -- padding
 	SkilletSkillListParent:SetWidth(width)
 --
@@ -2632,6 +2630,11 @@ local skillMenuSelection = {
 	{
 		text = "skillMenuSelection",
 		isTitle = true,
+		notCheckable = true,
+		tooltipWhileDisabled = 1,
+		tooltipOnButton = 1,
+		tooltipTitle = L["Internal Menu Name"],
+		tooltipText = L["Selection functions"],
 	},
 	{
 		text = L["Select All"],
@@ -2647,6 +2650,11 @@ local skillMenuGroup = {
 	{
 		text = "skillMenuGroup",
 		isTitle = true,
+		notCheckable = true,
+		tooltipWhileDisabled = 1,
+		tooltipOnButton = 1,
+		tooltipTitle = L["Internal Menu Name"],
+		tooltipText = L["Group functions"],
 	},
 	{
 		text = L["Empty Group"],
@@ -2662,9 +2670,15 @@ local skillMenuIgnore = {
 	{
 		text = "skillMenuIgnore",
 		isTitle = true,
+		notCheckable = true,
+		tooltipWhileDisabled = 1,
+		tooltipOnButton = 1,
+		tooltipOnButton = 1,
+		tooltipTitle = L["Internal Menu Name"],
+		tooltipText = L["Ignore List functions"],
 	},
 	{
-		text = "Add Recipe to Ignored List",
+		text = L["Add Recipe to Ignored List"],
 		func = function()
 					local index = Skillet.menuButton:GetID()
 					local skillDB = Skillet.db.realm.skillDB[Skillet.currentPlayer][Skillet.currentTrade][index]
@@ -2677,7 +2691,7 @@ local skillMenuIgnore = {
 				end,
 	},
 	{
-		text = "Remove Recipe from Ignored List",
+		text = L["Remove Recipe from Ignored List"],
 		func = function()
 					local index = Skillet.menuButton:GetID()
 					local skillDB = Skillet.db.realm.skillDB[Skillet.currentPlayer][Skillet.currentTrade][index]
@@ -2695,6 +2709,11 @@ local skillMenuList = {
 	{
 		text = "skillMenuList",
 		isTitle = true,
+		notCheckable = true,
+		tooltipWhileDisabled = 1,
+		tooltipOnButton = 1,
+		tooltipTitle = L["Internal Menu Name"],
+		tooltipText = L["Recipe functions"],
 	},
 	{
 		text = L["New Group"],
@@ -2704,6 +2723,7 @@ local skillMenuList = {
 	{
 		text = "-----",
 		isTitle = true,
+		notCheckable = true,
 	},
 	{
 		text = L["Selection"],
@@ -2725,9 +2745,10 @@ local skillMenuList = {
 	{
 		text = "-----",
 		isTitle = true,
+		notCheckable = true,
 	},
 	{
-		text = "Ignore",
+		text = L["Ignore"],
 		hasArrow = true,
 		menuList = skillMenuIgnore,
 	},
@@ -2737,6 +2758,11 @@ local skillMenuListLocked = {
 	{
 		text = "skillMenuListLocked",
 		isTitle = true,
+		notCheckable = true,
+		tooltipWhileDisabled = 1,
+		tooltipOnButton = 1,
+		tooltipTitle = L["Internal Menu Name"],
+		tooltipText = L["Recipe functions (locked)"],
 	},
 	{
 		text = L["Selection"],
@@ -2750,9 +2776,10 @@ local skillMenuListLocked = {
 	{
 		text = "-----",
 		isTitle = true,
+		notCheckable = true,
 	},
 	{
-		text = "Ignore",
+		text = L["Ignore"],
 		hasArrow = true,
 		menuList = skillMenuIgnore,
 	},
@@ -2762,6 +2789,11 @@ local headerMenuList = {
 	{
 		text = "headerMenuList",
 		isTitle = true,
+		notCheckable = true,
+		tooltipWhileDisabled = 1,
+		tooltipOnButton = 1,
+		tooltipTitle = L["Internal Menu Name"],
+		tooltipText = L["Header functions"],
 	},
 	{
 		text = L["Rename Group"],
@@ -2775,6 +2807,7 @@ local headerMenuList = {
 	{
 		text = "-----",
 		isTitle = true,
+		notCheckable = true,
 	},
 	{
 		text = L["Selection"],
@@ -2799,6 +2832,11 @@ local headerMenuListLocked = {
 	{
 		text = "headerMenuListLocked",
 		isTitle = true,
+		notCheckable = true,
+		tooltipWhileDisabled = 1,
+		tooltipOnButton = 1,
+		tooltipTitle = L["Internal Menu Name"],
+		tooltipText = L["Header functions (locked)"],
 	},
 	{
 		text = L["Selection"],
@@ -2815,6 +2853,11 @@ local headerMenuListMainGroup = {
 	{
 		text = "headerMenuListMainGroup",
 		isTitle = true,
+		notCheckable = true,
+		tooltipWhileDisabled = 1,
+		tooltipOnButton = 1,
+		tooltipTitle = L["Internal Menu Name"],
+		tooltipText = L["Complete List functions"],
 	},
 	{
 		text = L["New Group"],
@@ -2824,6 +2867,7 @@ local headerMenuListMainGroup = {
 	{
 		text = "-----",
 		isTitle = true,
+		notCheckable = true,
 	},
 	{
 		text = L["Selection"],
@@ -2848,6 +2892,11 @@ local headerMenuListMainGroupLocked = {
 	{
 		text = "headerMenuListMainGroupLocked",
 		isTitle = true,
+		notCheckable = true,
+		tooltipWhileDisabled = 1,
+		tooltipOnButton = 1,
+		tooltipTitle = L["Internal Menu Name"],
+		tooltipText = L["Complete List functions (locked)"],
 	},
 	{
 		text = L["Selection"],
@@ -2897,96 +2946,17 @@ end
 
 function Skillet:ReAnchorButtons(newFrame)
 	--DA.DEBUG(0,"ReAnchorButtons("..tostring(newFrame)..")")
-	SkilletRecipeNotesButton:SetPoint("BOTTOMRIGHT",newFrame,"TOPRIGHT",0,0)
 	SkilletQueueAllButton:SetPoint("TOPLEFT",newFrame,"BOTTOMLEFT",0,-2)
-	if Skillet.db.profile.support_crafting and CraftCreateButton then
-		CraftCreateButton:SetPoint("TOPLEFT",newFrame,"BOTTOMLEFT",0,-2)
-	else
-		SkilletEnchantButton:SetPoint("TOPLEFT",newFrame,"BOTTOMLEFT",0,-2)
-	end
+	SkilletEnchantButton:SetPoint("TOPLEFT",newFrame,"BOTTOMLEFT",0,-2)
 	SkilletQueueButton:SetPoint("TOPRIGHT",newFrame,"BOTTOMRIGHT",0,-2)
---[[
--- Do we need to do these as well?
---	SkilletItemCountInputBox
---	SkilletSub10Button
---	SkilletSub1Button
---	SkilletAdd1Button
---	SkilletAdd10Button
---	SkilletClearNumButton
-]]--
 end
 
 function Skillet:ShowReagentDetails()
 	DA.DEBUG(0,"ShowReagentDetails()")
 	SkilletQueueManagementParent:Hide();
-	SkilletViewCraftersParent:Hide()
 	SkilletReagentParent:Show()
-	SkilletReagentParent:SetHeight(260)
-	SkilletQueueManagementParent:SetHeight(260)
-	SkilletViewCraftersParent:SetHeight(260)
+	SkilletReagentParent:SetHeight(reagent_height)
 	Skillet:ReAnchorButtons(SkilletReagentParent)
-end
-
-function Skillet:ViewCraftersClicked()
-	if SkilletViewCraftersParent:IsVisible() then
-		Skillet:ShowReagentDetails()
-	else
-		self.queriedSkill = self.selectedSkill
-		SelectTradeSkill(self.selectedSkill);
-		QueryGuildMembersForRecipe();
-	end
-end
-
-function Skillet:SkilletShowGuildCrafters()
-	if ( self.queriedSkill == self.selectedSkill ) then
-		Skillet:ShowViewCrafters()
-	end
-end
-
-function Skillet:ShowViewCrafters()
-		SkilletQueueManagementParent:SetHeight(260)
-		SkilletQueueManagementParent:Hide();
-		SkilletViewCraftersParent:SetHeight(260)
-		SkilletViewCraftersParent:Show()
-		SkilletReagentParent:SetHeight(260)
-		SkilletReagentParent:Hide()
-		Skillet:ReAnchorButtons(SkilletViewCraftersParent)
-		SkilletViewCraftersScrollFrameScrollBar:SetValue(0);
-		Skillet.ViewCraftersUpdate()
-end
-
-function Skillet:ViewCraftersToggle(showDetails)
-	if SkilletViewCraftersParent:IsVisible() or showDetails then
-		Skillet:ShowReagentDetails()
-	else
-		Skillet:ShowViewCrafters()
-	end
-end
-
-function Skillet.ViewCraftersUpdate()
-	local skillLineID, recipeID, numMembers = GetGuildRecipeInfoPostQuery();
-	local offset = FauxScrollFrame_GetOffset(SkilletViewCraftersScrollFrame);
-	local index, button, name, online;
-	local SKILLET_CRAFTERS_DISPLAYED = 15
-		--DA.DEBUG(0, "Skillet.ViewCraftersUpdate "..numMembers.." - "..offset)
-		for i = 1, SKILLET_CRAFTERS_DISPLAYED, 1 do
-		index = i + offset;
-		button = _G["SkilletGuildCrafter"..i];
-		if ( index > numMembers ) then
-			button:Hide();
-		else
-			name, online = GetGuildRecipeMember(index);
-			button:SetText(name);
-			if ( online ) then
-				button:Enable();
-			else
-				button:Disable();
-			end
-			button:Show();
-			button.name = name;
-		end
-	end
-	FauxScrollFrame_Update(SkilletViewCraftersScrollFrame, numMembers, SKILLET_CRAFTERS_DISPLAYED, TRADE_SKILL_HEIGHT);
 end
 
 --
@@ -3036,10 +3006,7 @@ function Skillet:QueueManagementToggle(showDetails)
 	else
 		SkilletQueueManagementParent:Show();
 		SkilletQueueManagementParent:SetHeight(100)
-		SkilletViewCraftersParent:Hide()
-		SkilletViewCraftersParent:SetHeight(100)
 		SkilletReagentParent:Hide()
-		SkilletReagentParent:SetHeight(100)
 		Skillet:ReAnchorButtons(SkilletQueueManagementParent)
 	end
 end
