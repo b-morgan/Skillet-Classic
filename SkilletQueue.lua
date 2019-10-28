@@ -467,7 +467,7 @@ function Skillet:UNIT_SPELLCAST_SUCCEEDED(event, unit, castGUID, spellID)
 	self.castSpellName = GetSpellInfo(spellID)
 	DA.TRACE("spellID= "..tostring(spellID)..", spellName= "..tostring(self.castSpellName)..", processingSpell= "..tostring(self.processingSpell))
 	if unit == "player" then
-		if self.processingSpell and self.processingSpell == self.castSpellName or self.changingTrade then
+		if (self.processingSpell and self.processingSpell == self.castSpellName) or self.changingTrade then
 			Skillet:ContinueCast(self.castSpellName)
 		end
 	end

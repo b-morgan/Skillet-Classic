@@ -1155,6 +1155,7 @@ function Skillet:HideAllWindows()
 	end
 	self.currentTrade = nil
 	self.selectedSkill = nil
+	self.changingTrade = nil
 	return closed
 end
 
