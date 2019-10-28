@@ -67,6 +67,7 @@ local TranslateList = {
 	[3273] = {"frFR", "Premiers soins", "Secourisme"},		-- First Aid
 	[2108] = {"esES", "Peletería", "Marroquinería"},		-- leatherworking
 	[3908] = {"esES", "Sastrería", "Costura"},				-- tailoring
+	[2108] = {"koKR", "가죽세공", "가죽 세공"},					-- leatherworking
 }
 
 local TradeSkillIDsByName = {}		-- filled in with ids and names for reverse matching (since the same name may have multiple id's based on level)
