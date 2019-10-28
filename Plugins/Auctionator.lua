@@ -167,19 +167,18 @@ end
 
 function plugin.GetExtraText(skill, recipe)
 	local label, extra_text
-	local bop
-	if not skill or not recipe then return end
+	if not recipe then return end
 	local itemID = recipe.itemID
 	if Atr_GetAuctionBuyout and Skillet.db.profile.plugins.ATR.enabled and itemID then
-		local value = ( Atr_GetAuctionBuyout(itemID) or 0 ) * recipe.numMade
-		if value then
-			extra_text = Skillet:FormatMoneyFull(value, true)
+		local buyout = ( Atr_GetAuctionBuyout(itemID) or 0 ) * recipe.numMade
+		if buyout then
+			extra_text = Skillet:FormatMoneyFull(buyout, true)
 			label = "|r".. L["Buyout"]..":"
 		end
 		if Skillet.db.profile.plugins.ATR.reagentPrices then
 			local toConcatLabel = {}
 			local toConcatExtra = {}
-			local total = 0
+			local cost = 0
 			for i=1, #recipe.reagentData, 1 do
 				local reagent = recipe.reagentData[i]
 				if not reagent then
@@ -211,15 +210,15 @@ function plugin.GetExtraText(skill, recipe)
 					toConcatExtra[#toConcatExtra+1] = Skillet:FormatMoneyFull(value, true)
 					toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s", needed, itemName)
 				end
-				total = total + value
+				cost = cost + value
 			end
 			if Skillet.db.profile.plugins.ATR.useVendorCalc then
 				local markup = Skillet.db.profile.plugins.ATR.markup or markupDef
 				label = label .. "\n\n" .. table.concat(toConcatLabel,"\n") .. "\n   " .. L["Reagents"] .." * ".. markup * 100 .."%:\n"
-				extra_text =  extra_text .. "\n\n" .. table.concat(toConcatExtra,"\n") .. "\n" .. Skillet:FormatMoneyFull(total * markup, true) .. "\n"
+				extra_text =  extra_text .. "\n\n" .. table.concat(toConcatExtra,"\n") .. "\n" .. Skillet:FormatMoneyFull(cost * markup, true) .. "\n"
 			else
 				label = label .. "\n\n" .. table.concat(toConcatLabel,"\n") .. "\n   " .. L["Reagents"] .. ":\n"
-				extra_text =  extra_text .. "\n\n" .. table.concat(toConcatExtra,"\n") .. "\n" .. Skillet:FormatMoneyFull(total, true) .. "\n"
+				extra_text =  extra_text .. "\n\n" .. table.concat(toConcatExtra,"\n") .. "\n" .. Skillet:FormatMoneyFull(cost, true) .. "\n"
 			end
 		end
 	end
@@ -228,28 +227,40 @@ end
 
 function plugin.RecipeNameSuffix(skill, recipe)
 	local text
-	if recipe then
-		local itemID = recipe.itemID
-		if Atr_GetAuctionBuyout and Skillet.db.profile.plugins.ATR.enabled and itemID then
-			local value = Atr_GetAuctionBuyout(itemID)
-			if value then
-				value = value * recipe.numMade
-				local matsum = 0
-				for k,v in pairs(recipe.reagentData) do
-					local iprice = Atr_GetAuctionBuyout(v.id)
-					if iprice then
-						matsum = matsum + v.numNeeded * iprice
+	if not recipe then return end
+	local itemID = recipe.itemID
+	if Atr_GetAuctionBuyout and Skillet.db.profile.plugins.ATR.enabled and itemID then
+		local buyout = ( Atr_GetAuctionBuyout(itemID) or 0 ) * recipe.numMade
+		if Skillet.db.profile.plugins.ATR.reagentPrices then
+			local cost = 0
+			for i=1, #recipe.reagentData, 1 do
+				local needed = recipe.reagentData[i].numNeeded or 0
+				local id = recipe.reagentData[i].id
+				local value = ( Atr_GetAuctionBuyout(id) or 0 ) * needed
+				local buyFactor = Skillet.db.profile.plugins.ATR.buyFactor or buyFactorDef
+				if Skillet:VendorSellsReagent(id) then
+					if Skillet.db.profile.plugins.ATR.buyablePrices then
+						if Skillet.db.profile.plugins.ATR.useVendorCalc then
+							value = ( Atr_GetSellValue(id) or 0 ) * needed * buyFactor
+						end
+					else
+						value = 0
 					end
 				end
-				value = value - matsum
-				if Skillet.db.profile.plugins.ATR.useShort then
-					text = Skillet:FormatMoneyShort(value, true)
-				else
-					text = Skillet:FormatMoneyFull(value, true)
-				end
-				if Skillet.db.profile.plugins.ATR.onlyPositive and value <= 0 then
-					text = nil
-				end
+				cost = cost + value
+			end
+			if Skillet.db.profile.plugins.ATR.useVendorCalc then
+				local markup = Skillet.db.profile.plugins.ATR.markup or markupDef
+				cost = cost * markup
+			end
+			local profit = buyout - cost
+			if Skillet.db.profile.plugins.ATR.useShort then
+				text = Skillet:FormatMoneyShort(profit, true)
+			else
+				text = Skillet:FormatMoneyFull(profit, true)
+			end
+			if Skillet.db.profile.plugins.ATR.onlyPositive and profit <= 0 then
+				text = nil
 			end
 		end
 	end
