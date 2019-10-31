@@ -149,6 +149,7 @@ end
 function Skillet:StealEnchantButton()
 	DA.DEBUG(0,"StealEnchantButton()")
 	if Skillet.db.profile.support_crafting then
+		SkilletEnchantButton:Disable()			-- Disable our button because DoCraft is restricted
 		SkilletEnchantButton:Hide() 			-- Hide our Button
 		if not Skillet.EnchantOldParent and SkilletFrame and CraftCreateButton then
 			Skillet.EnchantOldParent = CraftCreateButton:GetParent()
@@ -2636,13 +2637,13 @@ end
 --
 
 local skillMenuSelection = {
---@alpha@
+--[===[@alpha@
 	{
 		text = "skillMenuSelection",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@
+--@end-alpha@]===]
 	{
 		text = L["Select All"],
 		func = function() Skillet:SkillButton_SetAllSelections(true) Skillet:UpdateTradeSkillWindow() end,
@@ -2654,13 +2655,13 @@ local skillMenuSelection = {
 }
 
 local skillMenuGroup = {
---@alpha@
+--[===[@alpha@
 	{
 		text = "skillMenuGroup",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@
+--@end-alpha@]===]
 	{
 		text = L["Empty Group"],
 		func = function() Skillet:SkillButton_NewGroup() end,
@@ -2672,13 +2673,13 @@ local skillMenuGroup = {
 }
 
 local skillMenuIgnore = {
---@alpha@
+--[===[@alpha@
 	{
 		text = "skillMenuIgnore",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@
+--@end-alpha@]===]
 	{
 		text = L["Add Recipe to Ignored List"],
 		func = function()
@@ -2708,13 +2709,13 @@ local skillMenuIgnore = {
 }
 
 local skillMenuList = {
---@alpha@
+--[===[@alpha@
 	{
 		text = "skillMenuList",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@
+--@end-alpha@]===]
 	{
 		text = L["New Group"],
 		hasArrow = true,
@@ -2755,13 +2756,13 @@ local skillMenuList = {
 }
 
 local skillMenuListLocked = {
---@alpha@
+--[===[@alpha@
 	{
 		text = "skillMenuListLocked",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@
+--@end-alpha@]===]
 	{
 		text = L["Selection"],
 		hasArrow = true,
@@ -2784,13 +2785,13 @@ local skillMenuListLocked = {
 }
 
 local headerMenuList = {
---@alpha@
+--[===[@alpha@
 	{
 		text = "headerMenuList",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@
+--@end-alpha@]===]
 	{
 		text = L["Rename Group"],
 		func = function() Skillet:SkillButton_NameEditEnable(Skillet.menuButton) end,
@@ -2825,13 +2826,13 @@ local headerMenuList = {
 }
 
 local headerMenuListLocked = {
---@alpha@
+--[===[@alpha@
 	{
 		text = "headerMenuListLocked",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@
+--@end-alpha@]===]
 	{
 		text = L["Selection"],
 		hasArrow = true,
@@ -2844,13 +2845,13 @@ local headerMenuListLocked = {
 }
 
 local headerMenuListMainGroup = {
---@alpha@
+--[===[@alpha@
 	{
 		text = "headerMenuListMainGroup",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@
+--@end-alpha@]===]
 	{
 		text = L["New Group"],
 		hasArrow = true,
@@ -2881,13 +2882,13 @@ local headerMenuListMainGroup = {
 }
 
 local headerMenuListMainGroupLocked = {
---@alpha@
+--[===[@alpha@
 	{
 		text = "headerMenuListMainGroupLocked",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@
+--@end-alpha@]===]
 	{
 		text = L["Selection"],
 		hasArrow = true,
