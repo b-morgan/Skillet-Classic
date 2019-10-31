@@ -344,7 +344,7 @@ function Skillet:ProcessQueue(altMode)
 				local Smelting = self:GetTradeName(2656)
 				--DA.DEBUG(1,"tradeID= "..tostring(tradeID)..", tradeName= "..tostring(tradeName)..", Mining= "..tostring(Mining)..", Smelting= "..tostring(Smelting))
 				if tradeName == Mining then tradeName = Smelting end
-				Skillet:Print(L["Changing profession to"],tradeName,L["Press Process to continue"])
+				self:Print(L["Changing profession to"],tradeName,L["Press Process to continue"])
 				self.queuecasting = false
 				self:ChangeTradeSkill(tradeID, tradeName)
 				self:QueueMoveToTop(qpos)
@@ -356,7 +356,12 @@ function Skillet:ProcessQueue(altMode)
 			--DA.DEBUG(1,"processingSpell= "..tostring(self.processingSpell)..", processingPosition= "..tostring(qpos)..", processingCommand= "..DA.DUMP1(command))
 			if self.isCraft then
 				--DA.DEBUG(1,"DoCraft(spell= "..tostring(recipeIndex)..", count= "..tostring(count)..") altMode= "..tostring(altMode))
-				DoCraft(recipeIndex, count)
+				if self.DoCraft then 
+					DoCraft(recipeIndex, count)
+				else
+					DA.WARN("processingSpell= "..tostring(self.processingSpell)..", processingPosition= "..tostring(qpos)..", processingCommand= "..DA.DUMP1(command))
+					DA.WARN("DoCraft(spell= "..tostring(recipeIndex)..", count= "..tostring(count)..") altMode= "..tostring(altMode))
+				end
 			else
 				--DA.DEBUG(1,"DoTradeSkill(spell= "..tostring(recipeIndex)..", count= "..tostring(count)..") altMode= "..tostring(altMode))
 				DoTradeSkill(recipeIndex, count)

@@ -87,7 +87,7 @@ Skillet.AdditionalAbilities = {
 -- Checks to see if the current trade is one that we support.
 --
 function Skillet:IsSupportedTradeskill(tradeID)
-	if IsShiftKeyDown() or not tradeID or tradeID == 5419 or tradeID == 53428 then
+	if IsShiftKeyDown() or UnitAffectingCombat("player") or not tradeID or tradeID == 5419 or tradeID == 53428 then
 		return false
 	end
 	return true
