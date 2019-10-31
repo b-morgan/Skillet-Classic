@@ -594,9 +594,9 @@ function Skillet:TradeButton_OnEnter(button)
 	else
 		local rank, maxRank = data.rank, data.maxRank
 		GameTooltip:AddLine("["..tostring(rank).."/"..tostring(maxRank).."]",0,1,0)
-		if tradeID == self.currentTrade then
-			GameTooltip:AddLine(L["shift-click to link"])
-		end
+--		if tradeID == self.currentTrade then
+--			GameTooltip:AddLine(L["shift-click to link"])
+--		end
 		local buttonIcon = _G[button:GetName().."Icon"]
 		local r,g,b = buttonIcon:GetVertexColor()
 		if g == 0 then
@@ -629,12 +629,12 @@ function Skillet:TradeButton_OnClick(this,button)
 	if button == "LeftButton" then
 		if player == self.currentPlayer then
 			if self.currentTrade == tradeID and IsShiftKeyDown() then
-				local link = GetTradeSkillListLink();
-				local activeEditBox =  ChatEdit_GetActiveWindow();
-				if activeEditBox or WIM_EditBoxInFocus ~= nil then
-					ChatEdit_InsertLink(link)
-				else
-					DA.DEBUG(0, link)
+				if GetTradeSkillListLink then
+					local link = GetTradeSkillListLink();
+					local activeEditBox =  ChatEdit_GetActiveWindow();
+					if activeEditBox or WIM_EditBoxInFocus ~= nil then
+						ChatEdit_InsertLink(link)
+					end
 				end
 			elseif self.currentTrade ~= tradeID then
 				if self.skillIsCraft[self.currentTrade] ~= self.skillIsCraft[tradeID] then
@@ -2637,13 +2637,13 @@ end
 --
 
 local skillMenuSelection = {
---[===[@alpha@
+--@alpha@
 	{
 		text = "skillMenuSelection",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]===]
+--@end-alpha@
 	{
 		text = L["Select All"],
 		func = function() Skillet:SkillButton_SetAllSelections(true) Skillet:UpdateTradeSkillWindow() end,
@@ -2655,13 +2655,13 @@ local skillMenuSelection = {
 }
 
 local skillMenuGroup = {
---[===[@alpha@
+--@alpha@
 	{
 		text = "skillMenuGroup",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]===]
+--@end-alpha@
 	{
 		text = L["Empty Group"],
 		func = function() Skillet:SkillButton_NewGroup() end,
@@ -2673,13 +2673,13 @@ local skillMenuGroup = {
 }
 
 local skillMenuIgnore = {
---[===[@alpha@
+--@alpha@
 	{
 		text = "skillMenuIgnore",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]===]
+--@end-alpha@
 	{
 		text = L["Add Recipe to Ignored List"],
 		func = function()
@@ -2709,13 +2709,13 @@ local skillMenuIgnore = {
 }
 
 local skillMenuList = {
---[===[@alpha@
+--@alpha@
 	{
 		text = "skillMenuList",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]===]
+--@end-alpha@
 	{
 		text = L["New Group"],
 		hasArrow = true,
@@ -2756,13 +2756,13 @@ local skillMenuList = {
 }
 
 local skillMenuListLocked = {
---[===[@alpha@
+--@alpha@
 	{
 		text = "skillMenuListLocked",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]===]
+--@end-alpha@
 	{
 		text = L["Selection"],
 		hasArrow = true,
@@ -2785,13 +2785,13 @@ local skillMenuListLocked = {
 }
 
 local headerMenuList = {
---[===[@alpha@
+--@alpha@
 	{
 		text = "headerMenuList",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]===]
+--@end-alpha@
 	{
 		text = L["Rename Group"],
 		func = function() Skillet:SkillButton_NameEditEnable(Skillet.menuButton) end,
@@ -2826,13 +2826,13 @@ local headerMenuList = {
 }
 
 local headerMenuListLocked = {
---[===[@alpha@
+--@alpha@
 	{
 		text = "headerMenuListLocked",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]===]
+--@end-alpha@
 	{
 		text = L["Selection"],
 		hasArrow = true,
@@ -2845,13 +2845,13 @@ local headerMenuListLocked = {
 }
 
 local headerMenuListMainGroup = {
---[===[@alpha@
+--@alpha@
 	{
 		text = "headerMenuListMainGroup",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]===]
+--@end-alpha@
 	{
 		text = L["New Group"],
 		hasArrow = true,
@@ -2882,13 +2882,13 @@ local headerMenuListMainGroup = {
 }
 
 local headerMenuListMainGroupLocked = {
---[===[@alpha@
+--@alpha@
 	{
 		text = "headerMenuListMainGroupLocked",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]===]
+--@end-alpha@
 	{
 		text = L["Selection"],
 		hasArrow = true,
