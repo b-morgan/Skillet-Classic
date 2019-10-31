@@ -833,18 +833,18 @@ function Skillet:SkilletShow()
 -- give Hunter Beast Training a pass
 -- for everything else bring up the appropriate Blizzard UI
 --
-		if self.castSpellID ~= 5149 then
-			if not IsShiftKeyDown() then
-				DA.DEBUG(0,"SkilletShow: "..tostring(self.currentTrade).." ("..tostring(name)..") is not supported")
-				DA.DEBUG(0,"tradeSkillIDsByName= "..DA.DUMP(self.tradeSkillIDsByName))
-			end
-			self:HideAllWindows()
-			if self.isCraft then
-				self:RestoreEnchantButton(true)
-				ShowUIPanel(CraftFrame)
-			else
-				ShowUIPanel(TradeSkillFrame)
-			end
+		if self.castSpellID == 5149 then
+			return
+		elseif not IsShiftKeyDown() and not UnitAffectingCombat("player") then
+			DA.DEBUG(0,"SkilletShow: "..tostring(self.currentTrade).." ("..tostring(name)..") is not supported")
+			DA.DEBUG(0,"tradeSkillIDsByName= "..DA.DUMP(self.tradeSkillIDsByName))
+		end
+		self:HideAllWindows()
+		if self.isCraft then
+			self:RestoreEnchantButton(true)
+			ShowUIPanel(CraftFrame)
+		else
+			ShowUIPanel(TradeSkillFrame)
 		end
 	end
 end
