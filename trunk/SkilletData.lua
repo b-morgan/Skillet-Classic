@@ -552,8 +552,10 @@ function Skillet:GetSkillRanks(player, trade)
 				name, rank, maxRank = GetTradeSkillLine()
 			end
 			if self.db.realm.tradeSkills[player] and self.db.realm.tradeSkills[player][trade] then
-				self.db.realm.tradeSkills[player][trade].rank = rank
-				self.db.realm.tradeSkills[player][trade].maxRank = maxRank
+				if rank ~= 0 and maxRank ~= 0 then
+					self.db.realm.tradeSkills[player][trade].rank = rank
+					self.db.realm.tradeSkills[player][trade].maxRank = maxRank
+				end
 			end
 		end
 		if self.db.realm.tradeSkills[player] then
@@ -723,7 +725,6 @@ local function ScanTrade()
 	mainGroup.autoGroup = true
 	Skillet:RecipeGroupClearEntries(mainGroup)
 	Skillet.groupList = {}
---	Skillet.db.realm.tradeSkills[player][tradeID].link = link		-- Classic has no link for the profession
 	Skillet.db.realm.tradeSkills[player][tradeID].name = profession
 	Skillet.db.realm.tradeSkills[player][tradeID].rank = rank
 	Skillet.db.realm.tradeSkills[player][tradeID].maxRank = maxRank
@@ -735,9 +736,10 @@ local function ScanTrade()
 		if not Skillet.db.realm.tradeSkills[player][SMELTING] then
 			Skillet.db.realm.tradeSkills[player][SMELTING] = {}
 		end
-		Skillet.db.realm.tradeSkills[player][tradeID].name = "Smelting ("..profession..")"
+		Skillet.db.realm.tradeSkills[player][SMELTING].name = "Smelting ("..profession..")"
 		Skillet.db.realm.tradeSkills[player][SMELTING].rank = rank
 		Skillet.db.realm.tradeSkills[player][SMELTING].maxRank = maxRank
+		Skillet.db.realm.tradeSkills[player][SMELTING].isCraft = Skillet.isCraft
 	end
 	local numHeaders = 0
 	local parentGroup
