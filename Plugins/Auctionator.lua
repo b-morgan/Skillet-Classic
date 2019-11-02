@@ -303,7 +303,7 @@ function Skillet:AuctionatorSearch(whichOne)
 		for i=1,#list,1 do
 			local id  = list[i].id
 			local name = GetItemInfo(id)
-			if (name) then
+			if name and not Skillet:VendorSellsReagent(id) then
 				table.insert (items, name)
 				--DA.DEBUG(0, "Item["..tostring(i).."] "..name.." ("..tostring(id)..") added")
 			end
