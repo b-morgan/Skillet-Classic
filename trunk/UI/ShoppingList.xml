@@ -264,9 +264,9 @@
 				<AbsDimension x="85" y="22"/>
 			</Size>
 			<Anchors>
-				<Anchor point="BOTTOMRIGHT" relativeTo="SkilletShoppingList" relativePoint="BOTTOMRIGHT">
+				<Anchor point="BOTTOMLEFT" relativeTo="SkilletShoppingList" relativePoint="BOTTOMLEFT">
 					<Offset>
-						<AbsDimension x="2" y="2"/>
+						<AbsDimension x="5" y="50"/>
 					</Offset>
 				</Anchor>
 			</Anchors>
