@@ -202,6 +202,7 @@ function Skillet:MERCHANT_CLOSED()
 	remove_merchant_buy_button()
 	merchant_inventory = {}
 	self.autoPurchaseComplete = nil
+	self:HideShoppingList()
 end
 
 --

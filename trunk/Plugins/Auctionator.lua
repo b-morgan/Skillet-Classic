@@ -1,3 +1,5 @@
+local addonName,addonTable = ...
+local DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
 
@@ -272,42 +274,66 @@ Skillet:RegisterRecipeNamePlugin("ATRPlugin")		-- we have a RecipeNamePrefix or 
 Skillet:RegisterDisplayDetailPlugin("ATRPlugin")	-- we have a GetExtraText function
 
 --
--- Auctionator support (moved here from MainFrame.lua)
--- needs to be debugged on Classic
+-- Auctionator support
+--  whichOne:
+--    false (or nil) will search for the item and reagents in the MainFrame
+--    true will search for the items in the ShoppingList
 --
-function Skillet:AuctionatorSearch()
+function Skillet:AuctionatorSearch(whichOne)
 	if not AuctionatorLoaded or not AuctionFrame then
 		return
 	end
 	if not AuctionFrame:IsShown() then
-		Atr_Error_Display ("When the Auction House is open\nclicking this button tells Auctionator\nto scan for the item and all its reagents.")
+		if whichOne then
+			Atr_Error_Display("When the Auction House is open\nclicking this button tells Auctionator\nto scan for the items in the Shopping List.")
+		else
+			Atr_Error_Display("When the Auction House is open\nclicking this button tells Auctionator\nto scan for the item and all its reagents.")
+		end
 		return
 	end
-	local recipe, recipeId = Skillet:GetRecipeDataByTradeIndex(Skillet.currentTrade, Skillet.selectedSkill)
-	if not recipe then
-		return
-	end
-	local BUY_TAB = 3;
-	Atr_SelectPane(BUY_TAB);
-	local numReagents = #recipe.reagentData
-	local shoppingListName = GetItemInfo(recipe.itemID)
-	if (shoppingListName == nil) then
-		shoppingListName = Skillet:GetRecipeName(recipeId)
-	end
-	local reagentIndex
+	local shoppingListName
 	local items = {}
-	if (shoppingListName) then
-		table.insert (items, shoppingListName)
-	end
-	for reagentIndex = 1, numReagents do
-		local reagentId = recipe.reagentData[reagentIndex].id
-		if (reagentId and (reagentId ~= 3371)) then
-			local reagentName = GetItemInfo(reagentId)
-			if (reagentName) then
-				table.insert (items, reagentName)
-				-- DA.DEBUG(0, "Reagent num "..reagentIndex.." ("..reagentId..") "..reagentName.." added")
+	if whichOne then
+		shoppingListName = L["Shopping List"]
+		local list = Skillet:GetShoppingList(Skillet.currentPlayer, false)
+		if not list or #list == 0 then
+			--DA.DEBUG(0,"Shopping List is empty")
+			return
+		end
+		for i=1,#list,1 do
+			local id  = list[i].id
+			local name = GetItemInfo(id)
+			if (name) then
+				table.insert (items, name)
+				--DA.DEBUG(0, "Item["..tostring(i).."] "..name.." ("..tostring(id)..") added")
+			end
+		end
+	else
+		local recipe, recipeId = Skillet:GetRecipeDataByTradeIndex(Skillet.currentTrade, Skillet.selectedSkill)
+		if not recipe then
+			return
+		end
+		shoppingListName = GetItemInfo(recipe.itemID)
+		if (shoppingListName == nil) then
+			shoppingListName = Skillet:GetRecipeName(recipeId)
+		end
+		if (shoppingListName) then
+			table.insert (items, shoppingListName)
+		end
+		local numReagents = #recipe.reagentData
+		local reagentIndex
+		for reagentIndex = 1, numReagents do
+			local reagentId = recipe.reagentData[reagentIndex].id
+			if reagentId and not Skillet:VendorSellsReagent(reagentId) then
+				local reagentName = GetItemInfo(reagentId)
+				if (reagentName) then
+					table.insert (items, reagentName)
+					--DA.DEBUG(0, "Reagent num "..reagentIndex.." ("..reagentId..") "..reagentName.." added")
+				end
 			end
 		end
 	end
+	local BUY_TAB = 3;
+	Atr_SelectPane(BUY_TAB)
 	Atr_SearchAH(shoppingListName, items)
 end

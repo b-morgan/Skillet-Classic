@@ -108,7 +108,6 @@ local function createShoppingListFrame(self)
 ]]--
 	-- Button to retrieve items needed from the bank
 	SkilletShoppingListRetrieveButton:SetText(L["Retrieve"])
-
 --
 -- The frame enclosing the scroll list needs a border and a background
 --
@@ -480,6 +479,9 @@ function Skillet:AUCTION_HOUSE_SHOW()
 	if #self.cachedShoppingList == 0 then
 		return
 	end
+	if AuctionatorLoaded and self.ATRPlugin and self.db.profile.plugins.ATR.enabled then
+		SkilletSLAuctionatorButton:Show()
+	end
 	self:DisplayShoppingList(false) -- false -> not at a bank
 end
 
@@ -489,6 +491,9 @@ end
 function Skillet:AUCTION_HOUSE_CLOSED()
 	self.auctionOpen = false
 	self:UnregisterEvent("AUCTION_OWNED_LIST_UPDATE")
+	if AuctionatorLoaded and self.ATRPlugin and self.db.profile.plugins.ATR.enabled then
+		SkilletSLAuctionatorButton:Hide()
+	end
 	self:HideShoppingList()
 end
 
