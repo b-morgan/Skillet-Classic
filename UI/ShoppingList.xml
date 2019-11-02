@@ -256,7 +256,26 @@
 				</OnClick>
 			</Scripts>
 		</Button>
-
+		<!--
+		# Shopping List Auctionator button
+		-->
+		<Button name="SkilletSLAuctionatorButton" inherits="UIPanelButtonTemplate" text="Auctionator" parent="SkilletShoppingList">
+			<Size>
+				<AbsDimension x="85" y="22"/>
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativeTo="SkilletShoppingList" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="2" y="2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					Skillet:AuctionatorSearch(true)
+				</OnClick>
+			</Scripts>
+		</Button>
 		<!--
 		#
 		# Check boxes for various recipe filtering options.
