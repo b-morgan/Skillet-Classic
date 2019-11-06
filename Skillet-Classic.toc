@@ -10,8 +10,8 @@
 ## X-RelSite-WoWI: 25287
 ## X-Website: http://www.wowace.com/addons/skillet-classic/
 ## SavedVariables: SkilletDB
-## SavedVariablesPerCharacter: SkilletDBPC, SkilletMemory
-## OptionalDeps: Ace3, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1, TradeSkillMaster, Auctionator, MissingTradeSkillsList
+## SavedVariablesPerCharacter: SkilletDBPC, SkilletMemory, SkilletProfile
+## OptionalDeps: Ace3, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1, TradeSkillMaster, Auctionator, BootyBayGazette, MissingTradeSkillsList, BeanCounter
 ## X-Embeds: Ace3, LibStub, CallbackHandler-1.0, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1
 
 ## LoadManagers: AddonLoader

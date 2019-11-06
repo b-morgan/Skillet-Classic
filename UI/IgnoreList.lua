@@ -89,8 +89,9 @@ local function createIgnoreListFrame(self)
 	titletext:SetShadowOffset(1,-1)
 	titletext:SetTextColor(1,1,1)
 	titletext:SetText("Skillet-Classic: Ignored Recipes")
-
-	-- The frame enclosing the scroll list needs a border and a background .....
+--
+-- The frame enclosing the scroll list needs a border and a background .....
+--
 	local backdrop = SkilletIgnoreListParent
 	if TSMAPI_FOUR then
 		backdrop:SetFrameStrata("HIGH")
@@ -99,19 +100,25 @@ local function createIgnoreListFrame(self)
 	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
 	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
 	backdrop:SetResizable(true)
-
-	-- Ace Window manager library, allows the window position (and size)
-	-- to be automatically saved
 	local ignoreListLocation = {
 		prefix = "ignoreListLocation_"
 	}
+
+--
+-- Ace Window manager library, allows the window position (and size)
+-- to be automatically saved
+--
 	local windowManager = LibStub("LibWindow-1.1")
 	windowManager.RegisterConfig(frame, self.db.profile, ignoreListLocation)
 	windowManager.RestorePosition(frame)  -- restores scale also
 	windowManager.MakeDraggable(frame)
-	-- lets play the resize me game!
+--
+-- lets play the resize me game!
+--
 	Skillet:EnableResize(frame, 380,150, Skillet.UpdateIgnoreListWindow)
-	-- so hitting [ESC] will close the window
+--
+-- so hitting [ESC] will close the window
+--
 	tinsert(UISpecialFrames, frame:GetName())
 	return frame
 end
@@ -144,7 +151,7 @@ function Skillet:GetIgnoreList(player)
 end
 
 function Skillet:DeleteIgnoreEntry(index, player, id)
-	local print=("DeleteIgnoreEntry("..tostring(index)..", "..tostring(player)..", "..tostring(id)..")")
+	DA.DEBUG(0,"DeleteIgnoreEntry("..tostring(index)..", "..tostring(player)..", "..tostring(id)..")")
 	table.remove(self.cachedIgnoreList,index)
 	self.db.realm.userIgnoredMats[player][id] = nil
 	self:UpdateIgnoreListWindow()
@@ -172,7 +179,9 @@ function Skillet:ClearIgnoreList(player)
 	self:UpdateTradeSkillWindow()
 end
 
+--
 -- Called to update the ignore list window
+--
 function Skillet:UpdateIgnoreListWindow()
 	DA.DEBUG(0,"UpdateIgnoreListWindow")
 	self.cachedIgnoreList = self:GetIgnoreList()
@@ -183,12 +192,16 @@ function Skillet:UpdateIgnoreListWindow()
 	end
 	local button_count = SkilletIgnoreListList:GetHeight() / SKILLET_IGNORE_LIST_HEIGHT
 	button_count = math.floor(button_count)
-	-- Update the scroll frame
+--
+-- Update the scroll frame
+--
 	FauxScrollFrame_Update(SkilletIgnoreListList,			-- frame
 							numItems,						-- num items
 							button_count,					-- num to display
 							SKILLET_IGNORE_LIST_HEIGHT)	-- value step (item height)
-	-- Where in the list of items to start counting.
+--
+-- Where in the list of items to start counting.
+--
 	local itemOffset = FauxScrollFrame_GetOffset(SkilletIgnoreListList)
 	local width = SkilletIgnoreListParent:GetWidth()
 	for i=1, button_count, 1 do
@@ -230,7 +243,9 @@ function Skillet:UpdateIgnoreListWindow()
 			rid:Hide()
 		end
 	end
-	-- Hide any of the buttons that we created, but don't need right now
+--
+-- Hide any of the buttons that we created, but don't need right now
+--
 	for i = button_count+1, num_buttons, 1 do
 		local button = get_button(i)
 		button:Hide()
@@ -248,6 +263,7 @@ end
 -- Functions to show and hide the Ignorelist
 --
 function Skillet:DisplayIgnoreList()
+	DA.DEBUG(0,"DisplayIgnoreList()")
 	if not self.ignoreList then
 		self.ignoreList = createIgnoreListFrame(self)
 	end

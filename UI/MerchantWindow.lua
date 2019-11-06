@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 -- Localization
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
+local PT = LibStub("LibPeriodicTable-3.1")
 
 local merchant_inventory = {}
 
