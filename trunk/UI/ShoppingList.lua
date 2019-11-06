@@ -106,8 +106,19 @@ local function createShoppingListFrame(self)
 	SkilletShowQueuesIncludeGuildText:SetText(L["Include guild"])
 	SkilletShowQueuesIncludeGuild:SetChecked(Skillet.db.char.include_guild)
 ]]--
-	-- Button to retrieve items needed from the bank
+--
+-- Button to retrieve items needed from the bank
+--
 	SkilletShoppingListRetrieveButton:SetText(L["Retrieve"])
+	SkilletShoppingListRetrieveButton:Hide()
+--
+-- Button to create an Auctionator search list for Shopping List contents
+--   should only show if the Auction House is open, Auctionator is
+--   installed, and the Auctionator plugin is enabled
+--   It should be hidden when the Auction House is closed
+--   Start with it (unconditionally) hidden
+--
+	SkilletSLAuctionatorButton:Hide()
 --
 -- The frame enclosing the scroll list needs a border and a background
 --
@@ -147,7 +158,7 @@ function Skillet:ShoppingListButton_OnEnter(button)
 end
 
 function Skillet:ClearShoppingList(player)
-	--DA.DEBUG(0,"ClearShoppingList(",player,")")
+	--DA.DEBUG(0,"ClearShoppingList("..tostring(player)..")")
 	local playerList
 	if player then
 		playerList = { player }
@@ -157,10 +168,10 @@ function Skillet:ClearShoppingList(player)
 			table.insert(playerList, player)
 		end
 	end
-	DA.DEBUG(0,"clear shopping list for: "..(player or "all players"))
+	--DA.DEBUG(0,"clear shopping list for: "..(player or "all players"))
 	for i=1,#playerList,1 do
 		local player = playerList[i]
-		DA.DEBUG(1,"player: "..player)
+		--DA.DEBUG(1,"player: "..player)
 		self.db.realm.reagentsInQueue[player] = {}
 		self.db.realm.queueData[player] = {}
 		self.db.realm.inventoryData[player] = {}
@@ -1015,13 +1026,14 @@ function Skillet:DisplayShoppingList(atBank)
 	if not self.shoppingList then
 		self.shoppingList = createShoppingListFrame(self)
 	end
-	local frame = self.shoppingList
+	SkilletSLAuctionatorButton:Hide()
 	if atBank then
 		SkilletShoppingListRetrieveButton:Show()
 	else
 		SkilletShoppingListRetrieveButton:Hide()
 	end
 	cache_list(self)
+	local frame = self.shoppingList
 	if not frame:IsVisible() then
 		frame:Show()
 	end

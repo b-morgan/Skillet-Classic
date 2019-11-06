@@ -1044,6 +1044,7 @@ Skillet.options =
 						SkilletShoppingList:SetPoint("TOPLEFT",950,-400);
 						windowManager.SavePosition(SkilletShoppingList)
 					end
+				else
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
 												  " Leave combat and try again.")
 				end
@@ -1066,4 +1067,3 @@ function Skillet:ConfigureOptions()
 	acedia:AddToBlizOptions("Skillet Profiles", "Profiles", "Skillet")
 	acedia:AddToBlizOptions("Skillet Plugins", "Plugins", "Skillet")
 end
-

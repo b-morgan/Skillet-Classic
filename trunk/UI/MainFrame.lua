@@ -367,7 +367,7 @@ function Skillet:CreateTradeSkillWindow()
 --
 -- lets play the resize me game!
 --
-	minwidth = SKILLET_SKILLLIST_MIN_WIDTH
+	local minwidth = SKILLET_SKILLLIST_MIN_WIDTH
 	minwidth = minwidth +                  -- minwidth of scroll button
 			   20 +                        -- padding between sroll and detail
 			   SKILLET_REAGENT_MIN_WIDTH + -- reagent window (fixed width)
@@ -523,7 +523,6 @@ function Skillet:ConfigureRecipeControls()
 		SkilletQueueButton:Hide()
 		SkilletCreateAllButton:Hide()
 		SkilletCreateButton:Hide()
-		SkilletItemCountInputBox:Hide()
 		SkilletQueueParent:Hide()
 		SkilletStartQueueButton:Hide()
 		SkilletEmptyQueueButton:Hide()
@@ -543,7 +542,6 @@ function Skillet:ConfigureRecipeControls()
 		SkilletQueueButton:Show()
 		SkilletCreateAllButton:Show()
 		SkilletCreateButton:Show()
-		SkilletItemCountInputBox:Show()
 		SkilletQueueParent:Show()
 		SkilletStartQueueButton:Show()
 		SkilletEmptyQueueButton:Show()
@@ -1424,9 +1422,6 @@ function Skillet:SkillButton_OnEnter(button)
 --
 	if numrecursive > 0 then
 		local text = "\n" .. CCRAFT..numrecursive .. "|r " .. L["can be created by crafting reagents"];
-		if num > 0 then
-			text = "\n" .. text;
-		end
 		tip:AddLine(text, 1, 1, 1, false); -- (text, r, g, b, wrap)
 	end
 --
@@ -1446,10 +1441,7 @@ function Skillet:SkillButton_OnEnter(button)
 		if numwalts >= 1000 then
 			numwalts = "##"
 		end
-		local text = CALTS..numwalts .. "|r " .. L["can be created from reagents on all characters"];
-		if num > 0 or numrecursive > 0 then
-			text = "\n" .. text;
-		end
+		local text = "\n" .. CALTS..numwalts .. "|r " .. L["can be created from reagents on all characters"];
 		tip:AddLine(text, 1, 1, 1, false);	-- (text, r, g, b, wrap)
 	end
 --
@@ -2530,23 +2522,6 @@ function Skillet:SkilletFrameForceClose()
 end
 
 --
--- Process/Pause button.
---
-function Skillet:StartQueue_OnClick(button)
-	local mouse = GetMouseButtonClicked()
-	--DA.DEBUG(0,"StartQueue_OnClick("..tostring(button).."), "..tostring(mouse))
-	if self.queuecasting then
-		self:CancelCast() -- next update will reset the text
-		button:Disable()
-		self.queuecasting = false
-	else
-		button:SetText(L["Pause"])
-		self:ProcessQueue(mouse == "RightButton" or IsAltKeyDown())
-	end
-	self:UpdateQueueWindow()
-end
-
---
 -- Called when the trade skill window is shown
 --
 local old_CloseSpecialWindows
@@ -2979,6 +2954,23 @@ local queueMenuList = {
 				end,
 	},
 }
+
+--
+-- Process/Pause button.
+--
+function Skillet:StartQueue_OnClick(button)
+	local mouse = GetMouseButtonClicked()
+	--DA.DEBUG(0,"StartQueue_OnClick("..tostring(button).."), "..tostring(mouse))
+	if self.queuecasting then
+		self:CancelCast() -- next update will reset the text
+		button:Disable()
+		self.queuecasting = false
+	else
+		button:SetText(L["Pause"])
+		self:ProcessQueue(mouse == "RightButton" or IsAltKeyDown())
+	end
+	self:UpdateQueueWindow()
+end
 
 function Skillet:SkilletQueueMenu_Show(button)
 	if not SkilletQueueMenu then
