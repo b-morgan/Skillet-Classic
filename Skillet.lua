@@ -198,17 +198,25 @@ function Skillet:OnInitialize()
 	end
 
 --
--- Change the dataVersion when code changes obsolete 
--- the current saved variables database.
+-- Change the dataVersion when (major) code changes
+-- obsolete the current saved variables database.
+--
+-- Change the customVersion when code changes obsolete 
+-- the custom group specific saved variables data.
+--
+-- Change the queueVersion when code changes obsolete 
+-- the queue specific saved variables data.
 --
 -- Change the recipeVersion when code changes obsolete 
--- the recipe specific saved variables database.
+-- the recipe specific saved variables data.
 --
 -- When Blizzard releases a new build, there's a chance that
 -- recipes have changed (i.e. different reagent requirements) so
 -- we clear the saved variables recipe data just to be safe.
 --
 	local dataVersion = 5
+	local queueVersion = 1
+	local customVersion = 1
 	local recipeVersion = 3
 	local _,wowBuild,_,wowVersion = GetBuildInfo();
 	self.wowBuild = wowBuild
@@ -216,6 +224,12 @@ function Skillet:OnInitialize()
 	if not self.db.global.dataVersion or self.db.global.dataVersion ~= dataVersion then
 		self.db.global.dataVersion = dataVersion
 		self:FlushAllData()
+	elseif not self.db.global.customVersion or self.db.global.customVersion ~= customVersion then
+		self.db.global.customVersion = customVersion
+--		self:FlushCustomData()			-- allow one release before doing anything
+	elseif not self.db.global.queueVersion or self.db.global.queueVersion ~= queueVersion then
+		self.db.global.queueVersion = queueVersion
+--		self:FlushQueueData()			-- allow one release before doing anything
 	elseif not self.db.global.recipeVersion or self.db.global.recipeVersion ~= recipeVersion then
 		self.db.global.recipeVersion = recipeVersion
 		self:FlushRecipeData()
@@ -320,6 +334,14 @@ StaticPopupDialogs["SKILLET_CONTINUE_CHANGE"] = {
 	self:InitializeDatabase(UnitName("player"))
 end
 
+--
+-- These functions reset parts of the database primarily
+-- when code changes obsolete the current database.
+--
+-- FlushAllData covers everything and (hopefully) is
+-- rarely used. There is a dataVersion number to
+-- increment to trigger a call.
+--
 function Skillet:FlushAllData()
 	Skillet.data = {}
 	Skillet.db.realm.tradeSkills = {}
@@ -330,17 +352,41 @@ function Skillet:FlushAllData()
 	Skillet.db.realm.bankData = {}
 	Skillet.db.realm.bankDetails = {}
 	Skillet.db.realm.userIgnoredMats = {}
+	Skillet:FlushCustomData()
+	Skillet:FlushQueueData()
 	Skillet:FlushRecipeData()
 end
 
+--
+-- Custom Groups data could represent significant
+-- effort by the player so don't clear it without
+-- good cause.
+--
+function Skillet:FlushCustomData()
+	Skillet.db.realm.groupDB = {}
+	Skillet.db.realm.groupSN = {}
+end
+
+--
+-- Saved queues are in the profile so
+-- clearing these tables is just the current
+-- queue and should have minimal impact.
+--
+function Skillet:FlushQueueData()
+	Skillet.db.realm.queueData = {}
+	Skillet.db.realm.reagentsInQueue = {}
+end
+
+--
+-- Recipe data is constantly getting rebuilt so
+-- clearing it should have minimal (if any) impact.
+-- Blizzard's "stealth" changes to recipes are the
+-- primary reason this function exists.
+--
 function Skillet:FlushRecipeData()
 	Skillet.db.global.recipeDB = {}
 	Skillet.db.global.itemRecipeUsedIn = {}
 	Skillet.db.global.itemRecipeSource = {}
-	Skillet.db.realm.queueData = {}
-	Skillet.db.realm.reagentsInQueue = {}
-	Skillet.db.realm.groupDB = {}
-	Skillet.db.realm.groupSN = {}
 	Skillet.db.realm.skillDB = {}
 	Skillet.db.realm.subClass = {}
 	Skillet.db.realm.invSlot = {}
@@ -350,6 +396,8 @@ end
 -- MissingVendorItem entries can be a string when bought with gold
 -- or a table when bought with an alternate currency
 -- table entries are {name, quantity, currencyName, currencyID, currencyCount}
+--
+-- Note: Classic doesn't have any alternate currencies yet.
 --
 function Skillet:InitializeMissingVendorItems()
 	self.db.global.MissingVendorItems = {

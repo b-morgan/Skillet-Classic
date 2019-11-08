@@ -662,7 +662,7 @@ Skillet.options =
 --
 		btsui = {
 			type = "toggle",
-			name = "B TS UI",
+			name = "BTSUI",
 			desc = "Show/Hide the Blizzard TradeSkill frame",
 			get = function()
 				return Skillet.data.btsui
@@ -679,7 +679,7 @@ Skillet.options =
 		},
 		bcui = {
 			type = "toggle",
-			name = "B C UI",
+			name = "BCUI",
 			desc = "Show/Hide the Blizzard Crafting frame",
 			get = function()
 				return Skillet.data.bcui
@@ -704,7 +704,7 @@ Skillet.options =
 			func = function()
 				Skillet:UpdateShoppingListWindow(false)
 			end,
-			order = 69
+			order = 71
 		},
 		utsw = {
 			type = 'execute',
@@ -713,8 +713,12 @@ Skillet.options =
 			func = function()
 				Skillet:UpdateTradeSkillWindow()
 			end,
-			order = 70
+			order = 72
 		},
+--
+-- command to turn on/off custom groups 
+-- (i.e. panic/debug button if they aren't working)
+--
 		customgroups = {
 			type = "toggle",
 			name = "CustomGroups",
@@ -730,7 +734,40 @@ Skillet.options =
 					SkilletRecipeGroupOperations:Disable()
 				end
 			end,
-			order = 71
+			order = 73
+		},
+--
+-- additional database flush commands
+--
+		flushcustomdata = {
+			type = 'execute',
+			name = "Flush Custom Data",
+			desc = "Flush Custom Group Data",
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:FlushCustomData()
+					Skillet:InitializeDatabase(UnitName("player"))
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
+												  " Leave combat and try again.")
+				end
+			end,
+			order = 74
+		},
+		flushqueuedata = {
+			type = 'execute',
+			name = "Flush Queue Data",
+			desc = "Flush Queue Data",
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:FlushQueueData()
+					Skillet:InitializeDatabase(UnitName("player"))
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
+												  " Leave combat and try again.")
+				end
+			end,
+			order = 75
 		},
 
 --
