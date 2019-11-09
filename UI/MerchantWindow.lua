@@ -125,7 +125,7 @@ local function update_merchant_buy_button()
 	Skillet:InventoryScan()
 	local list = Skillet:GetShoppingList(Skillet.currentPlayer, false)
 	if not list or #list == 0 then
-		DA.DEBUG(0,"ShoppingList is empty")
+		--DA.DEBUG(0,"ShoppingList is empty")
 		SkilletMerchantBuyFrame:Hide()
 		return false
 	elseif does_merchant_sell_required_items(list) == false then
