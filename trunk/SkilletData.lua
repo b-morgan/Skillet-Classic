@@ -710,7 +710,7 @@ local function ScanTrade()
 --
 	numSkills = numCrafts
 	end
-	--DA.DEBUG(2,"ScanTrade: "..tostring(profession)..": "..tostring(tradeID).." "..numSkills.." recipes")
+	DA.DEBUG(0,"ScanTrade: "..tostring(profession)..": "..tostring(tradeID).." "..numSkills.." recipes")
 	local skillDB = Skillet.db.realm.skillDB[player][tradeID]
 	local recipeDB = Skillet.db.global.recipeDB
 	local skillData = Skillet.data.skillList[player][tradeID]
@@ -755,8 +755,9 @@ local function ScanTrade()
 --	if Skillet.isCraft then
 --		s = 0
 --	end
+	local craftNameSeen = {}
 	for i = s, numSkills, 1 do
-		local _, skillName, skillType, numAvailable, isExpanded, subSpell, extra
+		local skillName, craftSubSpellName, skillType, numAvailable, isExpanded, subSpell, extra
 		if Skillet.isCraft then
 --
 -- If needed (by uncommenting three lines above), 
@@ -770,12 +771,12 @@ local function ScanTrade()
 --
 -- GetCraftInfo() returns are: craftName, craftSubSpellName, craftType, numAvailable, isExpanded, trainingPointCost, requiredLevel
 --
-				skillName, _, skillType, numAvailable, isExpanded = GetCraftInfo(i)
+				skillName, craftSubSpellName, skillType, numAvailable, isExpanded = GetCraftInfo(i)
 			end
 		else
 			skillName, skillType, numAvailable, isExpanded = GetTradeSkillInfo(i)
 		end
-		--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
+		DA.DEBUG(0,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", craftSubSpellName= "..tostring(craftSubSpellName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
 		if skillName then
 			if skillType == "header" or skillType == "subheader" then
 --
@@ -804,11 +805,26 @@ local function ScanTrade()
 				end
 			else
 --
--- In Classic, recipes do not have a numerical ID so
--- use the name as the id and 
--- (break everything that assumes it is a number)
+-- In Classic, recipes do not have a numerical ID so use the name as the id and 
+-- break everything that assumes it is a number and assumes it is unique
 --
-				local recipeID = skillName
+				local recipeID
+				recipeID = skillName
+				if Skillet.isCraft then
+					if craftNameSeen[recipeID] then
+						DA.DEBUG(0,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", craftSubSpellName= "..tostring(craftSubSpellName).." is not unique")
+--
+-- Make an attempt to create a unique recipeID
+--
+						if craftSubSpellName and craftSubSpellName ~= "" then
+							recipeID = recipeID..craftSubSpellName
+						else
+							recipeID = recipeID.."("..tostring(i)..")"
+						end
+						DA.DEBUG(0,"ScanTrade: using '"..tostring(recipeID).."' instead")
+					end
+					craftNameSeen[recipeID] = true
+				end
 				if currentGroup then
 					Skillet:RecipeGroupAddRecipe(currentGroup, recipeID, i)
 				else

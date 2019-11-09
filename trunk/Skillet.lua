@@ -856,24 +856,25 @@ function Skillet:SkilletShow()
 		self.selectedSkill = nil
 		self.dataScanned = false
 		self:ScheduleTimer("SkilletShowWindow", 0.5)
-		if Skillet.db.profile.hide_blizzard_frame then
-			if self.isCraft then
+		if self.isCraft then
+			if Skillet.db.profile.support_crafting then
+				self:StealEnchantButton()
+			end
+			if Skillet.db.profile.hide_blizzard_frame then
 				--DA.DEBUG(0,"HideUIPanel(CraftFrame)")
 				Skillet.hideCraftFrame = true
 				HideUIPanel(CraftFrame)
 				if Skillet.tradeShow then
 					CloseTradeSkill()
 				end
-				if Skillet.db.profile.support_crafting then
-					self:StealEnchantButton()
-				end
-			else
-				--DA.DEBUG(0,"HideUIPanel(TradeSkillFrame)")
-				Skillet.hideTradeSkillFrame = true
-				HideUIPanel(TradeSkillFrame)
-				if Skillet.craftShow then
-					CloseCraft()
-				end
+			end
+		elseif Skillet.db.profile.hide_blizzard_frame then
+			--DA.DEBUG(0,"HideUIPanel(TradeSkillFrame)")
+			Skillet.hideTradeSkillFrame = true
+			HideUIPanel(TradeSkillFrame)
+			if Skillet.craftShow then
+				self:RestoreEnchantButton()
+				CloseCraft()
 			end
 		end
 	else
