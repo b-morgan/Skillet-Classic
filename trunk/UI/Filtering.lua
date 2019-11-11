@@ -82,7 +82,7 @@ function Skillet:FilterDropDown_OnShow()
 	--DA.DEBUG(0,"FilterDropDown_OnShow()")
 	UIDropDownMenu_Initialize(SkilletFilterDropdown, Skillet.FilterDropDown_Initialize)
 	SkilletFilterDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
-	UIDropDownMenu_SetSelectedID(SkilletFilterDropdown, 1)
+	UIDropDownMenu_SetSelectedID(SkilletFilterDropdown, self.filterSelected)
 end
 
 --
@@ -92,7 +92,7 @@ function Skillet:FilterDropDown_OnLoad()
 	--DA.DEBUG(0,"FilterDropDown_OnLoad()")
 	UIDropDownMenu_Initialize(SkilletFilterDropdown, Skillet.FilterDropDown_Initialize)
 	SkilletFilterDropdown.displayMode = "MENU"  -- changes the pop-up borders to be rounded instead of square
-	UIDropDownMenu_SetSelectedID(SkilletFilterDropdown, 1)
+	UIDropDownMenu_SetSelectedID(SkilletFilterDropdown, self.filterSelected)
 end
 
 --
@@ -105,6 +105,7 @@ function Skillet.FilterDropDown_Initialize(menuFrame,level)
 	local subClass = Skillet.db.realm.subClass[player][tradeID]
 	local invSlot = Skillet.db.realm.invSlot[player][tradeID]
 	local index = 1
+	Skillet.filterSelected = index
 	local info
 	info = UIDropDownMenu_CreateInfo()
 	info.text = L["None"]
@@ -140,6 +141,9 @@ function Skillet.FilterDropDown_Initialize(menuFrame,level)
 			if self then
 				info.owner = self:GetParent()
 			end
+			if subClass.selected == n then
+				Skillet.filterSelected = index
+			end
 			UIDropDownMenu_AddButton(info)
 			index = index + 1
 		end
@@ -166,6 +170,9 @@ function Skillet.FilterDropDown_Initialize(menuFrame,level)
 			info.arg2 = n
 			if self then
 				info.owner = self:GetParent()
+			end
+			if invSlot.selected == n then
+				Skillet.filterSelected = index
 			end
 			UIDropDownMenu_AddButton(info)
 			index = index + 1

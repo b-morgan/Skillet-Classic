@@ -366,6 +366,11 @@ function Skillet:SortAndFilterRecipes() -- SAFR:
 	local sortedSkillList = Skillet.data.sortedSkillList[skillListKey]
 	local oldLength = #sortedSkillList
 	local button_index = 0
+--
+-- load the filter dropdown and the search textbox with
+-- data saved for the currentTrade
+--
+	Skillet:FilterDropDown_OnLoad()
 	local searchtext = Skillet:GetTradeSkillOption("searchtext")
 	local groupLabel = Skillet.currentGroupLabel
 	DA.DEBUG(1,"SAFR: searchtext="..tostring(searchtext)..", groupLabel="..tostring(groupLabel))
@@ -432,9 +437,8 @@ function Skillet:SortAndFilterRecipes() -- SAFR:
 			depth, index = 0, 0
 		end
 --
--- RecipeGroupFlatten(group, depth, list, index)
---   does filtering (only if the skillIndex is correct) and sorting
---   but not searching
+-- RecipeGroupFlatten does filtering (only if the skillIndex is correct)
+-- and sorting but not searching
 --
 		button_index = Skillet:RecipeGroupFlatten(group, depth, sortedSkillList, index)
 		--DA.DEBUG(1,"SAFR: sorted "..tostring(button_index).." skills in "..tostring(Skillet.currentGroupLabel))
