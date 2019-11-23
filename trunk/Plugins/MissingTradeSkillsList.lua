@@ -70,12 +70,10 @@ function plugin.OnInitialize()
 --
 -- Only do something if the MTSLUI_ToggleButton button exists (i.e. the addon MissingTradeSkillsList exists)
 --
-			if MTSLUI_ToggleButton then
-				if plugin.movedMTSL then
-					MTSLUI_ToggleButton:SetParent(SkilletFrame)
-					MTSLUI_ToggleButton:SetPoint(plugin.oldPoint[1], plugin.oldPoint[2], plugin.oldPoint[3], plugin.oldPoint[4], plugin.oldPoint[5])
-					plugin.movedMTSL = false
-				else
+			if MTSLUI_ToggleButton and Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
+				plugin.nowPoint = {}
+				plugin.nowPoint[1], plugin.nowPoint[2], plugin.nowPoint[3], plugin.nowPoint[4], plugin.nowPoint[5] = MTSLUI_ToggleButton:GetPoint(1)
+				if not plugin.setupMTSL then
 					plugin.oldPoint = {}
 					plugin.oldPoint[1], plugin.oldPoint[2], plugin.oldPoint[3], plugin.oldPoint[4], plugin.oldPoint[5] = MTSLUI_ToggleButton:GetPoint(1)
 					plugin.newPoint = {}
@@ -84,6 +82,13 @@ function plugin.OnInitialize()
 					plugin.newPoint[3] = plugin.oldPoint[3]
 					plugin.newPoint[4] = 0
 					plugin.newPoint[5] = 4
+					plugin.setupMTSL = true
+				end
+				if plugin.nowPoint[2] == plugin.newPoint[2] then
+					MTSLUI_ToggleButton:SetParent(SkilletFrame)
+					MTSLUI_ToggleButton:SetPoint(plugin.oldPoint[1], plugin.oldPoint[2], plugin.oldPoint[3], plugin.oldPoint[4], plugin.oldPoint[5])
+					plugin.movedMTSL = false
+				else
 					MTSLUI_ToggleButton:SetParent(SkilletPluginButton)
 					MTSLUI_ToggleButton:SetPoint(plugin.newPoint[1], plugin.newPoint[2], plugin.newPoint[3], plugin.newPoint[4], plugin.newPoint[5])
 					plugin.movedMTSL = true

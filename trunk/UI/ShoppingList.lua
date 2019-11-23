@@ -395,7 +395,7 @@ end
 -- Called when the bank frame is opened
 --
 function Skillet:BANKFRAME_OPENED()
-	DA.DEBUG(0,"BANKFRAME_OPENED")
+	DA.TRACE("BANKFRAME_OPENED")
 	bankFrameOpen = true
 	local player = self.currentPlayer
 --
@@ -422,7 +422,7 @@ end
 -- Called when the bank frame is closed
 --
 function Skillet:BANKFRAME_CLOSED()
-	DA.DEBUG(0,"BANKFRAME_CLOSED")
+	DA.TRACE("BANKFRAME_CLOSED")
 	local player = self.currentPlayer
 	self.db.realm.bankData[player] = {}
 	bank = {}
@@ -436,7 +436,7 @@ end
 --
 --[[
 function Skillet:GUILDBANKFRAME_OPENED()
-	DA.DEBUG(0,"GUILDBANKFRAME_OPENED")
+	DA.TRACE("GUILDBANKFRAME_OPENED")
 	guildbankQuery = 0
 	guildbankOnce = true
 	Skillet.guildBusy = false
@@ -462,7 +462,7 @@ end
 -- Called when the guild bank frame is closed
 --
 function Skillet:GUILDBANKFRAME_CLOSED()
-	DA.DEBUG(0,"GUILDBANKFRAME_CLOSED")
+	DA.TRACE("GUILDBANKFRAME_CLOSED")
 	guildbankFrameOpen = false
 	self:HideShoppingList()
 end
@@ -480,6 +480,7 @@ end
 -- Called when the auction frame is opened
 --
 function Skillet:AUCTION_HOUSE_SHOW()
+	DA.TRACE("AUCTION_HOUSE_SHOW")
 	self.auctionOpen = true
 	self:AuctionScan()
 	self:RegisterEvent("AUCTION_OWNED_LIST_UPDATE")
@@ -490,9 +491,6 @@ function Skillet:AUCTION_HOUSE_SHOW()
 	if #self.cachedShoppingList == 0 then
 		return
 	end
-	if AuctionatorLoaded and self.ATRPlugin and self.db.profile.plugins.ATR.enabled then
-		SkilletSLAuctionatorButton:Show()
-	end
 	self:DisplayShoppingList(false) -- false -> not at a bank
 end
 
@@ -500,11 +498,9 @@ end
 -- Called when the auction frame is closed
 --
 function Skillet:AUCTION_HOUSE_CLOSED()
+	DA.TRACE("AUCTION_HOUSE_CLOSED")
 	self.auctionOpen = false
 	self:UnregisterEvent("AUCTION_OWNED_LIST_UPDATE")
-	if AuctionatorLoaded and self.ATRPlugin and self.db.profile.plugins.ATR.enabled then
-		SkilletSLAuctionatorButton:Hide()
-	end
 	self:HideShoppingList()
 end
 
@@ -512,6 +508,7 @@ end
 --	Called when the auction list updates and the auction frame is opened.
 --
 function Skillet:AUCTION_OWNED_LIST_UPDATE()
+	DA.TRACE("AUCTION_OWNED_LIST_UPDATE")
 	self:AuctionScan()
  end
 
@@ -672,7 +669,7 @@ end
 -- It may look like a real Blizzard event but its not.
 --
 function Skillet:BANK_UPDATE(event,bagID) 
-	DA.DEBUG(2,"BANK_UPDATE( "..tostring(bagID).." )")
+	DA.TRACE("BANK_UPDATE( "..tostring(bagID).." )")
 	if Skillet.bankBusy then
 		DA.DEBUG(1, "BANK_UPDATE and bankBusy")
 		Skillet.gotBankEvent = true
@@ -727,7 +724,7 @@ end
 -- Called as a result of a QueryGuildBankTab call or as a result of a change in the guildbank's contents.
 --
 function Skillet:GUILDBANKBAGSLOTS_CHANGED(event)
-	DA.DEBUG(2,"GUILDBANKBAGSLOTS_CHANGED")
+	DA.TRACE("GUILDBANKBAGSLOTS_CHANGED")
 	if guildbankOnce then
 		guildbankQuery = guildbankQuery + 1
 		if guildbankQuery == GetNumGuildBankTabs() then
@@ -749,7 +746,7 @@ end
 -- Event is fired when the main bank (bagID == -1) contents change.
 --
 function Skillet:PLAYERBANKSLOTS_CHANGED(event,slot)
-	DA.DEBUG(2,"PLAYERBANKSLOTS_CHANGED"..", slot="..tostring(slot))
+	DA.TRACE("PLAYERBANKSLOTS_CHANGED"..", slot="..tostring(slot))
 	if Skillet.bankBusy then
 		DA.DEBUG(1,"PLAYERBANKSLOTS_CHANGED and bankBusy")
 		Skillet.gotBankEvent = true
@@ -764,7 +761,7 @@ end
 --
 --[[
 function Skillet:PLAYERREAGENTBANKSLOTS_CHANGED(event,slot)
-	DA.DEBUG(2,"PLAYERREAGENTBANKSLOTS_CHANGED"..", slot="..tostring(slot))
+	DA.TRACE("PLAYERREAGENTBANKSLOTS_CHANGED"..", slot="..tostring(slot))
 	if Skillet.bankBusy then
 		DA.DEBUG(1,"PLAYERREAGENTBANKSLOTS_CHANGED and bankBusy")
 		Skillet.gotBankEvent = true
@@ -1026,7 +1023,11 @@ function Skillet:DisplayShoppingList(atBank)
 	if not self.shoppingList then
 		self.shoppingList = createShoppingListFrame(self)
 	end
-	SkilletSLAuctionatorButton:Hide()
+	if self.auctionOpen and AuctionatorLoaded and self.ATRPlugin and self.db.profile.plugins.ATR.enabled then
+		SkilletSLAuctionatorButton:Show()
+	else
+		SkilletSLAuctionatorButton:Hide()
+	end
 	if atBank then
 		SkilletShoppingListRetrieveButton:Show()
 	else
@@ -1059,6 +1060,8 @@ end
 function Skillet:HideShoppingList()
 	if self.shoppingList then
 		self.shoppingList:Hide()
+		SkilletSLAuctionatorButton:Hide()
+		SkilletShoppingListRetrieveButton:Hide()
 	end
 	self.cachedShoppingList = nil
 end
