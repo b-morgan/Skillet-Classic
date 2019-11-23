@@ -36,7 +36,7 @@ Skillet.version = MAJOR_VERSION
 Skillet.package = PACKAGE_VERSION
 Skillet.build = ADDON_BUILD
 Skillet.project = WOW_PROJECT_ID
-local isClassic = WOW_PROJECT_ID == 2
+local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
 
 Skillet.isCraft = false			-- true for the Blizzard Craft UI, false for the Blizzard TradeSkill UI
 Skillet.lastCraft = false		-- help events know when to call ConfigureRecipeControls()
@@ -315,6 +315,9 @@ function Skillet:OnInitialize()
 	end
 	Skillet.FixBugs = Skillet.db.profile.FixBugs
 
+--
+-- Create a static popup for changing professions
+--
 StaticPopupDialogs["SKILLET_CONTINUE_CHANGE"] = {
 	text = "Skillet-Classic\n"..L["Press Okay to continue changing professions"],
 	button1 = OKAY,
@@ -644,7 +647,7 @@ function Skillet:OnEnable()
 --
 	self:UpgradeDataAndOptions()
 	self:CollectTradeSkillData()
-	self:UpdateAutoTradeButtons()
+	self:CreateAdditionalButtonsList()
 	self:EnablePlugins()
 	self:DisableBlizzardFrame()
 end
@@ -1095,25 +1098,35 @@ end
 --
 function Skillet:ChangeTradeSkill(tradeID, tradeName)
 	DA.DEBUG(0,"ChangeTradeSkill("..tostring(tradeID)..", "..tostring(tradeName)..")")
-	if not Skillet.delayChange then
-		DA.DEBUG(1,"ChangeTradeSkill: executing CastSpellByName("..tostring(tradeName)..")")
-		CastSpellByName(tradeName) -- trigger the whole rescan process via a TRADE_SKILL_SHOW or CRAFT_SHOW event
-		Skillet.changingTrade = tradeID
-		Skillet.changingName = tradeName
-		Skillet.delayChange = true
-		Skillet:ScheduleTimer("DelayChange", 0.5)
+	if not self.delayChange then
+		local spellID = tradeID
+		if tradeID == 2575 then spellID = 2656 end		-- Ye old Mining vs. Smelting issue
+		local spell = self:GetTradeName(spellID)
+		--DA.DEBUG(1,"tradeID= "..tostring(tradeID)..", tradeName= "..tostring(tradeName)..", Mining= "..tostring(Mining)..", Smelting= "..tostring(Smelting))
+		DA.DEBUG(1,"ChangeTradeSkill: executing CastSpellByName("..tostring(spell)..")")
+		CastSpellByName(spell) -- trigger the whole rescan process via a TRADE_SKILL_SHOW or CRAFT_SHOW event
+		self.changingTrade = tradeID
+		self.changingName = tradeName
+		self.delayChange = true
+		self:ScheduleTimer("DelayChange", 0.5)
 	else
 		DA.DEBUG(1,"ChangeTradeSkill: waiting for callback")
-		Skillet.needChange = true
+		self.needChange = true
 	end
 end
 
+--
+-- Called from a static popup to change professions
+--
 function Skillet:ContinueChange()
 	DA.DEBUG(0,"ContinueChange()")
-	self.isCraft = self.skillIsCraft[Skillet.changingTrade]
-	self.currentTrade = Skillet.changingTrade
-	Skillet:ChangeTradeSkill(Skillet.changingTrade, Skillet.changingName)
+	self.isCraft = self.skillIsCraft[self.changingTrade]
+	DA.DEBUG(1,"ContinueChange: changingTrade= "..tostring(self.changingTrade)..", changingName= "..tostring(self.changingName)..
+	  ", isCraft= "..tostring(self.isCraft))
+	self.currentTrade = self.changingTrade
+	self:ChangeTradeSkill(self.changingTrade, self.changingName)
 end
+
 --
 -- Either change to a different profession or change the currently selected recipe
 --
@@ -1125,6 +1138,7 @@ function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 	end
 	if tradeID ~= self.currentTrade then
 		local oldTradeID = self.currentTrade
+		local tradeName = self:GetTradeName(tradeID)
 		if self.skillIsCraft[oldTradeID] ~= self.skillIsCraft[TradeID] then
 			self.ignoreClose = true
 			self.isCraft = self.skillIsCraft[TradeID]	-- the skill we are going to
@@ -1134,14 +1148,6 @@ function Skillet:SetTradeSkill(player, tradeID, skillIndex)
 		self.selectedSkill = nil
 		self.currentGroup = nil
 		self:HideNotesWindow()
---
--- Using English spell names won't work for other locales
---
-		local tradeName = self:GetTradeName(tradeID)
-		local Mining = self:GetTradeName(MINING)
-		local Smelting = self:GetTradeName(SMELTING)
-		DA.DEBUG(0,"cast: "..tostring(spellName))
-		if tradeName == Mining then tradeName = Smelting end
 		self:ChangeTradeSkill(tradeID, tradeName)
 	else
 		self:SetSelectedSkill(skillIndex, false)
@@ -1204,7 +1210,6 @@ function Skillet:HideAllWindows()
 	end
 	self.currentTrade = nil
 	self.selectedSkill = nil
-	self.changingTrade = nil
 	return closed
 end
 

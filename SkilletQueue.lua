@@ -340,10 +340,6 @@ function Skillet:ProcessQueue(altMode)
 			local recipeIndex = command.recipeIndex
 			local count = command.count
 			if self.currentTrade ~= tradeID and tradeName then
-				local Mining = self:GetTradeName(2575)
-				local Smelting = self:GetTradeName(2656)
-				--DA.DEBUG(1,"tradeID= "..tostring(tradeID)..", tradeName= "..tostring(tradeName)..", Mining= "..tostring(Mining)..", Smelting= "..tostring(Smelting))
-				if tradeName == Mining then tradeName = Smelting end
 				self:Print(L["Changing profession to"],tradeName,L["Press Process to continue"])
 				self.queuecasting = false
 				self:ChangeTradeSkill(tradeID, tradeName)
@@ -423,14 +419,18 @@ function Skillet:QueueItems(count)
 	return count
 end
 
+--
 -- Queue the max number of craftable items for the currently selected skill
+--
 function Skillet:QueueAllItems()
 	DA.DEBUG(0,"QueueAllItems()");
 	local count = self:QueueItems()						-- no argument means queue em all
 	return count
 end
 
+--
 -- Adds the currently selected number of items to the queue and then starts the queue
+--
 function Skillet:CreateItems(count)
 	local mouse = GetMouseButtonClicked()
 	DA.DEBUG(0,"CreateItems("..tostring(count).."), "..tostring(mouse))
@@ -439,13 +439,17 @@ function Skillet:CreateItems(count)
 	end
 end
 
+--
 -- Adds one item to the queue and then starts the queue
+--
 function Skillet:EnchantItem()
 	DA.DEBUG(0,"EnchantItem()")
 	self:CreateItems(1)
 end
 
+--
 -- Queue and create the max number of craftable items for the currently selected skill
+--
 function Skillet:CreateAllItems()
 	local mouse = GetMouseButtonClicked()
 	DA.DEBUG(0,"CreateAllItems(), "..tostring(mouse))
@@ -550,7 +554,7 @@ end
 function Skillet:ContinueCast(spell)
 	DA.DEBUG(0,"ContinueCast("..tostring(spell)..")")
 	if self.changingTrade then			-- contains the tradeID we are changing to
-		self.changingTrade = nil
+--		self.changingTrade = nil
 		Skillet:SkilletShow()			-- seems to let DoTradeSkill know we have changed
 	else
 		self:AdjustInventory()
@@ -578,7 +582,9 @@ function Skillet:StopCast(spell, success)
 			else
 				command = queue[qpos]
 			end
-			-- empty queue or command not found (removed?)
+--
+-- empty queue or command not found (removed?)
+--
 			if not queue[1] or not command then
 				DA.DEBUG(0,"StopCast empty queue[1]= "..tostring(queue[1])..", command= "..tostring(command))
 				self.queuecasting = false
@@ -615,27 +621,20 @@ function Skillet:StopCast(spell, success)
 	end
 end
 
--- Stop a trade skill currently in prograess. We cannot cancel the current
--- item as that requires a "SpellStopCasting" call which can only be
--- made from secure code. All this does is stop repeating after the current item
-function Skillet:CancelCast()
-	DA.DEBUG(0,"CancelCast()")
---	StopTradeSkillRepeat()
-end
-
+--
 -- Removes an item from the queue
+--
 function Skillet:RemoveQueuedCommand(queueIndex)
 	DA.DEBUG(0,"RemoveQueuedCommand("..tostring(queueIndex)..")")
-	if queueIndex == 1 then
-		self:CancelCast()
-	end
 	self.reagentsChanged = {}
 	self:RemoveFromQueue(queueIndex)
 	self:UpdateQueueWindow()
 	self:UpdateTradeSkillWindow()
 end
 
+--
 -- Rebuilds reagentsInQueue list
+--
 function Skillet:ScanQueuedReagents()
 	DA.DEBUG(0,"ScanQueuedReagents()")
 	if self.linkedSkill or self.isGuild then

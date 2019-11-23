@@ -19,8 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
-Skillet.AutoButtonsList = {}			-- define here because it is used before it is filled
-
 SKILLET_TRADE_SKILL_HEIGHT = 16
 SKILLET_NUM_REAGENT_BUTTONS = 8
 
@@ -623,7 +621,7 @@ function Skillet:TradeButton_OnClick(this,button)
 	local name = this:GetName()
 	local _, player, tradeID = string.split("-", name)
 	tradeID = tonumber(tradeID)
-	DA.DEBUG(0,"TradeButton_OnClick "..tostring(name).." "..tostring(player).." "..tostring(tradeID)..", button= "..tostring(button))
+	DA.DEBUG(0,"TradeButton_OnClick: "..tostring(name).." "..tostring(player).." "..tostring(tradeID)..", button= "..tostring(button))
 	if button == "LeftButton" then
 		if player == self.currentPlayer then
 			if self.currentTrade == tradeID and IsShiftKeyDown() then
@@ -636,8 +634,6 @@ function Skillet:TradeButton_OnClick(this,button)
 				end
 			elseif self.currentTrade ~= tradeID then
 				if self.skillIsCraft[self.currentTrade] ~= self.skillIsCraft[tradeID] then
-					self.changingTrade = tradeID
-					self.changingName = self.tradeSkillNamesByID[tradeID]
 					local buttonName = "SkilletFrameTradeButton-"..player.."-"..self.currentTrade
 					local button = _G[buttonName]
 					if button then
@@ -649,6 +645,10 @@ function Skillet:TradeButton_OnClick(this,button)
 						CloseTradeSkill()
 					end
 					self:HideAllWindows()
+					self.changingTrade = tradeID
+					self.changingName = self.tradeSkillNamesByID[tradeID]
+					DA.DEBUG(0,"TradeButton_OnClick: changingTrade= "..tostring(self.changingTrade)..", changingName= "..tostring(self.changingName)..
+					  ", isCraft= "..tostring(self.isCraft))
 					StaticPopup_Show("SKILLET_CONTINUE_CHANGE")
 				else
 					self:SetTradeSkill(self.currentPlayer, tradeID)
@@ -658,6 +658,30 @@ function Skillet:TradeButton_OnClick(this,button)
 		end
 	end
 	GameTooltip:Hide()
+end
+
+function Skillet:CreateAdditionalButtonsList()
+	DA.DEBUG(3,"CreateAdditionalButtonsList()")
+	Skillet.AdditionalButtonsList = {}
+	local seenButtons = {}
+	local tradeSkillList = self.tradeSkillList
+	for i=1,#tradeSkillList,1 do
+		local tradeID = tradeSkillList[i]
+		local ranks = self:GetSkillRanks(self.currentPlayer, tradeID)
+		if ranks then
+			local additionalSpellTab = Skillet.AdditionalAbilities[tradeID]
+			if additionalSpellTab then
+				local spellID = additionalSpellTab[1]
+				if not seenButtons[spellID] then
+					DA.DEBUG(0,"CreateAdditionalButtonsList: tradeID= "..tostring(tradeID)..", additionalSpellTab= "..DA.DUMP1(additionalSpellTab))
+					table.insert(Skillet.AdditionalButtonsList, additionalSpellTab)
+					seenButtons[spellID] = true
+				end
+			end
+		else
+			--DA.DEBUG(3,"tradeID= "..tostring(tradeID).." has no ranks")
+		end
+	end		-- for
 end
 
 function Skillet:UpdateTradeButtons(player)
@@ -726,12 +750,21 @@ function Skillet:UpdateTradeButtons(player)
 		end
 	end		-- for
 --
--- Add some space and then go through the list created by UpdateAutoTradeButtons()
+-- Add some space and then go through the list created by CreateAdditionalButtonsList()
 --
 	position = position + 10
-	Skillet:UpdateAutoTradeButtons()
-	for i=1,#Skillet.AutoButtonsList,1 do	-- iterate thru all skills in defined order for neatness (professions, secondary, class skills)
-		local additionalSpellTab = Skillet.AutoButtonsList[i]
+--
+-- Create list of additional skills (if it doesn't exist)
+--
+	if not Skillet.AdditionalButtonsList then
+		self:CreateAdditionalButtonsList()
+	end
+--
+-- Iterate thru the list of additional skills and
+-- add buttons for each one
+--
+	for i=1,#Skillet.AdditionalButtonsList,1 do
+		local additionalSpellTab = Skillet.AdditionalButtonsList[i]
 		local additionalSpellId = additionalSpellTab[1]
 		local additionalSpellName = additionalSpellTab[2]
 		local spellName, _, spellIcon = GetSpellInfo(additionalSpellId)
@@ -756,47 +789,6 @@ function Skillet:UpdateTradeButtons(player)
 		button:Show()
 	end
 	--DA.DEBUG(3,"UpdateTradeButtons complete")
-end
-
-function Skillet:UpdateAutoTradeButtons()
-	DA.DEBUG(3,"UpdateAutoTradeButtons()")
---	if TSMAPI_FOUR then return end		-- Maybe later but for now, these buttons cause more trouble than they are worth.
-	local tradeSkillList = self.tradeSkillList
-	Skillet.AutoButtonsList = {}
-	for i=1,#tradeSkillList,1 do
-		local tradeID = tradeSkillList[i]
-		local ranks = self:GetSkillRanks(self.currentPlayer, tradeID)
-		if ranks then
-			local additionalSpellTab = Skillet.AdditionalAbilities[tradeID]
-			if additionalSpellTab then
-				table.insert(Skillet.AutoButtonsList, additionalSpellTab)
-				local additionalSpellId = additionalSpellTab[1]
-				local additionalSpellName = additionalSpellTab[2]
-				local spellName, _, spellIcon = GetSpellInfo(additionalSpellId)
-				--DA.DEBUG(3,"tradeID= "..tostring(tradeID)..", additionalSpellId= "..tostring(additionalSpellId)..
-				--  ", additionalSpellName= "..tostring(additionalSpellName)..", spellName= "..tostring(spellName))
-				local buttonName = "SkilletDo"..additionalSpellName
-				local buttonAutoName = "SkilletAuto"..additionalSpellName
-				local button = _G[buttonName]
-				local buttonAuto = _G[buttonAutoName]
-				if not buttonAuto then
-					buttonAuto = CreateFrame("Button", buttonAutoName, UIParent, "SkilletTradeButtonAdditionalTemplate")
-					buttonAuto:SetID(additionalSpellId)
-					buttonAuto:SetAttribute("type*", "macro");
-					buttonAuto:Hide()
-				end
-				local macrotext = Skillet:GetAutoTargetMacro(additionalSpellId)
-				if button then
-					--DA.DEBUG(3,"SetAttribute for "..tostring(buttonName))
-					button:SetAttribute("macrotext", macrotext)
-				end
-				--DA.DEBUG(3,"SetAttribute for "..tostring(buttonAutoName))
-				buttonAuto:SetAttribute("macrotext", macrotext)
-			end
-		else
-			--DA.DEBUG(3,"tradeID= "..tostring(tradeID).." has no ranks")
-		end
-	end		-- for
 end
 
 function SkilletPluginDropdown_OnClick(this)
@@ -2962,7 +2954,6 @@ function Skillet:StartQueue_OnClick(button)
 	local mouse = GetMouseButtonClicked()
 	--DA.DEBUG(0,"StartQueue_OnClick("..tostring(button).."), "..tostring(mouse))
 	if self.queuecasting then
-		self:CancelCast() -- next update will reset the text
 		button:Disable()
 		self.queuecasting = false
 	else
