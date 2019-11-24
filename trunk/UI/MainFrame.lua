@@ -1863,7 +1863,7 @@ function Skillet:UpdateQueueWindow()
 		SkilletStartQueueButton:Disable()
 		SkilletEmptyQueueButton:Disable()
 	end
-	if self.queuecasting then
+	if self.queueCasting then
 		SkilletStartQueueButton:SetText(L["Pause"])
 	else
 		SkilletStartQueueButton:SetText(L["Process"])
@@ -2953,9 +2953,9 @@ local queueMenuList = {
 function Skillet:StartQueue_OnClick(button)
 	local mouse = GetMouseButtonClicked()
 	--DA.DEBUG(0,"StartQueue_OnClick("..tostring(button).."), "..tostring(mouse))
-	if self.queuecasting then
+	if self.queueCasting then
 		button:Disable()
-		self.queuecasting = false
+		self.queueCasting = false
 	else
 		button:SetText(L["Pause"])
 		self:ProcessQueue(mouse == "RightButton" or IsAltKeyDown())

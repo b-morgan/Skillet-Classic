@@ -769,6 +769,8 @@ function Skillet:CRAFT_SHOW()
 		if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
 			Skillet.isCraft = nil
 			Skillet:SkilletClose()
+			Skillet.changingTrade = nil
+			Skillet.processingSpell = nil
 		end
 		ShowUIPanel(CraftFrame)
 		return
@@ -851,8 +853,8 @@ function Skillet:SkilletShow()
 	else
 		name, rank, maxRank = GetTradeSkillLine()
 	end
-	--DA.DEBUG(0,"name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
-	self.currentTrade = self.tradeSkillIDsByName[name]
+	DA.DEBUG(0,"name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
+	if name then self.currentTrade = self.tradeSkillIDsByName[name] end
 	if self:IsSupportedTradeskill(self.currentTrade) then
 		self:InventoryScan()
 		--DA.DEBUG(0,"SkilletShow: "..self.currentTrade..", name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
@@ -1083,18 +1085,23 @@ end
 
 --
 -- Make sure profession changes are spaced out
+--   delayChange is set when ChangeTradeSkill is called
+--     and cleared here when the timer expires.
 --
 function Skillet:DelayChange()
+	DA.DEBUG(0,"DelayChange()")
 	Skillet.delayChange = false
-	if Skillet.needChange then
-		Skillet.needChange = false
-		Skillet:ChangeTradeSkill(Skillet.changingTrade, Skillet.changingName)
+	if Skillet.delayNeeded then
+		Skillet.delayNeeded = false
+		Skillet:ChangeTradeSkill(Skillet.delayTrade, Skillet.delayName)
 	end
 end
 
 --
 -- Change to a different profession but
--- not more often than once every .5 seconds
+--   not more often than once every .5 seconds.
+-- If called too quickly, delayNeeded is set and
+--   the change is deferred until DelayChange is called.
 --
 function Skillet:ChangeTradeSkill(tradeID, tradeName)
 	DA.DEBUG(0,"ChangeTradeSkill("..tostring(tradeID)..", "..tostring(tradeName)..")")
@@ -1106,18 +1113,20 @@ function Skillet:ChangeTradeSkill(tradeID, tradeName)
 		DA.DEBUG(1,"ChangeTradeSkill: executing CastSpellByName("..tostring(spell)..")")
 		self.processingSpell = spell
 		CastSpellByName(spell) -- trigger the whole rescan process via a TRADE_SKILL_SHOW or CRAFT_SHOW event
-		self.changingTrade = tradeID
-		self.changingName = tradeName
+		self.delayTrade = tradeID
+		self.delayName = tradeName
 		self.delayChange = true
 		self:ScheduleTimer("DelayChange", 0.5)
 	else
 		DA.DEBUG(1,"ChangeTradeSkill: waiting for callback")
-		self.needChange = true
+		self.delayNeeded = true
 	end
 end
 
 --
 -- Called from a static popup to change professions
+--   changingTrade and changingName should be set to
+--   the target profession.
 --
 function Skillet:ContinueChange()
 	DA.DEBUG(0,"ContinueChange()")
@@ -1211,6 +1220,8 @@ function Skillet:HideAllWindows()
 	end
 	self.currentTrade = nil
 	self.selectedSkill = nil
+--	self.changingTrade = nil
+--	self.processingSkill = nil
 	return closed
 end
 
