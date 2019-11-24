@@ -332,7 +332,7 @@ function Skillet:ProcessQueue(altMode)
 --
 	if command then
 		if command.op == "iterate" then
-			self.queuecasting = true
+			self.queueCasting = true
 			--DA.DEBUG(1,"command= "..DA.DUMP1(command)..", currentTrade= "..tostring(currentTrade))
 			local recipeID = command.recipeID
 			local tradeID = command.tradeID
@@ -341,7 +341,7 @@ function Skillet:ProcessQueue(altMode)
 			local count = command.count
 			if self.currentTrade ~= tradeID and tradeName then
 				self:Print(L["Changing profession to"],tradeName,L["Press Process to continue"])
-				self.queuecasting = false
+				self.queueCasting = false
 				self:ChangeTradeSkill(tradeID, tradeName)
 				self:QueueMoveToTop(qpos)
 				return
@@ -370,7 +370,7 @@ function Skillet:ProcessQueue(altMode)
 				if itemID then
 					DA.DEBUG(0,"UseItemByName("..tostring(itemID)..")")
 					UseItemByName(itemID)
-					self.queuecasting = false
+					self.queueCasting = false
 				end
 			end
 			return
@@ -552,17 +552,21 @@ function Skillet:UI_INFO_MESSAGE(event, errorType, message)
 end
 
 function Skillet:ContinueCast(spell)
-	DA.DEBUG(0,"ContinueCast("..tostring(spell)..")")
+	DA.DEBUG(0,"ContinueCast("..tostring(spell).."): changingTrade= "..tostring(self.changingTrade)..
+	  ", processingSpell= "..tostring(self.processingSpell)..", queueCasting= "..tostring(self.queueCasting))
 	if self.changingTrade then			-- contains the tradeID we are changing to
-		self.processingSpell = nil
+		self.currentTrade = self.changingTrade
 		Skillet:SkilletShow()			-- seems to let DoTradeSkill know we have changed
+--		self.processingSpell = nil
+--		self.changingTrade = nil
 	else
 		self:AdjustInventory()
 	end
 end
 
 function Skillet:StopCast(spell, success)
-	DA.DEBUG(0,"StopCast("..tostring(spell)..", "..tostring(success)..")")
+	DA.DEBUG(0,"StopCast("..tostring(spell)..", "..tostring(success).."): changingTrade= "..tostring(self.changingTrade)..
+	  ", processingSpell= "..tostring(self.processingSpell)..", queueCasting= "..tostring(self.queueCasting))
 	if not self.db.realm.queueData then
 		self.db.realm.queueData = {}
 	end
@@ -587,7 +591,7 @@ function Skillet:StopCast(spell, success)
 --
 			if not queue[1] or not command then
 				DA.DEBUG(0,"StopCast empty queue[1]= "..tostring(queue[1])..", command= "..tostring(command))
-				self.queuecasting = false
+				self.queueCasting = false
 				self.processingSpell = nil
 				self.processingPosition = nil
 				self.processingCommand = nil
@@ -598,7 +602,7 @@ function Skillet:StopCast(spell, success)
 				command.count = command.count - 1
 				if command.count < 1 then
 					DA.DEBUG(0,"StopCast "..tostring(command.count).." < 1")
-					self.queuecasting = false
+					self.queueCasting = false
 					self.processingSpell = nil
 					self.processingPosition = nil
 					self.processingCommand = nil
@@ -609,10 +613,10 @@ function Skillet:StopCast(spell, success)
 			end
 		else
 			DA.DEBUG(0,"StopCast without success")
+			self.queueCasting = false
 			self.processingSpell = nil
 			self.processingPosition = nil
 			self.processingCommand = nil
-			self.queuecasting = false
 		end
 		DA.DEBUG(0,"StopCast is updating window")
 		self:AdjustInventory()
