@@ -476,7 +476,7 @@ function Skillet:UNIT_SPELLCAST_SUCCEEDED(event, unit, castGUID, spellID)
 	self.castSpellName = GetSpellInfo(spellID)
 	DA.TRACE("spellID= "..tostring(spellID)..", spellName= "..tostring(self.castSpellName)..", processingSpell= "..tostring(self.processingSpell))
 	if unit == "player" then
-		if (self.processingSpell and self.processingSpell == self.castSpellName) or self.changingTrade then
+		if self.processingSpell and self.processingSpell == self.castSpellName then
 			Skillet:ContinueCast(self.castSpellName)
 		end
 	end
@@ -554,7 +554,7 @@ end
 function Skillet:ContinueCast(spell)
 	DA.DEBUG(0,"ContinueCast("..tostring(spell)..")")
 	if self.changingTrade then			-- contains the tradeID we are changing to
---		self.changingTrade = nil
+		self.processingSpell = nil
 		Skillet:SkilletShow()			-- seems to let DoTradeSkill know we have changed
 	else
 		self:AdjustInventory()
