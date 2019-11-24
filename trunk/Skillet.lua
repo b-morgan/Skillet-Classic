@@ -1104,6 +1104,7 @@ function Skillet:ChangeTradeSkill(tradeID, tradeName)
 		local spell = self:GetTradeName(spellID)
 		--DA.DEBUG(1,"tradeID= "..tostring(tradeID)..", tradeName= "..tostring(tradeName)..", Mining= "..tostring(Mining)..", Smelting= "..tostring(Smelting))
 		DA.DEBUG(1,"ChangeTradeSkill: executing CastSpellByName("..tostring(spell)..")")
+		self.processingSpell = spell
 		CastSpellByName(spell) -- trigger the whole rescan process via a TRADE_SKILL_SHOW or CRAFT_SHOW event
 		self.changingTrade = tradeID
 		self.changingName = tradeName
