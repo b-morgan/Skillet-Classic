@@ -175,7 +175,7 @@ function plugin.GetExtraText(skill, recipe)
 		local buyout = ( Atr_GetAuctionBuyout(itemID) or 0 ) * recipe.numMade
 		if buyout then
 			extra_text = Skillet:FormatMoneyFull(buyout, true)
-			label = "|r".. L["Buyout"]..":"
+			label = "|r".."ATR "..L["Buyout"]..":"
 		end
 		if Skillet.db.profile.plugins.ATR.reagentPrices then
 			local toConcatLabel = {}
