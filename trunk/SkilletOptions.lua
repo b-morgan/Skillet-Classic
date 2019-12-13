@@ -280,7 +280,6 @@ Skillet.options =
 					end,
 					set = function(self,value)
 						Skillet.db.profile.support_crafting = value
---						Skillet:ConfigureRecipeControls()		-- this probably requires a "/reload"
 					end,
 					width = "double",
 					order = 29

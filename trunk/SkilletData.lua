@@ -63,15 +63,12 @@ local CraftList = {
 --   new is the return from GetTradeSkillLine() when the tradeskill / craft is opened
 --
 local TranslateList = {
-	[4036] = {"frFR", "Ingénieur", "Ingénierie"},			-- Engineering
-	[3273] = {"frFR", "Premiers soins", "Secourisme"},		-- First Aid
+	[4036] = {"frFR", "Ingénieur", "Ingénierie"},			-- engineering
+	[3273] = {"frFR", "Premiers soins", "Secourisme"},		-- first aid
 	[2108] = {"esES", "Peletería", "Marroquinería"},		-- leatherworking
 	[3908] = {"esES", "Sastrería", "Costura"},				-- tailoring
 	[2108] = {"koKR", "가죽세공", "가죽 세공"},					-- leatherworking
 }
-
-local TradeSkillIDsByName = {}		-- filled in with ids and names for reverse matching (since the same name may have multiple id's based on level)
-local TradeSkillNamesByID = {}		-- filled in with names and ids for reverse matching
 
 Skillet.AdditionalAbilities = {
 	[7411]	= {13262,"Disenchant"},		-- enchanting = disenchant (will disappear because enchanting is disabled)
@@ -105,6 +102,8 @@ function Skillet:CollectTradeSkillData()
 	DA.DEBUG(0,"CollectTradeSkillData()")
 	self.tradeSkillList = {}
 	self.skillIsCraft = {}
+	self.tradeSkillIDsByName = {}
+	self.tradeSkillNamesByID = {}
 	for i=1,#TradeSkillList,1 do
 		local id = TradeSkillList[i]
 		local name = GetSpellInfo(id)
@@ -112,8 +111,8 @@ function Skillet:CollectTradeSkillData()
 		if name then
 			table.insert(self.tradeSkillList,id)
 			self.skillIsCraft[id] = false
-			TradeSkillIDsByName[name] = id
-			TradeSkillNamesByID[id] = name
+			self.tradeSkillIDsByName[name] = id
+			self.tradeSkillNamesByID[id] = name
 		end
 	end
 	if self.db.profile.support_crafting then
@@ -124,25 +123,21 @@ function Skillet:CollectTradeSkillData()
 			if name then
 				table.insert(self.tradeSkillList,id)
 				self.skillIsCraft[id] = true
-				TradeSkillIDsByName[name] = id
-				TradeSkillNamesByID[id] = name
+				self.tradeSkillIDsByName[name] = id
+				self.tradeSkillNamesByID[id] = name
 			end
 		end
 	end
 	local locale = GetLocale()
-	DA.DEBUG(2,"locale= "..tostring(locale))
 	for id,t in pairs(TranslateList) do
 		local loc = t[1]
 		local old = t[2]
 		local new = t[3]
 		DA.DEBUG(2,"id= "..tostring(id)..", loc= "..tostring(loc)..", old= "..tostring(old)..", new= "..tostring(new))
 		if loc == locale then
-			TradeSkillIDsByName[new] = id
+			self.tradeSkillIDsByName[new] = id
 		end
 	end
-
-	self.tradeSkillIDsByName = TradeSkillIDsByName
-	self.tradeSkillNamesByID = TradeSkillNamesByID
 end
 
 --
