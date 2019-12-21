@@ -3082,6 +3082,7 @@ function Skillet:CreateStandaloneQueueFrame()
 end
 
 function Skillet:UpdateStandaloneQueueWindow()
+	--DA.DEBUG(0,"UpdateStandaloneQueueWindow()")
 	if not self.skilletStandaloneQueue or not self.skilletStandaloneQueue:IsVisible() then
 		return
 	end
@@ -3089,6 +3090,13 @@ function Skillet:UpdateStandaloneQueueWindow()
 	SkilletStandaloneQueue:SetScale(self.db.profile.scale)
 end
 
+--
+-- Adds a button to the tradeskill window. The button will be
+-- reparented and placed appropriately in the window.
+--
+-- The frame representing the main tradeskill window will be
+-- returned in case you need to pop up a frame attached to it.
+--
 function Skillet:AddButtonToTradeskillWindow(button)
 	if not SkilletFrame.added_buttons then
 		SkilletFrame.added_buttons = {}
@@ -3106,4 +3114,5 @@ function Skillet:AddButtonToTradeskillWindow(button)
 	if SkilletPluginButton then
 		SkilletPluginButton:Show()
 	end
+	return SkilletFrame
 end
