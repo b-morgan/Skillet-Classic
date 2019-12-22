@@ -787,7 +787,12 @@ function Skillet:CRAFT_SHOW()
 		Skillet:ConfigureRecipeControls()
 --		Skillet.ignoreClose = false
 	end
-	SkilletEnchantButton:Show()				-- Show our button
+	if Skillet.db.profile.support_crafting then
+		SkilletEnchantButton:Hide()
+	else
+		SkilletEnchantButton:Disable()		-- because DoCraft is restricted
+		SkilletEnchantButton:Show()
+	end
 	if not Skillet.changingTrade then		-- wait for UNIT_SPELLCAST_SUCCEEDED
 		Skillet:SkilletShow()
 	end
