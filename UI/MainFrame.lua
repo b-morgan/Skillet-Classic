@@ -160,6 +160,7 @@ function Skillet:StealEnchantButton()
 			Skillet.EnchantOldPoints = point
 			CraftCreateButton:ClearAllPoints()		-- Clear all positions
 			CraftCreateButton:SetAllPoints(SkilletEnchantButton) -- Copy positions from our button
+			CraftCreateButton:Enable()
 		end
 	end
 end
