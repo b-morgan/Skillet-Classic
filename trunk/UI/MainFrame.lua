@@ -159,8 +159,8 @@ function Skillet:StealEnchantButton()
 			--DA.DEBUG(1,"point= "..DA.DUMP1(point))
 			Skillet.EnchantOldPoints = point
 			CraftCreateButton:ClearAllPoints()		-- Clear all positions
-			CraftCreateButton:SetAllPoints(SkilletEnchantButton) -- Copy positions from our button
-			CraftCreateButton:Enable()
+--			CraftCreateButton:SetPoint("TOPLEFT", SkilletQueueParentBase, "TOPLEFT",0, 0)	-- doesn't overlap other buttons
+			CraftCreateButton:SetPoint("TOPLEFT", SkilletEnchantButton, "TOPLEFT",0, 0)
 		end
 	end
 end
@@ -186,8 +186,8 @@ function Skillet:RestoreEnchantButton(show)
 		if CraftCreateButton then
 			CraftCreateButton:Show()
 		end
-		SkilletEnchantButton:Disable()			-- Disable our button because DoCraft is restricted
 		if show then
+			SkilletEnchantButton:Disable()			-- Disable our button because DoCraft is restricted
 			SkilletEnchantButton:Show()				-- Show our button
 		else
 			SkilletEnchantButton:Hide()				-- Hide our button
@@ -532,9 +532,11 @@ function Skillet:ConfigureRecipeControls()
 		SkilletAdd10Button:Hide()
 		SkilletClearNumButton:Hide()
 		SkilletQueueOnlyButton:Hide()
-		SkilletEnchantButton:Show()
-		if not Skillet.db.profile.support_crafting then
+		if Skillet.db.profile.support_crafting then
+			SkilletEnchantButton:Hide()
+		else
 			SkilletEnchantButton:Disable()		-- because DoCraft is restricted
+			SkilletEnchantButton:Show()
 		end
 	else
 		SkilletQueueAllButton:Show()
