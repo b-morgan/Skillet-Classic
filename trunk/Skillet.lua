@@ -1288,9 +1288,7 @@ function Skillet:GetItemNote(key)
 	if not self.db.realm.notes[self.currentPlayer] then
 		return
 	end
---	local id = self:GetItemIDFromLink(link)
 	local kind, id = string.split(":", key)
-	id = tonumber(id) or 0
 	if kind == "enchant" then 					-- get the note by the itemID, not the recipeID
 		if self.data.recipeList[id] then
 			id = self.data.recipeList[id].itemID or 0
@@ -1300,7 +1298,7 @@ function Skillet:GetItemNote(key)
 	if id then
 		result = self.db.realm.notes[self.currentPlayer][id]
 	else
-		self:Print("Error: Skillet:GetItemNote() could not determine item ID for " .. key)
+		self:Print("Skillet:GetItemNote() could not determine item ID for " .. key)
 	end
 	if result and result == "" then
 		result = nil
@@ -1315,9 +1313,7 @@ end
 --
 function Skillet:SetItemNote(key, note)
 	--DA.DEBUG(0,"SetItemNote("..tostring(key)..", "..tostring(note)..")")
---	local id = self:GetItemIDFromLink(link);
 	local kind, id = string.split(":", key)
-	id = tonumber(id) or 0
 	if kind == "enchant" then 					-- store the note by the itemID, not the recipeID
 		if self.data.recipeList[id] then
 			id = self.data.recipeList[id].itemID or 0
@@ -1330,7 +1326,7 @@ function Skillet:SetItemNote(key, note)
 	if id then
 		self.db.realm.notes[self.currentPlayer][id] = note
 	else
-		self:Print("Error: Skillet:SetItemNote() could not determine item ID for " .. key)
+		self:Print("Skillet:SetItemNote() could not determine item ID for " .. key)
 	end
 end
 
@@ -1339,7 +1335,7 @@ end
 -- item.
 -- Returns true if tooltip modified.
 --
-function Skillet:AddItemNotesToTooltip(tooltip)
+function Skillet:AddItemNotesToTooltip(tooltip, altID)
 	--DA.DEBUG(0,"AddItemNotesToTooltip()")
 	if IsControlKeyDown() then
 		return
@@ -1352,21 +1348,26 @@ function Skillet:AddItemNotesToTooltip(tooltip)
 --
 -- get item name
 --
-	local name,link = tooltip:GetItem();
-	if not link then 
-		--DA.DEBUG(0,"Error: Skillet:AddItemNotesToTooltip() could not determine link")
-		return;
+	local id
+	if not altID then
+		local name,link = tooltip:GetItem()
+		if not link then 
+			--DA.DEBUG(0,"Error: AddItemNotesToTooltip() could not determine link")
+			return
+		end
+		id = self:GetItemIDFromLink(link)
+	else
+		id = altID
 	end
-	local id = self:GetItemIDFromLink(link);
 	if not id then
-		DA.DEBUG(0,"Error: Skillet:AddItemNotesToTooltip() could not determine id")
+		DA.DEBUG(0,"Error: AddItemNotesToTooltip() could not determine id")
 		return
 	end
-	--DA.DEBUG(1,"link= "..tostring(link)..", id= "..tostring(id)..", notes= "..tostring(notes_enabled)..", crafters= "..tostring(crafters_enabled))
+	--DA.DEBUG(1,"name= "..tostring(name)..", link= "..tostring(link)..", id= "..tostring(id)..", notes= "..tostring(notes_enabled)..", crafters= "..tostring(crafters_enabled))
 	if notes_enabled then
 		local header_added = false
 		for player,notes_table in pairs(self.db.realm.notes) do
-			local note = notes_table[id]
+			local note = notes_table[tostring(id)]
 			--DA.DEBUG(1,"player= "..tostring(player)..", table= "..DA.DUMP1(notes_table)..", note= '"..tostring(note).."'")
 			if note then
 				if not header_added then

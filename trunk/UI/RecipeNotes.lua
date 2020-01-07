@@ -1,3 +1,5 @@
+local addonName,addonTable = ...
+local DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
 
@@ -110,30 +112,38 @@ function Skillet:RecipeNote_OnClick(button)
 	editbox:SetFocus()
 end
 
+--
 -- Updates the notes window with the current data.
 -- This should display the notes for the recipe item itself and for
 -- any reagents that are needed
 --
--- XXX: and tools?
 function Skillet:UpdateNotesWindow()
 	local recipe, recipeID, itemID = self:GetRecipeDataByTradeIndex(self.currentTrade, self.selectedSkill)
 	if not recipe then
 		return
 	end
+	--DA.DEBUG(0,"UpdateNotesWindow: recipeID= "..tostring(recipeID)..", itemID= "..tostring(itemID))
+	--DA.DEBUG(0,"UpdateNotesWindow: recipe= "..DA.DUMP1(recipe))
 	if editbox then
 		editbox:Hide()
 	end
 	SkilletRecipeNotesFrameLabel:SetText(L["Notes"]);
 	local numItems = 1 + #recipe.reagentData
 
-	-- Update the scroll frame
+--
+-- Update the scroll frame
+--
 	FauxScrollFrame_Update(SkilletNotesList,				-- frame
 						   numItems,						-- num items
 						   SKILLET_NOTES_ITEM_DISPLAYED,	-- num to display
 						   SKILLET_NOTES_ITEM_HEIGHT)		-- value step (item height)
-	-- Where in the list of skill to start counting.
+--
+-- Where in the list of skill to start counting.
+--
 	local offset = FauxScrollFrame_GetOffset(SkilletNotesList);
-	-- now do all that nasty work to fill in the contents of the frame
+--
+-- now do all that nasty work to fill in the contents of the frame
+--
 	for i=1, SKILLET_NOTES_ITEM_DISPLAYED, 1 do
 		local index = i + offset
 		local button = _G["SkilletNotesButton"..i]
@@ -141,7 +151,9 @@ function Skillet:UpdateNotesWindow()
 			local text	 = _G[button:GetName() .. "Text"];
 			local icon	 = _G[button:GetName() .. "Icon"];
 			local notes	 = _G[button:GetName() .. "Notes"];
-			-- set the width based on whether or not the scroll bar is displayed
+--
+-- set the width based on whether or not the scroll bar is displayed
+--
 			if ( SkilletNotesList:IsShown() ) then
 				button:SetWidth(170)
 			else
@@ -150,22 +162,31 @@ function Skillet:UpdateNotesWindow()
 			local key
 			if index == 1 then
 				local texture
-				-- notes for the recipe itself
-				text:SetText((GetSpellInfo(recipeID)))
+--
+-- notes for the recipe itself
+--
+				text:SetText(recipeID)
 				if recipe.numMade > 0 then
 					local a
 					a,a,a,a,a,a,a,a,a,texture = GetItemInfo(recipe.itemID)		-- get the item texture
+					if recipe.itemID then
+						key = "item:"..recipe.itemID
+					else
+						key = "name:"..recipeID
+					end
 				else
 					texture = "Interface\\Icons\\Spell_Holy_GreaterHeal"		-- standard enchant icon
+					key = "enchant:"..recipeID
 				end
 				icon:SetNormalTexture(texture)
-				key = "enchant:"..recipeID
 			else
 				local name, link, _,_,_,_,_,_,_,texture = GetItemInfo(recipe.reagentData[index-1].id)
-				-- notes for a reagent
+--
+-- notes for a reagent
+--
 				text:SetText(name)
 				icon:SetNormalTexture(texture)
-				key = "item:"..recipe.reagentData[index-1].id
+				key = "reagent:"..recipe.reagentData[index-1].id
 			end
 			button:SetAttribute("notes_key", key)
 			local notes_text = self:GetItemNote(key)

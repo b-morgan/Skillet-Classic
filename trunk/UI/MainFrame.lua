@@ -1474,6 +1474,7 @@ end
 function Skillet:SetTradeSkillToolTip(button, skillIndex)
 	--DA.DEBUG(0,"SetTradeSkillToolTip("..tostring(button)..", "..tostring(skillIndex)..")")
 	GameTooltip:ClearLines()
+	local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	if Skillet.isCraft then
 		local craftName, craftSubSpellName, craftType, numAvailable, isExpanded, trainingPointCost, requiredLevel = GetCraftInfo(skillIndex)
 		local color = CraftTypeColor[craftType];
@@ -1483,6 +1484,7 @@ function Skillet:SetTradeSkillToolTip(button, skillIndex)
 			GameTooltip:AddLine(craftName, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, false);
 		end
 		if skillIndex then
+--			GameTooltip:SetCraftItem(skillIndex)
 			local requiredTotems = BuildColoredListString(GetCraftSpellFocus(skillIndex))
 			if ( requiredTotems ) then
 				GameTooltip:AddLine(REQUIRES_LABEL.." "..requiredTotems, 1,1,1, false)
@@ -1492,9 +1494,11 @@ function Skillet:SetTradeSkillToolTip(button, skillIndex)
 			if (desc) then
 				GameTooltip:AddLine(desc, 1,1,1, true)
 			end
+			if recipe and recipe.itemID ~= 0 then
+				Skillet:AddItemNotesToTooltip(GameTooltip, recipe.itemID)
+			end
 		end
 	else
-		local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 		if recipe then
 			if recipe.itemID ~= 0 then
 				GameTooltip:SetTradeSkillItem(skillIndex)
