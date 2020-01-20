@@ -607,14 +607,6 @@ Skillet.options =
 			type = 'input',
 			name = "PrintSavedQueue",
 			desc = "Print Named Saved Queue",
-			func = function()
-				if not (UnitAffectingCombat("player")) then
-					Skillet:PrintQueue()
-				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
-												  " Leave combat and try again.")
-				end
-			end,
 			get = function()
 				return value
 			end,
@@ -642,6 +634,20 @@ Skillet.options =
 			end,
 			order = 65
 		},
+		printauction = {
+			type = 'execute',
+			name = "PrintAuctionData",
+			desc = "Print Auction Data",
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:PrintAuctionData()
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
+												  " Leave combat and try again.")
+				end
+			end,
+			order = 66
+		},
 		enchanting = {
 			type = "toggle",
 			name = "Enchanting",
@@ -654,7 +660,7 @@ Skillet.options =
 				Skillet:ConfigureRecipeControls()
 				Skillet:UpdateTradeSkillWindow()
 			end,
-			order = 66,
+			order = 67,
 		},
 --
 -- commands to toggle Blizzard's frames (beats using "/run")
@@ -674,7 +680,7 @@ Skillet.options =
 					HideUIPanel(TradeSkillFrame)
 				end
 			end,
-			order = 67
+			order = 68
 		},
 		bcui = {
 			type = "toggle",
@@ -691,7 +697,7 @@ Skillet.options =
 					HideUIPanel(CraftFrame)
 				end
 			end,
-			order = 68
+			order = 69
 		},
 --
 -- commands to update Skillet's main windows

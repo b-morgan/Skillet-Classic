@@ -512,6 +512,34 @@ function Skillet:AUCTION_OWNED_LIST_UPDATE()
 	self:AuctionScan()
  end
 
+function Skillet:AuctionScan()
+	--DA.DEBUG(0,"AuctionScan()")
+	local player = Skillet.currentPlayer
+	local auctionData = {}
+	for i = 1, GetNumAuctionItems("owner") do
+		local _, _, count, _, _, _, _, _, _, _, _, _, _, _, _, saleStatus, itemID, _ =  GetAuctionItemInfo("owner", i);
+		if saleStatus ~= 1 then
+			auctionData[itemID] = (auctionData[itemID] or 0) + count
+		end
+	end
+	self.db.realm.auctionData[player] = auctionData
+end
+
+--
+-- Prints the contents of auctionData for this player
+--
+function Skillet:PrintAuctionData()
+	DA.DEBUG(0,"PrintAuctionData()");
+	local player = Skillet.currentPlayer
+	local auctionData = self.db.realm.auctionData[player]
+	if auctionData then
+		for itemID,count in pairs(auctionData) do
+			local itemName = GetItemInfo(itemID)
+			print("itemID= "..tostring(itemID).." ("..tostring(itemName).."), count= "..tostring(count))
+		end
+	end
+end
+
 --
 -- checks to see if this is a normal bag (not ammo, herb, enchanting, etc)
 -- I borrowed this code from ClosetGnome.
