@@ -246,8 +246,6 @@ function Skillet:PrintSaved()
 			end
 			print("name= "..tostring(name)..", size= "..tostring(size))
 		end
-	else
-		print("No SavedQueues")
 	end
 end
 
@@ -267,8 +265,6 @@ function Skillet:PrintQueue(name)
 		for qpos,command in pairs(queue) do
 			print("qpos= "..tostring(qpos)..", command= "..DA.DUMP1(command))
 		end
-	else
-		print("Queue is empty")
 	end
 end
 
