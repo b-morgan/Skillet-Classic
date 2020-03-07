@@ -41,6 +41,7 @@ local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
 Skillet.isCraft = false			-- true for the Blizzard Craft UI, false for the Blizzard TradeSkill UI
 Skillet.lastCraft = false		-- help events know when to call ConfigureRecipeControls()
 Skillet.ignoreClose = false		-- when switching from the Craft UI to the TradeSkill UI, ignore the other's close.
+Skillet.gttScale = GameTooltip:GetScale()
 
 local nonLinkingTrade = { [2656] = true, [53428] = true }				-- smelting, runeforging
 
@@ -70,8 +71,10 @@ local defaults = {
 		search_includes_reagents = true,
 		confirm_queue_clear = false,
 		queue_only_view = true,
+		scale_tooltip = false,
 		transparency = 1.0,
 		scale = 1.0,
+		ttscale = 1.0,
 		plugins = {},
 		SavedQueues = {},
 	},
