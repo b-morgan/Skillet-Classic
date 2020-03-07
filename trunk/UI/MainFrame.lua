@@ -626,7 +626,7 @@ function Skillet:TradeButton_OnClick(this,button)
 	tradeID = tonumber(tradeID)
 	DA.DEBUG(0,"TradeButton_OnClick: "..tostring(name).." "..tostring(player).." "..tostring(tradeID)..", button= "..tostring(button))
 	if button == "LeftButton" then
-		if player == self.currentPlayer then
+		if player == self.currentPlayer and self.currentTrade then
 			if self.currentTrade == tradeID and IsShiftKeyDown() then
 				if GetTradeSkillListLink then
 					local link = GetTradeSkillListLink();
@@ -1301,6 +1301,9 @@ function Skillet:SkillButton_OnEnter(button)
 	if ( GetCVar("useUiScale") == "1" ) then
 		uiScale = tonumber(GetCVar("uiscale"))
 	end
+	if Skillet.db.profile.ttscale then
+		uiScale = uiScale * Skillet.db.profile.ttscale
+	end
 	tip:SetScale(uiScale)
 --
 -- If not displaying full tooltips you have to press Ctrl to see them
@@ -1471,9 +1474,19 @@ end
 --
 -- Sets the game tooltip item to the selected skill
 --
-function Skillet:SetTradeSkillToolTip(button, skillIndex)
-	--DA.DEBUG(0,"SetTradeSkillToolTip("..tostring(button)..", "..tostring(skillIndex)..")")
+function Skillet:SetTradeSkillToolTip(skillIndex)
+	--DA.DEBUG(2,"SetTradeSkillToolTip("..tostring(skillIndex)..", "..tostring(onEvent)..")")
 	GameTooltip:ClearLines()
+	if Skillet.db.profile.scale_tooltip then
+		local uiScale = 1.0;
+		if ( GetCVar("useUiScale") == "1" ) then
+			uiScale = tonumber(GetCVar("uiscale"))
+		end
+		if Skillet.db.profile.ttscale then
+			uiScale = uiScale * Skillet.db.profile.ttscale
+		end
+		GameTooltip:SetScale(uiScale)
+	end
 	local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	if Skillet.isCraft then
 		local craftName, craftSubSpellName, craftType, numAvailable, isExpanded, trainingPointCost, requiredLevel = GetCraftInfo(skillIndex)
@@ -1512,6 +1525,19 @@ function Skillet:SetTradeSkillToolTip(button, skillIndex)
 			end
 		end
 	end
+	GameTooltip:Show()
+	CursorUpdate(self)
+end
+
+--
+-- Clears any changes and hides the game tooltip
+--
+function Skillet:ClearTradeSkillToolTip(skillIndex)
+	if Skillet.db.profile.scale_tooltip then
+		GameTooltip:SetScale(Skillet.gttScale)
+	end
+	GameTooltip:Hide()
+	ResetCursor()
 end
 
 function Skillet:SetReagentToolTip(reagentID, numNeeded, numCraftable)
@@ -2383,6 +2409,16 @@ end
 function Skillet:ReagentButtonOnEnter(button, skillIndex, reagentIndex)
 	--DA.DEBUG(3,"ReagentButtonOnEnter("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
+	if Skillet.db.profile.scale_tooltip then
+		local uiScale = 1.0;
+		if ( GetCVar("useUiScale") == "1" ) then
+			uiScale = tonumber(GetCVar("uiscale"))
+		end
+		if Skillet.db.profile.ttscale then
+			uiScale = uiScale * Skillet.db.profile.ttscale
+		end
+		GameTooltip:SetScale(uiScale)
+	end
 	local skill = self:GetSkill(self.currentPlayer, self.currentTrade, skillIndex)
 	if skill then
 		local recipe = self:GetRecipe(skill.id)
@@ -2413,6 +2449,11 @@ end
 --
 function Skillet:ReagentButtonOnLeave(button, skillIndex, reagentIndex)
 	gearTexture:Hide()
+	if Skillet.db.profile.scale_tooltip then
+		GameTooltip:SetScale(Skillet.gttScale)
+	end
+	GameTooltip:Hide()
+	ResetCursor()
 end
 
 function Skillet:ReagentButtonSkillSelect(player, id)
