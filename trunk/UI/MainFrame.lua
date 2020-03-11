@@ -1475,7 +1475,7 @@ end
 -- Sets the game tooltip item to the selected skill
 --
 function Skillet:SetTradeSkillToolTip(skillIndex)
-	--DA.DEBUG(2,"SetTradeSkillToolTip("..tostring(skillIndex)..", "..tostring(onEvent)..")")
+	--DA.DEBUG(2,"SetTradeSkillToolTip("..tostring(skillIndex)..")")
 	GameTooltip:ClearLines()
 	if Skillet.db.profile.scale_tooltip then
 		local uiScale = 1.0;
