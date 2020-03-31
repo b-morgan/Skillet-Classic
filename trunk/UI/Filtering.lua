@@ -99,7 +99,7 @@ end
 -- The method we use the initialize the new filter drop down.
 --
 function Skillet.FilterDropDown_Initialize(menuFrame,level)
-	--DA.DEBUG(0,"FilterDropDown_Initialize()")
+	--DA.DEBUG(0,"FilterDropDown_Initialize("..tostring(menuFrame)..", "..tostring(level)..")")
 	local player, tradeID = Skillet.currentPlayer, Skillet.currentTrade
 	if not player or not tradeID then return end
 	local subClass = Skillet.db.realm.subClass[player][tradeID]
@@ -113,9 +113,6 @@ function Skillet.FilterDropDown_Initialize(menuFrame,level)
 	info.value = index
 	info.arg1 = "None"
 	info.arg2 = "None"
-	if self then
-		info.owner = self:GetParent()
-	end
 	UIDropDownMenu_AddButton(info)
 	index = index + 1
 
@@ -124,9 +121,6 @@ function Skillet.FilterDropDown_Initialize(menuFrame,level)
 	info.func = Skillet.FilterDropDown_OnClick
 	info.value = index
 	info.isTitle = true
-	if self then
-		info.owner = self:GetParent()
-	end
 	UIDropDownMenu_AddButton(info)
 	index = index + 1
 
@@ -138,9 +132,6 @@ function Skillet.FilterDropDown_Initialize(menuFrame,level)
 			info.value = index
 			info.arg1 = n
 			info.arg2 = "None"
-			if self then
-				info.owner = self:GetParent()
-			end
 			if subClass.selected == n then
 				Skillet.filterSelected = index
 			end
@@ -154,9 +145,6 @@ function Skillet.FilterDropDown_Initialize(menuFrame,level)
 	info.func = Skillet.FilterDropDown_OnClick
 	info.value = index
 	info.isTitle = true
-	if self then
-		info.owner = self:GetParent()
-	end
 	UIDropDownMenu_AddButton(info)
 	index = index + 1
 
@@ -168,9 +156,6 @@ function Skillet.FilterDropDown_Initialize(menuFrame,level)
 			info.value = index
 			info.arg1 = "None"
 			info.arg2 = n
-			if self then
-				info.owner = self:GetParent()
-			end
 			if invSlot.selected == n then
 				Skillet.filterSelected = index
 			end

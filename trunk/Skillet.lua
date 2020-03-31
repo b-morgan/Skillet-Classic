@@ -918,9 +918,15 @@ function Skillet:SkilletShowWindow()
 		self.db.realm.skillDB[self.currentPlayer][self.currentTrade] = {}
 	end
 	if not self:RescanTrade() then
-		if TSMAPI_FOUR then
-			DA.CHAT(L["Conflict with the addon TradeSkillMaster"])
-			self.db.profile.TSMAPI_FOUR = true
+		if TSMAPI_FOUR or ZygorGuidesViewerClassicSettings then
+			if TSMAPI_FOUR then
+				DA.CHAT(L["Conflict with the addon TradeSkillMaster"])
+				self.db.profile.TSMAPI_FOUR = true
+			end
+			if ZygorGuidesViewerClassicSettings then
+				DA.CHAT(L["Conflict with the addon Zygor Guides"])
+				self.db.profile.ZYGOR = true
+			end
 		else
 			DA.CHAT(L["No headers, try again"])
 		end

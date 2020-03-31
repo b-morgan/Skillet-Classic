@@ -557,9 +557,6 @@ function Skillet.SortDropdown_Initialize(menuFrame,level)
 		info.func = Skillet.SortDropdown_OnClick
 		info.value = i
 		i = i + 1
-		if self then
-			info.owner = self:GetParent()
-		end
 		UIDropDownMenu_AddButton(info)
 	end
 end
