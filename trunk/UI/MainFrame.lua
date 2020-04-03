@@ -1279,7 +1279,7 @@ function Skillet:SkillButton_OnEnter(button)
 		return
 	end
 	buttonName:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
-	local recipe = self:GetRecipe(skill.recipeID) or Skillet.UnknownRecipe
+	local recipe = self:GetRecipe(skill.recipeID) or Skillet.unknownRecipe
 	if not self.db.profile.show_detailed_recipe_tooltip then
 --
 -- user does not want the tooltip displayed, it can get a bit big after all
@@ -1667,9 +1667,9 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		return
 	end
 	lastUpdateSpellID = skill.id
-	local recipe = Skillet.UnknownRecipe
+	local recipe = Skillet.unknownRecipe
 	if skill then
-		recipe = self:GetRecipe(skill.id) or Skillet.UnknownRecipe
+		recipe = self:GetRecipe(skill.id) or Skillet.unknownRecipe
 --
 -- Name of the skill
 --
@@ -1707,7 +1707,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 			end
 		end
 	else
-		recipe = Skillet.UnknownRecipe
+		recipe = Skillet.unknownRecipe
 		SkilletSkillName:SetText("unknown")
 	end
 --
@@ -3028,6 +3028,7 @@ Skillet.fullView = true
 function Skillet:ShowFullView()
 	Skillet.fullView = true
 	SkilletQueueParentBase:SetParent(SkilletFrame)
+	SkilletQueueParentBase:ClearAllPoints()
 	SkilletQueueParentBase:SetPoint("TOPLEFT",SkilletCreateAllButton,"BOTTOMLEFT",0,-3)
 	SkilletQueueParentBase:SetPoint("BOTTOMRIGHT",SkilletFrame,"BOTTOMRIGHT",-10,32)
 	SkilletStandaloneQueue:Hide()
@@ -3038,6 +3039,7 @@ end
 function Skillet:ShowQueueView()
 	Skillet.fullView = false
 	SkilletQueueParentBase:SetParent(SkilletStandaloneQueue)
+	SkilletQueueParentBase:ClearAllPoints()
 	SkilletQueueParentBase:SetPoint("TOPLEFT",SkilletStandaloneQueue,"TOPLEFT",5,-32)
 	SkilletQueueParentBase:SetPoint("BOTTOMRIGHT",SkilletStandaloneQueue,"BOTTOMRIGHT",-5,30)
 	SkilletStandaloneQueue:Show()
