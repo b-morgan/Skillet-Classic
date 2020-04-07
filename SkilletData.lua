@@ -771,7 +771,7 @@ local function ScanTrade()
 		else
 			skillName, skillType, numAvailable, isExpanded = GetTradeSkillInfo(i)
 		end
-		DA.DEBUG(0,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", craftSubSpellName= "..tostring(craftSubSpellName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
+		--DA.DEBUG(0,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", craftSubSpellName= "..tostring(craftSubSpellName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
 		if skillName then
 			if skillType == "header" or skillType == "subheader" then
 --
@@ -807,7 +807,7 @@ local function ScanTrade()
 				recipeID = skillName
 				if Skillet.isCraft then
 					if craftNameSeen[recipeID] then
-						DA.DEBUG(0,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", craftSubSpellName= "..tostring(craftSubSpellName).." is not unique")
+						--DA.DEBUG(0,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", craftSubSpellName= "..tostring(craftSubSpellName).." is not unique")
 --
 -- Make an attempt to create a unique recipeID
 --
@@ -816,7 +816,7 @@ local function ScanTrade()
 						else
 							recipeID = recipeID.."("..tostring(i)..")"
 						end
-						DA.DEBUG(0,"ScanTrade: using '"..tostring(recipeID).."' instead")
+						--DA.DEBUG(0,"ScanTrade: using '"..tostring(recipeID).."' instead")
 					end
 					craftNameSeen[recipeID] = true
 				end

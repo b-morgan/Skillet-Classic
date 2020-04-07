@@ -474,6 +474,8 @@ function Skillet:UNIT_SPELLCAST_SUCCEEDED(event, unit, castGUID, spellID)
 	if unit == "player" then
 		if self.processingSpell and self.processingSpell == self.castSpellName then
 			Skillet:ContinueCast(self.castSpellName)
+--		else
+--			self.processingSpell = self.castSpellName
 		end
 	end
 end
@@ -607,6 +609,8 @@ function Skillet:StopCast(spell, success)
 					DA.DEBUG(0,"removed queue command")
 				end
 			end
+			DA.DEBUG(0,"StopCast is updating window")
+			self:AdjustInventory()
 		else
 			DA.DEBUG(0,"StopCast without success")
 			self.queueCasting = false
@@ -614,8 +618,6 @@ function Skillet:StopCast(spell, success)
 			self.processingPosition = nil
 			self.processingCommand = nil
 		end
-		DA.DEBUG(0,"StopCast is updating window")
-		self:AdjustInventory()
 	else
 		DA.DEBUG(0,"StopCast called with "..tostring(spell).." ~= "..tostring(self.processingSpell))
 	end

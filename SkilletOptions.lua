@@ -284,6 +284,32 @@ Skillet.options =
 					width = "double",
 					order = 29
 				},
+				include_craftbuttons = {
+					type = "toggle",
+					name = L["CRAFTBUTTONSNAME"],
+					desc = L["CRAFTBUTTONSDESC"],
+					get = function()
+						return Skillet.db.profile.include_craftbuttons
+					end,
+					set = function(self,value)
+						Skillet.db.profile.include_craftbuttons = value
+					end,
+					width = "double",
+					order = 30
+				},
+				include_tradebuttons = {
+					type = "toggle",
+					name = L["TRADEBUTTONSNAME"],
+					desc = L["TRADEBUTTONSDESC"],
+					get = function()
+						return Skillet.db.profile.include_tradebuttons
+					end,
+					set = function(self,value)
+						Skillet.db.profile.include_tradebuttons = value
+					end,
+					width = "double",
+					order = 31
+				},
 				search_includes_reagents = {
 					type = "toggle",
 					name = L["INCLUDEREAGENTSNAME"],
@@ -296,7 +322,7 @@ Skillet.options =
 						Skillet.data.tooltipCache = {}
 					end,
 					width = "double",
-					order = 30
+					order = 32
 				},
 			}
 		},
