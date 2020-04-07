@@ -253,11 +253,11 @@ end
 function plugin.RecipeNameSuffix(skill, recipe)
 	local text
 	if not recipe then return end
-	DA.DEBUG(0,"RecipeNameSuffix: recipe= "..DA.DUMP1(recipe,1))
+	--DA.DEBUG(0,"RecipeNameSuffix: recipe= "..DA.DUMP1(recipe,1))
 	local itemID = recipe.itemID
-	DA.DEBUG(0,"RecipeNameSuffix: itemID= "..tostring(itemID)..", type= "..type(itemID))
+	--DA.DEBUG(0,"RecipeNameSuffix: itemID= "..tostring(itemID)..", type= "..type(itemID))
 	local itemName = GetItemInfo(itemID)
-	DA.DEBUG(0,"RecipeNameSuffix: itemName= "..tostring(itemName)..", type= "..type(itemName))
+	--DA.DEBUG(0,"RecipeNameSuffix: itemName= "..tostring(itemName)..", type= "..type(itemName))
 	if Skillet.db.profile.plugins.ATR.enabled and itemID then
 		local value
 		if isClassic and Atr_GetAuctionBuyout then
@@ -267,7 +267,7 @@ function plugin.RecipeNameSuffix(skill, recipe)
 		else
 			return
 		end
-		DA.DEBUG(0,"RecipeNameSuffix: value= "..tostring(value))
+		--DA.DEBUG(0,"RecipeNameSuffix: value= "..tostring(value))
 		local buyout = value * recipe.numMade
 		if Skillet.db.profile.plugins.ATR.reagentPrices then
 			local cost = 0
@@ -300,7 +300,7 @@ function plugin.RecipeNameSuffix(skill, recipe)
 						value = 0
 					end
 				end
-				DA.DEBUG(1, "RecipeNameSuffix: reagent["..i.."] ("..id..") "..tostring(name)..", value= "..tostring(value))
+				--DA.DEBUG(1, "RecipeNameSuffix: reagent["..i.."] ("..id..") "..tostring(name)..", value= "..tostring(value))
 				cost = cost + value
 			end
 			if Skillet.db.profile.plugins.ATR.useVendorCalc then
@@ -338,7 +338,7 @@ function Skillet:AuctionatorSearch(whichOne)
 		shoppingListName = L["Shopping List"]
 		local list = Skillet:GetShoppingList(Skillet.currentPlayer, false)
 		if not list or #list == 0 then
-			DA.DEBUG(0,"AuctionatorSearch: Shopping List is empty")
+			--DA.DEBUG(0,"AuctionatorSearch: Shopping List is empty")
 			return
 		end
 		for i=1,#list,1 do
@@ -346,7 +346,7 @@ function Skillet:AuctionatorSearch(whichOne)
 			local name = GetItemInfo(id)
 			if name and not Skillet:VendorSellsReagent(id) then
 				table.insert (items, name)
-				DA.DEBUG(1, "AuctionatorSearch: Item["..tostring(i).."] "..name.." ("..tostring(id)..") added")
+				--DA.DEBUG(1, "AuctionatorSearch: Item["..tostring(i).."] "..name.." ("..tostring(id)..") added")
 			end
 		end
 	else
@@ -378,19 +378,19 @@ function Skillet:AuctionatorSearch(whichOne)
 				local reagentName = GetItemInfo(id)
 				if (reagentName) then
 					table.insert (items, reagentName)
-					DA.DEBUG(1, "AuctionatorSearch: Reagent["..i.."] ("..id..") "..reagentName.." added")
+					--DA.DEBUG(1, "AuctionatorSearch: Reagent["..i.."] ("..id..") "..reagentName.." added")
 				end
 			end
 		end
 	end
-	DA.DEBUG(0, "AuctionatorSearch: items= "..DA.DUMP1(items))
+	--DA.DEBUG(0, "AuctionatorSearch: items= "..DA.DUMP1(items))
 	if isClassic then
-		DA.DEBUG(0, "AuctionatorSearch: shoppingListName= "..tostring(shoppingListName)..", items= "..DA.DUMP1(items))
+		--DA.DEBUG(0, "AuctionatorSearch: shoppingListName= "..tostring(shoppingListName)..", items= "..DA.DUMP1(items))
 		local BUY_TAB = 3;
 		Atr_SelectPane(BUY_TAB)
 		Atr_SearchAH(shoppingListName, items)
 	else
-		DA.DEBUG(0, "AuctionatorSearch: addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
+		--DA.DEBUG(0, "AuctionatorSearch: addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
 		Auctionator.API.v1.MultiSearch(addonName, items)
 	end
 end

@@ -68,6 +68,8 @@ local defaults = {
 		use_blizzard_for_followers = false,				-- not in Classic
 		hide_blizzard_frame = true,						-- primarily for debugging
 		support_crafting = true,
+		include_craftbuttons = true,
+		include_tradebuttons = true,
 		search_includes_reagents = true,
 		confirm_queue_clear = false,
 		queue_only_view = true,
@@ -698,7 +700,7 @@ end
 
 function Skillet:TRADE_SKILL_UPDATE()
 	DA.TRACE("TRADE_SKILL_UPDATE")
-	if not Skillet.tradeShow then return end
+	if Skillet.closingTrade or not Skillet.tradeShow then return end
 	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
 		if Skillet.lastCraft ~= Skillet.isCraft then
 			Skillet:ConfigureRecipeControls()
@@ -709,7 +711,7 @@ end
 
 function Skillet:CRAFT_UPDATE()
 	DA.TRACE("CRAFT_UPDATE")
-	if not Skillet.craftShow then return end
+	if Skillet.closingTrade or not Skillet.craftShow then return end
 	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
 		if Skillet.lastCraft ~= Skillet.isCraft then
 			Skillet:ConfigureRecipeControls()
@@ -744,17 +746,21 @@ end
 
 function Skillet:TRADE_SKILL_SHOW()
 	DA.TRACE("TRADE_SKILL_SHOW")
+	--DA.TRACE("TRADE_SKILL_SHOW: hideTradeSkillFrame= "..tostring(Skillet.hideTradeSkillFrame))
 	if Skillet.hideTradeSkillFrame then
 		HideUIPanel(TradeSkillFrame)
 		Skillet.hideTradeSkillFrame = nil
 	end
 	Skillet.tradeShow = true
 	Skillet.isCraft = false
+	local name = GetTradeSkillLine()
+	--DA.TRACE("TRADE_SKILL_SHOW: name= '"..tostring(name).."'")
+	--DA.TRACE("TRADE_SKILL_SHOW: lastCraft= "..tostring(Skillet.lastCraft))
 	if Skillet.lastCraft ~= Skillet.isCraft then
 		Skillet:ConfigureRecipeControls()
---		Skillet.ignoreClose = false
 	end
 	SkilletEnchantButton:Hide()				-- Hide our button
+	--DA.TRACE("TRADE_SKILL_SHOW: changingTrade= "..tostring(Skillet.changingTrade))
 	if not Skillet.changingTrade then		-- wait for UNIT_SPELLCAST_SUCCEEDED
 		Skillet:SkilletShow()
 	end
@@ -786,9 +792,11 @@ function Skillet:CRAFT_SHOW()
 	Skillet.craftShow = true
 	Skillet.isCraft = true
 	Skillet.hideCraftFrame = true
+	local name = GetCraftDisplaySkillLine()
+	--DA.TRACE("CRAFT_SHOW: name= '"..tostring(name).."'")
+	--DA.TRACE("CRAFT_SHOW: lastCraft= "..tostring(Skillet.lastCraft))
 	if Skillet.lastCraft ~= Skillet.isCraft then
 		Skillet:ConfigureRecipeControls()
---		Skillet.ignoreClose = false
 	end
 	if Skillet.db.profile.support_crafting then
 		SkilletEnchantButton:Hide()
@@ -796,6 +804,7 @@ function Skillet:CRAFT_SHOW()
 		SkilletEnchantButton:Disable()		-- because DoCraft is restricted
 		SkilletEnchantButton:Show()
 	end
+	--DA.TRACE("CRAFT_SHOW: changingTrade= "..tostring(Skillet.changingTrade))
 	if not Skillet.changingTrade then		-- wait for UNIT_SPELLCAST_SUCCEEDED
 		Skillet:SkilletShow()
 	end
@@ -955,12 +964,13 @@ function Skillet:SkilletShowWindow()
 end
 
 function Skillet:SkilletClose()
-	DA.DEBUG(0,"SkilletClose")
+	DA.DEBUG(0,"SkilletClose()")
 	self.lastCraft = self.isCraft
 	if self.isCraft then
 		self:RestoreEnchantButton(false)
 	end
 	self:HideAllWindows()
+	self.closingTrade = nil
 end
 
 function Skillet:BAG_OPEN(event, bagID)				-- Fires when a non-inventory container is opened.

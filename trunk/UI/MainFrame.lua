@@ -642,6 +642,7 @@ function Skillet:TradeButton_OnClick(this,button)
 					if button then
 						button:SetChecked(false)
 					end
+					self.closingTrade = true
 					if self.isCraft then
 						CloseCraft()
 					else
@@ -747,9 +748,12 @@ function Skillet:UpdateTradeButtons(player)
 			else
 				button:SetChecked(false)
 			end
-			button:Show()
-		else
-			--DA.DEBUG(3,"No ranks for tradeID= "..tostring(tradeID)..", tradeName= "..tostring(self.tradeSkillNamesByID[tradeID]))
+			if (self.db.profile.include_craftbuttons and self.skillIsCraft[tradeID]) or
+			  (self.db.profile.include_tradebuttons and not self.skillIsCraft[tradeID]) then
+				button:Show()
+			else
+				button:Hide()
+			end
 		end
 	end		-- for
 --
@@ -2549,6 +2553,8 @@ function Skillet:SkilletFrameForceClose()
 	else
 		CloseTradeSkill()
 	end
+	Skillet.processingSpell = nil
+	Skillet.changingTrade = nil
 	return self:HideAllWindows()
 end
 
