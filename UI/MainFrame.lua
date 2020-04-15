@@ -1478,8 +1478,8 @@ end
 --
 -- Sets the game tooltip item to the selected skill
 --
-function Skillet:SetTradeSkillToolTip(skillIndex)
-	--DA.DEBUG(2,"SetTradeSkillToolTip("..tostring(skillIndex)..")")
+function Skillet:SetTradeSkillToolTip(skillIndex, buttonID)
+	--DA.DEBUG(2,"SetTradeSkillToolTip("..tostring(skillIndex)..", "..tostring(buttonID)..")")
 	GameTooltip:ClearLines()
 	if Skillet.db.profile.scale_tooltip then
 		local uiScale = 1.0;
@@ -1493,24 +1493,8 @@ function Skillet:SetTradeSkillToolTip(skillIndex)
 	end
 	local recipe, recipeID = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	if Skillet.isCraft then
-		local craftName, craftSubSpellName, craftType, numAvailable, isExpanded, trainingPointCost, requiredLevel = GetCraftInfo(skillIndex)
-		local color = CraftTypeColor[craftType];
-		if (color) then
-			GameTooltip:AddLine(craftName, color.r, color.g, color.b, false);
-		else
-			GameTooltip:AddLine(craftName, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, false);
-		end
 		if skillIndex then
---			GameTooltip:SetCraftItem(skillIndex)
-			local requiredTotems = BuildColoredListString(GetCraftSpellFocus(skillIndex))
-			if ( requiredTotems ) then
-				GameTooltip:AddLine(REQUIRES_LABEL.." "..requiredTotems, 1,1,1, false)
-			end
-			GameTooltip:AddLine(" ")
-			local desc = GetCraftDescription(skillIndex)
-			if (desc) then
-				GameTooltip:AddLine(desc, 1,1,1, true)
-			end
+			GameTooltip:SetCraftSpell(skillIndex)
 			if recipe and recipe.itemID ~= 0 then
 				Skillet:AddItemNotesToTooltip(GameTooltip, recipe.itemID)
 			end
