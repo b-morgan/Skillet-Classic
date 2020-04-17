@@ -44,6 +44,7 @@ Locale\Locale-enUS.lua
 
 Locale\Locale-deDE.lua
 Locale\Locale-esES.lua
+Locale\Locale-esMX.lua
 Locale\Locale-frFR.lua
 Locale\Locale-itIT.lua
 Locale\Locale-koKR.lua
