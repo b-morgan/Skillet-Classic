@@ -52,7 +52,6 @@ Locale\Locale-ptBR.lua
 Locale\Locale-ruRU.lua
 Locale\Locale-zhCN.lua
 Locale\Locale-zhTW.lua
-Locale\Locale-zhCN.lua
 
 #### Main files
 Skillet.lua
