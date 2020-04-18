@@ -50,6 +50,7 @@ Locale\Locale-itIT.lua
 Locale\Locale-koKR.lua
 Locale\Locale-ptBR.lua
 Locale\Locale-ruRU.lua
+Locale\Locale-zhCN.lua
 Locale\Locale-zhTW.lua
 Locale\Locale-zhCN.lua
 

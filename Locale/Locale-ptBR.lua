@@ -18,4 +18,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 local L = LibStub("AceLocale-3.0"):NewLocale("Skillet", "ptBR")
 if not L then return end
 
---@localization(locale="ptBR", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@
+--@localization(locale="ptBR", format="lua_additive_table", handle-unlocalized="english", handle-subnamespaces="concat")@
