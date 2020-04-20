@@ -136,6 +136,7 @@ function Skillet:IsUpdatePluginRegistered(moduleName)
 end
 
 function Skillet:UpdatePlugins()
+	--DA.DEBUG(0,"UpdatePlugins()")
 	for k,v in pairs(Skillet.updatePlugins) do
 		v.Update()
 	end

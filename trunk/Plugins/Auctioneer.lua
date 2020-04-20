@@ -198,7 +198,7 @@ function plugin.GetExtraText(skill, recipe)
 					reagentName = tostring(id)
 				end
 				local text
-				local value = ( GetMarketValue(itemLink) or 0 ) * needed
+				local value = ( GetMarketValue(reagentLink) or 0 ) * needed
 				local buyFactor = Skillet.db.profile.plugins.AUC.buyFactor or buyFactorDef
 				if Skillet:VendorSellsReagent(id) then
 					toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s  |cff808080(%s)|r", needed, reagentName, L["buyable"])
@@ -220,7 +220,7 @@ function plugin.GetExtraText(skill, recipe)
 			end
 			if Skillet.db.profile.plugins.AUC.useVendorCalc then
 				local markup = Skillet.db.profile.plugins.AUC.markup or markupDef
-				label = label .. "\n\n" .. table.concat(toConcatLabel,"\n") .. "\n   " .. L["Reagents"] .." * ".. markup * 100 .."%:\n"
+				label = label .. "\n\n" .. table.concat(toConcatLabel,"\n") .. "\n   " .. L["Reagents"] .." * ".. (markup * 100) .."%:\n"
 				extra_text =  extra_text .. "\n\n" .. table.concat(toConcatExtra,"\n") .. "\n" .. Skillet:FormatMoneyFull(cost * markup, true) .. "\n"
 			else
 				label = label .. "\n\n" .. table.concat(toConcatLabel,"\n") .. "\n   " .. L["Reagents"] .. ":\n"
