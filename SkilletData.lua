@@ -750,7 +750,7 @@ local function ScanTrade()
 --	if Skillet.isCraft then
 --		s = 0
 --	end
-	local craftNameSeen = {}
+	local skillNameSeen = {}
 	for i = s, numSkills, 1 do
 		local skillName, craftSubSpellName, skillType, numAvailable, isExpanded, subSpell, extra
 		if Skillet.isCraft then
@@ -805,21 +805,19 @@ local function ScanTrade()
 --
 				local recipeID
 				recipeID = skillName
-				if Skillet.isCraft then
-					if craftNameSeen[recipeID] then
-						--DA.DEBUG(0,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", craftSubSpellName= "..tostring(craftSubSpellName).." is not unique")
+				if skillNameSeen[recipeID] then
+					DA.DEBUG(0,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", craftSubSpellName= "..tostring(craftSubSpellName).." is not unique")
 --
 -- Make an attempt to create a unique recipeID
 --
-						if craftSubSpellName and craftSubSpellName ~= "" then
-							recipeID = recipeID..craftSubSpellName
-						else
-							recipeID = recipeID.."("..tostring(i)..")"
-						end
-						--DA.DEBUG(0,"ScanTrade: using '"..tostring(recipeID).."' instead")
+					if craftSubSpellName and craftSubSpellName ~= "" then
+						recipeID = recipeID..craftSubSpellName
+					else
+						recipeID = recipeID.."("..tostring(i)..")"
 					end
-					craftNameSeen[recipeID] = true
+					DA.DEBUG(0,"ScanTrade: using '"..tostring(recipeID).."' instead")
 				end
+				skillNameSeen[recipeID] = true
 				if currentGroup then
 					Skillet:RecipeGroupAddRecipe(currentGroup, recipeID, i)
 				else
