@@ -421,8 +421,9 @@ function Skillet:InitializeMissingVendorItems()
 	}
 end
 
-function Skillet:InitializeDatabase(player)
-	DA.DEBUG(0,"initialize database for "..tostring(player))
+function Skillet:InitializeDatabase(player, clean)
+	if clean then action = "Clean" else action = "Initialize" end
+	DA.DEBUG(0,action.." database for "..tostring(player))
 	if self.linkedSkill or self.isGuild then  -- Avoid adding unnecessary data to savedvariables
 		return
 	end
@@ -436,37 +437,37 @@ function Skillet:InitializeDatabase(player)
 		if not self.db.realm.skillDB then
 			self.db.realm.skillDB = {}
 		end
-		if not self.db.realm.skillDB[player] then
+		if not self.db.realm.skillDB[player] or clean then
 			self.db.realm.skillDB[player] = {}
 		end
 		if not self.db.realm.subClass then
 			self.db.realm.subClass = {}
 		end
-		if not self.db.realm.subClass[player] then
+		if not self.db.realm.subClass[player] or clean then
 			self.db.realm.subClass[player] = {}
 		end
 		if not self.db.realm.invSlot then
 			self.db.realm.invSlot = {}
 		end
-		if not self.db.realm.invSlot[player] then
+		if not self.db.realm.invSlot[player] or clean then
 			self.db.realm.invSlot[player] = {}
 		end
 		if not self.db.realm.tradeSkills then
 			self.db.realm.tradeSkills = {}
 		end
-		if not self.db.realm.tradeSkills[player] then
+		if not self.db.realm.tradeSkills[player] or clean then
 			self.db.realm.tradeSkills[player] = {}
 		end
 		if not self.db.realm.queueData then
 			self.db.realm.queueData = {}
 		end
-		if not self.db.realm.queueData[player] then
+		if not self.db.realm.queueData[player] or clean then
 			self.db.realm.queueData[player] = {}
 		end
 		if not self.db.realm.auctionData then
 			self.db.realm.auctionData = {}
 		end
-		if not self.db.realm.auctionData[player] then
+		if not self.db.realm.auctionData[player] or clean then
 			self.db.realm.auctionData[player] = {}
 		end
 		if not self.data then
@@ -478,26 +479,26 @@ function Skillet:InitializeDatabase(player)
 		if not self.data.skillList then
 			self.data.skillList = {}
 		end
-		if not self.data.skillList[player] then
+		if not self.data.skillList[player] or clean then
 			self.data.skillList[player] = {}
 		end
 		if not self.data.groupList then
 			self.data.groupList = {}
 		end
-		if not self.data.groupList[player] then
+		if not self.data.groupList[player] or clean then
 			self.data.groupList[player] = {}
 		end
 		if not self.data.skillIndexLookup then
 			self.data.skillIndexLookup = {}
 		end
-		if not self.data.skillIndexLookup[player] then
+		if not self.data.skillIndexLookup[player] or clean then
 			self.data.skillIndexLookup[player] = {}
 		end
 		if player == UnitName("player") then
 			if not self.db.realm.inventoryData then
 				self.db.realm.inventoryData = {}
 			end
-			if not self.db.realm.inventoryData[player] then
+			if not self.db.realm.inventoryData[player] or clean then
 				self.db.realm.inventoryData[player] = {}
 			end
 --
@@ -506,13 +507,13 @@ function Skillet:InitializeDatabase(player)
 			if not self.db.realm.bagData then
 				self.db.realm.bagData = {}
 			end
-			if not self.db.realm.bagData[player] then
+			if not self.db.realm.bagData[player] or clean then
 				self.db.realm.bagData[player] = {}
 			end
 			if not self.db.realm.bagDetails then
 				self.db.realm.bagDetails = {}
 			end
-			if not self.db.realm.bagDetails[player] then
+			if not self.db.realm.bagDetails[player] or clean then
 				self.db.realm.bagDetails[player] = {}
 			end
 --
@@ -522,26 +523,26 @@ function Skillet:InitializeDatabase(player)
 			if not self.db.realm.bankData then
 				self.db.realm.bankData = {}
 			end
-			if not self.db.realm.bankData[player] then
+			if not self.db.realm.bankData[player] or clean then
 				self.db.realm.bankData[player] = {}
 			end
 			if not self.db.realm.bankDetails then
 				self.db.realm.bankDetails = {}
 			end
-			if not self.db.realm.bankDetails[player] then
+			if not self.db.realm.bankDetails[player] or clean then
 				self.db.realm.bankDetails[player] = {}
 			end
 --
 			if not self.db.realm.reagentsInQueue then
 				self.db.realm.reagentsInQueue = {}
 			end
-			if not self.db.realm.reagentsInQueue[player] then
+			if not self.db.realm.reagentsInQueue[player] or clean then
 				self.db.realm.reagentsInQueue[player] = {}
 			end
 			if not self.db.realm.userIgnoredMats then
 				self.db.realm.userIgnoredMats = {}
 			end
-			if not self.db.realm.userIgnoredMats[player] then
+			if not self.db.realm.userIgnoredMats[player] or clean then
 				self.db.realm.userIgnoredMats[player] = {}
 			end
 			if not self.db.profile.SavedQueues then
