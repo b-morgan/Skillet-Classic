@@ -543,6 +543,20 @@ Skillet.options =
 			end,
 			order = 55
 		},
+		flushplayerdata = {
+			type = 'execute',
+			name = L["Flush Player Data"],
+			desc = L["FLUSHPLAYERDATADESC"],
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:InitializeDatabase(UnitName("player"), true)
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
+												  " Leave combat and try again.")
+				end
+			end,
+			order = 56
+		},
 		standby = {
 			type = 'execute',
 			name = L["STANDBYNAME"],
@@ -557,7 +571,7 @@ Skillet.options =
 				end
 			end,
 			guiHidden = true,
-			order = 56
+			order = 57
 		},
 		ignorelist = {
 			type = 'execute',
@@ -571,7 +585,7 @@ Skillet.options =
 												  " Leave combat and try again.")
 				end
 			end,
-			order = 57
+			order = 58
 		},
 		ignoreclear = {
 			type = 'execute',
@@ -585,7 +599,7 @@ Skillet.options =
 												  " Leave combat and try again.")
 				end
 			end,
-			order = 58
+			order = 59
 		},
 		ignoreadd = {
 			type = "input",
@@ -599,7 +613,7 @@ Skillet.options =
 				local value = tonumber(value)
 				Skillet.db.realm.userIgnoredMats[UnitName("player")][value] = 1
 			end,
-			order = 59
+			order = 60
 		},
 		ignoredel = {
 			type = "input",
@@ -613,7 +627,7 @@ Skillet.options =
 				local value = tonumber(value)
 				Skillet.db.realm.userIgnoredMats[UnitName("player")][value] = nil
 			end,
-			order = 60
+			order = 61
 		},
 --[[
 		resetrecipefilter = {
@@ -628,7 +642,7 @@ Skillet.options =
 												  " Leave combat and try again.")
 				end
 			end,
-			order = 61
+			order = 62
 		},
 ]]--
 		printsaved = {
@@ -643,7 +657,7 @@ Skillet.options =
 												  " Leave combat and try again.")
 				end
 			end,
-			order = 62
+			order = 63
 		},
 		printqueue = {
 			type = 'execute',
@@ -657,7 +671,7 @@ Skillet.options =
 												  " Leave combat and try again.")
 				end
 			end,
-			order = 63
+			order = 64
 		},
 		printsavedqueue = {
 			type = 'input',
@@ -674,7 +688,7 @@ Skillet.options =
 												  " Leave combat and try again.")
 				end
 			end,
-			order = 64
+			order = 65
 		},
 		clearqueue = {
 			type = 'execute',
@@ -688,7 +702,7 @@ Skillet.options =
 												  " Leave combat and try again.")
 				end
 			end,
-			order = 65
+			order = 66
 		},
 		printauction = {
 			type = 'execute',
@@ -702,7 +716,7 @@ Skillet.options =
 												  " Leave combat and try again.")
 				end
 			end,
-			order = 66
+			order = 67
 		},
 		enchanting = {
 			type = "toggle",
@@ -716,7 +730,7 @@ Skillet.options =
 				Skillet:ConfigureRecipeControls()
 				Skillet:UpdateTradeSkillWindow()
 			end,
-			order = 67,
+			order = 68,
 		},
 --
 -- commands to toggle Blizzard's frames (beats using "/run")
@@ -736,7 +750,7 @@ Skillet.options =
 					HideUIPanel(TradeSkillFrame)
 				end
 			end,
-			order = 68
+			order = 69
 		},
 		bcui = {
 			type = "toggle",
@@ -753,7 +767,7 @@ Skillet.options =
 					HideUIPanel(CraftFrame)
 				end
 			end,
-			order = 69
+			order = 70
 		},
 --
 -- commands to update Skillet's main windows
