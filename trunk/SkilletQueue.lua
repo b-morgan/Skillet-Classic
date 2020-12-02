@@ -114,23 +114,23 @@ function Skillet:QueueAppendCommand(command, queueCraftables)
 		local skillIndexLookup = self.data.skillIndexLookup[Skillet.currentPlayer]
 		for i=1,#recipe.reagentData,1 do
 			local reagent = recipe.reagentData[i]
-			DA.DEBUG(1,"reagent= "..DA.DUMP1(reagent))
+			--DA.DEBUG(1,"reagent= "..DA.DUMP1(reagent))
 			local need = count * reagent.numNeeded
 			local numInBoth = GetItemCount(reagent.id, true)
 			local numInBags = GetItemCount(reagent.id, false)
 			local numInBank =  numInBoth - numInBags
-			DA.DEBUG(1,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
+			--DA.DEBUG(1,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
 			local have = numInBags + (reagentsInQueue[reagent.id] or 0);	-- In Classic just bags
 			reagentsInQueue[reagent.id] = (reagentsInQueue[reagent.id] or 0) - need;
 			reagentsChanged[reagent.id] = true
-			DA.DEBUG(1,"queueCraftables= "..tostring(queueCraftables)..", need= "..tostring(need)..", have= "..tostring(have))
+			--DA.DEBUG(1,"queueCraftables= "..tostring(queueCraftables)..", need= "..tostring(need)..", have= "..tostring(have))
 			if queueCraftables and need > have and (Skillet.db.profile.queue_glyph_reagents or not recipe.name:match(Skillet.L["Glyph "])) then
 				local recipeSource = self.db.global.itemRecipeSource[reagent.id]
-				DA.DEBUG(1,"recipeSource= "..DA.DUMP1(recipeSource))
+				--DA.DEBUG(1,"recipeSource= "..DA.DUMP1(recipeSource))
 				if recipeSource then
 					for recipeSourceID in pairs(recipeSource) do
 						local skillIndex = skillIndexLookup[recipeSourceID]
-						DA.DEBUG(1,"skillIndex= "..tostring(skillIndex))
+						--DA.DEBUG(1,"skillIndex= "..tostring(skillIndex))
 						if skillIndex then
 --
 -- identify that this queue has craftable reagent requirements
@@ -144,9 +144,7 @@ function Skillet:QueueAppendCommand(command, queueCraftables)
 -- do not add items from transmutation - this can create weird loops
 -- do not add items the user wants ignored
 --
-							DA.DEBUG(1,"recipeSourceID= "..tostring(recipeSourceID)..
-							  ", TradeSkillIgnoredMats= "..tostring(Skillet.TradeSkillIgnoredMats[recipeSourceID])..
-							  ", userIgnoredMats= "..tostring(Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeSourceID]))
+							--DA.DEBUG(1,"recipeSourceID= "..tostring(recipeSourceID)..", TradeSkillIgnoredMats= "..tostring(Skillet.TradeSkillIgnoredMats[recipeSourceID])..", userIgnoredMats= "..tostring(Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeSourceID]))
 							if not Skillet.TradeSkillIgnoredMats[recipeSourceID] and 
 							  not Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeSourceID] then
 								self:QueueAppendCommand(newCommand, queueCraftables, true)
@@ -281,7 +279,7 @@ function Skillet:ProcessQueue(altMode)
 --
 	repeat
 		command = queue[qpos]
-		DA.DEBUG(1,"command= "..DA.DUMP1(command))
+		--DA.DEBUG(1,"command= "..DA.DUMP1(command))
 		if command and command.op == "iterate" then
 			local recipe = self:GetRecipe(command.recipeID)
 			local craftable = true
@@ -297,11 +295,11 @@ function Skillet:ProcessQueue(altMode)
 				for i=1,#recipe.reagentData,1 do
 					local reagent = recipe.reagentData[i]
 					local reagentName = GetItemInfo(reagent.id) or reagent.id
-					DA.DEBUG(1,"id= "..tostring(reagent.id)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(reagent.numNeeded))
+					--DA.DEBUG(1,"id= "..tostring(reagent.id)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(reagent.numNeeded))
 					local numInBoth = GetItemCount(reagent.id, true)
 					local numInBags = GetItemCount(reagent.id, false)
 					local numInBank =  numInBoth - numInBags
-					DA.DEBUG(1,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
+					--DA.DEBUG(1,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
 					if numInBags < reagent.numNeeded then
 						Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded,"x",reagentName,"("..L["have"],numInBags..")")
 						craftable = false
@@ -336,11 +334,24 @@ function Skillet:ProcessQueue(altMode)
 			local recipeIndex = command.recipeIndex
 			local count = command.count
 			if self.currentTrade ~= tradeID and tradeName then
-				self:Print(L["Changing profession to"],tradeName,L["Press Process to continue"])
-				self.queueCasting = false
-				self:ChangeTradeSkill(tradeID, tradeName)
-				self:QueueMoveToTop(qpos)
-				return
+				--DA.DEBUG(1,"queue_crafts= "..tostring(self.db.profile.queue_crafts)..", skillIsCraft= "..tostring(self.skillIsCraft[tradeID]))
+				if self.db.profile.queue_crafts and self.skillIsCraft[tradeID] then
+--
+-- Blizzard has restricted DoCraft(index) to anything but their own UI.
+-- The queue_crafts option allows crafts to be queued so that
+-- the reagents can be placed in the shopping list. 
+-- This also queues the craft itself but we can't process that so remove it.
+--
+					self.queueCasting = false
+					self:RemoveFromQueue(qpos)
+					return
+				else
+					self:Print(L["Changing profession to"],tradeName,L["Press Process to continue"])
+					self.queueCasting = false
+					self:ChangeTradeSkill(tradeID, tradeName)
+					self:QueueMoveToTop(qpos)
+					return
+				end
 			end
 			self.processingSpell = self:GetRecipeName(recipeID)		-- In Classic, the recipeID is the recipeName
 			self.processingPosition = qpos
@@ -387,7 +398,7 @@ end
 --
 function Skillet:QueueItems(count)
 	DA.DEBUG(0,"QueueItems("..tostring(count)..")")
-	DA.DEBUG(1,"currentPlayer= "..tostring(self.currentPlayer)..", currentTrade= "..tostring(self.currentTrade)..", selectedSkill= "..tostring(self.selectedSkill))
+	--DA.DEBUG(1,"currentPlayer= "..tostring(self.currentPlayer)..", currentTrade= "..tostring(self.currentTrade)..", selectedSkill= "..tostring(self.selectedSkill))
 	if not self.selectedSkill then return 0 end
 	local skill = self:GetSkill(self.currentPlayer, self.currentTrade, self.selectedSkill)
 	if not skill then return 0 end

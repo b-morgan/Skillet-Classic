@@ -217,7 +217,7 @@ function Skillet:CreateTradeSkillWindow()
 	if frame:GetHeight() < 545 then
 		frame:SetHeight(545)
 	end
-	if TSMAPI_FOUR then
+	if TSM_API then
 		frame:SetFrameStrata("HIGH")
 		frame:SetBackdrop(TSMBackdrop)
 	else
@@ -519,7 +519,9 @@ function Skillet:ConfigureRecipeControls()
 	DA.DEBUG(0,"ConfigureRecipeControls()")
 	if Skillet.isCraft then
 		SkilletQueueAllButton:Hide()
-		SkilletQueueButton:Hide()
+		if not Skillet.db.profile.queue_crafts then
+			SkilletQueueButton:Hide()
+		end
 		SkilletCreateAllButton:Hide()
 		SkilletCreateButton:Hide()
 		SkilletQueueParent:Hide()
@@ -690,7 +692,7 @@ end
 
 function Skillet:UpdateTradeButtons(player)
 	DA.DEBUG(3,"UpdateTradeButtons("..tostring(player)..")")
---	if TSMAPI_FOUR then return end		-- Maybe later but for now, these buttons cause more trouble than they are worth.
+--	if TSM_API then return end		-- Maybe later but for now, these buttons cause more trouble than they are worth.
 	local position = 0 -- pixels
 	local tradeSkillList = self.tradeSkillList
 	local frameName = "SkilletFrameTradeButtons-"..player
@@ -2459,7 +2461,9 @@ function Skillet:ReagentButtonSkillSelect(player, id)
 	end
 end
 
+--
 -- Called when the reagent button is clicked
+--
 function Skillet:ReagentButtonOnClick(button, skillIndex, reagentIndex)
 	--DA.DEBUG(0,"ReagentButtonOnClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	if not self.db.profile.link_craftable_reagents then
@@ -2526,6 +2530,34 @@ function Skillet:ReagentButtonOnClick(button, skillIndex, reagentIndex)
 			local x, y = GetCursorPosition()
 			local uiScale = UIParent:GetEffectiveScale()
 			EasyMenu(self.data.recipeMenuTable, self.recipeMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+		end
+	end
+end
+
+--
+-- Called when the icon button is clicked
+--
+function Skillet:ReagentsLinkOnClick(button, skillIndex, reagentIndex)
+	DA.DEBUG(0,"ReagentLinkOnClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	if not self.db.profile.link_craftable_reagents then
+		return
+	end
+	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
+	--DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe))
+	local sep = " "
+	for i = 1, #recipe.reagentData, 1 do
+		local reagent = recipe.reagentData[i]
+		--DA.DEBUG(1,"reagent= "..DA.DUMP1(reagent))
+		if reagent then
+			local reagentName, reagentLink
+			if reagent.id then
+				reagentName, reagentLink = GetItemInfo(reagent.id)
+			end
+			--DA.DEBUG(1,"reagentLink= "..DA.DUMP1(reagentLink))
+			if reagentLink then
+				ChatEdit_InsertLink(sep .. reagent.numNeeded .. "x" .. reagentLink)
+			end
+		sep = ", "
 		end
 	end
 end
@@ -3068,7 +3100,7 @@ function Skillet:CreateStandaloneQueueFrame()
 	if not frame then
 		return nil
 	end
-	if TSMAPI_FOUR then
+	if TSM_API then
 		frame:SetFrameStrata("HIGH")
 	end
 	frame:SetBackdrop(FrameBackdrop);

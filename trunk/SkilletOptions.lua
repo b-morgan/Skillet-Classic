@@ -297,6 +297,19 @@ Skillet.options =
 					width = "double",
 					order = 30
 				},
+				queue_crafts = {
+					type = "toggle",
+					name = L["QUEUECRAFTSNAME"],
+					desc = L["QUEUECRAFTSDESC"],
+					get = function()
+						return Skillet.db.profile.queue_crafts
+					end,
+					set = function(self,value)
+						Skillet.db.profile.queue_crafts = value
+					end,
+					width = "double",
+					order = 31
+				},
 				include_tradebuttons = {
 					type = "toggle",
 					name = L["TRADEBUTTONSNAME"],
@@ -308,7 +321,7 @@ Skillet.options =
 						Skillet.db.profile.include_tradebuttons = value
 					end,
 					width = "double",
-					order = 31
+					order = 32
 				},
 				search_includes_reagents = {
 					type = "toggle",
@@ -322,7 +335,7 @@ Skillet.options =
 						Skillet.data.tooltipCache = {}
 					end,
 					width = "double",
-					order = 32
+					order = 33
 				},
 			}
 		},
