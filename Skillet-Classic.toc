@@ -7,8 +7,10 @@
 ## Version: @project-version@
 ## X-Category: Tradeskill
 ## X-License GPL v3 or later
-## X-RelSite-WoWI: 25287
-## X-Website: http://www.wowace.com/addons/skillet-classic/
+## X-Curse-Project-ID: 339820
+## X-WoWI-ID: 25287
+## X-Tukui-ProjectID: 46
+## X-Website: https://www.curseforge.com/wow/addons/skillet-classic
 ## SavedVariables: SkilletDB
 ## SavedVariablesPerCharacter: SkilletDBPC, SkilletMemory, SkilletProfile
 ## OptionalDeps: Ace3, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1, TradeSkillMaster, Auctionator, BootyBayGazette, MissingTradeSkillsList, BeanCounter

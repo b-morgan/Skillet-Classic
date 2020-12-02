@@ -57,7 +57,7 @@ local function createIgnoreListFrame(self)
 	if not frame then
 		return nil
 	end
-	if TSMAPI_FOUR then
+	if TSM_API then
 		frame:SetFrameStrata("TOOLTIP")
 	else
 		frame:SetFrameStrata("HIGH")
@@ -93,7 +93,7 @@ local function createIgnoreListFrame(self)
 -- The frame enclosing the scroll list needs a border and a background .....
 --
 	local backdrop = SkilletIgnoreListParent
-	if TSMAPI_FOUR then
+	if TSM_API then
 		backdrop:SetFrameStrata("HIGH")
 	end
 	backdrop:SetBackdrop(ControlBackdrop)

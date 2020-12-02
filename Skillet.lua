@@ -68,6 +68,7 @@ local defaults = {
 		use_blizzard_for_followers = false,				-- not in Classic
 		hide_blizzard_frame = true,						-- primarily for debugging
 		support_crafting = true,
+		queue_crafts = false,
 		include_craftbuttons = true,
 		include_tradebuttons = true,
 		search_includes_reagents = true,
@@ -583,11 +584,12 @@ function Skillet:OnEnable()
 	self:RegisterEvent("TRADE_SKILL_SHOW")
 	self:RegisterEvent("TRADE_SKILL_UPDATE")
 	self:RegisterEvent("TRADE_SKILL_NAME_UPDATE")
-	self:RegisterEvent("CRAFT_CLOSE")				-- craft event (could call SkilletClose)
-	self:RegisterEvent("CRAFT_SHOW")				-- craft event (could call SkilletShow)
-	self:RegisterEvent("CRAFT_UPDATE")				-- craft event
-	self:RegisterEvent("UNIT_PET_TRAINING_POINTS")	-- craft event
-
+	if not TSM_API then
+		self:RegisterEvent("CRAFT_CLOSE")			-- craft event (could call SkilletClose)
+		self:RegisterEvent("CRAFT_SHOW")			-- craft event (could call SkilletShow)
+		self:RegisterEvent("CRAFT_UPDATE")			-- craft event
+		self:RegisterEvent("UNIT_PET_TRAINING_POINTS")	-- craft event
+	end
 	self:RegisterEvent("UNIT_INVENTORY_CHANGED") 	-- Not sure if this is helpful but we will track it.
 	self:RegisterEvent("UNIT_PORTRAIT_UPDATE")		-- Not sure if this is helpful but we will track it.
 	self:RegisterEvent("SPELLS_CHANGED")			-- Not sure if this is helpful but we will track it.
@@ -928,10 +930,10 @@ function Skillet:SkilletShowWindow()
 		self.db.realm.skillDB[self.currentPlayer][self.currentTrade] = {}
 	end
 	if not self:RescanTrade() then
-		if TSMAPI_FOUR or ZygorGuidesViewerClassicSettings then
-			if TSMAPI_FOUR then
+		if TSM_API or ZygorGuidesViewerClassicSettings then
+			if TSM_API then
 				DA.CHAT(L["Conflict with the addon TradeSkillMaster"])
-				self.db.profile.TSMAPI_FOUR = true
+				self.db.profile.TSM_API = true
 			end
 			if ZygorGuidesViewerClassicSettings then
 				DA.CHAT(L["Conflict with the addon Zygor Guides"])

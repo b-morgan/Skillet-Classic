@@ -736,7 +736,7 @@
 					 wearing the item (if that is possible) -->
 					DressUpItemLink(link)
 				elseif ( IsShiftKeyDown() ) then
-				<!-- This put a link to the *item* that can be created with this trade skill
+				<!-- This will put a link to the *item* that can be created with this trade skill
 					 into the current chat edit box -->
 					ChatEdit_InsertLink(link)
 				else
@@ -2112,9 +2112,13 @@
 								 wearing the item (if that is possible) -->
 							DressUpItemLink(link)
 						elseif ( IsShiftKeyDown() ) then
-							<!-- This put a link to the *item* that can be created with this trade skill
+							<!-- This will put a link to the *item* that can be created with this trade skill
 								 into the current chat  box -->
 							ChatEdit_InsertLink(link)
+						elseif ( IsAltKeyDown() ) then
+						<!-- This will put a link to the *reagents* required by this *item*
+							 into the current chat edit box -->
+							Skillet:ReagentsLinkOnClick(self, Skillet.selectedSkill, self:GetID())
 						end
 					</OnClick>
 					<OnEnter>

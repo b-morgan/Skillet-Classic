@@ -544,40 +544,6 @@ function Skillet:RecipeGroupFlatten(group, depth, list, index, level)
 	return num
 end
 
-
---
--- make a db string for saving groups
---
--- Note: this function is recursive
---
-function Skillet:ConstructDBString(group, level)
-	--DA.DEBUG(3,"ConstructDBString("..tostring(group.name)..", "..tostring(level)..")")
-	--DA.DEBUG(4,"CDBS: group= "..DA.DUMP1(group,1))
-	if not level then level = 1 end
-	level = level + 1
-	if group and not group.autoGroup then
-		local key = group.key
-		local player, tradeID, label = string.split(":",key)
-		tradeID = tonumber(tradeID)
-		if not self.data.groupList[player][tradeID][label].autoGroup then
-			local groupString = group.groupIndex
-			for v,entry in pairs(group.entries) do
-				if not entry.subGroup then
-					groupString = groupString..":'"..entry.recipeID
-				else
-					groupString = groupString..":g"..entry.groupIndex	-- entry.subGroup.name
-					self:ConstructDBString(entry.subGroup, level)
-				end
-			end
-			if not self.db.realm.groupDB[key] then
-				self.db.realm.groupDB[key] = {}
-			end
-			--DA.DEBUG(5,"CDBS: groupString= "..tostring(groupString))
-			self.db.realm.groupDB[key][group.name] = groupString
-		end
-	end
-end
-
 function Skillet:PruneList(player)
 	--DA.DEBUG(3,"PruneList()")
 	if self.data.groupList then
@@ -614,6 +580,43 @@ function Skillet:InitGroupList(player, tradeID, label)
 	end
 end
 
+--
+-- make a db string for saving groups
+--
+-- Note: this function is recursive
+--
+function Skillet:ConstructDBString(group, level)
+	--DA.DEBUG(3,"ConstructDBString("..tostring(group.name)..", "..tostring(level)..")")
+	--DA.DEBUG(4,"CDBS: group= "..DA.DUMP1(group,1))
+	if not level then level = 1 end
+	level = level + 1
+	if group and not group.autoGroup then
+		local key = group.key
+		local player, tradeID, label = string.split(":",key)
+		tradeID = tonumber(tradeID)
+		if not self.data.groupList[player][tradeID][label].autoGroup then
+			local groupString = group.groupIndex
+			for v,entry in pairs(group.entries) do
+				if not entry.subGroup then
+--					groupString = groupString..":'"..entry.recipeID
+					local rID
+					rID = string.gsub(entry.recipeID, ":", ";")
+					rID = string.gsub(rID, "'", "`")
+					groupString = groupString..":'"..rID
+				else
+					groupString = groupString..":g"..entry.groupIndex	-- entry.subGroup.name
+					self:ConstructDBString(entry.subGroup, level)
+				end
+			end
+			if not self.db.realm.groupDB[key] then
+				self.db.realm.groupDB[key] = {}
+			end
+			--DA.DEBUG(5,"CDBS: groupString= "..tostring(groupString))
+			self.db.realm.groupDB[key][group.name] = groupString
+		end
+	end
+end
+
 function Skillet:DeconstructDBStrings() -- DDBS(1): DDBS(2)
 	--DA.DEBUG(3,"DeconstructDBStrings()")
 --
@@ -631,12 +634,10 @@ function Skillet:DeconstructDBStrings() -- DDBS(1): DDBS(2)
 				--DA.DEBUG(5,"DDBS(1): name= "..tostring(name)..", list= "..tostring(list))
 				local group = self:RecipeGroupNew(player, tradeID, label, name)
 				local groupContents = { string.split(":",list) }
---				local groupID = groupContents[1] or serial
 				local groupID = tonumber(groupContents[1]) or serial
 				serial = serial + 1
 				group.groupIndex = groupID
 				groupNames[groupID] = name
---				group.name = name
 			end
 		end
 	end
@@ -658,10 +659,8 @@ function Skillet:DeconstructDBStrings() -- DDBS(1): DDBS(2)
 					for j=2,#groupContents do
 						local recipeID = groupContents[j]
 						if string.sub(recipeID,1,1) == "g" then
---							local id = string.sub(recipeID,2)
 							local id = tonumber(string.sub(recipeID,2))
 							--DA.DEBUG(5,"DDBS(2): id= "..tostring(id))
---							local subGroup = self:RecipeGroupFind(player, tradeID, label, groupContents[1])
 							local subGroup = self:RecipeGroupFind(player, tradeID, label, groupNames[id])
 							if subGroup then
 								--DA.DEBUG(5,"DDBS(2): adding subGroup "..tostring(groupContents[1]))
@@ -669,6 +668,8 @@ function Skillet:DeconstructDBStrings() -- DDBS(1): DDBS(2)
 							end
 						elseif string.sub(recipeID,1,1) == "'" then
 							recipeID = string.sub(recipeID,2)
+							recipeID = string.gsub(recipeID, ";", ":")
+							recipeID = string.gsub(recipeID, "`", "'")
 							--DA.DEBUG(5,"DDBS(2): recipeID= "..tostring(recipeID))
 							local skillIndex = self.data.skillIndexLookup[player][recipeID]
 							if skillIndex then 

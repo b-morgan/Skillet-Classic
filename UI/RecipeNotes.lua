@@ -64,7 +64,7 @@ local function get_edit_box()
 	editbox:SetAutoFocus(true)
 	editbox:SetMultiLine(false)
 	editbox:SetFontObject(ChatFontNormal)
-	if TSMAPI_FOUR then
+	if TSM_API then
 		editbox:SetFrameStrata("HIGH")
 	end
 	editbox:SetBackdrop(ControlBackdrop)
