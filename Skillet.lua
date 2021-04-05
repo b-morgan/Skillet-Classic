@@ -179,6 +179,9 @@ end
 -- Called when the addon is loaded
 --
 function Skillet:OnInitialize()
+	if not SkilletWho then
+		SkilletWho = {}
+	end
 	if not SkilletDBPC then
 		SkilletDBPC = {}
 	end
@@ -641,6 +644,9 @@ function Skillet:OnEnable()
 --
 	self:RegisterEvent("PLAYER_LOGOUT")
 
+	self:RegisterEvent("PLAYER_LOGIN")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+
 --	self:RegisterEvent("ADDON_ACTION_BLOCKED")
 
 	self.bagsChanged = true
@@ -659,6 +665,23 @@ function Skillet:OnEnable()
 	self:CreateAdditionalButtonsList()
 	self:EnablePlugins()
 	self:DisableBlizzardFrame()
+end
+
+function Skillet:PLAYER_LOGIN()
+	DA.TRACE("PLAYER_LOGIN")
+end
+
+function Skillet:PLAYER_ENTERING_WORLD()
+	DA.TRACE("PLAYER_ENTERING_WORLD")
+	local player = UnitName("player")
+	local realm = GetRealmName()
+	local faction = UnitFactionGroup("player")
+--
+-- Store some identifying data in the per character saved variables file
+--
+	SkilletWho.player = player
+	SkilletWho.realm = realm
+	SkilletWho.faction = faction
 end
 
 function Skillet:ADDON_ACTION_BLOCKED()

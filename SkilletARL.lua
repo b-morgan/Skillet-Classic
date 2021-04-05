@@ -115,9 +115,9 @@ end
 
 function SkilletARL:RecipeFilterToggleButton_OnEnter(button)
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
-	GameTooltip:SetText("Filter recipes by source", nil, nil, nil, nil, true)
-	GameTooltip:AddLine("Left-Click to toggle", .7, .7, .7)
-	GameTooltip:AddLine("Right-Click for filtering options", .7, .7, .7)
+	GameTooltip:SetText(L["Filter recipes by source"], nil, nil, nil, nil, true)
+	GameTooltip:AddLine(L["Left-Click to toggle"], .7, .7, .7)
+	GameTooltip:AddLine(L["Right-Click for filtering options"], .7, .7, .7)
 	GameTooltip:Show()
 	GameTooltip:Show()
 end
