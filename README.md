@@ -1,6 +1,6 @@
 # Skillet-Classic
 World of Warcraft addon. Skillet-Classic is a replacement for the default TradeSkill (and Crafting/Enchanting) UI.
-<p>To report bugs and request new features check:&nbsp;<a href="https://www.curseforge.com/wow/addons/skillet-classic/issues">https://www.curseforge.com/wow/addons/skillet-classic/issues</a><br/>
+<p>To report bugs and request new features check:&nbsp;<a href="https://github.com/b-morgan/Skillet-Classic/issues">https://github.com/b-morgan/Skillet-Classic/issues</a><br/>
 To help with Localization see:&nbsp;<a href="https://www.curseforge.com/wow/addons/skillet-classic/localization">https://www.curseforge.com/wow/addons/skillet-classic/localization</a></p>
 <p><strong>Other than "Please open an issue" I won't be responding to bug reports in comments.</strong></p>
 <h3><strong>Features:</strong></h3>
