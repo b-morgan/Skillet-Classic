@@ -1,10 +1,10 @@
-## Interface: 11306
+## Interface: 11307
 ## Title: Skillet-Classic |cff7fff7f -Ace3-|r
 ## Notes: A replacement tradeskill window
 ## Notes-esES: Una sustitucion de la ventana de Habilidades de Comercio
 ## Notes-ruRU: Заменяет окно профессий на более функциональное.
 ## Author: bsmorgan
-## Version: 1.21
+## Version: @project-version@
 ## X-Category: Tradeskill
 ## X-License GPL v3 or later
 ## X-Curse-Project-ID: 447401
