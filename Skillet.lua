@@ -1176,6 +1176,21 @@ function Skillet:ChangeTradeSkill(tradeID, tradeName)
 	end
 end
 
+function Skillet:ChangeTrade(tradeID)
+	DA.DEBUG(0,"ChangeTrade("..tostring(tradeID)..")")
+	self.closingTrade = true
+	if self.isCraft then
+		CloseCraft()
+	else
+		CloseTradeSkill()
+	end
+	self:HideAllWindows()
+	self.changingTrade = tradeID
+	self.changingName = self.tradeSkillNamesByID[tradeID]
+	--DA.DEBUG(0,"ChangeTrade: changingTrade= "..tostring(self.changingTrade)..", changingName= "..tostring(self.changingName)..", isCraft= "..tostring(self.isCraft))
+	StaticPopup_Show("SKILLET_CONTINUE_CHANGE")
+end
+
 --
 -- Called from a static popup to change professions
 --   changingTrade and changingName should be set to

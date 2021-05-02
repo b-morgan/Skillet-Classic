@@ -666,6 +666,7 @@ local function ScanTrade()
 	end
 	local tradeID = Skillet.tradeSkillIDsByName[profession]
 	if not tradeID then
+		DA.DEBUG(0,"ScanTrade: tradeID is missing")
 		return false
 	end
 	Skillet.currentTrade = tradeID
@@ -693,7 +694,7 @@ local function ScanTrade()
 	if numCrafts then
 		for i = 1, numCrafts do
 			local skillName, skillType, numAvailable, isExpanded = GetCraftInfo(i)
-			--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
+			--DA.DEBUG(2,"ScanCraft: i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
 			if skillType == "header" or skillType == "subheader" then
 				if not isExpanded then
 					ExpandCraftSubClass(i)
@@ -703,7 +704,7 @@ local function ScanTrade()
 --
 -- From here on, just one loop variable needed
 --
-	numSkills = numCrafts
+		numSkills = numCrafts
 	end
 	DA.DEBUG(0,"ScanTrade: "..tostring(profession)..": "..tostring(tradeID).." "..numSkills.." recipes")
 	local skillDB = Skillet.db.realm.skillDB[player][tradeID]
@@ -739,7 +740,7 @@ local function ScanTrade()
 	local numHeaders = 0
 	local parentGroup
 --
--- data needed for filtering
+-- Data needed for filtering
 --
 	local numSubClass = {}
 	local numInvSlot = {}
@@ -771,11 +772,11 @@ local function ScanTrade()
 		else
 			skillName, skillType, numAvailable, isExpanded = GetTradeSkillInfo(i)
 		end
-		--DA.DEBUG(0,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", craftSubSpellName= "..tostring(craftSubSpellName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
+		--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", craftSubSpellName= "..tostring(craftSubSpellName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
 		if skillName then
 			if skillType == "header" or skillType == "subheader" then
 --
--- for headers (and subheaders) define groups and
+-- For headers (and subheaders) define groups and
 -- add a header entry in the skillDB (SavedVariables)
 --
 				numHeaders = numHeaders + 1
@@ -806,7 +807,7 @@ local function ScanTrade()
 				local recipeID
 				recipeID = skillName
 				if skillNameSeen[recipeID] then
-					DA.DEBUG(0,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", craftSubSpellName= "..tostring(craftSubSpellName).." is not unique")
+					DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", craftSubSpellName= "..tostring(craftSubSpellName).." is not unique")
 --
 -- Make an attempt to create a unique recipeID
 --
@@ -824,7 +825,7 @@ local function ScanTrade()
 					Skillet:RecipeGroupAddRecipe(mainGroup, recipeID, i)
 				end
 --
--- break recipes into lists and tables by profession for ease of sorting
+-- Break recipes into lists and tables by profession for ease of sorting
 --
 -- SavedVariables:
 --   skillDB(skillDBstring) fields are separated by "|"
@@ -1018,7 +1019,11 @@ local function ScanTrade()
 				if not recipeDB[recipeID] then
 					recipeDB[recipeID] = recipeString
 				elseif recipeDB[recipeID] ~= recipeString then
-					DA.DEBUG(0,"ScanTrade: replacing '"..tostring(recipeDB[recipeID]).."' with '"..tostring(recipeString).."'")
+					local oldTradeID, oldItemString, oldReagentString, oldToolString = string.split(" ",recipeDB[recipeID])
+					if oldItemString == itemString and oldReagentString == reagentString and oldToolString == toolString then
+						DA.WARN("ScanTrade: oldTradeID="..tostring(oldTradeID)..", tradeID="..tostring(tradeID))
+					end
+					DA.WARN("ScanTrade: replacing '"..tostring(recipeDB[recipeID]).."' with '"..tostring(recipeString).."'")
 					recipeDB[recipeID] = recipeString
 				end
 			end
@@ -1039,7 +1044,7 @@ local function ScanTrade()
 	Skillet:InventoryScan()
 	Skillet:CalculateCraftableCounts()
 	Skillet:SortAndFilterRecipes()
-	--DA.DEBUG(2,"ScanTrade Complete, numSkills= "..tostring(numSkills)..", numHeaders= "..tostring(numHeaders))
+	--DA.DEBUG(2,"ScanTrade: Complete, numSkills= "..tostring(numSkills)..", numHeaders= "..tostring(numHeaders))
 --
 -- return a boolean:
 --   true means we got good data for this profession (skill)
