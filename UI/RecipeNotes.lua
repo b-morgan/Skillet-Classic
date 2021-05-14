@@ -59,6 +59,9 @@ end
 
 local function get_edit_box()
 	local editbox = CreateFrame("EditBox", nil, nil)
+	if not editbox.SetBackdrop then
+		Mixin(editbox, BackdropTemplateMixin)
+	end
 	editbox:SetTextInsets(5,5,3,3)
 	editbox:SetMaxLetters(256)
 	editbox:SetAutoFocus(true)

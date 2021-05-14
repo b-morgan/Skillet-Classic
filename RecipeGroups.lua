@@ -34,7 +34,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 --
 --	The code that currently doesn't work is enabled / disabled in MainFrame.lua line 258:
 --	257:	SkilletGroupLabel:SetText(L["Grouping"])
---	258:	SkilletRecipeGroupOperations:Disable()				-- It is broken in Skillet-Classic
+--	258:	SkilletRecipeGroupOperations:Disable()
 --
 --
 

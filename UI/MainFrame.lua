@@ -217,6 +217,9 @@ function Skillet:CreateTradeSkillWindow()
 	if frame:GetHeight() < 545 then
 		frame:SetHeight(545)
 	end
+	if not frame.SetBackdrop then
+		Mixin(frame, BackdropTemplateMixin)
+	end
 	if TSM_API then
 		frame:SetFrameStrata("HIGH")
 		frame:SetBackdrop(TSMBackdrop)
@@ -314,6 +317,9 @@ function Skillet:CreateTradeSkillWindow()
 -- The frame enclosing the scroll list needs a border and a background .....
 --
 	local backdrop = SkilletSkillListParent
+	if not backdrop.SetBackdrop then
+		Mixin(backdrop, BackdropTemplateMixin)
+	end
 	backdrop:SetBackdrop(ControlBackdrop)
 	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
 	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
@@ -322,6 +328,9 @@ function Skillet:CreateTradeSkillWindow()
 -- Frame enclosing the reagent list
 --
 	backdrop = SkilletReagentParent
+	if not backdrop.SetBackdrop then
+		Mixin(backdrop, BackdropTemplateMixin)
+	end
 	backdrop:SetBackdrop(ControlBackdrop)
 	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
 	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
@@ -330,6 +339,9 @@ function Skillet:CreateTradeSkillWindow()
 -- Frame enclosing the queue
 --
 	backdrop = SkilletQueueParent
+	if not backdrop.SetBackdrop then
+		Mixin(backdrop, BackdropTemplateMixin)
+	end
 	backdrop:SetBackdrop(ControlBackdrop)
 	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
 	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
@@ -338,12 +350,18 @@ function Skillet:CreateTradeSkillWindow()
 -- frame enclosing the pop out notes panel
 --
 	backdrop = SkilletRecipeNotesFrame
+	if not backdrop.SetBackdrop then
+		Mixin(backdrop, BackdropTemplateMixin)
+	end
 	backdrop:SetBackdrop(ControlBackdrop)
 	backdrop:SetBackdropColor(0.1, 0.1, 0.1)
 	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
 	backdrop:SetResizable(true)
 	backdrop:Hide() -- initially hidden
 	backdrop = SkilletQueueManagementParent
+	if not backdrop.SetBackdrop then
+		Mixin(backdrop, BackdropTemplateMixin)
+	end
 	backdrop:SetBackdrop(ControlBackdrop)
 	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
 	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
@@ -1206,7 +1224,7 @@ function Skillet:UpdateTradeSkillWindow()
 					button:LockHighlight()
 				else
 					-- not selected
-					button:SetBackdropColor(0.8, 0.2, 0.2)
+--					button:SetBackdropColor(0.8, 0.2, 0.2)
 					button:UnlockHighlight()
 				end
 				show_button(button, self.currentTrade, skillIndex, i)
@@ -1283,6 +1301,9 @@ function Skillet:SkillButton_OnEnter(button)
 		return
 	end
 	local tip = SkilletTradeskillTooltip
+	if not tip.SetBackdrop then
+		Mixin(tip, BackdropTemplateMixin)
+	end
 	ShoppingTooltip1:Hide()
 	ShoppingTooltip2:Hide()
 	tip:SetOwner(button, "ANCHOR_BOTTOMRIGHT",-300);
@@ -3088,6 +3109,9 @@ function Skillet:CreateStandaloneQueueFrame()
 	local frame = SkilletStandaloneQueue
 	if not frame then
 		return nil
+	end
+	if not frame.SetBackdrop then
+		Mixin(frame, BackdropTemplateMixin)
 	end
 	if TSM_API then
 		frame:SetFrameStrata("HIGH")

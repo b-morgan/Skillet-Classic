@@ -62,6 +62,9 @@ local function createIgnoreListFrame(self)
 	else
 		frame:SetFrameStrata("HIGH")
 	end
+	if not frame.SetBackdrop then
+		Mixin(frame, BackdropTemplateMixin)
+	end
 	frame:SetBackdrop(FrameBackdrop)
 	frame:SetBackdropColor(0.1, 0.1, 0.1)
 	-- A title bar stolen from the Ace2 Waterfall window.
@@ -93,6 +96,9 @@ local function createIgnoreListFrame(self)
 -- The frame enclosing the scroll list needs a border and a background .....
 --
 	local backdrop = SkilletIgnoreListParent
+	if not backdrop.SetBackdrop then
+		Mixin(backdrop, BackdropTemplateMixin)
+	end
 	if TSM_API then
 		backdrop:SetFrameStrata("HIGH")
 	end
