@@ -569,6 +569,10 @@ function Skillet:GetSkill(player,trade,index)
 		if not Skillet.data.skillList[player][trade] then
 			Skillet.data.skillList[player][trade] = {}
 		end
+		if not Skillet.db.realm.skillDB[player][trade][index] then
+			DA.DEBUG(0,"GetSkill: skillDB missing for "..tostring(player)..", "..tostring(trade)..", "..tostring(index))
+			return
+		end
 		if not Skillet.data.skillList[player][trade][index] and Skillet.db.realm.skillDB[player][trade][index] then
 			local skillString = Skillet.db.realm.skillDB[player][trade][index]
 			if skillString then
