@@ -24,6 +24,9 @@ local L = Skillet.L
 --
 local MAJOR_VERSION = GetAddOnMetadata("Skillet-Classic", "Version");
 
+--
+-- All the options that we allow the user to control.
+--
 Skillet.options =
 {
 	handler = Skillet,
@@ -763,8 +766,10 @@ Skillet.options =
 				Skillet.data.btsui = value
 				if value then
 					ShowUIPanel(TradeSkillFrame)
+					Skillet.BlizzardUIshowing = true
 				else
 					HideUIPanel(TradeSkillFrame)
+					Skillet.BlizzardUIshowing = false
 				end
 			end,
 			order = 69

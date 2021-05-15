@@ -201,9 +201,6 @@ function Skillet:GetInventory(player, reagentID)
 		if self.db.realm.inventoryData[player] and self.db.realm.inventoryData[player][reagentID] then
 			--DA.DEBUG(1,"inventoryData= "..tostring(self.db.realm.inventoryData[player][reagentID]))
 			local have, make = string.split(" ", self.db.realm.inventoryData[player][reagentID])
-			--if numCanUse and have and tonumber(numCanUse) ~= tonumber(have) then
-				--DA.DEBUG(0,"inventoryData is stale")
-			--end
 			return tonumber(have) or 0, tonumber(make) or 0
 		elseif player == self.currentPlayer then	-- UnitName("player")
 			return GetItemCount(reagentID,false) or 0, 0

@@ -1,10 +1,12 @@
 local addonName,addonTable = ...
+local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
 local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
+local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
 local DA
-if isClassic then
-	DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
-else
+if isRetail then
 	DA = _G[addonName] -- for DebugAids.lua
+else
+	DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
 end
 --[[
 Skillet: A tradeskill window replacement.
@@ -100,7 +102,7 @@ plugin.options =
 		buyablePrices = {
 			type = "toggle",
 			name = "buyablePrices",
-			desc = "Show AH prices for buyable reagents",
+			desc = "Show vendor prices for buyable reagents",
 			get = function()
 				return Skillet.db.profile.plugins.ATR.buyablePrices
 			end,
@@ -172,6 +174,21 @@ plugin.options =
 			end,
 			order = 9
 		},
+		colorCode = {
+			type = "toggle",
+			name = "colorCode",
+			desc = "Add color to the results",
+			get = function()
+				return Skillet.db.profile.plugins.ATR.colorCode
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.ATR.colorCode = value
+				if value then
+					Skillet.db.profile.plugins.ATR.colorCode = value
+				end
+			end,
+			order = 10
+		},
 		buyFactor = {
 			type = "range",
 			name = "buyFactor",
@@ -185,7 +202,7 @@ plugin.options =
 				Skillet:UpdateTradeSkillWindow()
 			end,
 			width = "double",
-			order = 10
+			order = 20
 		},
 		markup = {
 			type = "range",
@@ -198,7 +215,7 @@ plugin.options =
 				Skillet.db.profile.plugins.ATR.markup = value
 			end,
 			width = "double",
-			order = 11,
+			order = 21,
 		},
 	},
 }
@@ -216,12 +233,15 @@ function plugin.OnInitialize()
 		Skillet.db.profile.plugins.ATR.buyFactor = buyFactorDef
 		Skillet.db.profile.plugins.ATR.markup = markupDef
 	end
+	if Skillet.db.profile.plugins.ATR.showProfitValue == nil then
+		Skillet.db.profile.plugins.ATR.showProfitValue = true
+	end
 	Skillet:AddPluginOptions(plugin.options)
 end
 
-function profitPctText(profit,cost,limit)
+local function profitPctText(profit,cost,limit)
 	local profitPct, proPctTxt
-	if cost then
+	if cost and cost ~= 0 then
 		profitPct = profit * 100 / cost
 		if profitPct > limit then
 			proPctTxt = ">"..tostring(limit)
@@ -245,7 +265,7 @@ function plugin.GetExtraText(skill, recipe)
 -- buyout is Auctionator's price (for one) times the number this recipe makes
 --
 		local buyout
-		if isClassic and Atr_GetAuctionBuyout then
+		if Atr_GetAuctionBuyout then
 			buyout = (Atr_GetAuctionBuyout(itemID) or 0) * recipe.numMade
 		elseif Auctionator and Auctionator.API.v1.GetAuctionPriceByItemID then
 			buyout = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, itemID) or 0) * recipe.numMade
@@ -257,113 +277,122 @@ function plugin.GetExtraText(skill, recipe)
 			extra_text = Skillet:FormatMoneyFull(buyout, true)
 		end
 --
--- Should we collect the price of reagents?
+-- Collect the price of reagents
 --
-		if Skillet.db.profile.plugins.ATR.reagentPrices then
-			local toConcatLabel = {}
-			local toConcatExtra = {}
-			local cost = 0
-			for i=1, #recipe.reagentData, 1 do
-				local reagent = recipe.reagentData[i]
-				if not reagent then
-					break
+		local toConcatLabel = {}
+		local toConcatExtra = {}
+		local cost = 0
+		for i=1,#recipe.reagentData do
+			local reagent = recipe.reagentData[i]
+			if not reagent then
+				break
+			end
+			local needed = reagent.numNeeded or 0
+			local id
+			if isRetail then
+				id = reagent.reagentID
+			else
+				id = reagent.id
+			end
+			local itemName = ""
+			if id then
+				itemName = GetItemInfo(id)
+				if not itemName then
+					itemName = ""
 				end
-				local needed = reagent.numNeeded or 0
-				local id
-				if isClassic then
-					id = reagent.id
-				else
-					id = reagent.reagentID
-				end
-				local itemName
-				if id then
-					itemName = GetItemInfo(id)
-				else
-					itemName = tostring(id)
-				end
+			end
 --
 -- Default value for a reagent is the Auctionator price
 --
-				local value
-				if isClassic then
-					value = (Atr_GetAuctionBuyout(id) or 0) * needed
-				else
-					value = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, id) or 0) * needed
-				end
-				if not Skillet:VendorSellsReagent(id) then
+			local value
+			if isRetail then
+				value = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, id) or 0) * needed
+			else
+				value = (Atr_GetAuctionBuyout(id) or 0) * needed
+			end
+			if not Skillet:VendorSellsReagent(id) then
 --
 -- Not sold by a vendor so use the default
 --
-					toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s", needed, itemName)
-					toConcatExtra[#toConcatExtra+1] = Skillet:FormatMoneyFull(value, true)
-				else
-					toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s  |cff808080(%s)|r", needed, itemName, L["buyable"])
-					if Skillet.db.profile.plugins.ATR.buyablePrices then
+				toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s", needed, itemName)
+				toConcatExtra[#toConcatExtra+1] = Skillet:FormatMoneyFull(value, true)
+			else
+				toConcatLabel[#toConcatLabel+1] = string.format("   %d x %s  |cff808080(%s)|r", needed, itemName, L["buyable"])
+				if Skillet.db.profile.plugins.ATR.buyablePrices then
 --
 -- If this reagent is sold by a vendor, then use that (calculated) price instead
 --
-						local buyFactor = Skillet.db.profile.plugins.ATR.buyFactor or buyFactorDef
-						value = ( select(11,GetItemInfo(id)) or 0 ) * needed * buyFactor
-						toConcatExtra[#toConcatExtra+1] = Skillet:FormatMoneyFull(value, true)
-					else
+					local buyFactor = Skillet.db.profile.plugins.ATR.buyFactor or buyFactorDef
+					value = ( select(11,GetItemInfo(id)) or 0 ) * needed * buyFactor
+					toConcatExtra[#toConcatExtra+1] = Skillet:FormatMoneyFull(value, true)
+				else
 --
 -- If this reagent is sold by a vendor, don't use the Auctionator price
 --
-						value = 0
-						toConcatExtra[#toConcatExtra+1] = ""
-					end
+					value = 0
+					toConcatExtra[#toConcatExtra+1] = ""
 				end
-				cost = cost + value
 			end
+			cost = cost + value
+		end
 --
--- Collect all the reagent information
+-- Show all the reagent information?
 --
+		if Skillet.db.profile.plugins.ATR.reagentPrices then
 			label = label.."\n\n"..table.concat(toConcatLabel,"\n").."\n"
 			extra_text = extra_text.."\n\n"..table.concat(toConcatExtra,"\n").."\n"
+		else
+			label = label.."\n"
+			extra_text = extra_text.."\n"
+		end
 --
 -- If reagents were priced as bought from a vendor, should we markup the price? 
 --
-			if Skillet.db.profile.plugins.ATR.useVendorCalc then
-				local markup = Skillet.db.profile.plugins.ATR.markup or markupDef
-				label = label.."\n   "..L["Cost"].." * "..(markup * 100).."%:\n"
-				cost = cost * markup
-			else
-				label = label.."\n   "..L["Cost"]..":\n"
-			end
-			extra_text = extra_text.."\n"..Skillet:FormatMoneyFull(cost, true).."\n"
+		if Skillet.db.profile.plugins.ATR.useVendorCalc then
+			local markup = Skillet.db.profile.plugins.ATR.markup or markupDef
+			label = label.."\n   "..L["Cost"].." * "..(markup * 100).."%:\n"
+			cost = cost * markup
+		else
+			label = label.."\n   "..L["Cost"]..":\n"
+		end
+		extra_text = extra_text.."\n"..Skillet:FormatMoneyFull(cost, true).."\n"
 --
 -- If we craft this item, will we make a profit?
 --
-			if buyout then
-				local profit = buyout - cost
-				if Skillet.db.profile.plugins.ATR.showProfitValue or Skillet.db.profile.plugins.ATR.showProfitPercentage then
-					label = label.."\n"
-					extra_text = extra_text.."\n"
+		if buyout then
+			local profit = buyout - cost
+			if Skillet.db.profile.plugins.ATR.showProfitValue or Skillet.db.profile.plugins.ATR.showProfitPercentage then
+				label = label.."\n"
+				extra_text = extra_text.."\n"
 --
 -- Show the profit absolute value and as a percentage of the cost
 --
-					label = label.."   Profit:\n"
-					extra_text = extra_text..Skillet:FormatMoneyFull(profit, true).."\n"
-					label = label.."   Profit percentage:\n"
-					extra_text = extra_text..profitPctText(profit,cost,9999).."%\n"
-				end
+				label = label.."   Profit:\n"
+				extra_text = extra_text..Skillet:FormatMoneyFull(profit, true).."\n"
+				label = label.."   Profit percentage:\n"
+				extra_text = extra_text..profitPctText(profit,cost,9999).."%\n"
 			end
 		end
 	end
 	return label, extra_text
 end
 
+--
+-- Returns a text representation of profit, numerical value of profit (for sorting purposes)
+--
 function plugin.RecipeNameSuffix(skill, recipe)
 	local text
+	local profit
 	if not recipe then return end
 	--DA.DEBUG(0,"RecipeNameSuffix: recipe= "..DA.DUMP1(recipe,1))
 	local itemID = recipe.itemID
 	--DA.DEBUG(0,"RecipeNameSuffix: itemID= "..tostring(itemID)..", type= "..type(itemID))
-	local itemName = GetItemInfo(itemID)
+	local itemName
+	if itemID then itemName = GetItemInfo(itemID) end
 	--DA.DEBUG(0,"RecipeNameSuffix: itemName= "..tostring(itemName)..", type= "..type(itemName))
 	if Skillet.db.profile.plugins.ATR.enabled and itemID then
 		local value
-		if isClassic and Atr_GetAuctionBuyout then
+		if Atr_GetAuctionBuyout then
 			value = Atr_GetAuctionBuyout(itemID) or 0
 		elseif Auctionator and Auctionator.API.v1.GetAuctionPriceByItemID then
 			value = Auctionator.API.v1.GetAuctionPriceByItemID(addonName, itemID) or 0
@@ -372,65 +401,65 @@ function plugin.RecipeNameSuffix(skill, recipe)
 		end
 		--DA.DEBUG(0,"RecipeNameSuffix: value= "..tostring(value))
 		local buyout = value * recipe.numMade
-		if Skillet.db.profile.plugins.ATR.reagentPrices then
-			local cost = 0
-			for i=1, #recipe.reagentData, 1 do
-				local reagent = recipe.reagentData[i]
-				if not reagent then
-					break
-				end
-				local needed = reagent.numNeeded or 0
-				local id
-				if isClassic then
-					id = reagent.id
-				else
-					id = reagent.reagentID
-				end
-				local name = GetItemInfo(id) or id
-				local value
-				if isClassic then
-					value = (Atr_GetAuctionBuyout(id) or 0) * needed
-				else
-					value = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, id) or 0) * needed
-				end
-				if Skillet:VendorSellsReagent(id) then
-					if Skillet.db.profile.plugins.ATR.buyablePrices then
-						if Skillet.db.profile.plugins.ATR.useVendorCalc then
-							local buyFactor = Skillet.db.profile.plugins.ATR.buyFactor or buyFactorDef
-							value = ( select(11,GetItemInfo(id)) or 0 ) * needed * buyFactor
-						end
-					else
-						value = 0
+		local cost = 0
+		for i=1,#recipe.reagentData do
+			local reagent = recipe.reagentData[i]
+			if not reagent then
+				break
+			end
+			local needed = reagent.numNeeded or 0
+			local id
+			if isRetail then
+				id = reagent.reagentID
+			else
+				id = reagent.id
+			end
+			local name = GetItemInfo(id) or id
+			local value
+			if isRetail then
+				value = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, id) or 0) * needed
+			else
+				value = (Atr_GetAuctionBuyout(id) or 0) * needed
+			end
+			if Skillet:VendorSellsReagent(id) then
+				if Skillet.db.profile.plugins.ATR.buyablePrices then
+					if Skillet.db.profile.plugins.ATR.useVendorCalc then
+						local buyFactor = Skillet.db.profile.plugins.ATR.buyFactor or buyFactorDef
+						value = ( select(11,GetItemInfo(id)) or 0 ) * needed * buyFactor
 					end
-				end
-				--DA.DEBUG(1, "RecipeNameSuffix: reagent["..i.."] ("..id..") "..tostring(name)..", value= "..tostring(value))
-				cost = cost + value
-			end
-			if Skillet.db.profile.plugins.ATR.useVendorCalc then
-				local markup = Skillet.db.profile.plugins.ATR.markup or markupDef
-				cost = cost * markup
-			end
-			local profit = buyout - cost
-			if Skillet.db.profile.plugins.ATR.showProfitValue then
-				if Skillet.db.profile.plugins.ATR.useShort then
-					text = Skillet:FormatMoneyShort(profit, true)
 				else
-					text = Skillet:FormatMoneyFull(profit, true)
+					value = 0
 				end
 			end
-			if Skillet.db.profile.plugins.ATR.showProfitPercentage then
-				if text then
-					text = text.." ("..profitPctText(profit,cost,999).."%)"
-				else
-					text = "("..profitPctText(profit,cost,999).."%)"
-				end
-			end
-			if Skillet.db.profile.plugins.ATR.onlyPositive and profit <= 0 then
-				text = nil
+			--DA.DEBUG(1, "RecipeNameSuffix: reagent["..i.."] ("..id..") "..tostring(name)..", value= "..tostring(value))
+			cost = cost + value
+		end
+		if Skillet.db.profile.plugins.ATR.useVendorCalc then
+			local markup = Skillet.db.profile.plugins.ATR.markup or markupDef
+			cost = cost * markup
+		end
+		profit = buyout - cost
+		if Skillet.db.profile.plugins.ATR.showProfitValue then
+			if Skillet.db.profile.plugins.ATR.useShort then
+				text = Skillet:FormatMoneyShort(profit, true, Skillet.db.profile.plugins.ATR.colorCode)
+			else
+				text = Skillet:FormatMoneyFull(profit, true, Skillet.db.profile.plugins.ATR.colorCode)
 			end
 		end
+		if Skillet.db.profile.plugins.ATR.showProfitPercentage then
+			if text then
+				text = text.." ("..profitPctText(profit,cost,999).."%)"
+			else
+				text = "("..profitPctText(profit,cost,999).."%)"
+			end
+		end
+		if Skillet.db.profile.plugins.ATR.onlyPositive and profit <= 0 then
+			text = nil
+		end
 	end
-	return text
+	--DA.DEBUG(0,"RecipeNameSuffix: text= "..tostring(text)..", profit= "..tostring(profit))
+	recipe.suffix = profit
+	return text, profit
 end
 
 Skillet:RegisterRecipeNamePlugin("ATRPlugin")		-- we have a RecipeNamePrefix or a RecipeNameSuffix function
@@ -474,17 +503,17 @@ function Skillet:AuctionatorSearch(whichOne)
 			table.insert (items, shoppingListName)
 		end
 		local i
-		for i=1, #recipe.reagentData, 1 do
+		for i=1,#recipe.reagentData do
 			local reagent = recipe.reagentData[i]
 			if not reagent then
 				break
 			end
 			local needed = reagent.numNeeded or 0
 			local id
-			if isClassic then
-				id = reagent.id
-			else
+			if isRetail then
 				id = reagent.reagentID
+			else
+				id = reagent.id
 			end
 			if id and not Skillet:VendorSellsReagent(id) then
 				local reagentName = GetItemInfo(id)
@@ -495,12 +524,7 @@ function Skillet:AuctionatorSearch(whichOne)
 			end
 		end
 	end
-	if isClassic then
-		DA.DEBUG(0, "AuctionatorSearch: shoppingListName= "..tostring(shoppingListName)..", items= "..DA.DUMP1(items))
-		local BUY_TAB = 3;
-		Atr_SelectPane(BUY_TAB)
-		Atr_SearchAH(shoppingListName, items)
-	else
+	if isRetail then
 		if Skillet.db.profile.plugins.ATR.useSearchExact and Auctionator.API.v1.MultiSearchExact then
 			DA.DEBUG(0, "AuctionatorSearch: (exact) addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
 			Auctionator.API.v1.MultiSearchExact(addonName, items)
@@ -508,5 +532,10 @@ function Skillet:AuctionatorSearch(whichOne)
 			DA.DEBUG(0, "AuctionatorSearch: addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
 			Auctionator.API.v1.MultiSearch(addonName, items)
 		end
+	else
+		DA.DEBUG(0, "AuctionatorSearch: shoppingListName= "..tostring(shoppingListName)..", items= "..DA.DUMP1(items))
+		local BUY_TAB = 3;
+		Atr_SelectPane(BUY_TAB)
+		Atr_SearchAH(shoppingListName, items)
 	end
 end
