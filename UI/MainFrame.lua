@@ -2675,13 +2675,13 @@ end
 --
 
 local skillMenuSelection = {
---@alpha@
+--[[
 	{
 		text = "skillMenuSelection",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]=]
+--]]
 	{
 		text = L["Select All"],
 		func = function() Skillet:SkillButton_SetAllSelections(true) Skillet:UpdateTradeSkillWindow() end,
@@ -2693,13 +2693,13 @@ local skillMenuSelection = {
 }
 
 local skillMenuGroup = {
---@alpha@
+--[[
 	{
 		text = "skillMenuGroup",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]=]
+--]]
 	{
 		text = L["Empty Group"],
 		func = function() Skillet:SkillButton_NewGroup() end,
@@ -2711,13 +2711,13 @@ local skillMenuGroup = {
 }
 
 local skillMenuIgnore = {
---@alpha@
+--[[
 	{
 		text = "skillMenuIgnore",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]=]
+--]]
 	{
 		text = L["Add Recipe to Ignored List"],
 		func = function()
@@ -2747,13 +2747,13 @@ local skillMenuIgnore = {
 }
 
 local skillMenuList = {
---@alpha@
+--[[
 	{
 		text = "skillMenuList",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]=]
+--]]
 	{
 		text = L["New Group"],
 		hasArrow = true,
@@ -2794,13 +2794,13 @@ local skillMenuList = {
 }
 
 local skillMenuListLocked = {
---@alpha@
+--[[
 	{
 		text = "skillMenuListLocked",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]=]
+--]]
 	{
 		text = L["Selection"],
 		hasArrow = true,
@@ -2823,13 +2823,13 @@ local skillMenuListLocked = {
 }
 
 local headerMenuList = {
---@alpha@
+--[[
 	{
 		text = "headerMenuList",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]=]
+--]]
 	{
 		text = L["Rename Group"],
 		func = function() Skillet:SkillButton_NameEditEnable(Skillet.menuButton) end,
@@ -2864,13 +2864,13 @@ local headerMenuList = {
 }
 
 local headerMenuListLocked = {
---@alpha@
+--[[
 	{
 		text = "headerMenuListLocked",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]=]
+--]]
 	{
 		text = L["Selection"],
 		hasArrow = true,
@@ -2883,13 +2883,13 @@ local headerMenuListLocked = {
 }
 
 local headerMenuListMainGroup = {
---@alpha@
+--[[
 	{
 		text = "headerMenuListMainGroup",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]=]
+--]]
 	{
 		text = L["New Group"],
 		hasArrow = true,
@@ -2920,13 +2920,13 @@ local headerMenuListMainGroup = {
 }
 
 local headerMenuListMainGroupLocked = {
---@alpha@
+--[[
 	{
 		text = "headerMenuListMainGroupLocked",
 		isTitle = true,
 		notCheckable = true,
 	},
---@end-alpha@]=]
+--]]
 	{
 		text = L["Selection"],
 		hasArrow = true,
