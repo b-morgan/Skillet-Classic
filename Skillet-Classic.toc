@@ -1,4 +1,5 @@
 ## Interface: 11307
+## Interface-BCC: 20501
 ## Title: Skillet-Classic |cff7fff7f -Ace3-|r
 ## Notes: A replacement tradeskill window
 ## Notes-esES: Una sustitucion de la ventana de Habilidades de Comercio
