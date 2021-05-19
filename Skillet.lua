@@ -30,7 +30,7 @@ Skillet.L = L
 
 -- Get version info from the .toc file
 local MAJOR_VERSION = GetAddOnMetadata("Skillet-Classic", "Version");
-local ADDON_BUILD = ((select(4, GetBuildInfo())) < 20000 and "Classic") or ((select(4, GetBuildInfo())) < 80000 and "TBC") or "Retail"
+local ADDON_BUILD = ((select(4, GetBuildInfo())) < 20000 and "Classic") or ((select(4, GetBuildInfo())) < 80000 and "BCC") or "Retail"
 Skillet.version = MAJOR_VERSION
 Skillet.build = ADDON_BUILD
 Skillet.project = WOW_PROJECT_ID
@@ -505,6 +505,18 @@ function Skillet:InitializeDatabase(player, clean)
 		if not self.data.skillIndexLookup[player] or clean then
 			self.data.skillIndexLookup[player] = {}
 		end
+		if not self.db.realm.faction then
+			self.db.realm.faction = {}
+		end
+		if not self.db.realm.guid then
+			self.db.realm.guid = {}
+		end
+		if not self.db.global.faction then
+			self.db.global.faction = {}
+		end
+		if not self.db.global.server then
+			self.db.global.server = {}
+		end
 		if player == UnitName("player") then
 			if not self.db.realm.inventoryData then
 				self.db.realm.inventoryData = {}
@@ -683,12 +695,37 @@ function Skillet:PLAYER_ENTERING_WORLD()
 	local player = UnitName("player")
 	local realm = GetRealmName()
 	local faction = UnitFactionGroup("player")
+	local guid = UnitGUID("player")		-- example: guid="Player-970-0002FD64" kind=="Player" server=="970" ID="0002FD64" 
 --
 -- Store some identifying data in the per character saved variables file
 --
 	SkilletWho.player = player
 	SkilletWho.realm = realm
 	SkilletWho.faction = faction
+	SkilletWho.guid = guid
+	if guid then
+		local kind, server, ID = strsplit("-", guid)
+		DA.DEBUG(1,"player="..tostring(player)..", faction="..tostring(faction)..", guid="..tostring(guid)..", server="..tostring(server))
+--
+-- If we support data sharing across connected realms, then
+-- Skillet.db.realm.* data needs to move to 
+-- Skillet.db.global.* data indexed by server.
+--
+		self.db.realm.guid[player]= guid
+		self.db.realm.faction[player] = faction
+		if (server) then
+			self.data.server = server
+			self.data.realm = realm
+			if not self.db.global.server[server] then
+				self.db.global.server[server] = {}
+			end
+			self.db.global.server[server][realm] = player
+			if not self.db.global.faction[server] then
+				self.db.global.faction[server] = {}
+			end
+			self.db.global.faction[server][player] = faction
+		end
+	end
 end
 
 function Skillet:ADDON_ACTION_BLOCKED()

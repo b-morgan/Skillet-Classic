@@ -256,7 +256,7 @@ function Skillet:CreateTradeSkillWindow()
 	titletext:SetShadowColor(0,0,0)
 	titletext:SetShadowOffset(1,-1)
 	titletext:SetTextColor(1,1,1)
-	titletext:SetText(L["Skillet Trade Skills"].." "..Skillet.version)
+	titletext:SetText(L["Skillet Trade Skills"].." "..Skillet.version.." ("..Skillet.wowVersion..")")
 	local label = _G["SkilletSearchLabel"]
 	label:SetText(L["Search"])
 	local label = _G["SkilletFilterLabel"]
@@ -933,7 +933,7 @@ function Skillet:UpdateTradeSkillWindow()
 	if not tradeName then tradeName = "" end
 	local title = _G["SkilletTitleText"];
 	if title then
-		title:SetText(L["Skillet Trade Skills"] .. " "..self.version..": " .. self.currentPlayer .. "/" .. tradeName)
+		title:SetText(L["Skillet Trade Skills"] .. " "..self.version.." ("..Skillet.wowVersion.."): " .. self.currentPlayer .. "/" .. tradeName)
 	end
 	local sortedSkillList = self.data.sortedSkillList[skillListKey]
 	local rank,maxRank = 0,0
