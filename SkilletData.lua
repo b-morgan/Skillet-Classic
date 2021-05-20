@@ -49,7 +49,7 @@ local TradeSkillList = {
 	3273,		-- first aid
 	2842,		-- poisons
 --	45357,		-- inscription (not in Classic)
---	25229,		-- jewelcrafting (not in Classic)
+	25229,		-- jewelcrafting
 --	53428,		-- runeforging (not in Classic)
 }
 
