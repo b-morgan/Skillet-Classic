@@ -922,6 +922,52 @@ function Skillet:IsTradeSkillLinked()
 end
 
 --
+-- Allow modifier keys that change initial frame behavior to be disabled.
+-- Modifier keys within the Skillet frame are not effected.
+-- Type "/skillet nomodkeys" to toggle.
+--
+-- Make modifier key to open Blizzard frame optional.
+--
+function Skillet:IsModKey1Down()
+	if not Skillet.db.profile.nomodkeys and IsShiftKeyDown() then
+		return true
+	end
+	return false
+end
+
+--
+-- Make modifier key to alter some behaviors optional.
+--
+function Skillet:IsModKey2Down()
+	if not Skillet.db.profile.nomodkeys and IsControlKeyDown() then
+		return true
+	end
+	return false
+end
+
+--
+-- Checks to see if the current trade is one that we support.
+-- Control key says we do (even if we don't, debugging)
+-- Shift key says we don't support it (even if we do)
+--
+function Skillet:IsSupportedTradeskill(tradeID)
+	--DA.DEBUG(0,"IsSupportedTradeskill("..tostring(tradeID)..")")
+	if self:IsModKey2Down() then
+		return true
+	end
+	if self:IsModKey1Down() then
+		return false
+	end
+--
+-- No support for Beast Training or Runeforging
+--
+	if not tradeID or tradeID == 5419 or tradeID == 53428 or UnitAffectingCombat("player") then
+		return false
+	end
+	return true
+end
+
+--
 -- Show the tradeskill window, called from TRADE_SKILL_SHOW event, clicking on links, or clicking on guild professions
 --
 function Skillet:SkilletShow()
@@ -974,7 +1020,7 @@ function Skillet:SkilletShow()
 --
 		if self.castSpellID == 5149 then
 			return
-		elseif not IsShiftKeyDown() and not UnitAffectingCombat("player") then
+		elseif not self:IsModKey1Down() and not UnitAffectingCombat("player") then
 			DA.DEBUG(0,"SkilletShow: "..tostring(self.currentTrade).." ("..tostring(name)..") is not supported")
 			DA.DEBUG(0,"tradeSkillIDsByName= "..DA.DUMP(self.tradeSkillIDsByName))
 		end
@@ -993,7 +1039,7 @@ end
 --
 function Skillet:SkilletShowWindow()
 	DA.DEBUG(0,"SkilletShowWindow(), currentTrade= "..tostring(self.currentTrade)..", scanInProgress= "..tostring(scanInProgress))
-	if IsControlKeyDown() then
+	if self:IsModKey2Down() then
 		self.db.realm.skillDB[self.currentPlayer][self.currentTrade] = {}
 	end
 	if not self:RescanTrade() then
@@ -1441,7 +1487,7 @@ end
 --
 function Skillet:AddItemNotesToTooltip(tooltip, altID)
 	--DA.DEBUG(0,"AddItemNotesToTooltip()")
-	if IsControlKeyDown() then
+	if self:IsModKey2Down() then
 		return
 	end
 	local notes_enabled = self.db.profile.show_item_notes_tooltip or false
