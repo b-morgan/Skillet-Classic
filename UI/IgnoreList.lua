@@ -186,16 +186,31 @@ function Skillet:ClearIgnoreList(player)
 end
 
 --
+-- Called to add a count to the Ignored List button in the main frame
+--
+function Skillet:UpdateIgnoreListButton()
+	DA.DEBUG(0,"UpdateIgnoreListButton()")
+	self.cachedIgnoreList = self:GetIgnoreList()
+	local numItems = #self.cachedIgnoreList
+	if numItems > 0 then
+		SkilletIgnoreListButton:SetText(L["Ignored List"].." ("..tostring(numItems)..")")
+	else
+		SkilletIgnoreListButton:SetText(L["Ignored List"])
+	end
+end
+
+--
 -- Called to update the ignore list window
 --
 function Skillet:UpdateIgnoreListWindow()
-	DA.DEBUG(0,"UpdateIgnoreListWindow")
+	DA.DEBUG(0,"UpdateIgnoreListWindow()")
 	self.cachedIgnoreList = self:GetIgnoreList()
 	local numItems = #self.cachedIgnoreList
 	if not self.ignoreList or not self.ignoreList:IsVisible() then
-	    DA.DEBUG(0,"No ignoreList visible so return")
+		DA.DEBUG(0,"No ignoreList visible so return")
 		return
 	end
+	self:UpdateIgnoreListButton()
 	local button_count = SkilletIgnoreListList:GetHeight() / SKILLET_IGNORE_LIST_HEIGHT
 	button_count = math.floor(button_count)
 --
