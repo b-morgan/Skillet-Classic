@@ -275,7 +275,7 @@ function Skillet:CreateTradeSkillWindow()
 	SkilletShoppingListButton:SetText(L["Shopping List"])
 	SkilletSortLabel:SetText(L["Sorting"])
 	SkilletGroupLabel:SetText(L["Grouping"])
-	SkilletIgnoredMatsButton:SetText(L["Ignored List"])
+	SkilletIgnoreListButton:SetText(L["Ignored List"])
 	SkilletQueueManagementButton:SetText(L["Queues"])
 	SkilletQueueLoadButton:SetText(L["Load"])
 	SkilletQueueDeleteButton:SetText(L["Delete"])
@@ -648,9 +648,11 @@ function Skillet:TradeButton_OnClick(this,button)
 	if button == "LeftButton" then
 		if player == self.currentPlayer and self.currentTrade then
 			if self.currentTrade == tradeID and IsShiftKeyDown() then
+				DA.DEBUG(0,"TradeButton_OnClick: Linking...")
 				if GetTradeSkillListLink then
-					local link = GetTradeSkillListLink();
-					local activeEditBox =  ChatEdit_GetActiveWindow();
+					local link = GetTradeSkillListLink()
+					local activeEditBox =  ChatEdit_GetActiveWindow()
+					DA.DEBUG(0,"TradeButton_OnClick: link= "..DA.PLINK(link)..", activeEditBox= "..tostring(activeEditBox))
 					if activeEditBox or WIM_EditBoxInFocus ~= nil then
 						ChatEdit_InsertLink(link)
 					end
@@ -880,7 +882,8 @@ function Skillet:UpdateTradeSkillWindow()
 	end
 	self:UpdateDetailsWindow(self.selectedSkill)
 	self:UpdateTradeButtons(self.currentPlayer)
-	SkilletIgnoredMatsButton:Show()
+	self:UpdateIgnoreListButton()
+	SkilletIgnoreListButton:Show()
 --
 -- Plugin button only shows if any plugins have registered
 --
@@ -1094,7 +1097,9 @@ function Skillet:UpdateTradeSkillWindow()
 				local recipe = self:GetRecipe(skill.recipeID)
 				buttonExpand.group = nil
 				button.skill = skill
-				local skill_color = skill.color or skill.skillData.color or NORMAL_FONT_COLOR
+--				local skill_color = skill.color or skill.skillData.color or NORMAL_FONT_COLOR
+				local _, difficulty = GetTradeSkillInfo(skillIndex)
+				local skill_color = Skillet.skill_style_type[difficulty] or skill.color or skill.skillData.color or NORMAL_FONT_COLOR
 				buttonText:SetTextColor(skill_color.r, skill_color.g, skill_color.b, textAlpha)
 				countText:SetTextColor(skill_color.r, skill_color.g, skill_color.b, textAlpha)
 				buttonExpand:Hide()
@@ -2097,6 +2102,17 @@ function Skillet:SkillButton_OnReceiveDrag(button)
 	end
 end
 
+function Skillet:SkillButton_LinkRecipe()
+	DA.DEBUG(0,"SkillButton_LinkRecipe()")
+	local skill = Skillet.menuButton.skill
+	if skill and skill.skillIndex then
+		local spellLink = GetTradeSkillRecipeLink(skill.skillIndex)
+		if (ChatEdit_GetLastActiveWindow():IsVisible() or WIM_EditBoxInFocus ~= nil) then
+			ChatEdit_InsertLink(spellLink)
+		end
+	end
+end
+
 function Skillet:SkillButton_CopySelected()
 	DA.DEBUG(0,"SkillButton_CopySelected()")
 	local skillListKey = self.currentPlayer..":"..self.currentTrade..":"..self.currentGroupLabel
@@ -2548,7 +2564,7 @@ end
 -- Called when the icon button is clicked
 --
 function Skillet:ReagentsLinkOnClick(button, skillIndex, reagentIndex)
-	DA.DEBUG(0,"ReagentLinkOnClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	DA.DEBUG(0,"ReagentsLinkOnClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
 	if not self.db.profile.link_craftable_reagents then
 		return
 	end
@@ -2755,6 +2771,10 @@ local skillMenuList = {
 	},
 --]]
 	{
+		text = L["Link Recipe"],
+		func = function() Skillet:SkillButton_LinkRecipe() end,
+	},
+	{
 		text = L["New Group"],
 		hasArrow = true,
 		menuList = skillMenuGroup,
@@ -2801,6 +2821,10 @@ local skillMenuListLocked = {
 		notCheckable = true,
 	},
 --]]
+	{
+		text = L["Link Recipe"],
+		func = function() Skillet:SkillButton_LinkRecipe() end,
+	},
 	{
 		text = L["Selection"],
 		hasArrow = true,
