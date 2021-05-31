@@ -651,11 +651,8 @@ function Skillet:TradeButton_OnClick(this,button)
 				DA.DEBUG(0,"TradeButton_OnClick: Linking...")
 				if GetTradeSkillListLink then
 					local link = GetTradeSkillListLink()
-					local activeEditBox =  ChatEdit_GetActiveWindow()
 					DA.DEBUG(0,"TradeButton_OnClick: link= "..DA.PLINK(link)..", activeEditBox= "..tostring(activeEditBox))
-					if activeEditBox or WIM_EditBoxInFocus ~= nil then
-						ChatEdit_InsertLink(link)
-					end
+					ChatEdit_InsertLink(link)
 				end
 			elseif self.currentTrade ~= tradeID then
 				if self.skillIsCraft[self.currentTrade] ~= self.skillIsCraft[tradeID] then
@@ -2107,9 +2104,7 @@ function Skillet:SkillButton_LinkRecipe()
 	local skill = Skillet.menuButton.skill
 	if skill and skill.skillIndex then
 		local spellLink = GetTradeSkillRecipeLink(skill.skillIndex)
-		if (ChatEdit_GetLastActiveWindow():IsVisible() or WIM_EditBoxInFocus ~= nil) then
-			ChatEdit_InsertLink(spellLink)
-		end
+		ChatEdit_InsertLink(spellLink)
 	end
 end
 
