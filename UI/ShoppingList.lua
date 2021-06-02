@@ -158,7 +158,9 @@ end
 function Skillet:ShoppingListButton_OnEnter(button)
 	local name, link, quality = GetItemInfo(button.id)
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
-	GameTooltip:SetHyperlink(link)
+	if link then
+		GameTooltip:SetHyperlink(link)
+	end
 	GameTooltip:Show()
 	CursorUpdate(button)
 end

@@ -1095,7 +1095,12 @@ function Skillet:UpdateTradeSkillWindow()
 				buttonExpand.group = nil
 				button.skill = skill
 --				local skill_color = skill.color or skill.skillData.color or NORMAL_FONT_COLOR
-				local _, difficulty = GetTradeSkillInfo(skillIndex)
+				local _, difficulty 
+				if self.isCraft then
+					_, _, difficulty = GetCraftInfo(skillIndex)
+				else
+					_, difficulty = GetTradeSkillInfo(skillIndex)
+				end
 				local skill_color = Skillet.skill_style_type[difficulty] or skill.color or skill.skillData.color or NORMAL_FONT_COLOR
 				buttonText:SetTextColor(skill_color.r, skill_color.g, skill_color.b, textAlpha)
 				countText:SetTextColor(skill_color.r, skill_color.g, skill_color.b, textAlpha)
