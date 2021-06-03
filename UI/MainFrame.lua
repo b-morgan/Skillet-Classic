@@ -1205,7 +1205,7 @@ function Skillet:UpdateTradeSkillWindow()
 -- rather than as a colour. This should help used that have problems
 -- distinguishing between the difficulty colours we use.
 --
-				if self.db.profile.enhanced_recipe_display then
+				if self.db.profile.enhanced_recipe_display and skill_color.alttext then
 					text = text .. skill_color.alttext;
 				end
 				suffixText:SetText(self:RecipeNameSuffix(skill, recipe) or "")

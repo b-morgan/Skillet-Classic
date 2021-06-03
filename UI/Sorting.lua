@@ -18,17 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
-local skill_style_type = {
-	["unavailable"]		= { r = 1.00, g = 0.00, b = 0.00, level = 6},
-	["unknown"]			= { r = 1.00, g = 0.00, b = 0.00, level = 5},
-	["optimal"]			= { r = 1.00, g = 0.50, b = 0.25, level = 4},
-	["medium"]			= { r = 1.00, g = 1.00, b = 0.00, level = 3},
-	["easy"]			= { r = 0.25, g = 0.75, b = 0.25, level = 2},
-	["trivial"]			= { r = 0.50, g = 0.50, b = 0.50, level = 1},
-	["header"]			= { r = 1.00, g = 0.82, b = 0,    level = 0},
-}
-Skillet.skill_style_type = skill_style_type
--- list of possible sorting methods
+local skill_style_type = Skillet.skill_style_type
+
+--
+-- List of possible sorting methods
+--
 local sorters = {}
 local recipe_sort_method = nil
 
@@ -87,13 +81,13 @@ local function sort_recipe_by_item_level(tradeskill, a, b)
 	if not right then right = 0 end
 	if left == right then
 --
--- same level, try iLevel next
+-- Same level, try iLevel next
 --
 		local left = select(4,GetItemInfo(left_r.itemID)) or 0
 		local right = select(4,GetItemInfo(right_r.itemID)) or 0
 		if left == right then
 --
--- same level, sort by difficulty
+-- Same level, sort by difficulty
 --
 			return sort_recipe_by_skill_level(tradeskill, a, b)
 		else
@@ -119,7 +113,7 @@ local function sort_recipe_by_item_quality(tradeskill, a, b)
 	if not right then right = 0 end
 	if left == right then
 --
--- same level, sort by level required to use
+-- Same level, sort by level required to use
 --
 		return sort_recipe_by_item_level(tradeskill, a, b)
 	else
@@ -157,7 +151,7 @@ local function SkillIsFilteredOut(skillIndex)
 		return false
 	end
 --
--- are we hiding anything that is trivial (has no chance of giving a skill point)
+-- Are we hiding anything that is trivial (has no chance of giving a skill point)
 --
 	if skill_style_type[skill.difficulty] then
 		if skill_style_type[skill.difficulty].level < (Skillet:GetTradeSkillOption("filterLevel") or 4) then
@@ -166,7 +160,7 @@ local function SkillIsFilteredOut(skillIndex)
 		end
 	end
 --
--- are we hiding anything that can't be created with the mats on this character?
+-- Are we hiding anything that can't be created with the mats on this character?
 --
 	if Skillet:GetTradeSkillOption("hideuncraftable") then
 		if not (skill.numCraftable > 0 and Skillet:GetTradeSkillOption("filterInventory-bag")) and
@@ -178,13 +172,13 @@ local function SkillIsFilteredOut(skillIndex)
 		end
 	end
 --
---	call our internal recipe filter
+--	Call our internal recipe filter
 --
 	if Skillet:RecipeFilter(skillIndex) then
 		return true
 	end
 --
---	call any external recipe filters
+--	Call any external recipe filters
 --
 	if Skillet.recipeFilters then
 		for _,f in pairs(Skillet.recipeFilters) do
@@ -195,7 +189,7 @@ local function SkillIsFilteredOut(skillIndex)
 		end
 	end
 --
--- string search
+-- String search
 --
 	local searchtext = Skillet:GetTradeSkillOption("searchtext")
 	if searchtext and searchtext ~= "" then
@@ -367,7 +361,7 @@ function Skillet:SortAndFilterRecipes() -- SAFR:
 	local oldLength = #sortedSkillList
 	local button_index = 0
 --
--- load the filter dropdown and the search textbox with
+-- Load the filter dropdown and the search textbox with
 -- data saved for the currentTrade
 --
 	Skillet:FilterDropDown_OnLoad()
@@ -375,10 +369,8 @@ function Skillet:SortAndFilterRecipes() -- SAFR:
 	local groupLabel = Skillet.currentGroupLabel
 	DA.DEBUG(1,"SAFR: searchtext="..tostring(searchtext)..", groupLabel="..tostring(groupLabel))
 	if searchtext and searchtext ~= "" or groupLabel == "Flat" then
---	DA.DEBUG(1,"SAFR: groupLabel="..tostring(groupLabel))
---	if groupLabel == "Flat" or groupLabel == "Blizzard" then
 --
--- no prep necessary, just loop through the list and filter or search as directed
+-- No prep necessary, just loop through the list and filter or search as directed
 --
 		for i=1, numSkills, 1 do
 			local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, i)
@@ -390,7 +382,7 @@ function Skillet:SortAndFilterRecipes() -- SAFR:
 						sortedSkillList[button_index] = {["recipeID"] = skill.id, ["spellID"] = recipe.spellID, ["name"] = recipe.name, ["skillIndex"] = i, ["recipeData"] = recipe, ["skillData"] = skill, ["depth"] = 0}
 					elseif i == Skillet.selectedSkill then
 --
--- if filtered out and selected - deselect
+-- If filtered out and selected - deselect
 --
 						Skillet.selectedSkill = nil
 					end
@@ -401,7 +393,7 @@ function Skillet:SortAndFilterRecipes() -- SAFR:
 		end	-- for
 		--DA.DEBUG(1,"SAFR: numSkills= "..tostring(numSkills)..", oldLength= "..tostring(oldLength)..", button_index= "..tostring(button_index))
 --
--- if the last result was larger than this result,
+-- If the last result was larger than this result,
 -- get rid of the extra old results.
 --
 		if oldLength > button_index then
@@ -492,7 +484,7 @@ function Skillet:InitializeSorting()
 	end)
 	SkilletSortDescButton:SetScript("OnClick", function()
 --
--- clicked the button will toggle sort descending off
+-- Clicked the button will toggle sort descending off
 --
 		set_sort_desc(false)
 		SkilletSortDescButton:Hide()
@@ -509,7 +501,7 @@ function Skillet:InitializeSorting()
 end
 
 --
--- called when the sort drop down is first loaded
+-- Called when the sort drop down is first loaded
 --
 function Skillet:SortDropdown_OnLoad()
 	UIDropDownMenu_Initialize(SkilletSortDropdown, Skillet.SortDropdown_Initialize)
