@@ -89,16 +89,6 @@ Skillet.AdditionalAbilities = {
 }
 
 --
--- Checks to see if the current trade is one that we support.
---
-function Skillet:IsSupportedTradeskill(tradeID)
-	if IsShiftKeyDown() or UnitAffectingCombat("player") or not tradeID or tradeID == 5419 or tradeID == 53428 then
-		return false
-	end
-	return true
-end
-
---
 -- Collects generic tradeskill and craft data (id to name and name to id)
 --
 -- self.tradeSkillList contains data from both.
