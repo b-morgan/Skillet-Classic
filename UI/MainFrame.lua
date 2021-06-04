@@ -1486,7 +1486,7 @@ function Skillet:SkillButton_OnEnter(button)
 		local counts = string.format("|cffa0a0a0[%d/%d/%d]|r", num, bank, numCraftable)
 		tip:AddDoubleLine(text, counts, 1, 1, 1);
 	end
-	local text = string.format("[%s/%s/%s]", L["Inventory"], L["bank"], L["craftable"]) -- match the case sometime
+	local text = string.format("[%s/%s/%s]", L["inventory"], L["bank"], L["craftable"])
 	tip:AddDoubleLine("\n", text)
 	local text = string.format("itemID= %d",recipe.itemID)
 	tip:AddDoubleLine("\n", text)
