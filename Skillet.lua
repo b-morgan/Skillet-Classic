@@ -58,11 +58,12 @@ local defaults = {
 		display_item_tooltip = true,					-- show item tooltip or recipe tooltip
 		link_craftable_reagents = true,
 		queue_craftable_reagents = true,
+		ignore_banked_reagents = false,
 		queue_glyph_reagents = false,					-- not in Classic
 		display_required_level = false,
 		display_item_level = false,
 		display_shopping_list_at_bank = true,
-		display_shopping_list_at_guildbank = false,		-- not in Classic
+		display_shopping_list_at_guildbank = false,		-- not in Classic, disabled (for now) in BCC
 		display_shopping_list_at_auction = true,
 		display_shopping_list_at_merchant = true,
 		use_blizzard_for_followers = false,				-- not in Classic
@@ -665,6 +666,9 @@ function Skillet:OnEnable()
 
 	self:RegisterEvent("PLAYER_LOGIN")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterEvent("NEW_RECIPE_LEARNED") -- arg1 = recipeID
+	self:RegisterEvent("SKILL_LINES_CHANGED") -- replacement for CHAT_MSG_SKILL?
+	self:RegisterEvent("LEARNED_SPELL_IN_TAB") -- arg1 = professionID
 
 --	self:RegisterEvent("ADDON_ACTION_BLOCKED")
 
@@ -754,6 +758,32 @@ function Skillet:PLAYER_LOGOUT()
 			end
 		end
 		SkilletMemory = DA.deepcopy(self.data.groupList) -- minus all the group "Blizzard" stuff
+	end
+end
+
+function Skillet:SKILL_LINES_CHANGED()
+	DA.TRACE("SKILL_LINES_CHANGED")
+	if Skillet.tradeSkillOpen then
+--		Skillet:RescanTrade()
+--		Skillet:UpdateTradeSkillWindow()
+		Skillet.dataSourceChanged = true	-- Process the change on the next TRADE_SKILL_LIST_UPDATE
+	end
+end
+
+function Skillet:LEARNED_SPELL_IN_TAB(event, profession)
+	DA.TRACE("LEARNED_SPELL_IN_TAB")
+	DA.TRACE("profession= "..tostring(profession))
+	if Skillet.tradeSkillOpen then
+		Skillet:RescanTrade()				-- Untested
+		Skillet:UpdateTradeSkillWindow()	-- Untested
+	end
+end
+
+function Skillet:NEW_RECIPE_LEARNED(event, recipeID)
+	DA.TRACE("NEW_RECIPE_LEARNED")
+	DA.TRACE("recipeID= "..tostring(recipeID))
+	if Skillet.tradeSkillOpen then
+		Skillet.dataSourceChanged = true	-- Process the change on the next TRADE_SKILL_LIST_UPDATE
 	end
 end
 
