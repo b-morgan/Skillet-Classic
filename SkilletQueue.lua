@@ -69,7 +69,12 @@ local function queueAppendReagent(command, reagentID, need, queueCraftables)
 	local numInBank =  numInBoth - numInBags
 	local numInQueue = reagentsInQueue[reagentID] or 0
 	DA.DEBUG(1,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank)..", numInQueue="..tostring(numInQueue))
-	local have = numInBoth + numInQueue
+	local have
+	if Skillet.db.profile.ignore_banked_reagents then
+		have = numInBags + numInQueue
+	else
+		have = numInBoth + numInQueue
+	end
 	DA.DEBUG(1,"queueCraftables= "..tostring(queueCraftables)..", need= "..tostring(need)..", have= "..tostring(have))
 	if queueCraftables and need > have then
 		local recipeSource = Skillet.db.global.itemRecipeSource[reagentID]
