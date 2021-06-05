@@ -764,9 +764,7 @@ end
 function Skillet:SKILL_LINES_CHANGED()
 	DA.TRACE("SKILL_LINES_CHANGED")
 	if Skillet.tradeSkillOpen then
---		Skillet:RescanTrade()
---		Skillet:UpdateTradeSkillWindow()
-		Skillet.dataSourceChanged = true	-- Process the change on the next TRADE_SKILL_LIST_UPDATE
+		Skillet.dataSourceChanged = true	-- Process the change on the next TRADE_SKILL_UPDATE
 	end
 end
 
@@ -774,8 +772,7 @@ function Skillet:LEARNED_SPELL_IN_TAB(event, profession)
 	DA.TRACE("LEARNED_SPELL_IN_TAB")
 	DA.TRACE("profession= "..tostring(profession))
 	if Skillet.tradeSkillOpen then
-		Skillet:RescanTrade()				-- Untested
-		Skillet:UpdateTradeSkillWindow()	-- Untested
+		Skillet.dataSourceChanged = true	-- Process the change on the next TRADE_SKILL_UPDATE
 	end
 end
 
@@ -783,7 +780,7 @@ function Skillet:NEW_RECIPE_LEARNED(event, recipeID)
 	DA.TRACE("NEW_RECIPE_LEARNED")
 	DA.TRACE("recipeID= "..tostring(recipeID))
 	if Skillet.tradeSkillOpen then
-		Skillet.dataSourceChanged = true	-- Process the change on the next TRADE_SKILL_LIST_UPDATE
+		Skillet.dataSourceChanged = true	-- Process the change on the next TRADE_SKILL_UPDATE
 	end
 end
 
@@ -806,6 +803,10 @@ function Skillet:TRADE_SKILL_UPDATE()
 			Skillet:ConfigureRecipeControls()
 		end
 		Skillet:AdjustInventory()
+		if Skillet.dataSourceChanged then
+			Skillet.dataSourceChanged = false
+			Skillet:SkilletShowWindow()
+		end
 	end
 end
 
@@ -817,6 +818,10 @@ function Skillet:CRAFT_UPDATE()
 			Skillet:ConfigureRecipeControls()
 		end
 		Skillet:AdjustInventory()
+		if Skillet.dataSourceChanged then
+			Skillet.dataSourceChanged = false
+			Skillet:SkilletShowWindow()
+		end
 	end
 end
 
@@ -1024,6 +1029,7 @@ function Skillet:SkilletShow()
 		--DA.DEBUG(0,"SkilletShow: "..self.currentTrade..", name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
 		self.selectedSkill = nil
 		self.dataScanned = false
+		self.tradeSkillOpen = true
 		self:ScheduleTimer("SkilletShowWindow", 0.5)
 		if self.isCraft then
 			if Skillet.db.profile.hide_blizzard_frame then
@@ -1111,6 +1117,7 @@ end
 
 function Skillet:SkilletClose()
 	DA.DEBUG(0,"SkilletClose()")
+	self.tradeSkillOpen = false
 	self.lastCraft = self.isCraft
 	if self.isCraft then
 		self:RestoreEnchantButton(false)
