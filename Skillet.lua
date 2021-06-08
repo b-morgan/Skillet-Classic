@@ -786,6 +786,7 @@ end
 
 function Skillet:TRADE_SKILL_NAME_UPDATE()
 	DA.TRACE("TRADE_SKILL_NAME_UPDATE")
+	--DA.TRACE("TRADE_SKILL_NAME_UPDATE: tradeShow= "..tostring(Skillet.tradeShow..", linkedSkill= "..tostring(Skillet.linkedSkill))
 	if not Skillet.tradeShow then return end
 	if Skillet.linkedSkill then
 		if Skillet.lastCraft ~= Skillet.isCraft then
@@ -797,31 +798,35 @@ end
 
 function Skillet:TRADE_SKILL_UPDATE()
 	DA.TRACE("TRADE_SKILL_UPDATE")
+	--DA.TRACE("TRADE_SKILL_UPDATE: closingTrade= "..tostring(Skillet.closingTrade)..", tradeShow= "..tostring(Skillet.tradeShow))
 	if Skillet.closingTrade or not Skillet.tradeShow then return end
 	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
 		if Skillet.lastCraft ~= Skillet.isCraft then
 			Skillet:ConfigureRecipeControls()
 		end
 		Skillet:AdjustInventory()
-		if Skillet.dataSourceChanged then
-			Skillet.dataSourceChanged = false
-			Skillet:SkilletShowWindow()
-		end
+	end
+	DA.TRACE("TRADE_SKILL_UPDATE: dataSourceChanged= "..tostring(Skillet.dataSourceChanged)..", dataScanned= "..tostring(Skillet.dataScanned))
+	if Skillet.dataSourceChanged or not Skillet.dataScanned then
+		Skillet.dataSourceChanged = false
+		Skillet:SkilletShowWindow()
 	end
 end
 
 function Skillet:CRAFT_UPDATE()
 	DA.TRACE("CRAFT_UPDATE")
+	--DA.TRACE("CRAFT_UPDATE: closingTrade= "..tostring(Skillet.closingTrade)..", tradeShow= "..tostring(Skillet.tradeShow))
 	if Skillet.closingTrade or not Skillet.craftShow then return end
 	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
 		if Skillet.lastCraft ~= Skillet.isCraft then
 			Skillet:ConfigureRecipeControls()
 		end
 		Skillet:AdjustInventory()
-		if Skillet.dataSourceChanged then
-			Skillet.dataSourceChanged = false
-			Skillet:SkilletShowWindow()
-		end
+	end
+	DA.TRACE("CRAFT_UPDATE: dataSourceChanged= "..tostring(Skillet.dataSourceChanged)..", dataScanned= "..tostring(Skillet.dataScanned))
+	if Skillet.dataSourceChanged or not Skillet.dataScanned then
+		Skillet.dataSourceChanged = false
+		Skillet:SkilletShowWindow()
 	end
 end
 
@@ -865,7 +870,6 @@ function Skillet:TRADE_SKILL_SHOW()
 		Skillet:ConfigureRecipeControls()
 	end
 	SkilletEnchantButton:Hide()				-- Hide our button
-	--DA.TRACE("TRADE_SKILL_SHOW: changingTrade= "..tostring(Skillet.changingTrade))
 	if not Skillet.changingTrade then		-- wait for UNIT_SPELLCAST_SUCCEEDED
 		Skillet:SkilletShow()
 	end
@@ -1003,7 +1007,7 @@ function Skillet:IsSupportedTradeskill(tradeID)
 end
 
 --
--- Show the tradeskill window, called from TRADE_SKILL_SHOW event, clicking on links, or clicking on guild professions
+-- Show the tradeskill window, called from TRADE_SKILL_SHOW or CRAFT_SHOW event or when changing trades.
 --
 function Skillet:SkilletShow()
 	DA.DEBUG(0,"SkilletShow(), currentTrade= "..tostring(self.currentTrade))
@@ -1030,7 +1034,6 @@ function Skillet:SkilletShow()
 		self.selectedSkill = nil
 		self.dataScanned = false
 		self.tradeSkillOpen = true
-		self:ScheduleTimer("SkilletShowWindow", 0.5)
 		if self.isCraft then
 			if Skillet.db.profile.hide_blizzard_frame then
 				--DA.DEBUG(0,"HideUIPanel(CraftFrame)")
@@ -1049,6 +1052,9 @@ function Skillet:SkilletShow()
 				CloseCraft()
 			end
 		end
+--
+-- Processing will continue in SkilletShowWindow when the TRADE_SKILL_UPDATE or CRAFT_UPDATE event fires
+--
 	else
 --
 -- give Hunter Beast Training a pass
@@ -1071,7 +1077,7 @@ function Skillet:SkilletShow()
 end
 
 --
--- Only called from SkilletShow() after a short delay
+-- Called from various events that indicate there may be new data
 --
 function Skillet:SkilletShowWindow()
 	DA.DEBUG(0,"SkilletShowWindow(), currentTrade= "..tostring(self.currentTrade)..", scanInProgress= "..tostring(scanInProgress))
@@ -1090,6 +1096,7 @@ function Skillet:SkilletShowWindow()
 			end
 		else
 			DA.CHAT(L["No headers, try again"])
+			DA.TRACE("SkilletShowWindow: No headers, try again")	-- For debugging event timing
 		end
 		return
 	end
