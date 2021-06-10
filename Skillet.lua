@@ -1095,8 +1095,11 @@ function Skillet:SkilletShowWindow()
 				self.db.profile.ZYGOR = true
 			end
 		else
-			DA.CHAT(L["No headers, try again"])
-			DA.TRACE("SkilletShowWindow: No headers, try again")	-- For debugging event timing
+--
+-- Changed from DA.CHAT because this state can happen before enough
+-- TRADE_SKILL_UPDATE or CRAFT_UPDATE events have occurred.
+--
+			DA.WARN(L["No headers, try again")
 		end
 		return
 	end
