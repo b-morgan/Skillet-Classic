@@ -1099,7 +1099,7 @@ function Skillet:SkilletShowWindow()
 -- Changed from DA.CHAT because this state can happen before enough
 -- TRADE_SKILL_UPDATE or CRAFT_UPDATE events have occurred.
 --
-			DA.WARN(L["No headers, try again")
+			DA.WARN(L["No headers, try again"])
 		end
 		return
 	end
