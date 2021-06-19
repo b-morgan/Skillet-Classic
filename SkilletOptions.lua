@@ -330,6 +330,7 @@ Skillet.options =
 					end,
 					set = function(self,value)
 						Skillet.db.profile.queue_crafts = value
+						Skillet:ConfigureRecipeControls()
 					end,
 					width = "full",
 					order = 33

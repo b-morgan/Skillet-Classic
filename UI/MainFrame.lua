@@ -537,7 +537,9 @@ function Skillet:ConfigureRecipeControls()
 	DA.DEBUG(0,"ConfigureRecipeControls()")
 	if Skillet.isCraft then
 		SkilletQueueAllButton:Hide()
-		if not Skillet.db.profile.queue_crafts then
+		if Skillet.db.profile.queue_crafts then
+			SkilletQueueButton:Show()
+		else
 			SkilletQueueButton:Hide()
 		end
 		SkilletCreateAllButton:Hide()
