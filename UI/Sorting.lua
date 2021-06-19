@@ -18,6 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
+--
+-- Table of difficulty colors defined in SkilletData.lua
+--
 local skill_style_type = Skillet.skill_style_type
 
 --
@@ -25,6 +28,10 @@ local skill_style_type = Skillet.skill_style_type
 --
 local sorters = {}
 local recipe_sort_method = nil
+
+local function NOSORT(tradeskill, a, b)
+	return (a.skillIndex or 0) < (b.skillIndex or 0)
+end
 
 local function sort_recipe_by_name(tradeskill, a, b)
 	if a.name == b.name then
@@ -135,8 +142,30 @@ local function sort_recipe_by_index(tradeskill, a, b)
 	end
 end
 
-local function NOSORT(tradeskill, a, b)
-	return (a.skillIndex or 0) < (b.skillIndex or 0)
+local function get_suffix(recipe, first)
+	local ret = recipe.suffix
+	if not ret and recipe.recipeData then
+		ret = recipe.recipeData.suffix
+	end
+	if first and ret == nil and recipe.recipeID then
+		actualRecipe = Skillet:GetRecipe(recipe.recipeID)
+		Skillet:RecipeNameSuffix(tradeskill, actualRecipe)
+		ret = get_suffix(actualRecipe, false)
+	end
+	return ret
+end
+
+local function sort_recipe_by_suffix(tradeskill, a, b)
+	if a.subGroup or b.subGroup then
+		return NOSORT(tradeskill, a, b)
+	end
+	local as = get_suffix(a, true)
+	local bs = get_suffix(b, true)
+	if as == bs then
+		return (a.skillIndex or 0) < (b.skillIndex or 0)
+	else
+		return (as or 0) > (bs or 0)
+	end
 end
 
 local function SkillIsFilteredOut(skillIndex)
@@ -147,6 +176,9 @@ local function SkillIsFilteredOut(skillIndex)
 	--DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe,1))
 	local recipeID = recipe.spellID or 0
 	if recipeID == 0 then
+--
+-- It's a header, don't filter here
+--
 		DA.DEBUG(1,"Detected header")
 		return false
 	end
@@ -345,6 +377,68 @@ end
 -- currently selected tradekskill and sorting method
 -- if no sorting, then headers will be included
 --
+-- Adds the sorting routine to the list of sorting routines.
+--
+function Skillet:AddRecipeSorter(text, sorter)
+	assert(text and tostring(text),
+		"Usage Skillet:AddRecipeSorter(text, sorter), text must be a string")
+	assert(sorter and type(sorter) == "function",
+		"Usage Skillet:AddRecipeSorter(text, sorter), sorter must be a function")
+	table.insert(sorters, {["name"]=text, ["sorter"]=sorter})
+end
+
+function Skillet:InitializeSorting()
+--
+-- Default sorting methods
+-- We don't go through the public API for this as we want our methods
+-- to appear first in the list, no matter what.
+--
+	table.insert(sorters, 1, {["name"]=L["None"], ["sorter"]=sort_recipe_by_index})
+	table.insert(sorters, 2, {["name"]=L["By Name"], ["sorter"]=sort_recipe_by_name})
+	table.insert(sorters, 3, {["name"]=L["By Difficulty"], ["sorter"]=sort_recipe_by_skill_level})
+--	table.insert(sorters, 4, {["name"]=L["By Skill Level"], ["sorter"]=sort_recipe_by_skill_level})
+	table.insert(sorters, 4, {["name"]=L["By Item Level"], ["sorter"]=sort_recipe_by_item_level})
+	table.insert(sorters, 5, {["name"]=L["By Quality"], ["sorter"]=sort_recipe_by_item_quality})
+	table.insert(sorters, 6, {["name"]=L["By Suffix"], ["sorter"]=sort_recipe_by_suffix})
+
+	recipe_sort_method = sort_recipe_by_index
+	SkilletSortAscButton:SetScript("OnClick", function()
+--
+-- clicked the button will toggle sort ascending off
+--
+		set_sort_desc(true)
+		SkilletSortAscButton:Hide()
+		SkilletSortDescButton:Show()
+		self:UpdateTradeSkillWindow()
+	end)
+	SkilletSortAscButton:SetScript("OnEnter", function()
+		GameTooltip:SetOwner(SkilletSortAscButton, "ANCHOR_RIGHT")
+		GameTooltip:SetText(L["SORTASC"])
+	end)
+	SkilletSortAscButton:SetScript("OnLeave", function()
+		GameTooltip:Hide()
+	end)
+	SkilletSortDescButton:SetScript("OnClick", function()
+--
+-- Clicked the button will toggle sort descending off
+--
+		set_sort_desc(false)
+		SkilletSortDescButton:Hide()
+		SkilletSortAscButton:Show()
+		self:UpdateTradeSkillWindow()
+	end)
+	SkilletSortDescButton:SetScript("OnEnter", function()
+		GameTooltip:SetOwner(SkilletSortDescButton, "ANCHOR_RIGHT")
+		GameTooltip:SetText(L["SORTDESC"])
+	end)
+	SkilletSortDescButton:SetScript("OnLeave", function()
+		GameTooltip:Hide()
+	end)
+end
+
+--
+-- Causes the list of recipes to be resorted
+--
 function Skillet:SortAndFilterRecipes() -- SAFR: 
 	local skillListKey = Skillet.currentPlayer..":"..Skillet.currentTrade..":"..Skillet.currentGroupLabel
 	local numSkills = Skillet:GetNumSkills(Skillet.currentPlayer, Skillet.currentTrade)
@@ -377,7 +471,12 @@ function Skillet:SortAndFilterRecipes() -- SAFR:
 			if skill then
 				local recipe = Skillet:GetRecipe(skill.id)
 				if skill.id ~= 0 then							-- not a header
-					if not SkillIsFilteredOut(i) then		-- skill is not filtered out
+					local filtered = SkillIsFilteredOut(i)
+					--DA.DEBUG(1,"SortAndFilterRecipes: SkillIsFilteredOut("..tostring(i)..")= "..tostring(filtered))
+					if not filtered then
+--
+-- skill is not filtered out
+--
 						button_index = button_index + 1
 						sortedSkillList[button_index] = {["recipeID"] = skill.id, ["spellID"] = recipe.spellID, ["name"] = recipe.name, ["skillIndex"] = i, ["recipeData"] = recipe, ["skillData"] = skill, ["depth"] = 0}
 					elseif i == Skillet.selectedSkill then
@@ -443,64 +542,6 @@ function Skillet:SortAndFilterRecipes() -- SAFR:
 end
 
 --
--- Adds the sorting routine to the list of sorting routines.
---
-function Skillet:AddRecipeSorter(text, sorter)
-	assert(text and tostring(text),
-		"Usage Skillet:AddRecipeSorter(text, sorter), text must be a string")
-	assert(sorter and type(sorter) == "function",
-		"Usage Skillet:AddRecipeSorter(text, sorter), sorter must be a function")
-	table.insert(sorters, {["name"]=text, ["sorter"]=sorter})
-end
-
-function Skillet:InitializeSorting()
---
--- Default sorting methods
--- We don't go through the public API for this as we want our methods
--- to appear first in the list, no matter what.
---
-	table.insert(sorters, 1, {["name"]=L["None"], ["sorter"]=sort_recipe_by_index})
-	table.insert(sorters, 2, {["name"]=L["By Name"], ["sorter"]=sort_recipe_by_name})
-	table.insert(sorters, 3, {["name"]=L["By Difficulty"], ["sorter"]=sort_recipe_by_skill_level})
---	table.insert(sorters, 4, {["name"]=L["By Skill Level"], ["sorter"]=sort_recipe_by_skill_level})
-	table.insert(sorters, 4, {["name"]=L["By Item Level"], ["sorter"]=sort_recipe_by_item_level})
-	table.insert(sorters, 5, {["name"]=L["By Quality"], ["sorter"]=sort_recipe_by_item_quality})
-	recipe_sort_method = sort_recipe_by_index
-	SkilletSortAscButton:SetScript("OnClick", function()
---
--- clicked the button will toggle sort ascending off
---
-		set_sort_desc(true)
-		SkilletSortAscButton:Hide()
-		SkilletSortDescButton:Show()
-		self:UpdateTradeSkillWindow()
-	end)
-	SkilletSortAscButton:SetScript("OnEnter", function()
-		GameTooltip:SetOwner(SkilletSortAscButton, "ANCHOR_RIGHT")
-		GameTooltip:SetText(L["SORTASC"])
-	end)
-	SkilletSortAscButton:SetScript("OnLeave", function()
-		GameTooltip:Hide()
-	end)
-	SkilletSortDescButton:SetScript("OnClick", function()
---
--- Clicked the button will toggle sort descending off
---
-		set_sort_desc(false)
-		SkilletSortDescButton:Hide()
-		SkilletSortAscButton:Show()
-		self:UpdateTradeSkillWindow()
-	end)
-	SkilletSortDescButton:SetScript("OnEnter", function()
-		GameTooltip:SetOwner(SkilletSortDescButton, "ANCHOR_RIGHT")
-		GameTooltip:SetText(L["SORTDESC"])
-	end)
-	SkilletSortDescButton:SetScript("OnLeave", function()
-		GameTooltip:Hide()
-	end)
-end
-
---
 -- Called when the sort drop down is first loaded
 --
 function Skillet:SortDropdown_OnLoad()
@@ -515,6 +556,10 @@ function Skillet:SortDropdown_OnLoad()
 			break
 		end
 	end
+--
+-- Can't call show_sort_toggle() here as the sort
+-- buttons have not been created yet
+--
 end
 
 --
@@ -551,6 +596,10 @@ function Skillet.SortDropdown_Initialize(menuFrame,level)
 		i = i + 1
 		UIDropDownMenu_AddButton(info)
 	end
+--
+-- Can't call show_sort_toggle() here as the sort
+-- buttons have not been created yet
+--
 end
 
 --
