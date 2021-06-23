@@ -298,6 +298,13 @@ function Skillet:ProcessQueue(altMode)
 			local tradeID = command.tradeID
 			local tradeName = command.tradeName
 			local recipeIndex = command.recipeIndex
+			local verifyIndex = self.data.skillIndexLookup[self.currentPlayer][recipeID]
+			if recipeIndex ~= verifyIndex then
+				DA.WARN("recipeIndex= "..tostring(recipeIndex).." and verifyIndex= "..tostring(verifyIndex).." do not match")
+				self.queueCasting = false
+				self:RemoveFromQueue(qpos)
+				return
+			end
 			local count = command.count
 			if self.currentTrade ~= tradeID and tradeName then
 				--DA.DEBUG(1,"queue_crafts= "..tostring(self.db.profile.queue_crafts)..", skillIsCraft= "..tostring(self.skillIsCraft[tradeID]))
