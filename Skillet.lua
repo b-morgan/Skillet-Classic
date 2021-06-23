@@ -350,6 +350,21 @@ StaticPopupDialogs["SKILLET_CONTINUE_CHANGE"] = {
 };
 
 --
+-- Create a static popup for changing professions
+--
+StaticPopupDialogs["SKILLET_IGNORE_CHANGE"] = {
+	text = "Skillet-Classic\n"..L["Use Action Bar button to change professions"],
+	button1 = OKAY,
+	OnAccept = function( self )
+		return
+	end,
+	timeout = 0,
+	exclusive = 1,
+	whileDead = 1,
+	hideOnEscape = 1
+};
+
+--
 -- Now do the character initialization
 --
 	self:InitializeDatabase(UnitName("player"))
@@ -692,6 +707,7 @@ end
 
 function Skillet:PLAYER_LOGIN()
 	DA.TRACE("PLAYER_LOGIN")
+	self.loginTime = GetTime()
 end
 
 function Skillet:PLAYER_ENTERING_WORLD()
@@ -758,6 +774,10 @@ function Skillet:PLAYER_LOGOUT()
 			end
 		end
 		SkilletMemory = DA.deepcopy(self.data.groupList) -- minus all the group "Blizzard" stuff
+	end
+	for tradeID in pairs(self.db.realm.tradeSkills[self.currentPlayer]) do
+		--DA.DEBUG(0,"tradeID= "..tostring(tradeID)..", count= "..tostring(self.db.realm.tradeSkills[self.currentPlayer][tradeID].count))
+		self.db.realm.tradeSkills[self.currentPlayer][tradeID].count = 0
 	end
 end
 
@@ -1131,9 +1151,14 @@ function Skillet:SkilletClose()
 	self.lastCraft = self.isCraft
 	if self.isCraft then
 		self:RestoreEnchantButton(false)
+		CloseCraft()
+	else
+		CloseTradeSkill()
 	end
-	self:HideAllWindows()
+	self.processingSpell = nil
+	self.changingTrade = nil
 	self.closingTrade = nil
+	return self:HideAllWindows()
 end
 
 function Skillet:BAG_OPEN(event, bagID)				-- Fires when a non-inventory container is opened.
@@ -1300,6 +1325,14 @@ function Skillet:ChangeTradeSkill(tradeID, tradeName)
 		if tradeID == 2575 then spellID = 2656 end		-- Ye old Mining vs. Smelting issue
 		local spell = self:GetTradeName(spellID)
 		--DA.DEBUG(1,"tradeID= "..tostring(tradeID)..", tradeName= "..tostring(tradeName)..", Mining= "..tostring(Mining)..", Smelting= "..tostring(Smelting))
+		if self.db.realm.tradeSkills[self.currentPlayer][tradeID].count < 1 then
+			DA.DEBUG(1,"ChangeTradeSkill: executing ChangeTrade("..tostring(tradeID).."), count= "..tostring(self.db.realm.tradeSkills[self.currentPlayer][tradeID].count)..", tradeName= "..tostring(tradeName))
+			self.db.realm.tradeSkills[self.currentPlayer][tradeID].count = 1
+			self.closingTrade = true
+			self:SkilletClose()
+			StaticPopup_Show("SKILLET_IGNORE_CHANGE")
+			return
+		end
 		DA.DEBUG(1,"ChangeTradeSkill: executing CastSpellByName("..tostring(spell)..")")
 		self.processingSpell = spell
 		CastSpellByName(spell) -- trigger the whole rescan process via a TRADE_SKILL_SHOW or CRAFT_SHOW event

@@ -161,6 +161,7 @@ function Skillet:ScanPlayerTradeSkills(player)
 							skillRanksData[id].name = name
 							skillRanksData[id].rank = 0
 							skillRanksData[id].maxRank = 0
+							skillRanksData[id].opened = 0
 							skillRanksData[id].isCraft = self.skillIsCraft[id]
 						end
 					else
@@ -728,6 +729,12 @@ local function ScanTrade()
 	Skillet.db.realm.tradeSkills[player][tradeID].rank = rank
 	Skillet.db.realm.tradeSkills[player][tradeID].maxRank = maxRank
 	Skillet.db.realm.tradeSkills[player][tradeID].isCraft = Skillet.isCraft
+	local opened = Skillet.db.realm.tradeSkills[player][tradeID].opened or 0
+	if opened < Skillet.loginTime then
+		Skillet.db.realm.tradeSkills[player][tradeID].count = 0
+		Skillet.db.realm.tradeSkills[player][tradeID].opened = GetTime()
+	end
+	Skillet.db.realm.tradeSkills[player][tradeID].count = Skillet.db.realm.tradeSkills[player][tradeID].count + 1
 --
 -- Mining and Smelting have a bipolar relationship 
 --
@@ -739,6 +746,12 @@ local function ScanTrade()
 		Skillet.db.realm.tradeSkills[player][SMELTING].rank = rank
 		Skillet.db.realm.tradeSkills[player][SMELTING].maxRank = maxRank
 		Skillet.db.realm.tradeSkills[player][SMELTING].isCraft = Skillet.isCraft
+		local opened = Skillet.db.realm.tradeSkills[player][SMELTING].opened or 0
+		if opened < Skillet.loginTime then
+			Skillet.db.realm.tradeSkills[player][SMELTING].count = 0
+			Skillet.db.realm.tradeSkills[player][SMELTING].opened = GetTime()
+		end
+		Skillet.db.realm.tradeSkills[player][SMELTING].count = Skillet.db.realm.tradeSkills[player][SMELTING].count + 1
 	end
 	local numHeaders = 0
 	local parentGroup
