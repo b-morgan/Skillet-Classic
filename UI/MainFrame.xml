@@ -865,7 +865,7 @@
 					<OnHide>
 						if Skillet.fullView then
 							Skillet:InventoryFilterButtons_Hide()
-							Skillet:SkilletFrameForceClose()
+							Skillet:SkilletClose()
 						end
 					</OnHide>
 				</Scripts>
