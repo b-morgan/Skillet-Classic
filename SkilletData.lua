@@ -729,8 +729,9 @@ local function ScanTrade()
 	Skillet.db.realm.tradeSkills[player][tradeID].rank = rank
 	Skillet.db.realm.tradeSkills[player][tradeID].maxRank = maxRank
 	Skillet.db.realm.tradeSkills[player][tradeID].isCraft = Skillet.isCraft
+	local login = Skillet.loginTime or 1
 	local opened = Skillet.db.realm.tradeSkills[player][tradeID].opened or 0
-	if opened < Skillet.loginTime then
+	if opened < login then
 		Skillet.db.realm.tradeSkills[player][tradeID].count = 0
 		Skillet.db.realm.tradeSkills[player][tradeID].opened = GetTime()
 	end
@@ -747,7 +748,7 @@ local function ScanTrade()
 		Skillet.db.realm.tradeSkills[player][SMELTING].maxRank = maxRank
 		Skillet.db.realm.tradeSkills[player][SMELTING].isCraft = Skillet.isCraft
 		local opened = Skillet.db.realm.tradeSkills[player][SMELTING].opened or 0
-		if opened < Skillet.loginTime then
+		if opened < login then
 			Skillet.db.realm.tradeSkills[player][SMELTING].count = 0
 			Skillet.db.realm.tradeSkills[player][SMELTING].opened = GetTime()
 		end

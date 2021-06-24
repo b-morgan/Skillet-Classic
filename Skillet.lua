@@ -707,7 +707,7 @@ end
 
 function Skillet:PLAYER_LOGIN()
 	DA.TRACE("PLAYER_LOGIN")
-	self.loginTime = GetTime()
+	Skillet.loginTime = GetTime()
 end
 
 function Skillet:PLAYER_ENTERING_WORLD()
@@ -716,6 +716,13 @@ function Skillet:PLAYER_ENTERING_WORLD()
 	local realm = GetRealmName()
 	local faction = UnitFactionGroup("player")
 	local guid = UnitGUID("player")		-- example: guid="Player-970-0002FD64" kind=="Player" server=="970" ID="0002FD64" 
+--
+-- PLAYER_ENTERING_WORLD happens on login and when changing zones so
+-- only save the time of the first one.
+--
+	if not Skillet.loginTime then
+		Skillet.loginTime = GetTime()
+	end
 --
 -- Store some identifying data in the per character saved variables file
 --
