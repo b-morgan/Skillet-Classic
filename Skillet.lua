@@ -781,13 +781,6 @@ function Skillet:PLAYER_LOGOUT()
 	end
 end
 
-function Skillet:SKILL_LINES_CHANGED()
-	DA.TRACE("SKILL_LINES_CHANGED")
-	if Skillet.tradeSkillOpen then
-		Skillet.dataSourceChanged = true	-- Process the change on the next TRADE_SKILL_UPDATE
-	end
-end
-
 function Skillet:LEARNED_SPELL_IN_TAB(event, profession)
 	DA.TRACE("LEARNED_SPELL_IN_TAB")
 	DA.TRACE("profession= "..tostring(profession))
@@ -806,7 +799,7 @@ end
 
 function Skillet:TRADE_SKILL_NAME_UPDATE()
 	DA.TRACE("TRADE_SKILL_NAME_UPDATE")
-	--DA.TRACE("TRADE_SKILL_NAME_UPDATE: tradeShow= "..tostring(Skillet.tradeShow..", linkedSkill= "..tostring(Skillet.linkedSkill))
+	DA.TRACE("TRADE_SKILL_NAME_UPDATE: tradeShow= "..tostring(Skillet.tradeShow)..", linkedSkill= "..tostring(Skillet.linkedSkill))
 	if not Skillet.tradeShow then return end
 	if Skillet.linkedSkill then
 		if Skillet.lastCraft ~= Skillet.isCraft then
@@ -818,7 +811,7 @@ end
 
 function Skillet:TRADE_SKILL_UPDATE()
 	DA.TRACE("TRADE_SKILL_UPDATE")
-	--DA.TRACE("TRADE_SKILL_UPDATE: closingTrade= "..tostring(Skillet.closingTrade)..", tradeShow= "..tostring(Skillet.tradeShow))
+	DA.TRACE("TRADE_SKILL_UPDATE: closingTrade= "..tostring(Skillet.closingTrade)..", tradeShow= "..tostring(Skillet.tradeShow))
 	if Skillet.closingTrade or not Skillet.tradeShow then return end
 	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
 		if Skillet.lastCraft ~= Skillet.isCraft then
@@ -835,7 +828,7 @@ end
 
 function Skillet:CRAFT_UPDATE()
 	DA.TRACE("CRAFT_UPDATE")
-	--DA.TRACE("CRAFT_UPDATE: closingTrade= "..tostring(Skillet.closingTrade)..", tradeShow= "..tostring(Skillet.tradeShow))
+	DA.TRACE("CRAFT_UPDATE: closingTrade= "..tostring(Skillet.closingTrade)..", tradeShow= "..tostring(Skillet.tradeShow))
 	if Skillet.closingTrade or not Skillet.craftShow then return end
 	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
 		if Skillet.lastCraft ~= Skillet.isCraft then
@@ -847,6 +840,13 @@ function Skillet:CRAFT_UPDATE()
 	if Skillet.dataSourceChanged or not Skillet.dataScanned then
 		Skillet.dataSourceChanged = false
 		Skillet:SkilletShowWindow()
+	end
+end
+
+function Skillet:SKILL_LINES_CHANGED()
+	DA.TRACE("SKILL_LINES_CHANGED")
+	if Skillet.tradeSkillOpen then
+		Skillet.dataSourceChanged = true	-- Process the change on the next TRADE_SKILL_UPDATE
 	end
 end
 
@@ -876,7 +876,7 @@ end
 
 function Skillet:TRADE_SKILL_SHOW()
 	DA.TRACE("TRADE_SKILL_SHOW")
-	--DA.TRACE("TRADE_SKILL_SHOW: hideTradeSkillFrame= "..tostring(Skillet.hideTradeSkillFrame))
+	DA.TRACE("TRADE_SKILL_SHOW: hideTradeSkillFrame= "..tostring(Skillet.hideTradeSkillFrame))
 	if Skillet.hideTradeSkillFrame then
 		HideUIPanel(TradeSkillFrame)
 		Skillet.hideTradeSkillFrame = nil
@@ -884,8 +884,8 @@ function Skillet:TRADE_SKILL_SHOW()
 	Skillet.tradeShow = true
 	Skillet.isCraft = false
 	local name = GetTradeSkillLine()
-	--DA.TRACE("TRADE_SKILL_SHOW: name= '"..tostring(name).."'")
-	--DA.TRACE("TRADE_SKILL_SHOW: lastCraft= "..tostring(Skillet.lastCraft))
+	DA.TRACE("TRADE_SKILL_SHOW: name= '"..tostring(name).."'")
+	DA.TRACE("TRADE_SKILL_SHOW: lastCraft= "..tostring(Skillet.lastCraft))
 	if Skillet.lastCraft ~= Skillet.isCraft then
 		Skillet:ConfigureRecipeControls()
 	end
@@ -922,8 +922,8 @@ function Skillet:CRAFT_SHOW()
 	Skillet.isCraft = true
 	Skillet.hideCraftFrame = true
 	local name = GetCraftDisplaySkillLine()
-	--DA.TRACE("CRAFT_SHOW: name= '"..tostring(name).."'")
-	--DA.TRACE("CRAFT_SHOW: lastCraft= "..tostring(Skillet.lastCraft))
+	DA.TRACE("CRAFT_SHOW: name= '"..tostring(name).."'")
+	DA.TRACE("CRAFT_SHOW: lastCraft= "..tostring(Skillet.lastCraft))
 	if Skillet.lastCraft ~= Skillet.isCraft then
 		Skillet:ConfigureRecipeControls()
 	end
@@ -933,7 +933,7 @@ function Skillet:CRAFT_SHOW()
 		SkilletEnchantButton:Disable()		-- because DoCraft is restricted
 		SkilletEnchantButton:Show()
 	end
-	--DA.TRACE("CRAFT_SHOW: changingTrade= "..tostring(Skillet.changingTrade))
+	DA.TRACE("CRAFT_SHOW: changingTrade= "..tostring(Skillet.changingTrade))
 	if not Skillet.changingTrade then		-- wait for UNIT_SPELLCAST_SUCCEEDED
 		Skillet:SkilletShow()
 	end
@@ -1156,7 +1156,6 @@ function Skillet:SkilletClose()
 		CloseTradeSkill()
 	end
 	self.processingSpell = nil
-	self.changingTrade = nil
 	self.closingTrade = nil
 	return self:HideAllWindows()
 end
@@ -1324,8 +1323,8 @@ function Skillet:ChangeTradeSkill(tradeID, tradeName)
 		local spellID = tradeID
 		if tradeID == 2575 then spellID = 2656 end		-- Ye old Mining vs. Smelting issue
 		local spell = self:GetTradeName(spellID)
-		--DA.DEBUG(1,"tradeID= "..tostring(tradeID)..", tradeName= "..tostring(tradeName)..", Mining= "..tostring(Mining)..", Smelting= "..tostring(Smelting))
-		if self.db.realm.tradeSkills[self.currentPlayer][tradeID].count < 1 then
+		DA.DEBUG(1,"tradeID= "..tostring(tradeID)..", tradeName= "..tostring(tradeName)..", Mining= "..tostring(Mining)..", Smelting= "..tostring(Smelting))
+		if not self.db.realm.tradeSkills[self.currentPlayer][tradeID].count or self.db.realm.tradeSkills[self.currentPlayer][tradeID].count < 1 then
 			DA.DEBUG(1,"ChangeTradeSkill: executing ChangeTrade("..tostring(tradeID).."), count= "..tostring(self.db.realm.tradeSkills[self.currentPlayer][tradeID].count)..", tradeName= "..tostring(tradeName))
 			self.db.realm.tradeSkills[self.currentPlayer][tradeID].count = 1
 			self.closingTrade = true
@@ -1357,7 +1356,7 @@ function Skillet:ChangeTrade(tradeID)
 	self:HideAllWindows()
 	self.changingTrade = tradeID
 	self.changingName = self.tradeSkillNamesByID[tradeID]
-	--DA.DEBUG(0,"ChangeTrade: changingTrade= "..tostring(self.changingTrade)..", changingName= "..tostring(self.changingName)..", isCraft= "..tostring(self.isCraft))
+	DA.DEBUG(0,"ChangeTrade: changingTrade= "..tostring(self.changingTrade)..", changingName= "..tostring(self.changingName)..", isCraft= "..tostring(self.isCraft))
 	StaticPopup_Show("SKILLET_CONTINUE_CHANGE")
 end
 
@@ -1665,4 +1664,3 @@ end
 function Skillet:IsCraft()
 	return Skillet.isCraft
 end
-
