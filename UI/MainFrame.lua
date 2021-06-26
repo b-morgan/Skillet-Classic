@@ -2590,6 +2590,18 @@ function Skillet:ReagentsLinkOnClick(button, skillIndex, reagentIndex)
 	end
 end
 
+function Skillet:SkilletFrameForceClose()
+	DA.DEBUG(0,"SkilletFrameForceClose()")
+	if Skillet.isCraft then
+		CloseCraft()
+	else
+		CloseTradeSkill()
+	end
+	Skillet.processingSpell = nil
+	Skillet.changingTrade = nil
+	return self:HideAllWindows()
+end
+
 --
 -- Called when the trade skill window is shown
 --
@@ -2603,7 +2615,7 @@ function Skillet:Tradeskill_OnShow()
 		old_CloseSpecialWindows = CloseSpecialWindows
 		CloseSpecialWindows = function()
 			local found = old_CloseSpecialWindows()
-			return self:SkilletClose() or found
+			return self:SkilletFrameForceClose() or found
 		end
 	end
 end
@@ -3106,7 +3118,7 @@ end
 
 function Skillet:StandaloneQueueClose()
 	Skillet:ShowFullView()
-	Skillet:SkilletClose()
+	Skillet:SkilletFrameForceClose()
 end
 
 function Skillet:HideStandaloneQueue()

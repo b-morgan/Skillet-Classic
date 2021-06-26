@@ -1158,13 +1158,9 @@ function Skillet:SkilletClose()
 	self.lastCraft = self.isCraft
 	if self.isCraft then
 		self:RestoreEnchantButton(false)
-		CloseCraft()
-	else
-		CloseTradeSkill()
 	end
-	self.processingSpell = nil
+	self:HideAllWindows()
 	self.closingTrade = nil
-	return self:HideAllWindows()
 end
 
 function Skillet:BAG_OPEN(event, bagID)				-- Fires when a non-inventory container is opened.
@@ -1671,3 +1667,4 @@ end
 function Skillet:IsCraft()
 	return Skillet.isCraft
 end
+
