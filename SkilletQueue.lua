@@ -116,7 +116,7 @@ end
 --
 local function AddToQueue(command)
 	DA.DEBUG(0,"AddToQueue("..DA.DUMP1(command)..")")
-	local queue = Skillet.db.realm.queueData[self.currentPlayer]
+	local queue = Skillet.db.realm.queueData[Skillet.currentPlayer]
 	if (not command.complex) then		-- we can add this queue entry to any of the other entries
 		local added
 		for i=1,#queue,1 do
