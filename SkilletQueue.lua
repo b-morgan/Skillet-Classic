@@ -61,7 +61,7 @@ local function queueAppendReagent(command, reagentID, need, queueCraftables)
 	if reagentID then
 		reagentName = GetItemInfo(reagentID)
 	end
-	DA.DEBUG(0,"queueAppendReagent("..tostring(reagentID)..", "..tostring(need)..", "..tostring(queueCraftables).."), name= "..tostring(reagentName))
+	DA.DEBUG(0,"queueAppendReagent("..tostring(reagentID)..", "..tostring(need)..", "..tostring(queueCraftables).."), name= "..tostring(reagentName)..", level= "..tostring(command.level))
 	local reagentsInQueue = Skillet.db.realm.reagentsInQueue[Skillet.currentPlayer]
 	local skillIndexLookup = Skillet.data.skillIndexLookup[Skillet.currentPlayer]
 	local numInBoth = GetItemCount(reagentID,true)
@@ -97,7 +97,7 @@ local function queueAppendReagent(command, reagentID, need, queueCraftables)
 --
 					if not Skillet.TradeSkillIgnoredMats[recipeSourceID] and
 					  not Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeSourceID] then
-						Skillet:QueueAppendCommand(newCommand, queueCraftables, true)
+						Skillet:QueueAppendCommand(newCommand, queueCraftables)
 						break
 					else
 						DA.DEBUG(3,"Did Not Queue "..tostring(recipeSourceID).." ("..tostring(recipeSource.name)..")")
@@ -106,25 +106,7 @@ local function queueAppendReagent(command, reagentID, need, queueCraftables)
 			end -- for
 		end
 	end
-end
-
---
--- Queue up the command and reserve reagents
---
-function Skillet:QueueAppendCommand(command, queueCraftables)
-	DA.DEBUG(0,"QueueAppendCommand("..DA.DUMP1(command)..", "..tostring(queueCraftables)..")")
-	local recipe = self:GetRecipe(command.recipeID)
-	DA.DEBUG(0,"recipe= "..DA.DUMP1(recipe))
-	if recipe then
-		local reagentsInQueue = self.db.realm.reagentsInQueue[Skillet.currentPlayer]
-		for i=1,#recipe.reagentData do
-			local reagent = recipe.reagentData[i]
-			DA.DEBUG(2,"reagent= "..DA.DUMP1(reagent))
-			queueAppendReagent(command, reagent.id, command.count * reagent.numNeeded, queueCraftables)
-		end -- for
-		reagentsInQueue[recipe.itemID] = (reagentsInQueue[recipe.itemID] or 0) + command.count * recipe.numMade;
-		Skillet:AddToQueue(command)
-	end
+	DA.DEBUG(0,"queueAppendReagent: level= "..tostring(command.level))
 end
 
 --
@@ -132,7 +114,7 @@ end
 -- we can't just increase the # of the first command if it happens to be the same recipe without making sure
 -- the additional queue entry doesn't require some additional craftable reagents
 --
-function Skillet:AddToQueue(command)
+local function AddToQueue(command)
 	DA.DEBUG(0,"AddToQueue("..DA.DUMP1(command)..")")
 	local queue = self.db.realm.queueData[self.currentPlayer]
 	if (not command.complex) then		-- we can add this queue entry to any of the other entries
@@ -160,7 +142,44 @@ function Skillet:AddToQueue(command)
 	else
 		table.insert(queue, command)
 	end
-	self:AdjustInventory()
+end
+
+--
+-- Queue up the command and reserve reagents
+--
+function Skillet:QueueAppendCommand(command, queueCraftables)
+	DA.DEBUG(0,"QueueAppendCommand("..DA.DUMP1(command)..", "..tostring(queueCraftables).."), level= "..tostring(command.level))
+	local recipe = self:GetRecipe(command.recipeID)
+	--DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe))
+	if recipe then
+		if not command.level then
+			self.newInQueue = {}
+		end
+		local level = command.level or 0
+		if not self.newInQueue[level] then
+			self.newInQueue[level] = {}
+		end
+		for i=1,#recipe.reagentData do
+			local reagent = recipe.reagentData[i]
+			--DA.DEBUG(3,"reagent= "..DA.DUMP1(reagent))
+			queueAppendReagent(command, reagent.id, command.count * reagent.numNeeded, queueCraftables)
+		end -- for
+		self.newInQueue[level][recipe.itemID] = (self.newInQueue[level][recipe.itemID] or 0) + command.count * recipe.numMade
+		--DA.DEBUG(2,"newInQueue["..tostring(level).."]["..tostring(recipe.itemID).."]= "..tostring(self.newInQueue[level][recipe.itemID]).." ("..tostring(recipe.name)..")")
+		AddToQueue(command)
+	end
+	DA.DEBUG(0,"QueueAppendCommand: level= "..tostring(command.level))
+	if not command.level then
+		local reagentsInQueue = self.db.realm.reagentsInQueue[Skillet.currentPlayer]
+		--DA.DEBUG(0,"QueueAppendCommand: newInQueue= "..DA.DUMP1(self.newInQueue))
+		for level in pairs(self.newInQueue) do
+			for itemID in pairs(self.newInQueue[level]) do
+				reagentsInQueue[itemID] = (reagentsInQueue[itemID] or 0) + self.newInQueue[level][itemID]
+			end
+		end
+		--DA.DEBUG(0,"QueueAppendCommand: reagentsInQueue= "..DA.DUMP1(reagentsInQueue))
+		self:AdjustInventory()
+	end
 end
 
 function Skillet:RemoveFromQueue(index)
@@ -193,6 +212,7 @@ function Skillet:ClearQueue()
 		self.db.realm.reagentsInQueue[self.currentPlayer] = {}
 		self:UpdateTradeSkillWindow()
 	end
+	self:AdjustInventory()
 	--DA.DEBUG(0,"ClearQueue Complete")
 end
 
