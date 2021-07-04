@@ -554,6 +554,7 @@ function Skillet:ContinueCast(spell)
 	  ", processingSpell= "..tostring(self.processingSpell)..", queueCasting= "..tostring(self.queueCasting))
 	if self.changingTrade then			-- contains the tradeID we are changing to
 		self.currentTrade = self.changingTrade
+		Skillet:SkilletShow()			-- seems to let DoTradeSkill know we have changed
 		self.processingSpell = nil
 		self.changingTrade = nil
 	else
