@@ -381,6 +381,7 @@ end
 function Skillet:FlushAllData()
 	Skillet.data = {}
 	Skillet.db.realm.tradeSkills = {}
+	Skillet.db.realm.lastSkills = {}
 	Skillet.db.realm.auctionData = {}
 	Skillet.db.realm.inventoryData = {}
 	Skillet.db.realm.bagData = {}
@@ -484,6 +485,12 @@ function Skillet:InitializeDatabase(player, clean)
 		end
 		if not self.db.realm.tradeSkills[player] or clean then
 			self.db.realm.tradeSkills[player] = {}
+		end
+		if not self.db.realm.lastSkills then
+			self.db.realm.lastSkills = {}
+		end
+		if not self.db.realm.lastSkills[player] or clean then
+			self.db.realm.lastSkills[player] = {}
 		end
 		if not self.db.realm.queueData then
 			self.db.realm.queueData = {}
@@ -818,8 +825,10 @@ end
 
 function Skillet:TRADE_SKILL_UPDATE()
 	DA.TRACE("TRADE_SKILL_UPDATE")
-	DA.TRACE("TRADE_SKILL_UPDATE: closingTrade= "..tostring(Skillet.closingTrade)..", tradeShow= "..tostring(Skillet.tradeShow))
+	Skillet.tradeUpdate = Skillet.tradeUpdate + 1
+	DA.TRACE("TRADE_SKILL_UPDATE: closingTrade= "..tostring(Skillet.closingTrade)..", tradeShow= "..tostring(Skillet.tradeShow)..", tradeUpdate= "..tostring(Skillet.tradeUpdate))
 	if Skillet.closingTrade or not Skillet.tradeShow then return end
+	if Skillet.tradeUpdate < 2 then return end
 	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
 		if Skillet.lastCraft ~= Skillet.isCraft then
 			Skillet:ConfigureRecipeControls()
@@ -835,8 +844,10 @@ end
 
 function Skillet:CRAFT_UPDATE()
 	DA.TRACE("CRAFT_UPDATE")
-	DA.TRACE("CRAFT_UPDATE: closingTrade= "..tostring(Skillet.closingTrade)..", tradeShow= "..tostring(Skillet.tradeShow))
+	Skillet.craftUpdate = Skillet.craftUpdate + 1
+	DA.TRACE("CRAFT_UPDATE: closingTrade= "..tostring(Skillet.closingTrade)..", tradeShow= "..tostring(Skillet.tradeShow)..", craftUpdate= "..tostring(Skillet.craftUpdate))
 	if Skillet.closingTrade or not Skillet.craftShow then return end
+	if Skillet.craftUpdate < 2 then return end
 	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
 		if Skillet.lastCraft ~= Skillet.isCraft then
 			Skillet:ConfigureRecipeControls()
@@ -883,6 +894,7 @@ end
 
 function Skillet:TRADE_SKILL_SHOW()
 	DA.TRACE("TRADE_SKILL_SHOW")
+	Skillet.tradeUpdate = 0
 	DA.TRACE("TRADE_SKILL_SHOW: hideTradeSkillFrame= "..tostring(Skillet.hideTradeSkillFrame))
 	if Skillet.hideTradeSkillFrame then
 		HideUIPanel(TradeSkillFrame)
@@ -928,6 +940,7 @@ function Skillet:CRAFT_SHOW()
 	Skillet.craftShow = true
 	Skillet.isCraft = true
 	Skillet.hideCraftFrame = true
+	Skillet.craftUpdate = 0
 	local name = GetCraftDisplaySkillLine()
 	DA.TRACE("CRAFT_SHOW: name= '"..tostring(name).."'")
 	DA.TRACE("CRAFT_SHOW: lastCraft= "..tostring(Skillet.lastCraft))

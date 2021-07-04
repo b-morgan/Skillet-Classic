@@ -653,18 +653,35 @@ function Skillet:CalculateCraftableCounts()
 end
 
 --
+-- Sanity check that the tradeID matches
+--
+local function CheckTradeID(tradeID, recipeID)
+	local recipeDB = Skillet.db.global.recipeDB
+	if recipeDB[recipeID] then
+		local oldTradeID, oldItemString, oldReagentString, oldToolString = string.split(" ",recipeDB[recipeID])
+		if oldTradeID ~= tostring(tradeID) then
+			DA.DEBUG(2,"CheckTradeID:  recipeID="..tostring(recipeID)..", oldTradeID="..tostring(oldTradeID)..", tradeID="..tostring(tradeID)..", tradeUpdate= "..tostring(Skillet.tradeUpdate)..", craftUpdate= "..tostring(Skillet.craftUpdate))
+			return true
+		end
+	end
+end
+
+--
 -- This is a local function only called from Skillet:ReScanTrade() which
 -- is defined after this one
 --
 local function ScanTrade()
-	--DA.DEBUG(2,"ScanTrade()")
+	DA.DEBUG(2,"ScanTrade()")
 	local profession, rank, maxRank
+	local numSkills, numCrafts
 	if Skillet.isCraft then
 		profession, rank, maxRank = GetCraftDisplaySkillLine()
+		numCrafts = GetNumCrafts()
 	else
 		profession, rank, maxRank = GetTradeSkillLine()
+		numSkills = GetNumTradeSkills()
 	end
-	--DA.DEBUG(2,"ScanTrade: profession= "..tostring(profession)..", rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
+	DA.DEBUG(2,"ScanTrade: profession= "..tostring(profession)..", rank= "..tostring(rank)..", maxRank= "..tostring(maxRank)..", numCrafts= "..tostring(numCrafts)..", numSkills= "..tostring(numSkills))
 	if profession == "UNKNOWN" then
 		return false
 	end
@@ -678,12 +695,6 @@ local function ScanTrade()
 --
 -- First, loop through all the recipe groups and make sure they are expanded
 --
-	local numSkills, numCrafts
-	if Skillet.isCraft then
-		numCrafts = GetNumCrafts()
-	else
-		numSkills = GetNumTradeSkills()
-	end
 	if numSkills then
 		for i = 1, numSkills do
 			local skillName, skillType, numAvailable, isExpanded = GetTradeSkillInfo(i)
@@ -692,6 +703,8 @@ local function ScanTrade()
 				if not isExpanded then
 					ExpandTradeSkillSubClass(i)
 				end
+			elseif CheckTradeID(tradeID, skillName) then
+				return false
 			end
 		end
 	end
@@ -703,16 +716,20 @@ local function ScanTrade()
 				if not isExpanded then
 					ExpandCraftSubClass(i)
 				end
+			elseif CheckTradeID(tradeID, skillName) then
+				return false
 			end
 		end
+		numSkills = numCrafts
+	end
 --
 -- From here on, just one loop variable needed
 --
-		numSkills = numCrafts
-	end
-	DA.DEBUG(0,"ScanTrade: "..tostring(profession)..": "..tostring(tradeID).." "..numSkills.." recipes")
-	local skillDB = Skillet.db.realm.skillDB[player][tradeID]
+	DA.DEBUG(2,"ScanTrade: "..tostring(profession)..": "..tostring(tradeID).." "..numSkills.." recipes")
 	local recipeDB = Skillet.db.global.recipeDB
+	local skillDB = Skillet.db.realm.skillDB[player][tradeID]
+	local tradeSkill = Skillet.db.realm.tradeSkills[player][tradeID]
+	local lastSkill = Skillet.db.realm.lastSkills[player][tradeID]
 	local skillData = Skillet.data.skillList[player][tradeID]
 	if not skillData then
 		return false
@@ -725,17 +742,26 @@ local function ScanTrade()
 	mainGroup.autoGroup = true
 	Skillet:RecipeGroupClearEntries(mainGroup)
 	Skillet.groupList = {}
-	Skillet.db.realm.tradeSkills[player][tradeID].name = profession
-	Skillet.db.realm.tradeSkills[player][tradeID].rank = rank
-	Skillet.db.realm.tradeSkills[player][tradeID].maxRank = maxRank
-	Skillet.db.realm.tradeSkills[player][tradeID].isCraft = Skillet.isCraft
+--
+-- Update the tradeSkill data keeping the previous values
+--
+	lastSkill.name = tradeSkill.name
+	lastSkill.rank = tradeSkill.rank
+	lastSkill.maxRank = tradeSkill.maxRank
+	lastSkill.isCraft = tradeSkill.isCraft
+	lastSkill.numSkills = tradeSkill.numSkills
+	tradeSkill.name = profession
+	tradeSkill.rank = rank
+	tradeSkill.maxRank = maxRank
+	tradeSkill.isCraft = Skillet.isCraft
+	tradeSkill.numSkills = numSkills
 	local login = Skillet.loginTime or 1
-	local opened = Skillet.db.realm.tradeSkills[player][tradeID].opened or 0
+	local opened = tradeSkill.opened or 0
 	if opened < login then
-		Skillet.db.realm.tradeSkills[player][tradeID].count = 0
-		Skillet.db.realm.tradeSkills[player][tradeID].opened = GetTime()
+		tradeSkill.count = 0
+		tradeSkill.opened = GetTime()
 	end
-	Skillet.db.realm.tradeSkills[player][tradeID].count = Skillet.db.realm.tradeSkills[player][tradeID].count + 1
+	tradeSkill.count = Skillet.db.realm.tradeSkills[player][tradeID].count + 1
 --
 -- Mining and Smelting have a bipolar relationship 
 --
@@ -789,7 +815,7 @@ local function ScanTrade()
 		else
 			skillName, skillType, numAvailable, isExpanded = GetTradeSkillInfo(i)
 		end
-		--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", craftSubSpellName= "..tostring(craftSubSpellName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
+		--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", craftSubSpellName= "..tostring(craftSubSpellName)..", skillType="..tostring(skillType)..", numAvailable= "..tostring(numAvailable)..", isExpanded= "..tostring(isExpanded))
 		if skillName then
 			if skillType == "header" or skillType == "subheader" then
 --
@@ -947,7 +973,7 @@ local function ScanTrade()
 					if recipe.numMade > 1 then
 						itemString = itemID..":"..recipe.numMade
 					else
-						itemString = itemID
+						itemString = tostring(itemID)
 					end
 					Skillet:ItemDataAddRecipeSource(itemID,recipeID) -- add a cross reference for the source of particular items
 --
@@ -1036,11 +1062,16 @@ local function ScanTrade()
 				if not recipeDB[recipeID] then
 					recipeDB[recipeID] = recipeString
 				elseif recipeDB[recipeID] ~= recipeString then
+--
+-- Another sanity check. A change of tradeID should have already been caught.
+--
 					local oldTradeID, oldItemString, oldReagentString, oldToolString = string.split(" ",recipeDB[recipeID])
 					if oldItemString == itemString and oldReagentString == reagentString and oldToolString == toolString then
-						DA.WARN("ScanTrade: oldTradeID="..tostring(oldTradeID)..", tradeID="..tostring(tradeID))
+						DA.WARN("ScanTrade: recipeID="..tostring(recipeID)..", oldTradeID="..tostring(oldTradeID)..", tradeID="..tostring(tradeID).." (match)")
+					elseif oldTradeID ~= tradeID then
+						DA.WARN("ScanTrade:  recipeID="..tostring(recipeID)..", oldTradeID="..tostring(oldTradeID)..", tradeID="..tostring(tradeID).." (no match)")
 					end
-					DA.WARN("ScanTrade: replacing '"..tostring(recipeDB[recipeID]).."' with '"..tostring(recipeString).."'")
+					DA.WARN("ScanTrade: replacing recipeID="..tostring(recipeID)..", '"..tostring(recipeDB[recipeID]).."' with '"..tostring(recipeString).."'")
 					recipeDB[recipeID] = recipeString
 				end
 			end
@@ -1094,6 +1125,9 @@ function Skillet:RescanTrade()
 	end
 	if not Skillet.db.realm.tradeSkills[player][tradeID] then
 		Skillet.db.realm.tradeSkills[player][tradeID] = {}
+	end
+	if not Skillet.db.realm.lastSkills[player][tradeID] then
+		Skillet.db.realm.lastSkills[player][tradeID] = {}
 	end
 --
 -- Our own filter data: subClass, invSlot
