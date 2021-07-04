@@ -381,7 +381,6 @@ end
 function Skillet:FlushAllData()
 	Skillet.data = {}
 	Skillet.db.realm.tradeSkills = {}
-	Skillet.db.realm.lastSkills = {}
 	Skillet.db.realm.auctionData = {}
 	Skillet.db.realm.inventoryData = {}
 	Skillet.db.realm.bagData = {}
@@ -485,12 +484,6 @@ function Skillet:InitializeDatabase(player, clean)
 		end
 		if not self.db.realm.tradeSkills[player] or clean then
 			self.db.realm.tradeSkills[player] = {}
-		end
-		if not self.db.realm.lastSkills then
-			self.db.realm.lastSkills = {}
-		end
-		if not self.db.realm.lastSkills[player] or clean then
-			self.db.realm.lastSkills[player] = {}
 		end
 		if not self.db.realm.queueData then
 			self.db.realm.queueData = {}

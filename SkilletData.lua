@@ -729,7 +729,6 @@ local function ScanTrade()
 	local recipeDB = Skillet.db.global.recipeDB
 	local skillDB = Skillet.db.realm.skillDB[player][tradeID]
 	local tradeSkill = Skillet.db.realm.tradeSkills[player][tradeID]
-	local lastSkill = Skillet.db.realm.lastSkills[player][tradeID]
 	local skillData = Skillet.data.skillList[player][tradeID]
 	if not skillData then
 		return false
@@ -743,13 +742,8 @@ local function ScanTrade()
 	Skillet:RecipeGroupClearEntries(mainGroup)
 	Skillet.groupList = {}
 --
--- Update the tradeSkill data keeping the previous values
+-- Update the tradeSkill data
 --
-	lastSkill.name = tradeSkill.name
-	lastSkill.rank = tradeSkill.rank
-	lastSkill.maxRank = tradeSkill.maxRank
-	lastSkill.isCraft = tradeSkill.isCraft
-	lastSkill.numSkills = tradeSkill.numSkills
 	tradeSkill.name = profession
 	tradeSkill.rank = rank
 	tradeSkill.maxRank = maxRank
@@ -1125,9 +1119,6 @@ function Skillet:RescanTrade()
 	end
 	if not Skillet.db.realm.tradeSkills[player][tradeID] then
 		Skillet.db.realm.tradeSkills[player][tradeID] = {}
-	end
-	if not Skillet.db.realm.lastSkills[player][tradeID] then
-		Skillet.db.realm.lastSkills[player][tradeID] = {}
 	end
 --
 -- Our own filter data: subClass, invSlot
