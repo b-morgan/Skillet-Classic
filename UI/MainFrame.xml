@@ -647,7 +647,7 @@
 	# Template for all buttons used to display the reagents needed
 	#
 	-->
-	<Frame name="SkilletItemTemplate" hidden="false" virtual="true">
+	<Frame name="SkilletReagentTemplate" hidden="false" virtual="true">
 		<Size>
 			<AbsDimension x="190" y="20"/>
 		</Size>
@@ -2151,7 +2151,7 @@
 			# And of course, buttons for the reagents ...
 			#
 			-->
-			<Button name="SkilletReagent1" inherits="SkilletItemTemplate" id="1" parent="SkilletReagentParent">
+			<Button name="SkilletReagent1" inherits="SkilletReagentTemplate" id="1" parent="SkilletReagentParent">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletReagentLabel" relativePoint="BOTTOMLEFT">
 						<Offset>
@@ -2160,7 +2160,7 @@
 					</Anchor>
 				</Anchors>
 			</Button>
-			<Button name="SkilletReagent2" inherits="SkilletItemTemplate" id="2" parent="SkilletReagentParent">
+			<Button name="SkilletReagent2" inherits="SkilletReagentTemplate" id="2" parent="SkilletReagentParent">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletReagent1" relativePoint="BOTTOMLEFT">
 						<Offset>
@@ -2169,7 +2169,7 @@
 					</Anchor>
 				</Anchors>
 			</Button>
-			<Button name="SkilletReagent3" inherits="SkilletItemTemplate" id="3" parent="SkilletReagentParent">
+			<Button name="SkilletReagent3" inherits="SkilletReagentTemplate" id="3" parent="SkilletReagentParent">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletReagent2" relativePoint="BOTTOMLEFT">
 						<Offset>
@@ -2178,7 +2178,7 @@
 					</Anchor>
 				</Anchors>
 			</Button>
-			<Button name="SkilletReagent4" inherits="SkilletItemTemplate" id="4" parent="SkilletReagentParent">
+			<Button name="SkilletReagent4" inherits="SkilletReagentTemplate" id="4" parent="SkilletReagentParent">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletReagent3" relativePoint="BOTTOMLEFT">
 						<Offset>
@@ -2187,7 +2187,7 @@
 					</Anchor>
 				</Anchors>
 			</Button>
-			<Button name="SkilletReagent5" inherits="SkilletItemTemplate" id="5" parent="SkilletReagentParent">
+			<Button name="SkilletReagent5" inherits="SkilletReagentTemplate" id="5" parent="SkilletReagentParent">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletReagent4" relativePoint="BOTTOMLEFT">
 						<Offset>
@@ -2196,7 +2196,7 @@
 					</Anchor>
 				</Anchors>
 			</Button>
-			<Button name="SkilletReagent6" inherits="SkilletItemTemplate" id="6" parent="SkilletReagentParent">
+			<Button name="SkilletReagent6" inherits="SkilletReagentTemplate" id="6" parent="SkilletReagentParent">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletReagent5" relativePoint="BOTTOMLEFT">
 						<Offset>
@@ -2205,7 +2205,7 @@
 					</Anchor>
 				</Anchors>
 			</Button>
-			<Button name="SkilletReagent7" inherits="SkilletItemTemplate" id="7" parent="SkilletReagentParent">
+			<Button name="SkilletReagent7" inherits="SkilletReagentTemplate" id="7" parent="SkilletReagentParent">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletReagent6" relativePoint="BOTTOMLEFT">
 						<Offset>
@@ -2214,7 +2214,7 @@
 					</Anchor>
 				</Anchors>
 			</Button>
-			<Button name="SkilletReagent8" inherits="SkilletItemTemplate" id="8" parent="SkilletReagentParent">
+			<Button name="SkilletReagent8" inherits="SkilletReagentTemplate" id="8" parent="SkilletReagentParent">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="SkilletReagent7" relativePoint="BOTTOMLEFT">
 						<Offset>

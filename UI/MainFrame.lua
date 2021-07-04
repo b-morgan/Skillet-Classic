@@ -2109,8 +2109,13 @@ end
 function Skillet:SkillButton_LinkRecipe()
 	DA.DEBUG(0,"SkillButton_LinkRecipe()")
 	local skill = Skillet.menuButton.skill
+	local spellLink
 	if skill and skill.skillIndex then
-		local spellLink = GetTradeSkillRecipeLink(skill.skillIndex)
+		if Skillet.isCraft then
+			spellLink = GetCraftItemLink(skill.skillIndex)
+		else
+			spellLink = GetTradeSkillRecipeLink(skill.skillIndex)
+		end
 		ChatEdit_InsertLink(spellLink)
 	end
 end
