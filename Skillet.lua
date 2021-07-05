@@ -821,7 +821,7 @@ function Skillet:TRADE_SKILL_UPDATE()
 	Skillet.tradeUpdate = Skillet.tradeUpdate + 1
 	DA.TRACE("TRADE_SKILL_UPDATE: closingTrade= "..tostring(Skillet.closingTrade)..", tradeShow= "..tostring(Skillet.tradeShow)..", tradeUpdate= "..tostring(Skillet.tradeUpdate))
 	if Skillet.closingTrade or not Skillet.tradeShow then return end
-	if Skillet.tradeUpdate < 2 then return end
+--	if Skillet.tradeUpdate < 2 then return end
 	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
 		if Skillet.lastCraft ~= Skillet.isCraft then
 			Skillet:ConfigureRecipeControls()
@@ -840,7 +840,7 @@ function Skillet:CRAFT_UPDATE()
 	Skillet.craftUpdate = Skillet.craftUpdate + 1
 	DA.TRACE("CRAFT_UPDATE: closingTrade= "..tostring(Skillet.closingTrade)..", tradeShow= "..tostring(Skillet.tradeShow)..", craftUpdate= "..tostring(Skillet.craftUpdate))
 	if Skillet.closingTrade or not Skillet.craftShow then return end
-	if Skillet.craftUpdate < 2 then return end
+--	if Skillet.craftUpdate < 2 then return end
 	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
 		if Skillet.lastCraft ~= Skillet.isCraft then
 			Skillet:ConfigureRecipeControls()
