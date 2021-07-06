@@ -597,7 +597,6 @@ function Skillet:InitializeDatabase(player, clean)
 				self.db.profile.plugins.recipeNamePlugin = nil
 			end
 			self:InitializePlugins()
-			self:ScanPlayerTradeSkills(player)
 		end
 	end
 end
@@ -699,7 +698,9 @@ function Skillet:OnEnable()
 -- run the upgrade code to convert any old settings
 --
 	self:UpgradeDataAndOptions()
+
 	self:CollectTradeSkillData()
+	self:ScanPlayerTradeSkills()
 	self:CreateAdditionalButtonsList()
 	self:EnablePlugins()
 	self:DisableBlizzardFrame()

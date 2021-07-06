@@ -141,42 +141,35 @@ end
 --
 -- this routine collects the basic data (which tradeskills a player has)
 --
-function Skillet:ScanPlayerTradeSkills(player)
-	--DA.DEBUG(0,"ScanPlayerTradeSkills("..tostring(player)..")")
-	if player == self.currentPlayer then -- only for active player
-		if not self.db.realm.tradeSkills[player] then
-			self.db.realm.tradeSkills[player] = {}
-		end
-		local skillRanksData = self.db.realm.tradeSkills[player]
-		if self.tradeSkillList then
-			for i=1,#self.tradeSkillList,1 do
-				local id = self.tradeSkillList[i]
-				local name = GetSpellInfo(id)				-- always returns data
-				if name then
-					local tradeName = GetSpellInfo(name)	-- only returns data if you have this spell in your spellbook
-					if tradeName then
-						--DA.DEBUG(2,"Collecting tradeskill data for: "..tostring(name)..", id= "..tostring(id)..", isCraft= "..tostring(self.skillIsCraft[id]))
-						if not skillRanksData[id] then
-							skillRanksData[id] = {}
-							skillRanksData[id].name = name
-							skillRanksData[id].rank = 0
-							skillRanksData[id].maxRank = 0
-							skillRanksData[id].opened = 0
-							skillRanksData[id].isCraft = self.skillIsCraft[id]
-						end
-					else
-						--DA.DEBUG(2,"Skipping tradeskill data for: "..tostring(name)..", id= "..tostring(id)..", isCraft= "..tostring(self.skillIsCraft[id]))
-						skillRanksData[id] = nil
+function Skillet:ScanPlayerTradeSkills()
+	DA.DEBUG(0,"ScanPlayerTradeSkills()")
+	local player = self.currentPlayer
+	if not self.db.realm.tradeSkills[player] then
+		self.db.realm.tradeSkills[player] = {}
+	end
+	local skillRanksData = self.db.realm.tradeSkills[player]
+	if self.tradeSkillList then
+		for i=1,#self.tradeSkillList,1 do
+			local id = self.tradeSkillList[i]
+			local name = GetSpellInfo(id)				-- always returns data
+			if name then
+				local tradeName = GetSpellInfo(name)	-- only returns data if you have this spell in your spellbook
+				if tradeName then
+					--DA.DEBUG(2,"Collecting tradeskill data for: "..tostring(name)..", id= "..tostring(id)..", isCraft= "..tostring(self.skillIsCraft[id]))
+					if not skillRanksData[id] then
+						skillRanksData[id] = {}
+						skillRanksData[id].name = name
+						skillRanksData[id].rank = 0
+						skillRanksData[id].maxRank = 0
+						skillRanksData[id].opened = 0
+						skillRanksData[id].isCraft = self.skillIsCraft[id]
 					end
+				else
+					--DA.DEBUG(2,"Skipping tradeskill data for: "..tostring(name)..", id= "..tostring(id)..", isCraft= "..tostring(self.skillIsCraft[id]))
+					skillRanksData[id] = nil
 				end
 			end
 		end
-		if not self.db.realm.faction then
-			self.db.realm.faction = {}
-		end
-		self.db.realm.faction[player] = UnitFactionGroup("player")
-	else
-		DA.DEBUG(0,"Player "..tostring(player).." is not currentPlayer")
 	end
 end
 
