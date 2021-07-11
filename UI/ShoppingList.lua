@@ -148,9 +148,13 @@ local function createShoppingListFrame(self)
 	windowManager.RegisterConfig(frame, self.db.profile, shoppingListLocation)
 	windowManager.RestorePosition(frame)  -- restores scale also
 	windowManager.MakeDraggable(frame)
-	-- lets play the resize me game!
+--
+-- lets play the resize me game!
+--
 	Skillet:EnableResize(frame, 300, 165, Skillet.UpdateShoppingListWindow)
-	-- so hitting [ESC] will close the window
+--
+-- so hitting [ESC] will close the window
+--
 	tinsert(UISpecialFrames, frame:GetName())
 	return frame
 end
