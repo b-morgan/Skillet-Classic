@@ -272,6 +272,13 @@ function Skillet:OnInitialize()
 	if not self.db.global.MissingVendorItems then
 		self:InitializeMissingVendorItems()
 	end
+	if not self.db.global.MissingSkillLevels then
+		self.db.global.MissingSkillLevels = {}
+	end
+	if not self.db.global.SkillLevels then
+		self:InitializeSkillLevels()
+	end
+
 --
 -- Classic doesn't have a Guild Bank
 -- Currently this only effects ShoppingList.lua
