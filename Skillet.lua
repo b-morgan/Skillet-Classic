@@ -845,7 +845,9 @@ end
 
 function Skillet:CRAFT_UPDATE()
 	DA.TRACE("CRAFT_UPDATE")
-	Skillet.craftUpdate = Skillet.craftUpdate + 1
+	if Skillet.craftUpdate then
+		Skillet.craftUpdate = Skillet.craftUpdate + 1
+	end
 	DA.TRACE("CRAFT_UPDATE: closingTrade= "..tostring(Skillet.closingTrade)..", tradeShow= "..tostring(Skillet.tradeShow)..", craftUpdate= "..tostring(Skillet.craftUpdate))
 	if Skillet.closingTrade or not Skillet.craftShow then return end
 --	if Skillet.craftUpdate < 2 then return end
