@@ -53,7 +53,7 @@ local skillColors = {
 function Skillet:InitializeSkillLevels()
 	self.db.global.SkillLevels = {
 		[0] = "orange/yellow/green/gray",
-		[7818] = "100/105/107/110",
+		[6338] = "100/105/107/110",
 	}
 end
 
