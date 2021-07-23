@@ -35,6 +35,7 @@ local skillColors = {
 --
 -- Our own table of skill levels (Skillet.db.global.SkillLevels)
 --   1) can be maintained manually
+--      To scrape from Wowhead: Follow instructions in ScrapeWowhead.js
 --   2) can be scrapped from an external website like https://classic.wowhead.com/
 --   3) can be maintained with an external addon (using AddTradeSkillLevels, DelTradeSkillLevels)
 --
@@ -49,12 +50,6 @@ local skillColors = {
 -- no other entry is found. The format of this table is the same as
 -- the table Skillet.db.global.SkillLevels to facilitate adding to this table.
 --
-
---[[
-To scrape manually:
-1) Go to a profession recipe page. Example: https://tbc.wowhead.com/alchemy#recipes
-2) Follow instructions in ScrapeWowhead.js
---]]
 
 -- Force refresh with /run Skillet:InitializeSkillLevels()
 function Skillet:InitializeSkillLevels()
