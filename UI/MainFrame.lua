@@ -1686,7 +1686,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		SkilletRecipeNotesButton:Show()
 		if recipe.spellID and recipe.itemID then
 			--DA.DEBUG(0,"UpdateDetailsWindow: itemID= "..tostring(recipe.itemID)..", spellID= "..tostring(recipe.spellID))
-			local orange,yellow,green,gray = self:GetTradeSkillLevels((recipe.itemID>0 and recipe.itemID) or -recipe.spellID)	-- was spellID now is itemID or -spellID
+			local orange,yellow,green,gray = self:GetTradeSkillLevels(recipe.itemID, recipe.spellID)
 			SkilletRankFrame.subRanks.green:SetValue(gray)
 			SkilletRankFrame.subRanks.yellow:SetValue(green)
 			SkilletRankFrame.subRanks.orange:SetValue(yellow)

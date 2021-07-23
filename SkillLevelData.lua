@@ -53,12 +53,18 @@ local skillColors = {
 function Skillet:InitializeSkillLevels()
 	self.db.global.SkillLevels = {
 		[0] = "orange/yellow/green/gray",
-		[6338] = "100/105/107/110",
+		[6338] = "100/105/107/110",			-- Silver Rod
 	}
 end
 
-function Skillet:GetTradeSkillLevels(itemID)
-	DA.DEBUG(0,"GetTradeSkillLevels("..tostring(itemID)..")")
+--
+-- Get TradeSkill Difficulty Levels
+--
+-- Note: MainFrame.lua used GetTradeSkillLevels((recipe.itemID>0 and recipe.itemID) or -recipe.spellID)
+--       other calls just use itemID
+--
+function Skillet:GetTradeSkillLevels(itemID, spellID)
+	DA.DEBUG(0,"GetTradeSkillLevels("..tostring(itemID)..", "..tostring(spellID)..")")
 	local a,b,c,d
 	local skillLevels = Skillet.db.global.SkillLevels
 	if itemID then 
@@ -66,16 +72,18 @@ function Skillet:GetTradeSkillLevels(itemID)
 			if self.isCraft then
 				itemID = -itemID
 			end
+			self.indexTradeSkillLevel = itemID
 --
 -- If there is an entry in our own table, use it
 --
 			if skillLevels and skillLevels[itemID] then
-				--DA.DEBUG(0,"levels= "..tostring(skillLevels[itemID]))
+				--DA.DEBUG(0,"GetTradeSkillLevels: levels= "..tostring(skillLevels[itemID]))
 				a,b,c,d = string.split("/", skillLevels[itemID])
 				a = tonumber(a) or 0
 				b = tonumber(b) or 0
 				c = tonumber(c) or 0
 				d = tonumber(d) or 0
+				self.sourceTradeSkillLevel = 1
 				return a, b, c, d
 			end
 --
@@ -84,21 +92,22 @@ function Skillet:GetTradeSkillLevels(itemID)
 			if isRetail and TradeskillInfo then
 				local recipeSource = Skillet.db.global.itemRecipeSource[itemID]
 				if type(recipeSource) == 'table' then
-					--DA.DEBUG(0,"recipeSource= "..DA.DUMP1(recipeSource))
+					--DA.DEBUG(0,"GetTradeSkillLevels: recipeSource= "..DA.DUMP1(recipeSource))
 					for recipeID in pairs(recipeSource) do
-						--DA.DEBUG(1,"recipeID= "..tostring(recipeID))
+						--DA.DEBUG(1,"GetTradeSkillLevels: recipeID= "..tostring(recipeID))
 						local TSILevels = TradeskillInfo:GetCombineDifficulty(recipeID)
 						if type(TSILevels) == 'table' then
-							--DA.DEBUG(1,"TSILevels="..DA.DUMP1(TSILevels))
+							--DA.DEBUG(1,"GetTradeSkillLevels: TSILevels="..DA.DUMP1(TSILevels))
 							a = tonumber(TSILevels[1]) or 0
 							b = tonumber(TSILevels[2]) or 0
 							c = tonumber(TSILevels[3]) or 0
 							d = tonumber(TSILevels[4]) or 0
+							self.sourceTradeSkillLevel = 2
 							return a, b, c, d
 						end
 					end
 				else
-					--DA.DEBUG(0,"recipeSource= "..tostring(recipeSource))
+					--DA.DEBUG(0,"GetTradeSkillLevels: recipeSource= "..tostring(recipeSource))
 				end
 			end
 --
@@ -108,21 +117,33 @@ function Skillet:GetTradeSkillLevels(itemID)
 			if PT then
 				local levels = PT:ItemInSet(itemID,"TradeskillLevels")
 				if levels then
-					--DA.DEBUG(0,"levels= "..tostring(levels))
+					--DA.DEBUG(0,"GetTradeSkillLevels (PT): levels= "..tostring(levels))
 					a,b,c,d = string.split("/",levels)
 					a = tonumber(a) or 0
 					b = tonumber(b) or 0
 					c = tonumber(c) or 0
 					d = tonumber(d) or 0
+					self.sourceTradeSkillLevel = 3
 					return a, b, c, d
 				end
 			end
+		else
+			DA.DEBUG(0,"GetTradeSkillLevels: "..tostring(itemID).." is not a number")
+			self.sourceTradeSkillLevel = 4
+			self.indexTradeSkillLevel = nil
+			return 0, 0, 0, 0 
 		end
+	else
+		DA.DEBUG(0,"GetTradeSkillLevels: itemID is missing")
+		self.sourceTradeSkillLevel = 4
+		self.indexTradeSkillLevel = nil
+		return 0, 0, 0, 0 
 	end
-	if not Skillet.db.global.MissingSkillLevels then
-		Skillet.db.global.MissingSkillLevels = {}
+	if not self.db.global.MissingSkillLevels then
+		self.db.global.MissingSkillLevels = {}
 	end
-	Skillet.db.global.MissingSkillLevels[itemID] = "0/0/0/0"
+	self.db.global.MissingSkillLevels[itemID] = "0/0/0/0"
+	self.sourceTradeSkillLevel = 5
 	return 0, 0, 0, 0 
 end
 
@@ -159,3 +180,26 @@ function Skillet:DelTradeSkillLevels(itemID)
 		skillLevels[itemID] = nil
 	end
 end
+
+--
+-- Print the TradeSkillLevels(itemID) result including the actual index and the source.
+--
+-- index will be itemID or if the current profession is Enchanting, -itemID
+--
+-- source will be:
+--    1 if from Skillet.db.global.SkillLevels
+--    2 if from TradeskillInfo
+--    3 if from LibPeriodicTable
+--    4 if itemID was missing or not a number
+--    5 if it wasn't found (and was added to Skillet.db.global.MissingSkillLevels)
+--
+function Skillet:PrintTradeSkillLevels(itemID, spellID)
+	--DA.DEBUG(0,"PrintTradeSkillLevels("..tostring(itemID)..", "..tostring(spellID)..")")
+	if itemID then
+		local orange, yellow, green, gray = self:GetTradeSkillLevels(itemID, spellID)
+		DA.CHAT("PrintTradeSkillLevels: itemID= "..tostring(itemID)..", spellID= "..tostring(spellID))
+		DA.CHAT("PrintTradeSkillLevels: index= "..tostring(self.indexTradeSkillLevel)..", source= "..tostring(self.sourceTradeSkillLevel))
+		DA.CHAT("PrintTradeSkillLevels: levels= "..tostring(orange).."/"..tostring(yellow).."/"..tostring(green).."/"..tostring(gray))
+	end
+end
+
