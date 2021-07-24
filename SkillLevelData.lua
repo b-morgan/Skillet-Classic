@@ -38,7 +38,8 @@ local skillColors = {
 --   2) can be scrapped from an external website like https://classic.wowhead.com/
 --   3) can be maintained with an external addon (using AddTradeSkillLevels, DelTradeSkillLevels)
 --
--- Each entry is: [itemID] = "orange/yellow/green/gray"
+-- Each entry is either [itemID] = "orange/yellow/green/gray" or a table of 
+--   spellIDs with the same format (i.e. [itemID][spellID])
 --   itemID is the item made by the recipe or the recipeID of the Enchant
 --   orange is the (numeric) skill level below which recipe is orange
 --   yellow is the (numeric) skill level below which the recipe is yellow
@@ -77,8 +78,14 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 -- If there is an entry in our own table, use it
 --
 			if skillLevels and skillLevels[itemID] then
-				--DA.DEBUG(0,"GetTradeSkillLevels: levels= "..tostring(skillLevels[itemID]))
-				a,b,c,d = string.split("/", skillLevels[itemID])
+				local levels = skillLevels[itemID]
+				if type(levels) == 'table' then
+					if spellID then
+						levels = skillLevels[itemID][spellID]
+					end
+				end
+				--DA.DEBUG(0,"GetTradeSkillLevels: levels= "..tostring(levels))
+				a,b,c,d = string.split("/", levels)
 				a = tonumber(a) or 0
 				b = tonumber(b) or 0
 				c = tonumber(c) or 0
@@ -159,13 +166,18 @@ function Skillet:GetTradeSkillLevelColor(itemID, rank)
 	return skillColors["unknown"]
 end
 
-function Skillet:AddTradeSkillLevels(itemID, orange, yellow, green, gray)
-	--DA.DEBUG(0,"AddTradeSkillLevels("..tostring(itemID)..", "..tostring(orange)..", "..tostring(yellow)..", "..tostring(green)..", "..tostring(gray)..")")
+function Skillet:AddTradeSkillLevels(itemID, orange, yellow, green, gray, spellID)
+	--DA.DEBUG(0,"AddTradeSkillLevels("..tostring(itemID)..", "..tostring(orange)..", "..tostring(yellow)..", "..tostring(green)..", "..tostring(gray)..", "..tostring(spellID)..")")
 	local skillLevels = Skillet.db.global.SkillLevels
-	if itemID then
 --
--- should add some sanity checking 
+-- We should add some sanity checking
 --
+	if itemID and spellID then
+		if not skillLevels[itemID] then 
+			skillLevels[itemID] = {}
+		end
+		skillLevels[itemID][spellID] = tostring(orange).."/"..tostring(yellow).."/"..tostring(green).."/"..tostring(gray)
+	elseif itemID then
 		skillLevels[itemID] = tostring(orange).."/"..tostring(yellow).."/"..tostring(green).."/"..tostring(gray)
 	end
 end
@@ -175,7 +187,7 @@ function Skillet:DelTradeSkillLevels(itemID)
 	local skillLevels = Skillet.db.global.SkillLevels
 	if itemID then
 --
--- we could add some additional checking
+-- We could add some additional checking
 --
 		skillLevels[itemID] = nil
 	end

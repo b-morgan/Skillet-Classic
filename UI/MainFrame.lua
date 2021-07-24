@@ -937,15 +937,14 @@ function Skillet:UpdateTradeSkillWindow()
 	if title then
 		title:SetText(L["Skillet Trade Skills"] .. " "..self.version.." ("..Skillet.wowVersion.."): " .. self.currentPlayer .. "/" .. tradeName)
 	end
-	local sortedSkillList = self.data.sortedSkillList[skillListKey]
+--
+-- Progression status bar
+--
 	local rank,maxRank = 0,0
 	local skillRanks = self:GetSkillRanks(self.currentPlayer, self.currentTrade)
 	if skillRanks then
 		rank,maxRank = skillRanks.rank, skillRanks.maxRank
 	end
---
--- Progression status bar
---
 	SkilletRankFrame:SetMinMaxValues(0, maxRank)
 	SkilletRankFrame:SetValue(rank)
 	SkilletRankFrameSkillRank:SetText(tradeName.."    "..rank.."/"..maxRank)
@@ -997,6 +996,7 @@ function Skillet:UpdateTradeSkillWindow()
 -- Iterate through all the buttons that make up the scroll window
 -- and fill them in with data or hide them, as necessary
 --
+	local sortedSkillList = self.data.sortedSkillList[skillListKey]
 	--DA.DEBUG(0,"Start for loop, button_count= "..tostring(button_count))
 	for i=1, button_count, 1 do
 		local rawSkillIndex = i + skillOffset
@@ -1684,9 +1684,24 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 --
 		SkilletSkillName:SetText(recipe.name)
 		SkilletRecipeNotesButton:Show()
-		if recipe.spellID and recipe.itemID then
+--
+-- Fill the skill level bar
+--
+		if recipe.itemID and recipe.spellID then
 			--DA.DEBUG(0,"UpdateDetailsWindow: itemID= "..tostring(recipe.itemID)..", spellID= "..tostring(recipe.spellID))
 			local orange,yellow,green,gray = self:GetTradeSkillLevels(recipe.itemID, recipe.spellID)
+--
+-- Save the actual values
+--
+			SkilletRankFrame.itemID = recipe.itemID
+			SkilletRankFrame.spellID = recipe.spellID
+			SkilletRankFrame.gray = gray
+			SkilletRankFrame.green = green
+			SkilletRankFrame.yellow = yellow
+			SkilletRankFrame.orange = orange
+--
+-- Set the graphical values
+--
 			SkilletRankFrame.subRanks.green:SetValue(gray)
 			SkilletRankFrame.subRanks.yellow:SetValue(green)
 			SkilletRankFrame.subRanks.orange:SetValue(yellow)
@@ -2407,11 +2422,20 @@ function Skillet:RankFrame_OnEnter(button)
 	GameTooltip:SetOwner(button, "ANCHOR_BOTTOMLEFT")
 	local r,g,b = SkilletSkillName:GetTextColor()
 	GameTooltip:AddLine(SkilletSkillName:GetText(),r,g,b)
-	local gray = SkilletRankFrame.subRanks.green:GetValue()
-	local green = SkilletRankFrame.subRanks.yellow:GetValue()
-	local yellow = SkilletRankFrame.subRanks.orange:GetValue()
-	local orange = SkilletRankFrame.subRanks.red:GetValue()
-	-- lets add the chance to level up that skill with that receipt
+	local itemID = SkilletRankFrame.itemID
+	local spellID = SkilletRankFrame.spellID
+	local gray = SkilletRankFrame.gray
+	local green = SkilletRankFrame.green
+	local yellow = SkilletRankFrame.yellow
+	local orange = SkilletRankFrame.orange
+	--DA.DEBUG(0,"RankFrame_OnEnter: "..tostring(itemID).."= "..tostring(orange).."/"..tostring(yellow).."/"..tostring(green).."/"..tostring(gray)..", spellID= "..tostring(spellID))
+	if not gray then gray = SkilletRankFrame.subRanks.green:GetValue() end
+	if not green then green = SkilletRankFrame.subRanks.yellow:GetValue() end
+	if not yellow then yellow = SkilletRankFrame.subRanks.orange:GetValue() end
+	if not orange then orange = SkilletRankFrame.subRanks.red:GetValue() end
+--
+-- Lets add the chance to level up that skill with that receipt
+--
 	local chance = Skillet:getLvlUpChance()
 	chance = math.floor(chance*10)/10		-- one decimal is enough
 	GameTooltip:AddLine(COLORORANGE..orange.."|r/"..COLORYELLOW..yellow.."|r/"..COLORGREEN..green.."|r/"..COLORGRAY..gray.."|r/ Chance:"..chance.."|r%")
