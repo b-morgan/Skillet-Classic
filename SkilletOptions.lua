@@ -900,6 +900,9 @@ Skillet.options =
 			end,
 			order = 76
 		},
+--
+-- commands to print and initialize skill data (SkillLevelData.lua)
+--
 		printskilllevels = {
 			type = 'input',
 			name = "PrintSkillLevels",
@@ -916,6 +919,20 @@ Skillet.options =
 				end
 			end,
 			order = 77
+		},
+		initskilllevels = {
+			type = 'execute',
+			name = "Init Skill Levels",
+			desc = "Initialize Skill Levels",
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:InitializeSkillLevels()
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
+												  " Leave combat and try again.")
+				end
+			end,
+			order = 78
 		},
 
 --
