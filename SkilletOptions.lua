@@ -898,7 +898,24 @@ Skillet.options =
 			set = function(self,value)
 				Skillet.db.profile.nomodkeys = value
 			end,
-			order = 75
+			order = 76
+		},
+		printskilllevels = {
+			type = 'input',
+			name = "PrintSkillLevels",
+			desc = "Print Skill Levels",
+			get = function()
+				return value
+			end,
+			set = function(self,value)
+				if not (UnitAffectingCombat("player")) then
+					Skillet:PrintTradeSkillLevels(value)
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
+												  " Leave combat and try again.")
+				end
+			end,
+			order = 77
 		},
 
 --
