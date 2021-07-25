@@ -54,8 +54,22 @@ function get_skill_levels() {
           if ($first_link[0].href.indexOf('cauldron') != -1) { level = 360; }
           arr.unshift(level);
         }
-        // Manual fix for 2 starter enchanting recipies since wowhead data is incomplete
-        if (is_enchanting && arr.length == 3 && [7418, 7428].includes(spellID)) {
+        /*
+        Manual fixes for some starter recipes that Wowhead does not have complete data for.
+        These can be removed if wowhead ever uploads corrected data.
+        Affected recipes:
+          Charred Wolf Meat (2538)
+          Roasted Boar Meat (2657)
+          Smelt Copper (2540)
+          Crafted Light Shot (3920)
+          Delicate Copper Wire (25255)
+          Rough Stone Statue (32259)
+          Braided Copper Ring (25493)
+          Woven Copper Ring (26925)
+          Enchant Bracer Minor Health (7418)
+          Enchant Bracer Minor Deflection (7428)
+        */
+        if (arr.length == 3 && [2538, 2657, 2540, 3920, 25255, 32259, 25493, 26925, 7418, 7428].includes(spellID)) {
             arr.unshift(1);
         }
         // ---- ----
