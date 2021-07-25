@@ -1491,6 +1491,9 @@ function Skillet:SkillButton_OnEnter(button)
 	local text = string.format("[%s/%s/%s]", L["inventory"], L["bank"], L["craftable"])
 	tip:AddDoubleLine("\n", text)
 	local text = string.format("itemID= %d",recipe.itemID)
+	if Skillet.isCraft then
+		text = string.format("spellID= %d",recipe.itemID)
+	end
 	tip:AddDoubleLine("\n", text)
 	tip:Show()
 	button.locked = false
