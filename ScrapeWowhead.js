@@ -23,6 +23,9 @@ function get_skill_levels() {
         var spellID = $second_link[0].href.match(/spell=[0-9]*/)[0].split('=')[1];
         var itemID  = 0; // placeholder for enchanting
 
+        // Skip basic campfire, not a real recipe
+        if (spellID == 818) { return; }
+        
         if (!is_enchanting) {
             itemID = $first_link[0].href.match(/item=[0-9]*/)[0].split('=')[1];
         }
