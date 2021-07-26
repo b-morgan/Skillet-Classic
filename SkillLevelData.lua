@@ -174,7 +174,7 @@ function Skillet:GetTradeSkillLevelColor(itemID, rank)
 end
 
 function Skillet:AddTradeSkillLevels(itemID, orange, yellow, green, gray, spellID)
-	--DA.DEBUG(0,"AddTradeSkillLevels("..tostring(itemID)..", "..tostring(orange)..", "..tostring(yellow)..", "..tostring(green)..", "..tostring(gray)..", "..tostring(spellID)..")")
+	DA.DEBUG(0,"AddTradeSkillLevels("..tostring(itemID)..", "..tostring(orange)..", "..tostring(yellow)..", "..tostring(green)..", "..tostring(gray)..", "..tostring(spellID)..")")
 	local skillLevels = Skillet.db.global.SkillLevels
 --
 -- We should add some sanity checking
@@ -190,7 +190,7 @@ function Skillet:AddTradeSkillLevels(itemID, orange, yellow, green, gray, spellI
 end
 
 function Skillet:DelTradeSkillLevels(itemID)
-	--DA.DEBUG(0,"DelTradeSkillLevels("..tostring(itemID)..")")
+	DA.DEBUG(0,"DelTradeSkillLevels("..tostring(itemID)..")")
 	local skillLevels = Skillet.db.global.SkillLevels
 	if itemID then
 --
