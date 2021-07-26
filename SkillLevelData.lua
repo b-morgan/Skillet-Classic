@@ -31,6 +31,7 @@ local skillColors = {
 	["trivial"]		= { r = 0.50, g = 0.50, b = 0.50, level = 1, alttext="",    cstring = "|cff808080"},
 	["header"]		= { r = 1.00, g = 0.82, b = 0,    level = 0, alttext="",    cstring = "|cffffc800"},
 }
+
 --
 -- function InitializeSkillLevels (which loads Skillet.db.global.SkillLevels) is 
 -- at the end of this file.
@@ -52,7 +53,7 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 	local skillLevels = Skillet.db.global.SkillLevels
 	if itemID then 
 		if tonumber(itemID) ~= nil and itemID ~= 0 then
-			if self.isCraft then
+			if self.isCraft or self.currentTrade == 7411 then  -- isCraft for Classic and BCC, Enchanting TradeID for retail
 				itemID = -itemID
 			end
 			self.indexTradeSkillLevel = itemID
@@ -63,12 +64,16 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 				local levels = skillLevels[itemID]
 				if type(levels) == 'table' then
 					if spellID then
-						for spell, strng in pairs(levels) do
-							name = GetSpellInfo(spell)
-							DA.DEBUG(0,"GetTradeSkillLevels: name= "..tostring(name))
-							if name == spellID then
-								levels = strng
-								break
+						if isRetail then
+							levels = skillLevels[itemID][spellID]
+						else
+							for spell, strng in pairs(levels) do
+								name = GetSpellInfo(spell)
+								DA.DEBUG(0,"GetTradeSkillLevels: name= "..tostring(name))
+								if name == spellID then
+									levels = strng
+									break
+								end
 							end
 						end
 					end
@@ -84,18 +89,23 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 					return a, b, c, d
 				end
 			end
+
 --
 -- The TradeskillInfo addon seems to be more accurate than LibPeriodicTable-3.1
 --
 			if isRetail and TradeskillInfo then
 				local recipeSource = Skillet.db.global.itemRecipeSource[itemID]
+				if not recipeSource then
+					DA.DEBUG(0,"GetTradeSkillLevels: itemID= "..tostring(itemID)..", recipeSource= "..tostring(recipeSource))
+					recipeSource = Skillet.db.global.itemRecipeSource[-itemID]
+				end
 				if type(recipeSource) == 'table' then
-					--DA.DEBUG(0,"GetTradeSkillLevels: recipeSource= "..DA.DUMP1(recipeSource))
+					DA.DEBUG(0,"GetTradeSkillLevels: itemID= "..tostring(itemID)..", recipeSource= "..DA.DUMP1(recipeSource))
 					for recipeID in pairs(recipeSource) do
-						--DA.DEBUG(1,"GetTradeSkillLevels: recipeID= "..tostring(recipeID))
+						DA.DEBUG(1,"GetTradeSkillLevels: recipeID= "..tostring(recipeID))
 						local TSILevels = TradeskillInfo:GetCombineDifficulty(recipeID)
 						if type(TSILevels) == 'table' then
-							--DA.DEBUG(1,"GetTradeSkillLevels: TSILevels="..DA.DUMP1(TSILevels))
+							DA.DEBUG(1,"GetTradeSkillLevels: TSILevels="..DA.DUMP1(TSILevels))
 							a = tonumber(TSILevels[1]) or 0
 							b = tonumber(TSILevels[2]) or 0
 							c = tonumber(TSILevels[3]) or 0
@@ -105,17 +115,23 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 						end
 					end
 				else
-					--DA.DEBUG(0,"GetTradeSkillLevels: recipeSource= "..tostring(recipeSource))
+					DA.DEBUG(0,"GetTradeSkillLevels: itemID= "..tostring(itemID)..", recipeSource= "..tostring(recipeSource))
 				end
 			end
+
 --
 -- Check LibPeriodicTable
 -- Note: The itemID for Enchants is negative
 --
 			if PT then
 				local levels = PT:ItemInSet(itemID,"TradeskillLevels")
+				DA.DEBUG(0,"GetTradeSkillLevels (PT): itemID= "..tostring(itemID)..", levels= "..tostring(levels))
+				if not levels then
+					itemID = -itemID
+					levels = PT:ItemInSet(itemID,"TradeskillLevels")
+					DA.DEBUG(0,"GetTradeSkillLevels (PT): itemID= "..tostring(itemID)..", levels= "..tostring(levels))
+				end
 				if levels then
-					--DA.DEBUG(0,"GetTradeSkillLevels (PT): levels= "..tostring(levels))
 					a,b,c,d = string.split("/",levels)
 					a = tonumber(a) or 0
 					b = tonumber(b) or 0
