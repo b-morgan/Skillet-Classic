@@ -820,7 +820,7 @@
 	#
 	# Don't change the name 'SkilletFrame' as other addons may depend on it
 	-->
-	<Frame name="SkilletFrame" toplevel="true" movable="true" clampedToScreen="true" resizable="true" parent="UIParent" enableMouse="true" hidden="true">
+	<Frame name="SkilletFrame" toplevel="true" movable="true" resizable="true" parent="UIParent" enableMouse="true" hidden="true">
 		<Size>
 			<AbsDimension x="750" y="580"/>
 		</Size>
