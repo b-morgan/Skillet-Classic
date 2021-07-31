@@ -399,6 +399,9 @@ function Skillet:CreateTradeSkillWindow()
 	self.fullView = true
 	self.saved_full_button_count = 0
 	self.saved_SA_button_count = 0
+	if self.db.profile.clamp_to_screen then
+		frame:SetClampedToScreen(self.db.profile.clamp_to_screen)
+	end
 	return frame
 end
 
@@ -3220,6 +3223,9 @@ function Skillet:CreateStandaloneQueueFrame()
 -- so hitting [ESC] will close the window
 --
 	tinsert(UISpecialFrames, frame:GetName())
+	if self.db.profile.clamp_to_screen then
+		frame:SetClampedToScreen(self.db.profile.clamp_to_screen)
+	end
 	return frame
 end
 

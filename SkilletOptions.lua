@@ -442,6 +442,21 @@ Skillet.options =
 					width = "full",
 					order = 5,
 				},
+				clamp_to_screen = {
+					type = "toggle",
+					name = L["CLAMPTOSCREENNAME"],
+					desc = L["CLAMPTOSCREENDESC"],
+					get = function()
+						return Skillet.db.profile.clamp_to_screen
+					end,
+					set = function(self,value)
+						Skillet.db.profile.clamp_to_screen = value
+						if SkilletFrame then SkilletFrame:SetClampedToScreen(value) end
+						if SkilletStandaloneQueue then SkilletStandaloneQueue:SetClampedToScreen(value) end
+					end,
+					width = "full",
+					order = 5,
+				},
 				scale_tooltip = {
 					type = "toggle",
 					name = L["SCALETOOLTIPNAME"],

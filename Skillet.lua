@@ -75,6 +75,7 @@ local defaults = {
 		search_includes_reagents = true,
 		confirm_queue_clear = false,
 		queue_only_view = true,
+		clamp_to_screen = true,
 		scale_tooltip = false,
 		transparency = 1.0,
 		scale = 1.0,
