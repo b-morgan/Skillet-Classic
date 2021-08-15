@@ -2398,15 +2398,17 @@ function Skillet:getLvlUpChance()
 --
 -- icy: 03.03.2012:
 -- according to pope (http://www.wowhead.com/spell=83949#comments)
--- % to level up with this receipt is calculated by: (greySkill - yourSkill) / (greySkill - yellowSkill
+-- % to level up with this receipt is calculated by: (greySkill - yourSkill) / (greySkill - yellowSkill)
 --
-	local skilRanks = self:GetSkillRanks(self.currentPlayer, self.currentTrade)
 	local currentLevel, maxLevel = 0, 0
-	if skilRanks then
-		currentLevel, maxLevel = skilRanks.rank, skilRanks.maxRank
+	local skillRanks = self:GetSkillRanks(self.currentPlayer, self.currentTrade)
+	if skillRanks then
+		currentLevel, maxLevel = skillRanks.rank, skillRanks.maxRank
 	end
-	local gray = tonumber(SkilletRankFrame.subRanks.green:GetValue())
-	local yellow = tonumber(SkilletRankFrame.subRanks.orange:GetValue())
+	local gray = SkilletRankFrame.gray
+	local yellow = SkilletRankFrame.yellow
+	if not gray then gray = SkilletRankFrame.subRanks.green:GetValue() end
+	if not yellow then yellow = SkilletRankFrame.subRanks.orange:GetValue() end
 	--DA.DEBUG(0,"currentLevel= "..tostring(currentLevel)..", gray= "..tostring(gray)..", yellow= "..tostring(yellow))
 	if (currentLevel > gray) then
 		return 0
@@ -2597,29 +2599,83 @@ function Skillet:ReagentButtonOnClick(button, skillIndex, reagentIndex)
 end
 
 --
--- Called when the icon button is clicked
+-- Recurse through the reagents expanding craftables into their non-craftable source.
 --
-function Skillet:ReagentsLinkOnClick(button, skillIndex, reagentIndex)
-	DA.DEBUG(0,"ReagentsLinkOnClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+local function recurseReagents(recipe, level)
+	DA.DEBUG(0,"recurseReagents("..tostring(recipe.name)..", "..tostring(level)..")")
+	--DA.DEBUG(1,"recurseReagents: recipe= "..DA.DUMP1(recipe))
+	for i = 1, #recipe.reagentData, 1 do
+		local reagent = recipe.reagentData[i]
+		--DA.DEBUG(1,"recurseReagents: reagent= "..DA.DUMP1(reagent))
+		if reagent and reagent.id then
+			local reagentName, reagentLink, recipeSource, reagentIndex
+			reagentName, reagentLink = GetItemInfo(reagent.id)
+			recipeSource = Skillet.db.global.itemRecipeSource[reagent.id]
+			DA.DEBUG(1,"recurseReagents: recipeSource= "..DA.DUMP1(recipeSource))
+			if recipeSource then
+				for recipeSourceID in pairs(recipeSource) do
+					reagentRecipe = Skillet:GetRecipe(recipeSourceID)
+					--DA.DEBUG(2,"recurseReagents: recipeSourceID= "..tostring(recipeSourceID)..", reagentRecipe= "..DA.DUMP1(reagentRecipe))
+					reagentIndex = Skillet.data.skillIndexLookup[Skillet.currentPlayer][recipeSourceID]
+					--DA.DEBUG(2,"recurseReagents: recipeSourceID= "..tostring(recipeSourceID)..", reagentIndex= "..tostring(reagentIndex))
+				end
+			end
+			--DA.DEBUG(1,"recurseReagents: reagentLink= "..DA.DUMP1(reagentLink))
+			if reagentLink then
+--				if reagentIndex and reagentRecipe.tradeID == Skillet.currentTrade then
+				if reagentIndex then
+					recurseReagents(reagentRecipe, level+1)
+				end
+				if not Skillet.reagentLinkList[level] then
+					Skillet.reagentLinkList[level] = {}
+				end
+				DA.DEBUG(1,"recurseReagents: level= "..tostring(level)..", tradeID= "..tostring(reagentRecipe.tradeID)..", reagentID= "..tostring(reagent.id)..", numNeeded= "..tostring(reagent.numNeeded)..", reagentName= "..tostring(reagentName))
+				Skillet.reagentLinkList[level][reagent.id] = {}
+				Skillet.reagentLinkList[level][reagent.id].tradeID = reagentRecipe.tradeID
+				Skillet.reagentLinkList[level][reagent.id].numNeeded = reagent.numNeeded
+				Skillet.reagentLinkList[level][reagent.id].reagentLink = reagentLink
+			end
+		end
+	end
+end
+
+--
+-- Called when the icon button is alt-clicked
+--
+function Skillet:ReagentsLinkOnClick(button, skillIndex, recurse)
+	DA.DEBUG(0,"ReagentsLinkOnClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(recurse)..")")
 	if not self.db.profile.link_craftable_reagents then
 		return
 	end
+	local skillIndexLookup = Skillet.data.skillIndexLookup[Skillet.currentPlayer]
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	--DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe))
+	self.reagentLinkList = {}
+	recurseReagents(recipe, 1)
+	DA.DEBUG(1,"reagentLinkList= "..DA.DUMP1(self.reagentLinkList))
 	local sep = " "
 	for i = 1, #recipe.reagentData, 1 do
 		local reagent = recipe.reagentData[i]
 		--DA.DEBUG(1,"reagent= "..DA.DUMP1(reagent))
-		if reagent then
-			local reagentName, reagentLink
-			if reagent.id then
-				reagentName, reagentLink = GetItemInfo(reagent.id)
+		if reagent and reagent.id then
+			local reagentName, reagentLink, recipeSource, reagentIndex
+			reagentName, reagentLink = GetItemInfo(reagent.id)
+			recipeSource = Skillet.db.global.itemRecipeSource[reagent.id]
+			--DA.DEBUG(1,"recipeSource= "..DA.DUMP1(recipeSource))
+			if recipeSource then
+				for recipeSourceID in pairs(recipeSource) do
+					reagentRecipe = Skillet:GetRecipe(recipeSourceID)
+					reagentIndex = skillIndexLookup[recipeSourceID]
+					--DA.DEBUG(2,"recipeSourceID= "..tostring(recipeSourceID)..", reagentIndex= "..tostring(reagentIndex))
+				end
 			end
 			--DA.DEBUG(1,"reagentLink= "..DA.DUMP1(reagentLink))
-			if reagentLink then
+			if reagentLink and reagentIndex then
+				ChatEdit_InsertLink(sep .. reagent.numNeeded .. "x" .. reagentLink.."*")
+			elseif reagentLink then
 				ChatEdit_InsertLink(sep .. reagent.numNeeded .. "x" .. reagentLink)
 			end
-		sep = ", "
+			sep = ", "
 		end
 	end
 end

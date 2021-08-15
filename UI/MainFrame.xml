@@ -2110,7 +2110,7 @@
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
 						local link = Skillet:GetTradeSkillItemLink(Skillet.selectedSkill)
-						if ( IsControlKeyDown() ) then
+						if ( IsControlKeyDown() and not IsAltKeyDown() ) then
 							<!-- This opens up the dressing room window and display the character
 								 wearing the item (if that is possible) -->
 							DressUpItemLink(link)
@@ -2121,7 +2121,7 @@
 						elseif ( IsAltKeyDown() ) then
 						<!-- This will put a link to the *reagents* required by this *item*
 							 into the current chat edit box -->
-							Skillet:ReagentsLinkOnClick(self, Skillet.selectedSkill, self:GetID())
+							Skillet:ReagentsLinkOnClick(self, Skillet.selectedSkill, IsControlKeyDown())
 						end
 					</OnClick>
 					<OnEnter>
