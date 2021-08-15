@@ -41,12 +41,15 @@ local skillColors = {
 -- provided and maintained by Matthew Hively, https://github.com/matthewhively
 --
 
+--
+-- Table of racial bonuses (including retail)
+--
 local racialList = {
 	[4036]  = {["Gnome"] = 15,				-- engineering
 			   ["KulTiran"] = 5},
-	[25229] = {["Draenei"] = 5,				-- jewelcrafting
-			   ["KulTiran"] = 5},
 	[7411]  = {["BloodElf"] = 10,			-- enchanting
+			   ["KulTiran"] = 5},
+	[25229] = {["Draenei"] = 5,				-- jewelcrafting
 			   ["KulTiran"] = 5},
 	[2259]  = {["Goblin"] = 15,				-- alchemy
 			   ["KulTiran"] = 5},
@@ -59,18 +62,13 @@ local racialList = {
 }
 
 --
--- local function returns any racial bonus that may apply using:
---   Skillet.currentPlayer
---   Skillet.currentTrade
---   Skillet.db.realm.race[player]
---
+-- local function returns any racial bonus that may apply
 --
 local function getRacialBonus()
 	local player = Skillet.currentPlayer
 	local trade = Skillet.currentTrade
 	local race = Skillet.db.realm.race[player]
 	DA.DEBUG(0,"getRacialBonus: trade = "..tostring(trade).." ("..tostring(GetSpellInfo(trade)).."), race= "..tostring(race))
-	--DA.DEBUG(0,"getRacialBonus: racialList = "..DA.DUMP1(racialList))
 	if racialList[trade] then
 		for r, bonus in pairs(racialList[trade]) do
 			--DA.DEBUG(1,"getRacialBonus: r = "..tostring(r)..", bonus= "..tostring(bonus))
@@ -82,6 +80,7 @@ local function getRacialBonus()
 	end
 	return 0
 end
+
 --
 -- Get TradeSkill Difficulty Levels
 --
