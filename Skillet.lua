@@ -532,6 +532,12 @@ function Skillet:InitializeDatabase(player, clean)
 		if not self.db.realm.faction then
 			self.db.realm.faction = {}
 		end
+		if not self.db.realm.race then
+			self.db.realm.race = {}
+		end
+		if not self.db.realm.class then
+			self.db.realm.class = {}
+		end
 		if not self.db.realm.guid then
 			self.db.realm.guid = {}
 		end
@@ -724,6 +730,8 @@ function Skillet:PLAYER_ENTERING_WORLD()
 	local player = UnitName("player")
 	local realm = GetRealmName()
 	local faction = UnitFactionGroup("player")
+	local raceName, raceFile, raceID = UnitRace("player")
+	local className, classFile, classId = UnitClass("player")
 	local guid = UnitGUID("player")		-- example: guid="Player-970-0002FD64" kind=="Player" server=="970" ID="0002FD64" 
 --
 -- PLAYER_ENTERING_WORLD happens on login and when changing zones so
@@ -738,6 +746,11 @@ function Skillet:PLAYER_ENTERING_WORLD()
 	SkilletWho.player = player
 	SkilletWho.realm = realm
 	SkilletWho.faction = faction
+	SkilletWho.raceFile = raceFile
+	SkilletWho.classFile = classFile
+	self.db.realm.faction[player] = faction
+	self.db.realm.race[player] = raceFile
+	self.db.realm.class[player] = classFile
 	SkilletWho.guid = guid
 	if guid then
 		local kind, server, ID = strsplit("-", guid)
@@ -748,7 +761,6 @@ function Skillet:PLAYER_ENTERING_WORLD()
 -- Skillet.db.global.* data indexed by server.
 --
 		self.db.realm.guid[player]= guid
-		self.db.realm.faction[player] = faction
 		if (server) then
 			self.data.server = server
 			self.data.realm = realm

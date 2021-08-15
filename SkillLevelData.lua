@@ -41,6 +41,47 @@ local skillColors = {
 -- provided and maintained by Matthew Hively, https://github.com/matthewhively
 --
 
+local racialList = {
+	[4036]  = {["Gnome"] = 15,				-- engineering
+			   ["KulTiran"] = 5},
+	[25229] = {["Draenei"] = 5,				-- jewelcrafting
+			   ["KulTiran"] = 5},
+	[7411]  = {["BloodElf"] = 10,			-- enchanting
+			   ["KulTiran"] = 5},
+	[2259]  = {["Goblin"] = 15,				-- alchemy
+			   ["KulTiran"] = 5},
+	[2018]  = {["LightforgedDraenei"] = 15,	-- blacksmithing
+			   ["DarkIronDwarf"] = 5,
+			   ["KulTiran"] = 5},
+	[45357] = {["Nightborne"] = 15,			-- inscription
+			   ["KulTiran"] = 5},
+	[2550]  = {["Pandaren"] = 15},			-- cooking
+}
+
+--
+-- local function returns any racial bonus that may apply using:
+--   Skillet.currentPlayer
+--   Skillet.currentTrade
+--   Skillet.db.realm.race[player]
+--
+--
+local function getRacialBonus()
+	local player = Skillet.currentPlayer
+	local trade = Skillet.currentTrade
+	local race = Skillet.db.realm.race[player]
+	DA.DEBUG(0,"getRacialBonus: trade = "..tostring(trade).." ("..tostring(GetSpellInfo(trade)).."), race= "..tostring(race))
+	--DA.DEBUG(0,"getRacialBonus: racialList = "..DA.DUMP1(racialList))
+	if racialList[trade] then
+		for r, bonus in pairs(racialList[trade]) do
+			--DA.DEBUG(1,"getRacialBonus: r = "..tostring(r)..", bonus= "..tostring(bonus))
+			if r == race then
+			DA.DEBUG(1,"getRacialBonus: bonus = "..tostring(bonus))
+				return bonus
+			end
+		end
+	end
+	return 0
+end
 --
 -- Get TradeSkill Difficulty Levels
 --
@@ -48,8 +89,9 @@ local skillColors = {
 --   Old MainFrame.lua call: GetTradeSkillLevels((recipe.itemID>0 and recipe.itemID) or -recipe.spellID)
 --
 function Skillet:GetTradeSkillLevels(itemID, spellID)
-	DA.DEBUG(0,"GetTradeSkillLevels("..tostring(itemID)..", "..tostring(spellID)..")")
+	--DA.DEBUG(0,"GetTradeSkillLevels("..tostring(itemID)..", "..tostring(spellID)..")")
 	local a,b,c,d
+	local rb = getRacialBonus()
 	local skillLevels = Skillet.db.global.SkillLevels
 	if itemID then 
 		if tonumber(itemID) ~= nil and itemID ~= 0 then
@@ -69,7 +111,7 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 						else
 							for spell, strng in pairs(levels) do
 								name = GetSpellInfo(spell)
-								DA.DEBUG(0,"GetTradeSkillLevels: name= "..tostring(name))
+								--DA.DEBUG(1,"GetTradeSkillLevels: name= "..tostring(name))
 								if name == spellID then
 									levels = strng
 									break
@@ -78,13 +120,13 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 						end
 					end
 				end
-				DA.DEBUG(0,"GetTradeSkillLevels: levels= "..tostring(levels))
+				--DA.DEBUG(1,"GetTradeSkillLevels: levels= "..tostring(levels))
 				if levels and type(levels) == 'string' then
 					a,b,c,d = string.split("/", levels)
-					a = tonumber(a) or 0
-					b = tonumber(b) or 0
-					c = tonumber(c) or 0
-					d = tonumber(d) or 0
+					a = tonumber(a) or 0 + rb
+					b = tonumber(b) or 0 + rb
+					c = tonumber(c) or 0 + rb
+					d = tonumber(d) or 0 + rb
 					self.sourceTradeSkillLevel = 1
 					return a, b, c, d
 				end
@@ -96,26 +138,26 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 			if isRetail and TradeskillInfo then
 				local recipeSource = Skillet.db.global.itemRecipeSource[itemID]
 				if not recipeSource then
-					DA.DEBUG(0,"GetTradeSkillLevels: itemID= "..tostring(itemID)..", recipeSource= "..tostring(recipeSource))
+					--DA.DEBUG(1,"GetTradeSkillLevels: itemID= "..tostring(itemID)..", recipeSource= "..tostring(recipeSource))
 					recipeSource = Skillet.db.global.itemRecipeSource[-itemID]
 				end
 				if type(recipeSource) == 'table' then
-					DA.DEBUG(0,"GetTradeSkillLevels: itemID= "..tostring(itemID)..", recipeSource= "..DA.DUMP1(recipeSource))
+					--DA.DEBUG(1,"GetTradeSkillLevels: itemID= "..tostring(itemID)..", recipeSource= "..DA.DUMP1(recipeSource))
 					for recipeID in pairs(recipeSource) do
-						DA.DEBUG(1,"GetTradeSkillLevels: recipeID= "..tostring(recipeID))
+						--DA.DEBUG(2,"GetTradeSkillLevels: recipeID= "..tostring(recipeID))
 						local TSILevels = TradeskillInfo:GetCombineDifficulty(recipeID)
 						if type(TSILevels) == 'table' then
-							DA.DEBUG(1,"GetTradeSkillLevels: TSILevels="..DA.DUMP1(TSILevels))
-							a = tonumber(TSILevels[1]) or 0
-							b = tonumber(TSILevels[2]) or 0
-							c = tonumber(TSILevels[3]) or 0
-							d = tonumber(TSILevels[4]) or 0
+							--DA.DEBUG(2,"GetTradeSkillLevels: TSILevels="..DA.DUMP1(TSILevels))
+							a = tonumber(TSILevels[1]) or 0 + rb
+							b = tonumber(TSILevels[2]) or 0 + rb
+							c = tonumber(TSILevels[3]) or 0 + rb
+							d = tonumber(TSILevels[4]) or 0 + rb
 							self.sourceTradeSkillLevel = 2
 							return a, b, c, d
 						end
 					end
 				else
-					DA.DEBUG(0,"GetTradeSkillLevels: itemID= "..tostring(itemID)..", recipeSource= "..tostring(recipeSource))
+					--DA.DEBUG(1,"GetTradeSkillLevels: itemID= "..tostring(itemID)..", recipeSource= "..tostring(recipeSource))
 				end
 			end
 
@@ -125,18 +167,18 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 --
 			if PT then
 				local levels = PT:ItemInSet(itemID,"TradeskillLevels")
-				DA.DEBUG(0,"GetTradeSkillLevels (PT): itemID= "..tostring(itemID)..", levels= "..tostring(levels))
+				--DA.DEBUG(1,"GetTradeSkillLevels (PT): itemID= "..tostring(itemID)..", levels= "..tostring(levels))
 				if not levels then
 					itemID = -itemID
 					levels = PT:ItemInSet(itemID,"TradeskillLevels")
-					DA.DEBUG(0,"GetTradeSkillLevels (PT): itemID= "..tostring(itemID)..", levels= "..tostring(levels))
+					--DA.DEBUG(1,"GetTradeSkillLevels (PT): itemID= "..tostring(itemID)..", levels= "..tostring(levels))
 				end
 				if levels then
 					a,b,c,d = string.split("/",levels)
-					a = tonumber(a) or 0
-					b = tonumber(b) or 0
-					c = tonumber(c) or 0
-					d = tonumber(d) or 0
+					a = tonumber(a) or 0 + rb
+					b = tonumber(b) or 0 + rb
+					c = tonumber(c) or 0 + rb
+					d = tonumber(d) or 0 + rb
 					self.sourceTradeSkillLevel = 3
 					return a, b, c, d
 				end

@@ -1055,7 +1055,7 @@ local function ScanTrade()
 					local oldTradeID, oldItemString, oldReagentString, oldToolString = string.split(" ",recipeDB[recipeID])
 					if oldItemString == itemString and oldReagentString == reagentString and oldToolString == toolString then
 						DA.WARN("ScanTrade: recipeID="..tostring(recipeID)..", oldTradeID="..tostring(oldTradeID)..", tradeID="..tostring(tradeID).." (match)")
-					elseif oldTradeID ~= tradeID then
+					elseif oldTradeID ~= tostring(tradeID) then
 						DA.WARN("ScanTrade:  recipeID="..tostring(recipeID)..", oldTradeID="..tostring(oldTradeID)..", tradeID="..tostring(tradeID).." (no match)")
 					end
 					DA.WARN("ScanTrade: replacing recipeID="..tostring(recipeID)..", '"..tostring(recipeDB[recipeID]).."' with '"..tostring(recipeString).."'")
