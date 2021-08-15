@@ -122,10 +122,10 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 				--DA.DEBUG(1,"GetTradeSkillLevels: levels= "..tostring(levels))
 				if levels and type(levels) == 'string' then
 					a,b,c,d = string.split("/", levels)
-					a = tonumber(a) or 0 + rb
-					b = tonumber(b) or 0 + rb
-					c = tonumber(c) or 0 + rb
-					d = tonumber(d) or 0 + rb
+					a = (tonumber(a) or 0) + rb
+					b = (tonumber(b) or 0) + rb
+					c = (tonumber(c) or 0) + rb
+					d = (tonumber(d) or 0) + rb
 					self.sourceTradeSkillLevel = 1
 					return a, b, c, d
 				end
@@ -147,10 +147,10 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 						local TSILevels = TradeskillInfo:GetCombineDifficulty(recipeID)
 						if type(TSILevels) == 'table' then
 							--DA.DEBUG(2,"GetTradeSkillLevels: TSILevels="..DA.DUMP1(TSILevels))
-							a = tonumber(TSILevels[1]) or 0 + rb
-							b = tonumber(TSILevels[2]) or 0 + rb
-							c = tonumber(TSILevels[3]) or 0 + rb
-							d = tonumber(TSILevels[4]) or 0 + rb
+							a = (tonumber(TSILevels[1]) or 0) + rb
+							b = (tonumber(TSILevels[2]) or 0) + rb
+							c = (tonumber(TSILevels[3]) or 0) + rb
+							d = (tonumber(TSILevels[4]) or 0) + rb
 							self.sourceTradeSkillLevel = 2
 							return a, b, c, d
 						end
@@ -174,10 +174,10 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 				end
 				if levels then
 					a,b,c,d = string.split("/",levels)
-					a = tonumber(a) or 0 + rb
-					b = tonumber(b) or 0 + rb
-					c = tonumber(c) or 0 + rb
-					d = tonumber(d) or 0 + rb
+					a = (tonumber(a) or 0) + rb
+					b = (tonumber(b) or 0) + rb
+					c = (tonumber(c) or 0) + rb
+					d = (tonumber(d) or 0) + rb
 					self.sourceTradeSkillLevel = 3
 					return a, b, c, d
 				end
