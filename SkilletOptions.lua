@@ -153,32 +153,32 @@ Skillet.options =
 					width = "full",
 					order = 19
 				},
-					queue_craftable_reagents = {
-						type = "toggle",
-						name = L["QUEUECRAFTABLEREAGENTSNAME"],
-						desc = L["QUEUECRAFTABLEREAGENTSDESC"],
-						get = function()
-							return Skillet.db.profile.queue_craftable_reagents
-						end,
-						set = function(self,value)
-							Skillet.db.profile.queue_craftable_reagents = value
-						end,
-						width = 1.5,
-						order = 20
-					},
-					ignore_banked_reagents = {
-						type = "toggle",
-						name = L["IGNOREBANKEDREAGENTSNAME"],
-						desc = L["IGNOREBANKEDREAGENTSDESC"],
-						get = function()
-							return Skillet.db.profile.ignore_banked_reagents
-						end,
-						set = function(self,value)
-							Skillet.db.profile.ignore_banked_reagents = value
-						end,
-						width = 1.5,
-						order = 21
-					},
+				queue_craftable_reagents = {
+					type = "toggle",
+					name = L["QUEUECRAFTABLEREAGENTSNAME"],
+					desc = L["QUEUECRAFTABLEREAGENTSDESC"],
+					get = function()
+						return Skillet.db.profile.queue_craftable_reagents
+					end,
+					set = function(self,value)
+						Skillet.db.profile.queue_craftable_reagents = value
+					end,
+					width = 1.5,
+					order = 20
+				},
+				ignore_banked_reagents = {
+					type = "toggle",
+					name = L["IGNOREBANKEDREAGENTSNAME"],
+					desc = L["IGNOREBANKEDREAGENTSDESC"],
+					get = function()
+						return Skillet.db.profile.ignore_banked_reagents
+					end,
+					set = function(self,value)
+						Skillet.db.profile.ignore_banked_reagents = value
+					end,
+					width = 1.5,
+					order = 21
+				},
 --[[
 				queue_glyph_reagents = {
 					type = "toggle",
@@ -368,7 +368,6 @@ Skillet.options =
 			type = 'group',
 			name = L["Appearance"],
 			desc = L["APPEARANCEDESC"],
---			order = 12,
 			args = {
 				display_required_level = {
 					type = "toggle",
