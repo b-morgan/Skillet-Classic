@@ -2601,10 +2601,13 @@ end
 --
 -- Recurse through the reagents expanding craftables into their non-craftable source.
 --
-local function recurseReagents(recipe, level)
-	DA.DEBUG(0,"recurseReagents("..tostring(recipe.name)..", "..tostring(level)..")")
-	--DA.DEBUG(1,"recurseReagents: recipe= "..DA.DUMP1(recipe))
+local function recurseReagents(orecipe, oi, recipe, level)
+	DA.DEBUG(0,"recurseReagents("..tostring(orecipe.name)..", "..tostring(oi)..", "..tostring(recipe.name)..", "..tostring(level)..")")
+	--DA.DEBUG(1,"recurseReagents: orecipe= "..DA.DUMP1(orecipe))
+	DA.DEBUG(1,"recurseReagents: recipe= "..DA.DUMP1(recipe))
 	for i = 1, #recipe.reagentData, 1 do
+		if level == 1 then oi = i end
+		local oreagent = orecipe.reagentData[oi]
 		local reagent = recipe.reagentData[i]
 		--DA.DEBUG(1,"recurseReagents: reagent= "..DA.DUMP1(reagent))
 		if reagent and reagent.id then
@@ -2622,18 +2625,26 @@ local function recurseReagents(recipe, level)
 			end
 			--DA.DEBUG(1,"recurseReagents: reagentLink= "..DA.DUMP1(reagentLink))
 			if reagentLink then
---				if reagentIndex and reagentRecipe.tradeID == Skillet.currentTrade then
 				if reagentIndex then
-					recurseReagents(reagentRecipe, level+1)
+					recurseReagents(orecipe, oi, reagentRecipe, level+1)
 				end
-				if not Skillet.reagentLinkList[level] then
-					Skillet.reagentLinkList[level] = {}
+				if not Skillet.reagentLinkList[oreagent.id] then
+					Skillet.reagentLinkList[oreagent.id] = {}
 				end
-				DA.DEBUG(1,"recurseReagents: level= "..tostring(level)..", tradeID= "..tostring(reagentRecipe.tradeID)..", reagentID= "..tostring(reagent.id)..", numNeeded= "..tostring(reagent.numNeeded)..", reagentName= "..tostring(reagentName))
-				Skillet.reagentLinkList[level][reagent.id] = {}
-				Skillet.reagentLinkList[level][reagent.id].tradeID = reagentRecipe.tradeID
-				Skillet.reagentLinkList[level][reagent.id].numNeeded = reagent.numNeeded
-				Skillet.reagentLinkList[level][reagent.id].reagentLink = reagentLink
+				if not Skillet.reagentLinkList[oreagent.id][level] then
+					Skillet.reagentLinkList[oreagent.id][level] = {}
+				end
+				if not Skillet.reagentLinkList[oreagent.id][level][reagent.id] then
+					Skillet.reagentLinkList[oreagent.id][level][reagent.id] = {}
+				end
+				Skillet.reagentLinkList[oreagent.id][level][reagent.id].reagentIndex = i
+				Skillet.reagentLinkList[oreagent.id][level][reagent.id].reagentName = reagentName
+				Skillet.reagentLinkList[oreagent.id][level][reagent.id].reagentLink = reagentLink
+				Skillet.reagentLinkList[oreagent.id][level][reagent.id].numNeeded = reagent.numNeeded
+				Skillet.reagentLinkList[oreagent.id][level][reagent.id].tradeID = reagentRecipe.tradeID
+				Skillet.reagentLinkList[oreagent.id][level][reagent.id].recipeID = recipe.itemID
+				Skillet.reagentLinkList[oreagent.id][level][reagent.id].recipeName = recipe.name
+				Skillet.reagentLinkList[oreagent.id][level][reagent.id].orecipeIndex = oi
 			end
 		end
 	end
@@ -2650,9 +2661,11 @@ function Skillet:ReagentsLinkOnClick(button, skillIndex, recurse)
 	local skillIndexLookup = Skillet.data.skillIndexLookup[Skillet.currentPlayer]
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	--DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe))
-	self.reagentLinkList = {}
-	recurseReagents(recipe, 1)
-	DA.DEBUG(1,"reagentLinkList= "..DA.DUMP1(self.reagentLinkList))
+	if recurse then
+		self.reagentLinkList = {}
+		recurseReagents(recipe, 0, recipe, 1)
+		DA.DEBUG(1,"reagentLinkList= "..DA.DUMP(self.reagentLinkList))
+	end
 	local sep = " "
 	for i = 1, #recipe.reagentData, 1 do
 		local reagent = recipe.reagentData[i]
