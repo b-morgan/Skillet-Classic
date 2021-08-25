@@ -1729,6 +1729,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 			local cooldown = GetCraftCooldown(skillIndex)
 			if cooldown and cooldown > 0 then
 				SkilletSkillCooldown:SetText(COOLDOWN_REMAINING.." "..SecondsToTime(cooldown))
+			end
 		end
 	else
 		recipe = Skillet.unknownRecipe
