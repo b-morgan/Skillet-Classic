@@ -1721,19 +1721,14 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 --
 		SkilletSkillCooldown:SetText("")
 		if not Skillet.isCraft then
-			local _, _, _, _, _, _, _, _, _, _, _, displayAsUnavailable, unavailableString = GetTradeSkillInfo(skillIndex)
-			--DA.DEBUG(0,"displayAsUnavailable="..tostring(displayAsUnavailable)..", unavailableString="..tostring(unavailableString))
-			local cooldown = 0
-			cooldown = (skill.cooldown or 0) - time()
-			if cooldown > 0 then
+			local cooldown = GetTradeSkillCooldown(skillIndex)
+			if cooldown and cooldown > 0 then
 				SkilletSkillCooldown:SetText(COOLDOWN_REMAINING.." "..SecondsToTime(cooldown))
-			elseif displayAsUnavailable then
-				local width = SkilletReagentParent:GetWidth()
-				local iconw = SkilletSkillIcon:GetWidth()
-				SkilletSkillCooldown:SetWidth(width - iconw - 15)
-				SkilletSkillCooldown:SetMaxLines(3)
-				SkilletSkillCooldown:SetText(unavailableString)
 			end
+		else
+			local cooldown = GetCraftCooldown(skillIndex)
+			if cooldown and cooldown > 0 then
+				SkilletSkillCooldown:SetText(COOLDOWN_REMAINING.." "..SecondsToTime(cooldown))
 		end
 	else
 		recipe = Skillet.unknownRecipe
