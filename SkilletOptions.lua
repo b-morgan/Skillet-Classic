@@ -240,7 +240,6 @@ Skillet.options =
 					},
 					display_shopping_list_at_guildbank = {
 						hidden = isClassic,
-						disabled = isBCC,
 						type = "toggle",
 						name = L["Guild bank"],
 						desc = L["DISPLAYSHOPPINGLISTATGUILDBANKDESC"],

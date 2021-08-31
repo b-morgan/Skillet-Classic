@@ -279,16 +279,9 @@ function Skillet:OnInitialize()
 	if not self.db.global.SkillLevels then
 		self:InitializeSkillLevels()
 	end
-
---
--- Classic doesn't have a Guild Bank
--- Currently this only effects ShoppingList.lua
---
---[[
 	if not self.db.global.cachedGuildbank then
 		self.db.global.cachedGuildbank = {}
 	end
-]]--
 
 --
 -- Hook default tooltips
@@ -659,11 +652,13 @@ function Skillet:OnEnable()
 	self:RegisterEvent("BANKFRAME_OPENED")
 	self:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
 	self:RegisterEvent("BANKFRAME_CLOSED")
---[[
-	self:RegisterEvent("GUILDBANKFRAME_OPENED")
-	self:RegisterEvent("GUILDBANKBAGSLOTS_CHANGED")
-	self:RegisterEvent("GUILDBANKFRAME_CLOSED")
-]]--
+
+	if isBCC then
+		self:RegisterEvent("GUILDBANKFRAME_OPENED")
+		self:RegisterEvent("GUILDBANKBAGSLOTS_CHANGED")
+		self:RegisterEvent("GUILDBANKFRAME_CLOSED")
+	end
+
 	self:RegisterEvent("AUCTION_HOUSE_SHOW")
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
 --

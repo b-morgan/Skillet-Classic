@@ -46,16 +46,11 @@ local FrameBackdrop = {
 local bankFrameOpen = false
 local bank						-- Detailed contents of the bank.
 local bankData					-- By item contents of the bank.
---
--- In Classic, there is no guildbank
---
---[[
 local guildbankFrameOpen = false
 local guildbankQuery = 0		-- Need to wait until all the QueryGuildBankTab()s finish
 local guildbankOnce = true		-- but only indexGuildBank once for each OPENED
 local guildbank					-- Detailed contents of the guildbank
 local guildbankData				-- By item  contents of the guildbank
-]]--
 
 --
 -- Creates and sets up the shopping list window
@@ -192,22 +187,13 @@ function Skillet:ClearShoppingList(player)
 	self:UpdateTradeSkillWindow()
 end
 
---
--- In Classic, there is no guildbank
---
---[[
 function Skillet:GetShoppingList(player, includeGuildbank)
 	--DA.DEBUG(0,"GetShoppingList("..tostring(player)..", "..tostring(includeGuildbank)..")")
-]]--
-function Skillet:GetShoppingList(player)
-	--DA.DEBUG(0,"GetShoppingList("..tostring(player)..")")
 	self:InventoryScan()
---[[
 	if not Skillet.db.global.cachedGuildbank then
 		Skillet.db.global.cachedGuildbank = {}
 	end
- 	local cachedGuildbank = Skillet.db.global.cachedGuildbank
-]]--
+	local cachedGuildbank = Skillet.db.global.cachedGuildbank
 	local list = {}
 	local playerList
 	if player then
@@ -224,13 +210,11 @@ function Skillet:GetShoppingList(player)
 	if not usedInventory[curPlayer] then
 		usedInventory[curPlayer] = {}
 	end
---[[
 	local usedGuild = {}
 	local curGuild = GetGuildInfo("player")
 	if curGuild and not cachedGuildbank[curGuild] then
 		cachedGuildbank[curGuild] = {}
 	end
-]]--
 	for i=1,#playerList,1 do
 		local player = playerList[i]
 		if not usedInventory[player] then
@@ -262,7 +246,6 @@ function Skillet:GetShoppingList(player)
 					end
 				end
 				deficit = deficit + numInBoth + numInBothCurrent
---[[
 				if curGuild and not cachedGuildbank[curGuild][id] then
 					cachedGuildbank[curGuild][id] = 0
 				end
@@ -280,7 +263,6 @@ function Skillet:GetShoppingList(player)
 					usedGuild[id] = usedGuild[id] + temp  -- keep track how many have been used
 					usedGuild[id] = math.min(usedGuild[id], cachedGuildbank[curGuild][id]) -- but don't use more than there is
 				end
-]]--
 				if deficit < 0 then
 					local entry = { ["id"] = id, ["count"] = -deficit, ["player"] = player, ["value"] = 0, ["source"] = "?" }
 					table.insert(list, entry)
@@ -291,18 +273,12 @@ function Skillet:GetShoppingList(player)
 	return list
 end
 
---
--- In Classic, there is no guildbank
---
 local function cache_list(self)
 	local name = nil
 	if not Skillet.db.char.include_alts then
 		name = Skillet.currentPlayer
 	end
---[[
 	self.cachedShoppingList = self:GetShoppingList(name, Skillet.db.char.include_guild)
-]]--
-	self.cachedShoppingList = self:GetShoppingList(name)
 end
 
 local function indexBank()
@@ -349,10 +325,6 @@ local function indexBank()
 	Skillet.db.realm.bankDetails[player] = bank
 end
 
---
--- In Classic, there is no guild bank
---
---[[
 local function indexGuildBank(tab)
 	DA.DEBUG(0,"indexGuildBank("..tostring(tab)..")")
 --
@@ -401,7 +373,6 @@ function Skillet:indexAllGuildBankTabs()
 	end
 	guildbankFrameOpen = true
 end
-]]--
 
 --
 -- Called when the bank frame is opened
@@ -443,10 +414,6 @@ function Skillet:BANKFRAME_CLOSED()
 	self:HideShoppingList()
 end
 
---
--- In Classic, there is no guild bank
---
---[[
 function Skillet:GUILDBANKFRAME_OPENED()
 	DA.TRACE("GUILDBANKFRAME_OPENED")
 	guildbankQuery = 0
@@ -478,7 +445,6 @@ function Skillet:GUILDBANKFRAME_CLOSED()
 	guildbankFrameOpen = false
 	self:HideShoppingList()
 end
-]]--
 
 --
 -- Called when the cursor has changed (should only be needed while debugging)
@@ -742,10 +708,6 @@ function Skillet:BANK_UPDATE(event,bagID)
 end
 
 --
--- In Classic, there is no guild bank
---
---[[
---
 -- Called once to get things started and then is called after both
 -- GUILDBANKBAGSLOTS_CHANGED and BAG_UPDATE_DELAYED events have fired.
 --
@@ -778,9 +740,11 @@ local function processGuildQueue(where)
 		end
 	end
 end
+
 function Skillet:UpdateGuildQueue(where)
 	processGuildQueue(where)
 end
+
 --
 -- Event is fired when the guild bank contents change.
 -- Called as a result of a QueryGuildBankTab call or as a result of a change in the guildbank's contents.
@@ -802,7 +766,6 @@ function Skillet:GUILDBANKBAGSLOTS_CHANGED(event)
 		end
 	end
 end
-]]--
 
 --
 -- Event is fired when the main bank (bagID == -1) contents change.
@@ -880,9 +843,6 @@ function Skillet:GetReagentsFromBanks()
 --
 -- Do things using a queue and events.
 --
--- In Classic, there is no guild bank
---
---[[
 	if guildbankFrameOpen then
 		DA.DEBUG(0,"#list=",#list)
 		local guildQueue = Skillet.guildQueue
@@ -913,7 +873,6 @@ function Skillet:GetReagentsFromBanks()
 			end
 		end
 	end
-]]--
 end
 
 function Skillet:ShoppingListToggleShowAlts()
@@ -1065,8 +1024,8 @@ function Skillet:UpdateShoppingListWindow(use_cached_recipes)
 -- Hide any of the buttons that we created, but don't need right now
 --
 	for i = button_count+1, num_buttons, 1 do
-	   local button = get_button(i)
-	   button:Hide()
+		local button = get_button(i)
+		button:Hide()
 	end
 end
 
