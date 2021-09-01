@@ -297,10 +297,6 @@
 			</Scripts>
 		</CheckButton>
 
-		<!--
-		#
-		#  In Classic, there is no guildbank.
-		#
 		<CheckButton name="SkilletShowQueuesIncludeGuild" inherits="SkilletShoppingListCheckButtonTemplate">
 			<Anchors>
 				<Anchor point="BOTTOMRIGHT" relativeTo="SkilletShoppingList" relativePoint="BOTTOMRIGHT">
@@ -316,7 +312,6 @@
 				</OnClick>
 			</Scripts>
 		</CheckButton>
-		-->
 
 		<CheckButton name="SkilletShowQueuesInItemOrder" inherits="SkilletShoppingListCheckButtonTemplate2">
 			<Anchors>

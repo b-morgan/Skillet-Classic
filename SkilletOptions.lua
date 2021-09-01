@@ -361,6 +361,21 @@ Skillet.options =
 					width = "full",
 					order = 35
 				},
+				use_guildbank_as_alt = {
+					hidden = isClassic,
+					type = "toggle",
+					name = L["USEGUILDBANKASALTNAME"],
+					desc = L["USEGUILDBANKASALTDESC"],
+					get = function()
+						return Skillet.db.profile.use_guildbank_as_alt
+					end,
+					set = function(self,value)
+						Skillet.db.profile.use_guildbank_as_alt = value
+						Skillet:UpdateTradeSkillWindow()
+					end,
+					width = "full",
+					order = 36
+				},
 			}
 		},
 		appearance = {

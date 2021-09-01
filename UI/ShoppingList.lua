@@ -25,6 +25,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ]]--
 
+local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
+local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
+local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
+
 SKILLET_SHOPPING_LIST_HEIGHT = 16
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
@@ -100,10 +104,13 @@ local function createShoppingListFrame(self)
 	SkilletShowQueuesInItemOrder:SetChecked(Skillet.db.char.item_order)
 	SkilletShowQueuesMergeItemsText:SetText(L["Merge items"])
 	SkilletShowQueuesMergeItems:SetChecked(Skillet.db.char.merge_items)
---[[
-	SkilletShowQueuesIncludeGuildText:SetText(L["Include guild"])
-	SkilletShowQueuesIncludeGuild:SetChecked(Skillet.db.char.include_guild)
-]]--
+	if isBCC then
+		SkilletShowQueuesIncludeGuildText:SetText(L["Include guild"])
+		SkilletShowQueuesIncludeGuild:SetChecked(Skillet.db.char.include_guild)
+	else
+		SkilletShowQueuesIncludeGuildText:Hide()
+		SkilletShowQueuesIncludeGuild:Hide()
+	end
 --
 -- Button to retrieve items needed from the bank
 --
@@ -252,10 +259,12 @@ function Skillet:GetShoppingList(player, includeGuildbank)
 				if not usedGuild[id] then
 					usedGuild[id] = 0
 				end
-				-- If the Guildbank should be included then
-				-- the player must be in the guild to use items from the guild bank and
-				-- only count guild bank items when not at the guild bank because
-				-- we might start using them.
+--
+-- If the Guildbank should be included then
+-- the player must be in the guild to use items from the guild bank and
+-- only count guild bank items when not at the guild bank because
+-- we might start using them.
+--
 				if includeGuildbank and curGuild and not guildbankFrameOpen then
 					DA.DEBUG(2,"deficit=",deficit,"cachedGuildbank=",cachedGuildbank[curGuild][id],"usedGuild=",usedGuild[id])
 					local temp = -1 * math.min(deficit,0) -- calculate exactly how many are needed
