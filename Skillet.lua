@@ -708,8 +708,8 @@ function Skillet:OnEnable()
 -- run the upgrade code to convert any old settings
 --
 	self:UpgradeDataAndOptions()
-
 	self:CollectTradeSkillData()
+	self:CollectCurrencyData()
 	self:ScanPlayerTradeSkills()
 	self:CreateAdditionalButtonsList()
 	self:EnablePlugins()

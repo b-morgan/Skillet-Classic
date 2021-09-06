@@ -139,6 +139,21 @@ function Skillet:CollectTradeSkillData()
 end
 
 --
+-- Collects currency data (id to name and name to id)
+--
+function Skillet:CollectCurrencyData()
+	DA.DEBUG(0,"CollectCurrencyData()")
+	self.currencyIDsByName = {}
+	self.currencyNamesByID = {}
+end
+
+function Skillet:AddCurrencyData(name,id)
+	DA.DEBUG(0,"AddCurrencyData("..tostring(name)..", "..tostring(id)..")")
+	self.currencyIDsByName[name] = id
+	self.currencyNamesByID[id] = name
+end
+
+--
 -- this routine collects the basic data (which tradeskills a player has)
 --
 function Skillet:ScanPlayerTradeSkills()
