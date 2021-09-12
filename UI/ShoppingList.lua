@@ -380,7 +380,6 @@ function Skillet:indexAllGuildBankTabs()
 	for tab=1, numTabs, 1 do
 		indexGuildBank(tab)
 	end
-	guildbankFrameOpen = true
 end
 
 --
@@ -425,6 +424,7 @@ end
 
 function Skillet:GUILDBANKFRAME_OPENED()
 	DA.TRACE("GUILDBANKFRAME_OPENED")
+	guildbankFrameOpen = true
 	guildbankQuery = 0
 	guildbankOnce = true
 	Skillet.guildBusy = false
@@ -628,10 +628,6 @@ local function getItemFromBank(itemID, bag, slot, count)
 	return num_moved
 end
 
---
--- In Classic, there is no guild bank
---
---[[
 local function getItemFromGuildBank(itemID, bag, slot, count)
 	DA.DEBUG(0,"getItemFromGuildBank(",itemID, bag, slot, count,")")
 	ClearCursor()
@@ -661,7 +657,6 @@ local function getItemFromGuildBank(itemID, bag, slot, count)
 	ClearCursor()
 	return num_moved
 end
-]]--
 
 --
 -- Called once to get things started and then is called after both
