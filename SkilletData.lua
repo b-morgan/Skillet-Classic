@@ -248,6 +248,31 @@ local TradeSkillIgnoredMats	 = {
 Skillet.TradeSkillIgnoredMats = TradeSkillIgnoredMats
 
 --
+-- Enchants that produce items
+--
+local EnchantSpellToItem = {
+	[14923] = 11287 , -- Lesser Magic Wand
+	[25124] = 20744 , -- Minor Wizard Oil
+	[14807] = 11288 , -- Greater Magic Wand
+	[25125] = 20745 , -- Minor Mana Oil
+	[14809] = 11289 , -- Lesser Mystic Wand
+	[14810] = 11290 , -- Greater Mystic Wand
+	[25126] = 20746 , -- Lesser Wizard Oil
+	[25127] = 20747 , -- Lesser Mana Oil
+	[15596] = 11811 , -- Smoking Heart of the Mountain
+	[25128] = 20750 , -- Wizard Oil
+	[17180] = 12655 , -- Enchanted Thorium Bar
+	[17181] = 12810 , -- Enchanted Leather
+	[25130] = 20748 , -- Brilliant Mana Oil
+	[25129] = 20749 , -- Brilliant Wizard Oil
+	[28027] = 22460 , -- Prismatic Sphere
+	[28016] = 22521 , -- Superior Mana Oil
+	[28022] = 22449 , -- Large Prismatic Shard
+	[28019] = 22522 , -- Superior Wizard Oil
+}
+Skillet.EnchantSpellToItem = EnchantSpellToItem
+
+--
 -- None of these "features" exist in Classic
 --
 Skillet.scrollData = {
