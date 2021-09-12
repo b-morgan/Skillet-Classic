@@ -260,6 +260,13 @@ function plugin.GetExtraText(skill, recipe)
 	local label, extra_text
 	if not recipe then return end
 	local itemID = recipe.itemID
+--
+-- Check for Enchanting. Most recipes don't produce an item but
+-- we still should get reagent prices.
+--
+	if recipe.tradeID == 7411 and itemID then
+		itemID = Skillet.EnchantSpellToItem[itemID] or 0
+	end
 	if Skillet.db.profile.plugins.ATR.enabled and itemID then
 --
 -- buyout is Auctionator's price (for one) times the number this recipe makes
@@ -386,6 +393,13 @@ function plugin.RecipeNameSuffix(skill, recipe)
 	if not recipe then return end
 	--DA.DEBUG(0,"RecipeNameSuffix: recipe= "..DA.DUMP1(recipe,1))
 	local itemID = recipe.itemID
+--
+-- Check for Enchanting. Most recipes don't produce an item but
+-- we still should get reagent prices.
+--
+	if recipe.tradeID == 7411 and itemID then
+		itemID = Skillet.EnchantSpellToItem[itemID] or 0
+	end
 	--DA.DEBUG(0,"RecipeNameSuffix: itemID= "..tostring(itemID)..", type= "..type(itemID))
 	local itemName
 	if itemID then itemName = GetItemInfo(itemID) end

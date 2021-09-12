@@ -173,6 +173,13 @@ function plugin.GetExtraText(skill, recipe)
 	local label, extra_text
 	if not recipe then return end
 	local itemID = recipe.itemID
+--
+-- Check for Enchanting. Most recipes don't produce an item but
+-- we still should get reagent prices.
+--
+	if recipe.tradeID == 7411 and itemID then
+		itemID = Skillet.EnchantSpellToItem[itemID] or 0
+	end
 	if Skillet.db.profile.plugins.AUC.enabled and itemID and IsAddOnLoaded("Auc-Advanced") and AucAdvanced then
 		local itemName, itemLink = GetItemInfo(itemID)
 		local market = ( GetMarketValue(itemLink) or 0 ) * recipe.numMade
@@ -235,6 +242,13 @@ function plugin.RecipeNameSuffix(skill, recipe)
 	local text
 	if not recipe then return end
 	local itemID = recipe.itemID
+--
+-- Check for Enchanting. Most recipes don't produce an item but
+-- we still should get reagent prices.
+--
+	if recipe.tradeID == 7411 and itemID then
+		itemID = Skillet.EnchantSpellToItem[itemID] or 0
+	end
 	if Skillet.db.profile.plugins.AUC.enabled and itemID and IsAddOnLoaded("Auc-Advanced") and AucAdvanced then
 		local buyout = ( GetMarketValue(itemLink) or 0 ) * recipe.numMade
 		if Skillet.db.profile.plugins.AUC.reagentPrices then

@@ -1,4 +1,7 @@
 local addonName,addonTable = ...
+local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
+local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
+local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
 local DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
@@ -168,6 +171,13 @@ function plugin.GetExtraText(skill, recipe)
 	if not recipe then return end
 	local itemID = recipe.itemID
 	local minBuyout, maxBuyout, daysElapsed
+--
+-- Check for Enchanting. Most recipes don't produce an item but
+-- we still should get reagent prices.
+--
+	if recipe.tradeID == 7411 and itemID then
+		itemID = Skillet.EnchantSpellToItem[itemID] or 0
+	end
 	if Skillet.db.profile.plugins.APS.enabled and itemID and Auctipus and Auctipus.API and Auctipus.API.GetAuctionBuyoutRange then
 		minBuyout, maxBuyout, daysElapsed = Auctipus.API.GetAuctionBuyoutRange(itemID)
 		local buyout = ( minBuyout or 0 ) * recipe.numMade
@@ -235,6 +245,13 @@ function plugin.RecipeNameSuffix(skill, recipe)
 	if not recipe then return end
 	local itemID = recipe.itemID
 	local minBuyout, maxBuyout, daysElapsed
+--
+-- Check for Enchanting. Most recipes don't produce an item but
+-- we still should get reagent prices.
+--
+	if recipe.tradeID == 7411 and itemID then
+		itemID = Skillet.EnchantSpellToItem[itemID] or 0
+	end
 	if Skillet.db.profile.plugins.APS.enabled and itemID and Auctipus and Auctipus.API and Auctipus.API.GetAuctionBuyoutRange then
 		minBuyout, maxBuyout, daysElapsed = Auctipus.API.GetAuctionBuyoutRange(itemID)
 		local buyout = ( minBuyout or 0 ) * recipe.numMade
