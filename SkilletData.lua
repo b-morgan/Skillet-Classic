@@ -149,8 +149,10 @@ end
 
 function Skillet:AddCurrencyData(name,id)
 	DA.DEBUG(0,"AddCurrencyData("..tostring(name)..", "..tostring(id)..")")
-	self.currencyIDsByName[name] = id
-	self.currencyNamesByID[id] = name
+	if name and id then
+		self.currencyIDsByName[name] = id
+		self.currencyNamesByID[id] = name
+	end
 end
 
 --

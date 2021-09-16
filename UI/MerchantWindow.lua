@@ -72,11 +72,12 @@ local function update_merchant_inventory()
 						DA.DEBUG(2,"itemCount for "..tostring(name).." ("..tostring(id)..")= "..tostring(itemCount))
 						for j=1, itemCount, 1 do
 							itemTexture, itemValue, itemLink, currencyName = GetMerchantItemCostItem(i, j)
-							if itemLink then
+							DA.DEBUG(2,"itemTexture= "..tostring(itemTexture)..", itemValue= "..tostring(itemValue)..", itemLink= "..DA.PLINK(itemLink)..", currencyName= "..tostring(currencyName))
+							if currencyName then
+								currencyID = -1 * tonumber(Skillet.currencyIDsByName[currencyName] or 0)
+							elseif itemLink then
 								currencyName = GetItemInfo(itemLink)
 								currencyID = Skillet:GetItemIDFromLink(itemLink)
-							elseif currencyName then
-								currencyID = -1 * tonumber(Skillet.currencyIDsByName[currencyName] or 0)
 							end
 							DA.DEBUG(2,"Currency for "..tostring(name).." ("..tostring(id)..")= "..tostring(currencyName).." ("..tostring(currencyID)..") x "..tostring(itemValue))
 							Skillet:AddCurrencyData(currencyName,currencyID)
