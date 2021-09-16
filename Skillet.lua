@@ -843,7 +843,6 @@ function Skillet:TRADE_SKILL_UPDATE()
 		if Skillet.lastCraft ~= Skillet.isCraft then
 			Skillet:ConfigureRecipeControls()
 		end
-		Skillet:AdjustInventory()
 	end
 	DA.TRACE("TRADE_SKILL_UPDATE: dataSourceChanged= "..tostring(Skillet.dataSourceChanged)..", dataScanned= "..tostring(Skillet.dataScanned))
 	if Skillet.dataSourceChanged or not Skillet.dataScanned then
@@ -864,7 +863,6 @@ function Skillet:CRAFT_UPDATE()
 		if Skillet.lastCraft ~= Skillet.isCraft then
 			Skillet:ConfigureRecipeControls()
 		end
-		Skillet:AdjustInventory()
 	end
 	DA.TRACE("CRAFT_UPDATE: dataSourceChanged= "..tostring(Skillet.dataSourceChanged)..", dataScanned= "..tostring(Skillet.dataScanned))
 	if Skillet.dataSourceChanged or not Skillet.dataScanned then
@@ -1081,7 +1079,6 @@ function Skillet:SkilletShow()
 	DA.DEBUG(0,"name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
 	if name then self.currentTrade = self.tradeSkillIDsByName[name] end
 	if self:IsSupportedTradeskill(self.currentTrade) then
-		self:InventoryScan()
 		--DA.DEBUG(0,"SkilletShow: "..self.currentTrade..", name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
 		self.selectedSkill = nil
 		self.dataScanned = false
