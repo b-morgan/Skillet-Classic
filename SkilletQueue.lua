@@ -383,6 +383,7 @@ function Skillet:ProcessQueue(altMode)
 		DA.DEBUG(0,"not command, clearing queueData for "..tostring(self.currentPlayer))
 		self.db.realm.queueData[self.currentPlayer] = {}
 	end		-- command
+	self:AdjustInventory()
 end
 
 --
