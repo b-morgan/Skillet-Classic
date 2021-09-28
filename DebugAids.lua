@@ -66,7 +66,7 @@ function DA.CHAT(text)
 end
 
 function DA.WARN(...)
-	if not DA.WarnLog then return "" end
+	if not DA.WarnLog and not DA.DebugLogging then return "" end
 	local text = ""
 	local comma = ""
 	for i = 1, select("#", ...), 1 do
