@@ -178,6 +178,13 @@ function Skillet:EnableBlizzardFrame()
 	end
 end
 
+function Skillet:RefreshConfig(event, database, profile)
+	DA.CHAT("RefreshConfig("..tostring(event)..", "..tostring(profile)..")")
+--
+-- Would do some stuff here
+--
+end
+
 --
 -- Called when the addon is loaded
 --
@@ -201,7 +208,11 @@ function Skillet:OnInitialize()
 	DA.DebugLog = SkilletDBPC
 	DA.DebugProfile = SkilletProfile
 	self.db = AceDB:New("SkilletDB", defaults)
-
+	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnNewProfile", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileDeleted", "RefreshConfig")
 --
 -- Clean up obsolete data
 --
