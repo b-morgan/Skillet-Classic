@@ -570,10 +570,11 @@ function Skillet:StopCast(spell, success)
 		self.db.realm.queueData = {}
 	end
 	local queue = self.db.realm.queueData[self.currentPlayer]
+	local qpos, command
 	if spell == self.processingSpell then
 		if success then
-			local qpos = self.processingPosition or 1
-			local command = nil
+			qpos = self.processingPosition or 1
+			command = nil
 			if not queue[qpos] or queue[qpos] ~= self.processingCommand then
 				for i=1,#queue,1 do
 					if queue[i] == self.processingCommand then
@@ -606,8 +607,8 @@ function Skillet:StopCast(spell, success)
 					self.processingPosition = nil
 					self.processingCommand = nil
 					self.reagentsChanged = {}
-					self:RemoveFromQueue(qpos)		-- implied queued reagent inventory adjustment in remove routine
-					DA.DEBUG(0,"removed queue command")
+					self:RemoveFromQueue(qpos)
+					DA.DEBUG(0,"removed successful queue command at "..tostring(qpos))
 				end
 			end
 			DA.DEBUG(0,"StopCast is updating window")
@@ -618,6 +619,10 @@ function Skillet:StopCast(spell, success)
 			self.processingSpell = nil
 			self.processingPosition = nil
 			self.processingCommand = nil
+			qpos = self.processingPosition or 1
+			self.reagentsChanged = {}
+			self:RemoveFromQueue(qpos)
+			DA.DEBUG(0,"removed failed queue command at "..tostring(qpos))
 		end
 	else
 		DA.DEBUG(0,"StopCast called with "..tostring(spell).." ~= "..tostring(self.processingSpell))
