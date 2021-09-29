@@ -615,14 +615,16 @@ function Skillet:StopCast(spell, success)
 			self:AdjustInventory()
 		else
 			DA.DEBUG(0,"StopCast without success")
+			qpos = self.processingPosition
 			self.queueCasting = false
 			self.processingSpell = nil
 			self.processingPosition = nil
 			self.processingCommand = nil
-			qpos = self.processingPosition or 1
-			self.reagentsChanged = {}
-			self:RemoveFromQueue(qpos)
-			DA.DEBUG(0,"removed failed queue command at "..tostring(qpos))
+			if qpos then
+				self.reagentsChanged = {}
+				self:RemoveFromQueue(qpos)
+				DA.DEBUG(0,"removed failed queue command at "..tostring(qpos))
+			end
 		end
 	else
 		DA.DEBUG(0,"StopCast called with "..tostring(spell).." ~= "..tostring(self.processingSpell))
