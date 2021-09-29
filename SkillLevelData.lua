@@ -68,7 +68,7 @@ local function getRacialBonus()
 	local player = Skillet.currentPlayer
 	local trade = Skillet.currentTrade
 	local race = Skillet.db.realm.race[player]
-	DA.DEBUG(0,"getRacialBonus: trade = "..tostring(trade).." ("..tostring(GetSpellInfo(trade)).."), race= "..tostring(race))
+	--DA.DEBUG(0,"getRacialBonus: trade = "..tostring(trade).." ("..tostring(GetSpellInfo(trade)).."), race= "..tostring(race))
 	if racialList[trade] then
 		for r, bonus in pairs(racialList[trade]) do
 			--DA.DEBUG(1,"getRacialBonus: r = "..tostring(r)..", bonus= "..tostring(bonus))

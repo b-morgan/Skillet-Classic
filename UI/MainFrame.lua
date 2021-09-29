@@ -702,7 +702,7 @@ function Skillet:CreateAdditionalButtonsList()
 end
 
 function Skillet:UpdateTradeButtons(player)
-	DA.DEBUG(3,"UpdateTradeButtons("..tostring(player)..")")
+	--DA.DEBUG(0,"UpdateTradeButtons("..tostring(player)..")")
 --	if TSM_API then return end		-- Maybe later but for now, these buttons cause more trouble than they are worth.
 	local position = 0 -- pixels
 	local tradeSkillList = self.tradeSkillList
@@ -1260,7 +1260,7 @@ function Skillet:UpdateTradeSkillWindow()
 		SkilletFrameEmptySpace:SetPoint("TOPLEFT",SkilletSkillListParent,"TOPLEFT")
 	end
 	SkilletFrameEmptySpace:SetPoint("BOTTOMRIGHT",SkilletSkillListParent,"BOTTOMRIGHT")
-	DA.DEBUG(3,"UpdateTradeSkillWindow Complete")
+	--DA.DEBUG(3,"UpdateTradeSkillWindow Complete")
 end
 
 --

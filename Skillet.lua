@@ -1206,6 +1206,9 @@ end
 
 function Skillet:UNIT_INVENTORY_CHANGED(event, unit)
 	DA.TRACE("UNIT_INVENTORY_CHANGED( "..tostring(unit).." )")
+	if self.tradeSkillOpen then
+		self:AdjustInventory()
+	end
 end
 
 --
