@@ -1913,9 +1913,9 @@ function Skillet:UpdateQueueWindow()
 		SkilletEmptyQueueButton:Disable()
 	end
 	if self.queueCasting then
-		SkilletStartQueueButton:SetText(L["Pause"])
+		SkilletStartQueueButton:Disable()
 	else
-		SkilletStartQueueButton:SetText(L["Process"])
+		SkilletStartQueueButton:Enable()
 	end
 	local button_count = SkilletQueueList:GetHeight() / SKILLET_TRADE_SKILL_HEIGHT
 	button_count = math.floor(button_count)
@@ -3149,11 +3149,10 @@ local queueMenuList = {
 function Skillet:StartQueue_OnClick(button)
 	local mouse = GetMouseButtonClicked()
 	--DA.DEBUG(0,"StartQueue_OnClick("..tostring(button).."), "..tostring(mouse))
+	button:Disable()
 	if self.queueCasting then
-		button:Disable()
 		self.queueCasting = false
 	else
-		button:SetText(L["Pause"])
 		self:ProcessQueue(mouse == "RightButton" or IsAltKeyDown())
 	end
 	self:UpdateQueueWindow()
