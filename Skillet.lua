@@ -1468,6 +1468,7 @@ function Skillet:HideTradeSkillWindow()
 	local closed -- was anything closed by us?
 	local frame = self.tradeSkillFrame
 	if frame and frame:IsVisible() then
+		self:DisablePauseButton()
 		self:StopCast()
 		frame:Hide()
 		closed = true
@@ -1481,7 +1482,9 @@ end
 function Skillet:HideAllWindows()
 	--DA.DEBUG(0,"HideAllWindows()")
 	local closed -- was anything closed?
-	-- Cancel anything currently being created
+--
+-- Cancel anything currently being created
+--
 	if self:HideTradeSkillWindow() then
 		closed = true
 	end

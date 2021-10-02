@@ -2715,7 +2715,6 @@ function Skillet:SkilletFrameForceClose()
 	end
 	Skillet.processingSpell = nil
 	Skillet.changingTrade = nil
-	Skillet:DisablePauseButton()
 	return self:HideAllWindows()
 end
 
