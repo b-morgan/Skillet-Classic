@@ -351,7 +351,7 @@ function Skillet:ProcessQueue(altMode)
 			--DA.DEBUG(1,"processingSpell= "..tostring(self.processingSpell)..", processingPosition= "..tostring(qpos)..", processingCommand= "..DA.DUMP1(command))
 			if self.isCraft then
 				--DA.DEBUG(1,"DoCraft(spell= "..tostring(recipeIndex)..", count= "..tostring(count)..") altMode= "..tostring(altMode))
-				if self.DoCraft then 
+				if self.DoCraft then
 					DoCraft(recipeIndex, count)
 				else
 					DA.WARN("processingSpell= "..tostring(self.processingSpell)..", processingPosition= "..tostring(qpos)..", processingCommand= "..DA.DUMP1(command))
@@ -359,6 +359,7 @@ function Skillet:ProcessQueue(altMode)
 				end
 			else
 				--DA.DEBUG(1,"DoTradeSkill(spell= "..tostring(recipeIndex)..", count= "..tostring(count)..") altMode= "..tostring(altMode))
+				self:EnablePauseButton()
 				DoTradeSkill(recipeIndex, count)
 			end
 --
@@ -620,7 +621,7 @@ function Skillet:StopCast(spell, success)
 			self.processingSpell = nil
 			self.processingPosition = nil
 			self.processingCommand = nil
-			if qpos then
+			if qpos and not self.pauseQueue then
 				self.reagentsChanged = {}
 				self:RemoveFromQueue(qpos)
 				DA.DEBUG(0,"removed failed queue command at "..tostring(qpos))

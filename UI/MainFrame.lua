@@ -195,6 +195,17 @@ function Skillet:RestoreEnchantButton(show)
 	end
 end
 
+function Skillet:EnablePauseButton()
+	SkilletStartQueueButton:Hide()
+	SkilletPauseQueueButton:Show()
+	self.pauseQueue = false
+end
+
+function Skillet:DisablePauseButton()
+	SkilletStartQueueButton:Show()
+	SkilletPauseQueueButton:Hide()
+end
+
 function Skillet:CreateTradeSkillWindow()
 --
 -- We are going to steal the Enchant button to avoid DoCraft errors so
@@ -268,6 +279,9 @@ function Skillet:CreateTradeSkillWindow()
 	SkilletCreateButton:SetText(L["Create"])
 	SkilletQueueButton:SetText(L["Queue"])
 	SkilletStartQueueButton:SetText(L["Process"])
+	SkilletPauseQueueButton:SetText(L["Pause"])
+	SkilletPauseQueueButton:SetAttribute("type", "macro")
+	SkilletPauseQueueButton:SetAttribute("macrotext", "/stopcasting")
 	SkilletEmptyQueueButton:SetText(L["Clear"])
 	SkilletEnchantButton:SetText(L["Enchant"])
 	SkilletRecipeNotesButton:SetText(L["Notes"])
@@ -549,6 +563,7 @@ function Skillet:ConfigureRecipeControls()
 		SkilletCreateButton:Hide()
 		SkilletQueueParent:Hide()
 		SkilletStartQueueButton:Hide()
+		SkilletPauseQueueButton:Hide()
 		SkilletEmptyQueueButton:Hide()
 		SkilletItemCountInputBox:Hide()
 		SkilletSub10Button:Hide()
@@ -882,6 +897,9 @@ function Skillet:UpdateTradeSkillWindow()
 	else
 		numTradeSkills = 0
 	end
+	Skillet:ScanQueuedReagents()
+	Skillet:InventoryScan()
+	self:CalculateCraftableCounts()
 	self:UpdateDetailsWindow(self.selectedSkill)
 	self:UpdateTradeButtons(self.currentPlayer)
 	self:UpdateIgnoreListButton()
@@ -1899,7 +1917,6 @@ end
 function Skillet:UpdateQueueWindow()
 	local queue = self.db.realm.queueData[self.currentPlayer]
 	if not queue then
-		SkilletStartQueueButton:SetText(L["Process"])
 		SkilletEmptyQueueButton:Disable()
 		SkilletStartQueueButton:Disable()
 		return
@@ -1913,9 +1930,9 @@ function Skillet:UpdateQueueWindow()
 		SkilletEmptyQueueButton:Disable()
 	end
 	if self.queueCasting then
-		SkilletStartQueueButton:Disable()
+		self:EnablePauseButton()
 	else
-		SkilletStartQueueButton:Enable()
+		self:DisablePauseButton()
 	end
 	local button_count = SkilletQueueList:GetHeight() / SKILLET_TRADE_SKILL_HEIGHT
 	button_count = math.floor(button_count)
@@ -3144,18 +3161,40 @@ local queueMenuList = {
 }
 
 --
--- Process/Pause button.
+-- Process button
 --
 function Skillet:StartQueue_OnClick(button)
 	local mouse = GetMouseButtonClicked()
 	--DA.DEBUG(0,"StartQueue_OnClick("..tostring(button).."), "..tostring(mouse))
-	button:Disable()
 	if self.queueCasting then
 		self.queueCasting = false
 	else
 		self:ProcessQueue(mouse == "RightButton" or IsAltKeyDown())
 	end
 	self:UpdateQueueWindow()
+end
+
+--
+-- Pause button
+--   before executing secure action "/stopcasting" macro
+--
+function Skillet:PauseQueue_PreClick(button)
+	local mouse = GetMouseButtonClicked()
+	DA.DEBUG(0,"PauseQueue_PreClick("..tostring(button).."), "..tostring(mouse))
+	if self.queueCasting then
+		self.queueCasting = false
+		self.pauseQueue = true
+	end
+	self:UpdateQueueWindow()
+end
+
+--
+-- Pause button
+--   after executing secure action "/stopcasting" macro
+--
+function Skillet:PauseQueue_PostClick(button)
+	local mouse = GetMouseButtonClicked()
+	DA.DEBUG(0,"PauseQueue_PostClick("..tostring(button).."), "..tostring(mouse))
 end
 
 function Skillet:SkilletQueueMenu_Show(button)

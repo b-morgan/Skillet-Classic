@@ -2663,6 +2663,31 @@
 			</Button>
 			<!--
 			#
+			# A (secure) button that pauses the queue
+			#
+			-->
+			<Button name="SkilletPauseQueueButton" inherits="UIPanelButtonTemplate,SecureActionButtonTemplate" text="Pause" parent="SkilletQueueParentBase">
+				<Size>
+					<AbsDimension x="90" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SkilletQueueParent" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+					</OnLoad>
+					<PreClick>
+						Skillet:PauseQueue_PreClick(self,button)
+					</PreClick>
+				</Scripts>
+			</Button>
+			<!--
+			#
 			# A button that clears the current queue
 			#
 			-->
