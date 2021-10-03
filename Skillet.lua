@@ -1499,6 +1499,7 @@ function Skillet:HideAllWindows()
 	end
 	self.currentTrade = nil
 	self.selectedSkill = nil
+	self.queueCasting = nil
 	return closed
 end
 
