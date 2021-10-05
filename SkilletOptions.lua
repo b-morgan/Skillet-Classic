@@ -427,33 +427,18 @@ Skillet.options =
 					width = "full",
 					order = 3,
 				},
-				confirm_queue_clear = {
+				interrupt_clears_queue = {
 					type = "toggle",
-					name = L["CONFIRMQUEUECLEARNAME"],
-					desc = L["CONFIRMQUEUECLEARDESC"],
+					name = L["INTERRUPTCLEARNAME"],
+					desc = L["INTERRUPTCLEARDESC"],
 					get = function()
-						return Skillet.db.profile.confirm_queue_clear
+						return Skillet.db.profile.interrupt_clears_queue
 					end,
 					set = function(self,value)
-						Skillet.db.profile.confirm_queue_clear = value
-						Skillet:UpdateTradeSkillWindow()
+						Skillet.db.profile.interrupt_clears_queue = value
 					end,
 					width = "full",
 					order = 4,
-				},
-				queue_only_view = {
-					type = "toggle",
-					name = L["QUEUEONLYVIEWNAME"],
-					desc = L["QUEUEONLYVIEWDESC"],
-					get = function()
-						return Skillet.db.profile.queue_only_view
-					end,
-					set = function(self,value)
-						Skillet.db.profile.queue_only_view = value
-						Skillet:UpdateTradeSkillWindow()
-					end,
-					width = "full",
-					order = 5,
 				},
 				clamp_to_screen = {
 					type = "toggle",
@@ -481,7 +466,7 @@ Skillet.options =
 						Skillet.db.profile.scale_tooltip = value
 					end,
 					width = "full",
-					order = 7,
+					order = 6,
 				},
 				transparency = {
 					type = "range",

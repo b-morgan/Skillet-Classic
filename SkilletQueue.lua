@@ -187,18 +187,15 @@ function Skillet:RemoveFromQueue(index)
 	local queue = self.db.realm.queueData[self.currentPlayer]
 	local command = queue[index]
 	local reagentsInQueue = self.db.realm.reagentsInQueue[Skillet.currentPlayer]
-	local reagentsChanged = self.reagentsChanged
 	if command.op == "iterate" then
 		local recipe = self:GetRecipe(command.recipeID)
 		if not command.count then
 			command.count = 1
 		end
 		reagentsInQueue[recipe.itemID] = (reagentsInQueue[recipe.itemID] or 0) - (recipe.numMade or 0) * command.count
-		reagentsChanged[recipe.itemID] = true
 		for i=1,#recipe.reagentData,1 do
 			local reagent = recipe.reagentData[i]
 			reagentsInQueue[reagent.id] = (reagentsInQueue[reagent.id] or 0) + (reagent.numNeeded or 0) * command.count
-			reagentsChanged[reagent.id] = true
 		end
 	end
 	table.remove(queue, index)
@@ -566,7 +563,7 @@ end
 
 function Skillet:StopCast(spell, success)
 	DA.DEBUG(0,"StopCast("..tostring(spell)..", "..tostring(success).."): changingTrade= "..tostring(self.changingTrade)..
-	  ", processingSpell= "..tostring(self.processingSpell)..", queueCasting= "..tostring(self.queueCasting))
+	  ", processingSpell= "..tostring(self.processingSpell)..", queueCasting= "..tostring(self.queueCasting)..", pauseQueue= "..tostring(self.pauseQueue))
 	if not self.db.realm.queueData then
 		self.db.realm.queueData = {}
 	end
@@ -607,13 +604,10 @@ function Skillet:StopCast(spell, success)
 					self.processingSpell = nil
 					self.processingPosition = nil
 					self.processingCommand = nil
-					self.reagentsChanged = {}
 					self:RemoveFromQueue(qpos)
 					DA.DEBUG(0,"removed successful queue command at "..tostring(qpos))
 				end
 			end
-			DA.DEBUG(0,"StopCast is updating window")
-			self:AdjustInventory()
 		else
 			DA.DEBUG(0,"StopCast without success")
 			qpos = self.processingPosition
@@ -621,12 +615,13 @@ function Skillet:StopCast(spell, success)
 			self.processingSpell = nil
 			self.processingPosition = nil
 			self.processingCommand = nil
-			if qpos and not self.pauseQueue then
-				self.reagentsChanged = {}
+			if self.db.profile.interrupt_clears_queue and qpos then -- if qpos and not self.pauseQueue then
 				self:RemoveFromQueue(qpos)
 				DA.DEBUG(0,"removed failed queue command at "..tostring(qpos))
 			end
+			self.pauseQueue = false
 		end
+		self:AdjustInventory()
 	else
 		DA.DEBUG(0,"StopCast called with "..tostring(spell).." ~= "..tostring(self.processingSpell))
 	end
@@ -637,7 +632,6 @@ end
 --
 function Skillet:RemoveQueuedCommand(queueIndex)
 	DA.DEBUG(0,"RemoveQueuedCommand("..tostring(queueIndex)..")")
-	self.reagentsChanged = {}
 	self:RemoveFromQueue(queueIndex)
 	self:UpdateQueueWindow()
 	self:UpdateTradeSkillWindow()
