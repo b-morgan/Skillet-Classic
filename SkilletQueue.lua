@@ -437,14 +437,6 @@ function Skillet:CreateItems(count)
 end
 
 --
--- Adds one item to the queue and then starts the queue
---
-function Skillet:EnchantItem()
-	DA.DEBUG(0,"EnchantItem()")
-	self:CreateItems(1)
-end
-
---
 -- Queue and create the max number of craftable items for the currently selected skill
 --
 function Skillet:CreateAllItems()
@@ -453,6 +445,14 @@ function Skillet:CreateAllItems()
 	if self:QueueAllItems() > 0 then
 		self:ProcessQueue(mouse == "RightButton" or IsAltKeyDown())
 	end
+end
+
+--
+-- Adds one item to the queue and then starts the queue
+--
+function Skillet:EnchantItem()
+	DA.DEBUG(0,"EnchantItem()")
+	self:CreateItems(1)
 end
 
 function Skillet:UNIT_SPELLCAST_SENT(event, unit, target, castGUID)
