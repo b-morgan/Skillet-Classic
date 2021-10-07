@@ -198,6 +198,9 @@ function Skillet:RemoveFromQueue(index)
 			reagentsInQueue[reagent.id] = (reagentsInQueue[reagent.id] or 0) + (reagent.numNeeded or 0) * command.count
 		end
 	end
+	if self.skippedQueue[index] then
+		self.skippedQueue[index] = nil
+	end
 	table.remove(queue, index)
 	self:AdjustInventory()
 end
@@ -206,6 +209,7 @@ function Skillet:ClearQueue()
 	DA.DEBUG(0,"ClearQueue()")
 	if #self.db.realm.queueData[self.currentPlayer]>0 then
 		self.db.realm.queueData[self.currentPlayer] = {}
+		self.skippedQueue = {}
 		self.db.realm.reagentsInQueue[self.currentPlayer] = {}
 		self:UpdateTradeSkillWindow()
 	end
@@ -244,7 +248,7 @@ function Skillet:PrintQueue(name)
 	end
 	if queue then
 		for qpos,command in pairs(queue) do
-			print("qpos= "..tostring(qpos)..", command= "..DA.DUMP1(command))
+			print("qpos= "..tostring(qpos)..", skipped= "..tostring(self.skippedQueue[qpos])..", command= "..DA.DUMP1(command))
 		end
 	end
 end
@@ -256,13 +260,14 @@ function Skillet:ProcessQueue(altMode)
 	local skillIndexLookup = self.data.skillIndexLookup[self.currentPlayer]
 	self.processingPosition = nil
 	self.processingCommand = nil
+	self.skippedQueue = {}
 	local command
 --
 -- find the first queue entry that is craftable
 --
 	repeat
 		command = queue[qpos]
-		--DA.DEBUG(1,"command= "..DA.DUMP1(command))
+		--DA.DEBUG(1,"qpos= "..tostring(qpos)..", command= "..DA.DUMP1(command))
 		if command and command.op == "iterate" then
 			local recipe = self:GetRecipe(command.recipeID)
 			local craftable = true
@@ -273,6 +278,7 @@ function Skillet:ProcessQueue(altMode)
 			end
 			if cooldown then
 				Skillet:Print(L["Skipping"],recipe.name,"-",L["has cooldown of"],SecondsToTime(cooldown))
+				self.skippedQueue[qpos] = true
 				craftable = false
 			else
 				for i=1,#recipe.reagentData,1 do
@@ -285,6 +291,7 @@ function Skillet:ProcessQueue(altMode)
 					--DA.DEBUG(1,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
 					if numInBags < reagent.numNeeded then
 						Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded,"x",reagentName,"("..L["have"],numInBags..")")
+						self.skippedQueue[qpos] = true
 						craftable = false
 						break
 					end
@@ -298,14 +305,12 @@ function Skillet:ProcessQueue(altMode)
 -- either queue[qpos] is craftable or nothing is craftable
 --
 	if qpos > #queue then
-		qpos = 1				-- nothing is craftable
-		command = queue[qpos]
+		--DA.DEBUG(1,"Nothing is craftable")
+		return
 	end
 --
 -- Process this item in the queue:
 -- Change professions if necessary (and come back later).
--- If we got here with nothing craftable in the queue,
--- let DoTradeSkill or DoCraft generate the error.
 --
 	if command then
 		if command.op == "iterate" then
@@ -615,7 +620,7 @@ function Skillet:StopCast(spell, success)
 			self.processingSpell = nil
 			self.processingPosition = nil
 			self.processingCommand = nil
-			if self.db.profile.interrupt_clears_queue and qpos then -- if qpos and not self.pauseQueue then
+			if self.db.profile.interrupt_clears_queue and qpos and not self.skippedQueue[qpos] then -- if qpos and not self.pauseQueue then
 				self:RemoveFromQueue(qpos)
 				DA.DEBUG(0,"removed failed queue command at "..tostring(qpos))
 			end
