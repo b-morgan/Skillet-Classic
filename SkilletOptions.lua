@@ -1269,16 +1269,28 @@ Skillet.options =
 	}
 }
 
+--
+-- Configure the options window
+--
 function Skillet:ConfigureOptions()
 	local acecfg = LibStub("AceConfig-3.0")
-	acecfg:RegisterOptionsTable("Skillet", self.options, "skillet")
+	acecfg:RegisterOptionsTable("Skillet", self.options, "Skillet")
 	acecfg:RegisterOptionsTable("Skillet Features", self.options.args.features)
 	acecfg:RegisterOptionsTable("Skillet Appearance", self.options.args.appearance)
 	acecfg:RegisterOptionsTable("Skillet Profiles", LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db))
 	acecfg:RegisterOptionsTable("Skillet Plugins", Skillet.pluginsOptions)
 	local acedia = LibStub("AceConfigDialog-3.0")
-	acedia:AddToBlizOptions("Skillet Features", "Skillet")
+	Skillet.optionsFrame = acedia:AddToBlizOptions("Skillet Features", "Skillet")
 	acedia:AddToBlizOptions("Skillet Appearance", "Appearance", "Skillet")
 	acedia:AddToBlizOptions("Skillet Profiles", "Profiles", "Skillet")
 	acedia:AddToBlizOptions("Skillet Plugins", "Plugins", "Skillet")
 end
+
+--
+-- Show the options window
+--
+function Skillet:ShowOptions()
+	InterfaceOptionsFrame_Show()
+	InterfaceOptionsFrame_OpenToCategory("Skillet")
+end
+

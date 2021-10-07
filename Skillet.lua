@@ -1503,14 +1503,6 @@ function Skillet:HideAllWindows()
 end
 
 --
--- Show the options window
---
-function Skillet:ShowOptions()
-	InterfaceOptionsFrame_Show()
-	InterfaceOptionsFrame_OpenToCategory("Skillet")
-end
-
---
 -- Sets the specific trade skill that the user wants to see details on.
 --
 function Skillet:SetSelectedSkill(skillIndex)
