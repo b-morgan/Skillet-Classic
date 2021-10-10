@@ -1286,11 +1286,35 @@ function Skillet:ConfigureOptions()
 	acedia:AddToBlizOptions("Skillet Plugins", "Plugins", "Skillet")
 end
 
+local function ScrollToCategory(panelName,offset)
+	local idx = 0
+	InterfaceOptionsFrameAddOnsListScrollBar:SetValue(0)
+	local mdx = #INTERFACEOPTIONS_ADDONCATEGORIES
+	for i,cat in ipairs(INTERFACEOPTIONS_ADDONCATEGORIES) do 
+		if not cat.hidden then 
+			idx = idx + 1
+			if cat.name == panelName then
+				break
+			end
+		end
+	end
+	local numbuttons = #(InterfaceOptionsFrameAddOns.buttons)
+	--DA.DEBUG(0,"ScrollToCategory: numbuttons= "..tostring(numbuttons)..", idx= "..tostring(idx)..", mdx= "..tostring(mdx)..", offset= "..tostring(offset))
+	if idx and numbuttons and idx > numbuttons then
+		local btnHeight = InterfaceOptionsFrameAddOns.buttons[1]:GetHeight()
+		if offset+idx > mdx then
+			idx = mdx - offset
+		end
+		InterfaceOptionsFrameAddOnsListScrollBar:SetValue((offset+idx-numbuttons)*btnHeight)
+	end
+end
+
 --
 -- Show the options window
 --
 function Skillet:ShowOptions()
 	InterfaceOptionsFrame_Show()
+	ScrollToCategory("Skillet",4)
 	InterfaceOptionsFrame_OpenToCategory("Skillet")
 end
 
