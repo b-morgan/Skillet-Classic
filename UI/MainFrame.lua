@@ -553,18 +553,19 @@ end
 function Skillet:ConfigureRecipeControls()
 	DA.DEBUG(0,"ConfigureRecipeControls()")
 	if Skillet.isCraft then
-		SkilletQueueAllButton:Hide()
 		if Skillet.db.profile.queue_crafts then
 			SkilletQueueButton:Show()
+			SkilletEmptyQueueButton:Show()
 		else
 			SkilletQueueButton:Hide()
+			SkilletEmptyQueueButton:Hide()
 		end
+		SkilletQueueAllButton:Hide()
 		SkilletCreateAllButton:Hide()
 		SkilletCreateButton:Hide()
 		SkilletQueueParent:Hide()
 		SkilletStartQueueButton:Hide()
 		SkilletPauseQueueButton:Hide()
-		SkilletEmptyQueueButton:Hide()
 		SkilletItemCountInputBox:Hide()
 		SkilletSub10Button:Hide()
 		SkilletSub1Button:Hide()
@@ -1916,6 +1917,19 @@ end
 --
 function Skillet:UpdateQueueWindow()
 	local queue = self.db.realm.queueData[self.currentPlayer]
+	if self.isCraft then 
+		if not queue then
+			SkilletEmptyQueueButton:Disable()
+			return
+		end
+		local numItems = #queue
+		if numItems > 0 then
+			SkilletEmptyQueueButton:Enable()
+		else
+			SkilletEmptyQueueButton:Disable()
+		end
+		return 
+	end
 	if not queue then
 		SkilletEmptyQueueButton:Disable()
 		SkilletStartQueueButton:Disable()
