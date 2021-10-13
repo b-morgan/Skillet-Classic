@@ -715,10 +715,8 @@ function Skillet:OnEnable()
 	self.currentGroupLabel = "Blizzard"
 	self.currentGroup = nil
 	self.skippedQueue = {}
---
--- run the upgrade code to convert any old settings
---
-	self:UpgradeDataAndOptions()
+	self:UpgradeDataAndOptions()		-- run the upgrade code to convert any old settings
+	self:ConvertIgnoreListData()
 	self:CollectTradeSkillData()
 	self:CollectCurrencyData()
 	self:ScanPlayerTradeSkills()
