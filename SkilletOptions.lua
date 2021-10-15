@@ -1230,6 +1230,22 @@ Skillet.options =
 			end,
 			order = 98
 		},
+		UpdateWait = {
+			type = "input",
+			name = "UpdateWait",
+			desc = "Option for debugging",
+			get = function()
+				return Skillet.db.realm.update_wait
+			end,
+			set = function(self,value)
+				value = tonumber(value)
+				if not value then value = 1
+				elseif value < 1 then value = 1
+				elseif value > 9 then value = 10 end
+				Skillet.db.realm.update_wait = value
+			end,
+			order = 85
+		},
 
 --
 -- command to reset the position of the major Skillet frames
@@ -1264,7 +1280,7 @@ Skillet.options =
 												  " Leave combat and try again.")
 				end
 			end,
-			order = 99
+			order = 100
 		},
 	}
 }
