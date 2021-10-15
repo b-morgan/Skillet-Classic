@@ -22,62 +22,86 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   for when I screw up the SavedVariables layout and need to fix it somehow.
 ]]--
 
+--
 -- Runs all the update functions, should they be required
+--
 function Skillet:UpgradeDataAndOptions()
-
-    if SkilletDB.servers then
-       SkilletDB.realms = SkilletDB.servers
-	   SkilletDB.servers = nil
-
-	   self.db = LibStub("AceDB-3.0"):New("SkilletDB")
-    end
-
+	if not self.db then
+		self.db = LibStub("AceDB-3.0"):New("SkilletDB")
+	end
+	if SkilletDB.servers then
+		SkilletDB.realms = SkilletDB.servers
+		SkilletDB.servers = nil
+	end
 	if self.db.profile.transparency<0.1 or self.db.profile.transparency>1 then
 		self.db.profile.transparency=1
 	end
-
 	if self.db.profile.scale<0.1 or self.db.profile.scale>2 then
 		self.db.profile.scale=1
 	end
-
-    -- Upgrade from Skillet 1.2 and earlier where recipes where (stupidly)
-    -- stored per-charcter where no one else could see them
-    if self.db.char.recipes then
-        self.db.char.recipes = nil
-    end
-
+--
+-- Upgrade from Skillet 1.2 and earlier where recipes where (stupidly)
+-- stored per-charcter where no one else could see them
+--
+	if self.db.char.recipes then
+		self.db.char.recipes = nil
+	end
 	if self.db.realm.recipes then
-        self.db.realm.recipes = nil
-    end
-
-    -- Update from Skillet 1.5 or earlier where profile options were
-    -- actually stored per character
-    if self.db.char.vendor_buy_button then
-        self.db.profile.vendor_buy_button = self.db.char.vendor_buy_button
-        self.db.char.vendor_buy_button = nil
-    end
-    if self.db.char.vendor_auto_buy then
-        self.db.profile.vendor_auto_buy = self.db.char.vendor_auto_buy
-        self.db.char.vendor_auto_buy = nil
-    end
-    if self.db.char.show_item_notes_tooltip then
-        self.db.profile.show_item_notes_tooltip = self.db.char.show_item_notes_tooltip
-        self.db.char.show_item_notes_tooltip = nil
-    end
-    if self.db.char.show_detailed_recipe_tooltip then
-        self.db.profile.show_detailed_recipe_tooltip = self.db.char.show_detailed_recipe_tooltip
-        self.db.char.show_detailed_recipe_tooltip = nil
-    end
-    if self.db.char.link_craftable_reagents then
-        self.db.profile.link_craftable_reagents = self.db.char.link_craftable_reagents
-        self.db.char.link_craftable_reagents = nil
-    end
-
-    -- Moved any recipe notes to the server level so all alts can see then
-    if self.db.char.notes then
-        self.db.realm.notes[UnitName("player")] = self.db.char.notes
-        self.db.char.notes = nil
-    end
-
+		self.db.realm.recipes = nil
+	end
+--
+-- Update from Skillet 1.5 or earlier where profile options were
+-- actually stored per character
+--
+	if self.db.char.vendor_buy_button then
+		self.db.profile.vendor_buy_button = self.db.char.vendor_buy_button
+		self.db.char.vendor_buy_button = nil
+	end
+	if self.db.char.vendor_auto_buy then
+		self.db.profile.vendor_auto_buy = self.db.char.vendor_auto_buy
+		self.db.char.vendor_auto_buy = nil
+	end
+	if self.db.char.show_item_notes_tooltip then
+		self.db.profile.show_item_notes_tooltip = self.db.char.show_item_notes_tooltip
+		self.db.char.show_item_notes_tooltip = nil
+	end
+	if self.db.char.show_detailed_recipe_tooltip then
+		self.db.profile.show_detailed_recipe_tooltip = self.db.char.show_detailed_recipe_tooltip
+		self.db.char.show_detailed_recipe_tooltip = nil
+	end
+--
+-- Move any recipe notes to the server level so all alts can see then
+--
+	if self.db.char.notes then
+		self.db.realm.notes[UnitName("player")] = self.db.char.notes
+		self.db.char.notes = nil
+	end
+--
+-- Move shopping list options
+--
+	if self.db.char.link_craftable_reagents then
+		self.db.profile.link_craftable_reagents = self.db.char.link_craftable_reagents
+		self.db.char.link_craftable_reagents = nil
+	end
+	if self.db.char.include_alts then
+		self.db.profile.include_alts = self.db.char.include_alts
+		self.db.char.include_alts = nil
+	end
+	if self.db.char.same_faction then
+		self.db.profile.same_faction = self.db.char.same_faction
+		self.db.char.same_faction = nil
+	end
+	if self.db.char.item_order then
+		self.db.profile.item_order = self.db.char.item_order
+		self.db.char.item_order = nil
+	end
+	if self.db.char.merge_items then
+		self.db.profile.merge_items = self.db.char.merge_items
+		self.db.char.merge_items = nil
+	end
+	if self.db.char.include_guild then
+		self.db.profile.include_guild = self.db.char.include_guild
+		self.db.char.include_guild = nil
+	end
 end
 
