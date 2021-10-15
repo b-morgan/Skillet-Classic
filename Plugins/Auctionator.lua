@@ -491,7 +491,7 @@ function Skillet:AuctionatorSearch(whichOne)
 	local items = {}
 	if whichOne then
 		shoppingListName = L["Shopping List"]
-		local list = Skillet:GetShoppingList(nil, false)
+		local list = Skillet:GetShoppingList(nil, nil, false)
 		if not list or #list == 0 then
 			DA.DEBUG(0,"AuctionatorSearch: Shopping List is empty")
 			return
