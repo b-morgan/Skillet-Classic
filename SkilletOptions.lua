@@ -949,7 +949,7 @@ Skillet.options =
 		},
 
 --
--- commands to manipulate the state of debugging code flags
+-- Commands to manipulate the state of debugging code flags
 -- (See DebugAids.lua)
 --
 		WarnShow = {
@@ -1230,21 +1230,50 @@ Skillet.options =
 			end,
 			order = 98
 		},
-		UpdateWait = {
+--
+-- Commands to set/show how many TRADE_SKILL_UPDATE / CRAFT_UPDATE events to ignore
+--
+		TradeWait = {
 			type = "input",
-			name = "UpdateWait",
-			desc = "Option for debugging",
+			name = "TradeWait",
+			desc = "Number of TRADE_SKILL_UPDATE events to ignore",
 			get = function()
-				return Skillet.db.realm.update_wait
+				return Skillet.db.realm.trade_wait
 			end,
 			set = function(self,value)
 				value = tonumber(value)
 				if not value then value = 1
 				elseif value < 1 then value = 1
 				elseif value > 9 then value = 10 end
-				Skillet.db.realm.update_wait = value
+				Skillet.db.realm.trade_wait = value
 			end,
-			order = 85
+			order = 100
+		},
+		CraftWait = {
+			type = "input",
+			name = "CraftWait",
+			desc = "Number of CRAFT_UPDATE events to ignore",
+			get = function()
+				return Skillet.db.realm.craft_wait
+			end,
+			set = function(self,value)
+				value = tonumber(value)
+				if not value then value = 1
+				elseif value < 1 then value = 1
+				elseif value > 9 then value = 10 end
+				Skillet.db.realm.craft_wait = value
+			end,
+			order = 101
+		},
+		ShowWait = {
+			type = 'execute',
+			name = "ShowWait",
+			desc = "Print *_UPDATE Waits",
+			func = function()
+				print("TradeWait= "..tostring(Skillet.db.realm.trade_wait))
+				print("CraftWait= "..tostring(Skillet.db.realm.craft_wait))
+			end,
+			order = 103
 		},
 
 --
@@ -1280,7 +1309,7 @@ Skillet.options =
 												  " Leave combat and try again.")
 				end
 			end,
-			order = 100
+			order = 110
 		},
 	}
 }
