@@ -892,7 +892,7 @@ function Skillet:ShoppingListToggleShowAlts()
 end
 
 function Skillet:ShoppingListToggleSameFaction()
-	Skillet.db.char.same_faction = not Skillet.db.char.same_faction
+	Skillet.db.profile.same_faction = not Skillet.db.profile.same_faction
 end
 
 function Skillet:ShoppingListToggleItemOrder()
