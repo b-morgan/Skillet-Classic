@@ -22,6 +22,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   for when I screw up the SavedVariables layout and need to fix it somehow.
 ]]--
 
+local function deepcopy(orig)
+	local orig_type = type(orig)
+	local copy
+	if orig_type == 'table' then
+		copy = {}
+		for orig_key, orig_value in next, orig, nil do
+			copy[deepcopy(orig_key)] = deepcopy(orig_value)
+		end
+		setmetatable(copy, deepcopy(getmetatable(orig)))
+	else -- number, string, boolean, etc
+		copy = orig
+	end
+	return copy
+end
+
 --
 -- Runs all the update functions, should they be required
 --
@@ -102,6 +117,17 @@ function Skillet:UpgradeDataAndOptions()
 	if self.db.char.include_guild then
 		self.db.profile.include_guild = self.db.char.include_guild
 		self.db.char.include_guild = nil
+	end
+--
+-- Move Custom Groups
+--
+	if self.db.realm.groupDB and self.db.realm.groupDB[self.currentPlayer] then
+		self.db.profile.groupDB = deepcopy(self.db.realm.groupDB[self.currentPlayer])
+		self.db.realm.groupDB[self.currentPlayer] = nil
+	end
+	if self.db.realm.groupSN and self.db.realm.groupSN[self.currentPlayer] then
+		self.db.profile.groupSN = deepcopy(self.db.realm.groupSN[self.currentPlayer])
+		self.db.realm.groupSN[self.currentPlayer] = nil
 	end
 end
 

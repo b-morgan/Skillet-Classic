@@ -220,6 +220,12 @@ end
 -- Called from events related to profile manipulation and new characters
 --
 function Skillet:ConfigurePlayerProfile()
+	if not self.db.profile.groupDB then
+		self.db.profile.groupDB = {}
+	end
+	if not self.db.profile.groupSN then
+		self.db.profile.groupSN = {}
+	end
 	if not self.db.profile.SavedQueues then
 		self.db.profile.SavedQueues = {}
 	end
@@ -438,8 +444,8 @@ end
 -- good cause.
 --
 function Skillet:FlushCustomData()
-	Skillet.db.realm.groupDB = {}
-	Skillet.db.realm.groupSN = {}
+	Skillet.db.profile.groupDB = {}
+	Skillet.db.profile.groupSN = {}
 end
 
 --
@@ -524,12 +530,6 @@ function Skillet:InitializeDatabase(player, clean)
 --
 -- Realm data
 --
-		if not self.db.realm.groupDB then
-			self.db.realm.groupDB = {}
-		end
-		if not self.db.realm.groupSN then
-			self.db.realm.groupSN = {}
-		end
 		if not self.db.realm.skillDB then
 			self.db.realm.skillDB = {}
 		end
@@ -566,8 +566,11 @@ function Skillet:InitializeDatabase(player, clean)
 		if not self.db.realm.auctionData[player] or clean then
 			self.db.realm.auctionData[player] = {}
 		end
-		if not self.db.realm.update_wait then
-			self.db.realm.update_wait = 1	-- variable to control how many TRADE_SKILL_UPDATE / CRAFT_UPDATE events to ignore
+		if not self.db.realm.trade_wait then
+			self.db.realm.trade_wait = 1	-- variable to control how many TRADE_SKILL_UPDATE events to ignore
+		end
+		if not self.db.realm.craft_wait then
+			self.db.realm.craft_wait = 1	-- variable to control how many CRAFT_UPDATE events to ignore
 		end
 		if not self.db.realm.faction then
 			self.db.realm.faction = {}
@@ -874,7 +877,7 @@ function Skillet:TRADE_SKILL_UPDATE()
 	Skillet.tradeUpdate = Skillet.tradeUpdate + 1
 	DA.TRACE("TRADE_SKILL_UPDATE: closingTrade= "..tostring(Skillet.closingTrade)..", tradeShow= "..tostring(Skillet.tradeShow)..", tradeUpdate= "..tostring(Skillet.tradeUpdate))
 	if Skillet.closingTrade or not Skillet.tradeShow then return end
-	if Skillet.tradeUpdate < Skillet.db.realm.update_wait then return end
+	if Skillet.tradeUpdate < Skillet.db.realm.trade_wait then return end
 	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
 		if Skillet.lastCraft ~= Skillet.isCraft then
 			Skillet:ConfigureRecipeControls()
@@ -894,7 +897,7 @@ function Skillet:CRAFT_UPDATE()
 	end
 	DA.TRACE("CRAFT_UPDATE: closingTrade= "..tostring(Skillet.closingTrade)..", tradeShow= "..tostring(Skillet.tradeShow)..", craftUpdate= "..tostring(Skillet.craftUpdate))
 	if Skillet.closingTrade or not Skillet.craftShow then return end
-	if Skillet.craftUpdate < Skillet.db.realm.update_wait then return end
+	if Skillet.craftUpdate < Skillet.db.realm.craft_wait then return end
 	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
 		if Skillet.lastCraft ~= Skillet.isCraft then
 			Skillet:ConfigureRecipeControls()
