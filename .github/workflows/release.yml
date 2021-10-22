@@ -39,7 +39,13 @@ jobs:
           fetch-depth: 10
 
       # once cloned, we just run the GitHub Action for the packager project
-      - name: Package and release for Classic (both flavors)
+      - name: Package and release for Burning Crusade Classic
         uses: BigWigsMods/packager@master
         with:
-          args: -g classic
+          args: -g bcc
+ 
+ # once cloned, we just run the GitHub Action for the packager project
+      - name: Package and release for Classic Era
+        uses: BigWigsMods/packager@master
+        with:
+          args: -g classic -w 0
