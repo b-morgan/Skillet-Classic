@@ -312,10 +312,12 @@ function plugin.GetExtraText(skill, recipe)
 -- Default value for a reagent is the Auctionator price
 --
 			local value
-			if isRetail then
+			if Atr_GetAuctionBuyout then
+				value = (Atr_GetAuctionBuyout(id) or 0) * needed
+			elseif Auctionator and Auctionator.API.v1.GetAuctionPriceByItemID then
 				value = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, id) or 0) * needed
 			else
-				value = (Atr_GetAuctionBuyout(id) or 0) * needed
+				value = 0
 			end
 			if not Skillet:VendorSellsReagent(id) then
 --
@@ -430,10 +432,12 @@ function plugin.RecipeNameSuffix(skill, recipe)
 			end
 			local name = GetItemInfo(id) or id
 			local value
-			if isRetail then
+			if Atr_GetAuctionBuyout then
+				value = (Atr_GetAuctionBuyout(id) or 0) * needed
+			elseif Auctionator and Auctionator.API.v1.GetAuctionPriceByItemID then
 				value = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, id) or 0) * needed
 			else
-				value = (Atr_GetAuctionBuyout(id) or 0) * needed
+				value = 0
 			end
 			if Skillet:VendorSellsReagent(id) then
 				if Skillet.db.profile.plugins.ATR.buyablePrices then
@@ -538,15 +542,13 @@ function Skillet:AuctionatorSearch(whichOne)
 			end
 		end
 	end
-	if isRetail then
-		if Skillet.db.profile.plugins.ATR.useSearchExact and Auctionator.API.v1.MultiSearchExact then
-			DA.DEBUG(0, "AuctionatorSearch: (exact) addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
-			Auctionator.API.v1.MultiSearchExact(addonName, items)
-		else
-			DA.DEBUG(0, "AuctionatorSearch: addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
-			Auctionator.API.v1.MultiSearch(addonName, items)
-		end
-	else
+	if Skillet.db.profile.plugins.ATR.useSearchExact and Auctionator.API.v1.MultiSearchExact then
+		DA.DEBUG(0, "AuctionatorSearch: (exact) addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
+		Auctionator.API.v1.MultiSearchExact(addonName, items)
+	elseif Auctionator.API.v1.MultiSearch then
+		DA.DEBUG(0, "AuctionatorSearch: addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
+		Auctionator.API.v1.MultiSearch(addonName, items)
+	elseif Atr_SelectPane and Atr_SearchAH then
 		DA.DEBUG(0, "AuctionatorSearch: shoppingListName= "..tostring(shoppingListName)..", items= "..DA.DUMP1(items))
 		local BUY_TAB = 3;
 		Atr_SelectPane(BUY_TAB)
