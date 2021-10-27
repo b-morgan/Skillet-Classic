@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
 local function deepcopy(orig)
+	--DA.DEBUG(0,"deepcopy("..DA.DUMP1(orig)..")")
 	local orig_type = type(orig)
 	local copy
 	if orig_type == 'table' then
@@ -121,13 +122,30 @@ function Skillet:UpgradeDataAndOptions()
 --
 -- Move Custom Groups
 --
-	if self.db.realm.groupDB and self.db.realm.groupDB[self.currentPlayer] then
-		self.db.profile.groupDB = deepcopy(self.db.realm.groupDB[self.currentPlayer])
-		self.db.realm.groupDB[self.currentPlayer] = nil
+	DA.DEBUG(0,"Move Custom Groups")
+	if self.db.realm.groupDB then
+		for key,data in pairs(self.db.realm.groupDB) do
+			local player, tradeID, label = string.split(":", key)
+			if player == self.currentPlayer then
+				local new = tradeID..":"..label
+				if not self.db.profile.groupDB[new] then
+					self.db.profile.groupDB[new] = deepcopy(self.db.realm.groupDB[key])
+					self.db.realm.groupDB[key] = nil
+				end
+			end
+		end
 	end
-	if self.db.realm.groupSN and self.db.realm.groupSN[self.currentPlayer] then
-		self.db.profile.groupSN = deepcopy(self.db.realm.groupSN[self.currentPlayer])
-		self.db.realm.groupSN[self.currentPlayer] = nil
+	if self.db.realm.groupSN then
+		for key,data in pairs(self.db.realm.groupSN) do
+			local player, tradeID = string.split(":", key)
+			if player == self.currentPlayer then
+				local new = tonumber(tradeID)
+				if not self.db.profile.groupSN[new] then
+					self.db.profile.groupSN[new] = deepcopy(self.db.realm.groupSN[key])
+					self.db.realm.groupSN[key] = nil
+				end
+			end
+		end
 	end
 end
 
