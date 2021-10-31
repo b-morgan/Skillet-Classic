@@ -1784,7 +1784,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 --
 -- Check for Auction House
 --
-	if AuctionFrame and self.auctionOpen and (AuctionatorLoaded or Auctionator.State.Loaded) and self.ATRPlugin and self.db.profile.plugins.ATR.enabled then
+	if self.auctionOpen and Auctionator and self.ATRPlugin and self.db.profile.plugins.ATR.enabled then
 		SkilletAuctionatorButton:Show()
 	else
 		SkilletAuctionatorButton:Hide()

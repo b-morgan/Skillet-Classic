@@ -1060,7 +1060,7 @@ function Skillet:DisplayShoppingList(atBank)
 	if not self.shoppingList then
 		self.shoppingList = createShoppingListFrame(self)
 	end
-	if self.auctionOpen and (AuctionatorLoaded or Auctionator.State.Loaded) and self.ATRPlugin and self.db.profile.plugins.ATR.enabled then
+	if self.auctionOpen and Auctionator and self.ATRPlugin and self.db.profile.plugins.ATR.enabled then
 		SkilletSLAuctionatorButton:Show()
 	else
 		SkilletSLAuctionatorButton:Hide()
