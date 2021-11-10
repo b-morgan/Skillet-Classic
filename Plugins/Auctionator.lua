@@ -189,6 +189,21 @@ plugin.options =
 			end,
 			order = 10
 		},
+		alwaysEnchanting = {
+			type = "toggle",
+			name = "alwaysEnchanting",
+			desc = "Always show Enchanting profit (loss)",
+			get = function()
+				return Skillet.db.profile.plugins.ATR.alwaysEnchanting
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.ATR.alwaysEnchanting = value
+				if value then
+					Skillet.db.profile.plugins.ATR.alwaysEnchanting = value
+				end
+			end,
+			order = 11
+		},
 		buyFactor = {
 			type = "range",
 			name = "buyFactor",
@@ -471,7 +486,16 @@ function plugin.RecipeNameSuffix(skill, recipe)
 				text = "("..profitPctText(profit,cost,999).."%)"
 			end
 		end
-		if Skillet.db.profile.plugins.ATR.onlyPositive and profit <= 0 then
+--
+-- Enchants don't have any profit so if checked, always display the (negative) cost.
+--
+		if recipe.tradeID == 7411 then
+			if not Skillet.db.profile.plugins.ATR.alwaysEnchanting then
+				if Skillet.db.profile.plugins.ATR.onlyPositive and profit <= 0 then
+					text = nil
+				end
+			end
+		elseif Skillet.db.profile.plugins.ATR.onlyPositive and profit <= 0 then
 			text = nil
 		end
 	end
