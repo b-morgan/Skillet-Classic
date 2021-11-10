@@ -19,6 +19,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 local L = Skillet.L
 
+StaticPopupDialogs["SKILLET_QUEUE_LARGE"] = {
+	text = "Skillet-Classic\n"..L["Request to queue %s items.\n Are you sure?"],
+	button1 = ACCEPT,
+	button2 = CANCEL,
+	OnAccept = function( self )
+		Skillet:QueueItems(Skillet.queueCount)
+		return
+	end,
+	OnCancel = function( self )
+		Skillet.queueCount = 0
+		return
+	end,
+	timeout = 0,
+	exclusive = 1,
+	whileDead = 1,
+	hideOnEscape = 1
+};
+
 --
 -- Iterates through a list of reagentIDs and recalculates craftability
 --
@@ -407,6 +425,11 @@ function Skillet:QueueItems(count)
 		end
 		if count == 0 then
 			count = (skill.numCraftableAlts or 0) / (recipe.numMade or 1)
+		end
+		self.queueCount = math.min(count, 9999)
+		if self.queueCount == 9999 then
+			StaticPopup_Show("SKILLET_QUEUE_LARGE", tostring(self.queueCount))
+			return 0
 		end
 	end
 	count = math.min(count, 9999)
