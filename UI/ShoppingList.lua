@@ -496,6 +496,7 @@ function Skillet:AUCTION_HOUSE_CLOSED()
 	DA.TRACE("AUCTION_HOUSE_CLOSED")
 	self.auctionOpen = false
 	self:UnregisterEvent("AUCTION_OWNED_LIST_UPDATE")
+	SkilletAuctionatorButton:Hide()
 	self:HideShoppingList()
 end
 
