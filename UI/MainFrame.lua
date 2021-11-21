@@ -196,14 +196,18 @@ function Skillet:RestoreEnchantButton(show)
 end
 
 function Skillet:EnablePauseButton()
-	SkilletStartQueueButton:Hide()
-	SkilletPauseQueueButton:Show()
-	self.pauseQueue = false
+	if not self.isCraft then
+		SkilletStartQueueButton:Hide()
+		SkilletPauseQueueButton:Show()
+		self.pauseQueue = false
+	end
 end
 
 function Skillet:DisablePauseButton()
-	SkilletStartQueueButton:Show()
-	SkilletPauseQueueButton:Hide()
+	if not self.isCraft then
+		SkilletStartQueueButton:Show()
+		SkilletPauseQueueButton:Hide()
+	end
 end
 
 function Skillet:CreateTradeSkillWindow()
@@ -556,14 +560,15 @@ function Skillet:ConfigureRecipeControls()
 		if Skillet.db.profile.queue_crafts then
 			SkilletQueueButton:Show()
 			SkilletEmptyQueueButton:Show()
+			SkilletQueueParent:Show()
 		else
 			SkilletQueueButton:Hide()
 			SkilletEmptyQueueButton:Hide()
+			SkilletQueueParent:Hide()
 		end
 		SkilletQueueAllButton:Hide()
 		SkilletCreateAllButton:Hide()
 		SkilletCreateButton:Hide()
-		SkilletQueueParent:Hide()
 		SkilletStartQueueButton:Hide()
 		SkilletPauseQueueButton:Hide()
 		SkilletItemCountInputBox:Hide()
@@ -1914,39 +1919,39 @@ end
 --
 -- Updates the window/scroll list displaying queue of items
 -- that are waiting to be crafted.
+-- Enchanting (isCraft) shows the window but not the processing buttons.
 --
 function Skillet:UpdateQueueWindow()
 	local queue = self.db.realm.queueData[self.currentPlayer]
-	if self.isCraft then 
-		if not queue then
-			SkilletEmptyQueueButton:Disable()
-			return
-		end
-		local numItems = #queue
-		if numItems > 0 then
-			SkilletEmptyQueueButton:Enable()
-		else
-			SkilletEmptyQueueButton:Disable()
-		end
-		return 
-	end
 	if not queue then
 		SkilletEmptyQueueButton:Disable()
-		SkilletStartQueueButton:Disable()
+		if self.isCraft then
+			SkilletStartQueueButton:Hide()
+		else
+			SkilletStartQueueButton:Disable()
+		end
 		return
 	end
 	local numItems = #queue
 	if numItems > 0 then
-		SkilletStartQueueButton:Enable()
 		SkilletEmptyQueueButton:Enable()
+		if self.isCraft then
+			SkilletStartQueueButton:Hide()
+		else
+			SkilletStartQueueButton:Enable()
+		end
 	else
-		SkilletStartQueueButton:Disable()
 		SkilletEmptyQueueButton:Disable()
+		if self.isCraft then
+			SkilletStartQueueButton:Hide()
+		else
+			SkilletStartQueueButton:Disable()
+		end
 	end
 	if self.queueCasting then
-		self:EnablePauseButton()
+		self:EnablePauseButton()	-- handles isCraft internally
 	else
-		self:DisablePauseButton()
+		self:DisablePauseButton()	-- handles isCraft internally
 	end
 	local button_count = SkilletQueueList:GetHeight() / SKILLET_TRADE_SKILL_HEIGHT
 	button_count = math.floor(button_count)
