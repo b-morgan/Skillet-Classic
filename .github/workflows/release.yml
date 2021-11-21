@@ -44,8 +44,8 @@ jobs:
         with:
           args: -g bcc
  
- # once cloned, we just run the GitHub Action for the packager project
+      # once cloned, we just run the GitHub Action for the packager project
       - name: Package and release for Classic Era
         uses: BigWigsMods/packager@master
         with:
-          args: -g classic -w 0
+          args: -g classic
