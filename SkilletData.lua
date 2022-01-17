@@ -286,6 +286,8 @@ local EnchantSpellToItem = {
 	[28016] = 22521 , -- Superior Mana Oil
 	[28022] = 22449 , -- Large Prismatic Shard
 	[28019] = 22522 , -- Superior Wizard Oil
+	[28028] = 22459 , -- Void Sphere
+	[42615] = 22448 , -- Small Prismatic Shard
 }
 Skillet.EnchantSpellToItem = EnchantSpellToItem
 
