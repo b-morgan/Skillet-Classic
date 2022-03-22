@@ -96,11 +96,11 @@ function plugin.OnInitialize()
 				end
 			end
 		end)
-		if IsAddOnLoaded("MissingTradeSkillsList") then
+		if IsAddOnLoaded("MissingTradeSkillsList_TBC") then
 			Skillet:AddButtonToTradeskillWindow(plugin.moveMTSLButton)
 		end
 	end
-	if not IsAddOnLoaded("MissingTradeSkillsList") then
+	if not IsAddOnLoaded("MissingTradeSkillsList_TBC") then
 		Skillet.db.profile.plugins.MTSL.enabled = false
 	end
 end
