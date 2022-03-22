@@ -1,6 +1,6 @@
-## Interface: 11401
-## Interface-Classic: 11401
-## Interface-BCC: 20503
+## Interface: 11402
+## Interface-Classic: 11402
+## Interface-BCC: 20504
 ## Title: Skillet-Classic |cff7fff7f -Ace3-|r
 ## Notes: A replacement tradeskill window
 ## Notes-esES: Una sustitucion de la ventana de Habilidades de Comercio
@@ -79,6 +79,7 @@ Plugins\MissingTradeSkillsList.lua
 Plugins\AuctionDB.lua
 Plugins\Auctioneer.lua
 Plugins\AuctionLite.lua
+Plugins\CancelForm.lua
 #### Addons not ported to Classic
 ## Plugins\AckisRecipeList.lua
 ## Plugins\TradeSkillInfo.lua
