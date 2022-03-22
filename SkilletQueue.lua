@@ -281,6 +281,10 @@ function Skillet:ProcessQueue(altMode)
 	self.skippedQueue = {}
 	local command
 --
+-- If any plugins have registered a ProcessQueue function, call it now
+--
+	self:ProcessQueuePlugins()
+--
 -- find the first queue entry that is craftable
 --
 	repeat

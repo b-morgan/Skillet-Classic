@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Skillet.registeredPlugins = {}		-- plugins that have registered a function
 Skillet.updatePlugins = {}			-- each plugin will register if it has an Update function
+Skillet.processQueuePlugins = {}	-- each plugin will register if it has an ProcessQueue function
 Skillet.displayDetailPlugins = {}	-- each plugin will register if it has a GetExtraText function
 Skillet.RecipeNamePrefixes = {}		-- each plugin will register, only one can be active
 Skillet.RecipeNameSuffixes = {}		-- each plugin will register, only one can be active
@@ -142,6 +143,31 @@ function Skillet:UpdatePlugins()
 	end
 end
 
+function Skillet:RegisterProcessQueuePlugin(moduleName, priority)
+	DA.DEBUG(0,"RegisterProcessQueuePlugin("..tostring(moduleName)..", "..tostring(priority))
+	if not priority then priority = 100 end
+	if type(moduleName) == "string" then
+		local module = Skillet[moduleName]
+		if module and type(module) == "table" and module.ProcessQueue then
+			Skillet.processQueuePlugins[moduleName] = module
+			Skillet.registeredPlugins[moduleName] = module
+		end
+	end
+end
+
+function Skillet:IsProcessQueuePluginRegistered(moduleName)
+	if type(moduleName)	 == "string" then
+		return Skillet.processQueuePlugins[moduleName] ~= nil
+	end
+end
+
+function Skillet:ProcessQueuePlugins()
+	--DA.DEBUG(0,"ProcessQueuePlugins()")
+	for k,v in pairs(Skillet.processQueuePlugins) do
+		v.ProcessQueue()
+	end
+end
+
 function Skillet:GetExtraText(skill, recipe)
 	local output_label, output_text
 	for k,v in pairs(Skillet.displayDetailPlugins) do
@@ -219,3 +245,4 @@ function Skillet:EnablePlugins()
 		end
 	end
 end
+
