@@ -511,10 +511,11 @@ Skillet:RegisterDisplayDetailPlugin("ATRPlugin")	-- we have a GetExtraText funct
 --
 -- Auctionator button support
 --  whichOne:
---    false (or nil) will search for the item and reagents in the MainFrame
 --    true will search for the items in the ShoppingList
+--    false (or nil) will search for the item and reagents in the MainFrame
 --
 function Skillet:AuctionatorSearch(whichOne)
+	DA.DEBUG(0, "AuctionatorSearch("..tostring(whichOne)..")")
 	local shoppingListName
 	local items = {}
 	if whichOne then
@@ -537,7 +538,14 @@ function Skillet:AuctionatorSearch(whichOne)
 		if not recipe then
 			return
 		end
-		shoppingListName = GetItemInfo(recipe.itemID)
+		local itemID = recipe.itemID
+--
+-- Check for Enchanting and add the Enchant name if no item is produced.
+--
+		if recipe.tradeID == 7411 and itemID then
+			itemID = Skillet.EnchantSpellToItem[itemID] or 0
+		end
+		shoppingListName = GetItemInfo(itemID)
 		if (shoppingListName == nil) then
 			shoppingListName = Skillet:GetRecipeName(recipeId)
 		end
@@ -557,11 +565,15 @@ function Skillet:AuctionatorSearch(whichOne)
 			else
 				id = reagent.id
 			end
-			if id and not Skillet:VendorSellsReagent(id) then
+			if id then
 				local reagentName = GetItemInfo(id)
 				if (reagentName) then
-					table.insert (items, reagentName)
-					DA.DEBUG(1, "AuctionatorSearch: Reagent["..i.."] ("..id..") "..reagentName.." added")
+					if not Skillet:VendorSellsReagent(id) then
+						table.insert (items, reagentName)
+						DA.DEBUG(1, "AuctionatorSearch:  Added  ["..i.."] ("..id..") "..reagentName)
+					else
+						DA.DEBUG(1, "AuctionatorSearch: Skipped ["..i.."] ("..id..") "..reagentName)
+					end
 				end
 			end
 		end
