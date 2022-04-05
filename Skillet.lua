@@ -767,6 +767,8 @@ function Skillet:PLAYER_ENTERING_WORLD()
 	local faction = UnitFactionGroup("player")
 	local raceName, raceFile, raceID = UnitRace("player")
 	local className, classFile, classId = UnitClass("player")
+	local locale = GetLocale()
+	local _,wowBuild,_,wowVersion = GetBuildInfo();
 	local guid = UnitGUID("player")		-- example: guid="Player-970-0002FD64" kind=="Player" server=="970" ID="0002FD64" 
 --
 -- PLAYER_ENTERING_WORLD happens on login and when changing zones so
@@ -786,6 +788,9 @@ function Skillet:PLAYER_ENTERING_WORLD()
 	self.db.realm.faction[player] = faction
 	self.db.realm.race[player] = raceFile
 	self.db.realm.class[player] = classFile
+	SkilletWho.locale = locale
+	SkilletWho.wowBuild = wowBuild
+	SkilletWho.wowVersion = wowVersion
 	SkilletWho.guid = guid
 	if guid then
 		local kind, server, ID = strsplit("-", guid)
