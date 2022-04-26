@@ -1,5 +1,5 @@
-## Interface: 11402
-## Interface-Classic: 11402
+## Interface: 11403
+## Interface-Classic: 11403
 ## Interface-BCC: 20504
 ## Title: Skillet-Classic |cff7fff7f -Ace3-|r
 ## Notes: A replacement tradeskill window
