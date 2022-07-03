@@ -132,7 +132,7 @@ end
 -- we can't just increase the # of the first command if it happens to be the same recipe without making sure
 -- the additional queue entry doesn't require some additional craftable reagents
 --
-local function AddToQueue(command)
+function Skillet:AddToQueue(command)
 	DA.DEBUG(0,"AddToQueue("..DA.DUMP1(command)..")")
 	local queue = Skillet.db.realm.queueData[Skillet.currentPlayer]
 	if (not command.complex) then		-- we can add this queue entry to any of the other entries
@@ -184,7 +184,7 @@ function Skillet:QueueAppendCommand(command, queueCraftables)
 		end -- for
 		self.newInQueue[level][recipe.itemID] = (self.newInQueue[level][recipe.itemID] or 0) + command.count * recipe.numMade
 		--DA.DEBUG(2,"newInQueue["..tostring(level).."]["..tostring(recipe.itemID).."]= "..tostring(self.newInQueue[level][recipe.itemID]).." ("..tostring(recipe.name)..")")
-		AddToQueue(command)
+		self:AddToQueue(command)
 	end
 	DA.DEBUG(0,"QueueAppendCommand: level= "..tostring(command.level))
 	if not command.level then
