@@ -30,7 +30,7 @@ Skillet.L = L
 
 -- Get version info from the .toc file
 local MAJOR_VERSION = GetAddOnMetadata("Skillet-Classic", "Version");
-local ADDON_BUILD = ((select(4, GetBuildInfo())) < 20000 and "Classic") or ((select(4, GetBuildInfo())) < 80000 and "BCC") or "Retail"
+local ADDON_BUILD = ((select(4, GetBuildInfo())) < 20000 and "Classic") or ((select(4, GetBuildInfo())) < 30000 and "BCC") or ((select(4, GetBuildInfo())) < 40000 and "Wrath") or "Retail"
 Skillet.version = MAJOR_VERSION
 Skillet.build = ADDON_BUILD
 Skillet.project = WOW_PROJECT_ID
@@ -42,6 +42,9 @@ Skillet.isCraft = false			-- true for the Blizzard Craft UI, false for the Blizz
 Skillet.lastCraft = false		-- help events know when to call ConfigureRecipeControls()
 Skillet.ignoreClose = false		-- when switching from the Craft UI to the TradeSkill UI, ignore the other's close.
 Skillet.gttScale = GameTooltip:GetScale()
+
+Skillet.tradeUpdate = 0
+Skillet.craftUpdate = 0
 
 local nonLinkingTrade = { [2656] = true, [53428] = true }				-- smelting, runeforging
 
@@ -870,9 +873,7 @@ function Skillet:TRADE_SKILL_NAME_UPDATE()
 	DA.TRACE("TRADE_SKILL_NAME_UPDATE: tradeShow= "..tostring(Skillet.tradeShow)..", linkedSkill= "..tostring(Skillet.linkedSkill))
 	if not Skillet.tradeShow then return end
 	if Skillet.linkedSkill then
-		if Skillet.lastCraft ~= Skillet.isCraft then
-			Skillet:ConfigureRecipeControls()
-		end
+		Skillet:ConfigureRecipeControls()
 		Skillet:SkilletShow()
 	end
 end
@@ -884,9 +885,7 @@ function Skillet:TRADE_SKILL_UPDATE()
 	if Skillet.closingTrade or not Skillet.tradeShow then return end
 	if Skillet.tradeUpdate < Skillet.db.realm.trade_wait then return end
 	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
-		if Skillet.lastCraft ~= Skillet.isCraft then
-			Skillet:ConfigureRecipeControls()
-		end
+		Skillet:ConfigureRecipeControls()
 	end
 	DA.TRACE("TRADE_SKILL_UPDATE: dataSourceChanged= "..tostring(Skillet.dataSourceChanged)..", dataScanned= "..tostring(Skillet.dataScanned))
 	if Skillet.dataSourceChanged or not Skillet.dataScanned then
@@ -897,16 +896,12 @@ end
 
 function Skillet:CRAFT_UPDATE()
 	DA.TRACE("CRAFT_UPDATE")
-	if Skillet.craftUpdate then
-		Skillet.craftUpdate = Skillet.craftUpdate + 1
-	end
+	Skillet.craftUpdate = Skillet.craftUpdate + 1
 	DA.TRACE("CRAFT_UPDATE: closingTrade= "..tostring(Skillet.closingTrade)..", tradeShow= "..tostring(Skillet.tradeShow)..", craftUpdate= "..tostring(Skillet.craftUpdate))
 	if Skillet.closingTrade or not Skillet.craftShow then return end
 	if Skillet.craftUpdate < Skillet.db.realm.craft_wait then return end
 	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
-		if Skillet.lastCraft ~= Skillet.isCraft then
-			Skillet:ConfigureRecipeControls()
-		end
+		Skillet:ConfigureRecipeControls()
 	end
 	DA.TRACE("CRAFT_UPDATE: dataSourceChanged= "..tostring(Skillet.dataSourceChanged)..", dataScanned= "..tostring(Skillet.dataScanned))
 	if Skillet.dataSourceChanged or not Skillet.dataScanned then
@@ -959,10 +954,8 @@ function Skillet:TRADE_SKILL_SHOW()
 	local name = GetTradeSkillLine()
 	DA.TRACE("TRADE_SKILL_SHOW: name= '"..tostring(name).."'")
 	DA.TRACE("TRADE_SKILL_SHOW: lastCraft= "..tostring(Skillet.lastCraft))
-	if Skillet.lastCraft ~= Skillet.isCraft then
-		Skillet:ConfigureRecipeControls()
-	end
-	SkilletEnchantButton:Hide()				-- Hide our button
+	Skillet:ConfigureRecipeControls()
+--	SkilletEnchantButton:Hide()				-- Hide our button
 	if not Skillet.changingTrade then		-- wait for UNIT_SPELLCAST_SUCCEEDED
 		Skillet:SkilletShow()
 	end
@@ -1123,13 +1116,13 @@ function Skillet:SkilletShow()
 	DA.DEBUG(0,"name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
 	if name then self.currentTrade = self.tradeSkillIDsByName[name] end
 	if self:IsSupportedTradeskill(self.currentTrade) then
-		--DA.DEBUG(0,"SkilletShow: "..self.currentTrade..", name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
+		DA.DEBUG(0,"SkilletShow: "..self.currentTrade..", name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
 		self.selectedSkill = nil
 		self.dataScanned = false
 		self.tradeSkillOpen = true
 		if self.isCraft then
 			if Skillet.db.profile.hide_blizzard_frame then
-				--DA.DEBUG(0,"HideUIPanel(CraftFrame)")
+				DA.DEBUG(0,"HideUIPanel(CraftFrame)")
 				Skillet.hideCraftFrame = true
 				HideUIPanel(CraftFrame)
 				if Skillet.tradeShow then
@@ -1137,7 +1130,7 @@ function Skillet:SkilletShow()
 				end
 			end
 		elseif Skillet.db.profile.hide_blizzard_frame then
-			--DA.DEBUG(0,"HideUIPanel(TradeSkillFrame)")
+			DA.DEBUG(0,"HideUIPanel(TradeSkillFrame)")
 			Skillet.hideTradeSkillFrame = true
 			HideUIPanel(TradeSkillFrame)
 			if Skillet.craftShow then
@@ -1148,6 +1141,13 @@ function Skillet:SkilletShow()
 --
 -- Processing will continue in SkilletShowWindow when the TRADE_SKILL_UPDATE or CRAFT_UPDATE event fires
 --
+		if self.build == "Wrath" then
+			if self.isCraft then
+				Skillet:CRAFT_UPDATE()
+			else
+				Skillet:TRADE_SKILL_UPDATE()
+			end
+		end
 	else
 --
 -- give Hunter Beast Training a pass

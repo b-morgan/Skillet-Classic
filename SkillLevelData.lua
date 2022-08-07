@@ -293,7 +293,8 @@ end
 --
 function Skillet:InitializeSkillLevels()
 	self.db.global.SkillLevels = {
-		[0] = "orange/yellow/green/gray",
+--		      "orange/yellow/green/gray",
+		[0] = "0/0/0/0",
 		-- alchemy
 		[118] = "1/55/75/95",
 		[858] = "55/85/105/125",

@@ -556,6 +556,7 @@ end
 --
 function Skillet:ConfigureRecipeControls()
 	DA.DEBUG(0,"ConfigureRecipeControls()")
+	--DA.DEBUG(1,"ConfigureRecipeControls: build= "..tostring(Skillet.build)..", currentTrade= "..tostring(Skillet.currentTrade))
 	if Skillet.isCraft then
 		if Skillet.db.profile.queue_crafts then
 			SkilletQueueButton:Show()
@@ -584,6 +585,29 @@ function Skillet:ConfigureRecipeControls()
 			SkilletEnchantButton:Disable()		-- because DoCraft is restricted
 			SkilletEnchantButton:Show()
 		end
+	elseif Skillet.build == "Wrath" and Skillet.currentTrade == 7411 then
+		if Skillet.db.profile.queue_crafts then
+			SkilletQueueButton:Show()
+			SkilletEmptyQueueButton:Show()
+			SkilletQueueParent:Show()
+		else
+			SkilletQueueButton:Hide()
+			SkilletEmptyQueueButton:Hide()
+			SkilletQueueParent:Hide()
+		end
+		SkilletQueueAllButton:Hide()
+		SkilletCreateAllButton:Hide()
+		SkilletCreateButton:Hide()
+		SkilletStartQueueButton:Hide()
+		SkilletPauseQueueButton:Hide()
+		SkilletItemCountInputBox:Hide()
+		SkilletSub10Button:Hide()
+		SkilletSub1Button:Hide()
+		SkilletAdd1Button:Hide()
+		SkilletAdd10Button:Hide()
+		SkilletClearNumButton:Hide()
+		SkilletQueueOnlyButton:Hide()
+		SkilletEnchantButton:Show()
 	else
 		SkilletQueueAllButton:Show()
 		SkilletQueueButton:Show()
@@ -898,6 +922,7 @@ function Skillet:UpdateTradeSkillWindow()
 		end
 	end
 	self:ResetTradeSkillWindow()
+	self:ConfigureRecipeControls()
 	if self.data.sortedSkillList[skillListKey] then
 		numTradeSkills = self.data.sortedSkillList[skillListKey].count
 	else
