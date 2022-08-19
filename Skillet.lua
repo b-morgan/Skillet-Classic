@@ -70,6 +70,7 @@ local defaults = {
 		display_shopping_list_at_merchant = true,
 		display_shopping_list_at_guildbank = false,		-- in BCC only
 		use_guildbank_as_alt = false,					-- in BCC only
+		use_bank_as_alt = false,
 		use_blizzard_for_followers = false,				-- not in Classic
 		hide_blizzard_frame = true,						-- primarily for debugging
 		support_crafting = true,
