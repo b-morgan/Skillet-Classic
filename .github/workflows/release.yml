@@ -39,18 +39,12 @@ jobs:
           fetch-depth: 10
 
       # once cloned, we just run the GitHub Action for the packager project
-      - name: Package and release for Burning Crusade Classic
+
+      - name: Package and release for Wrath of the Lich King Classic
         uses: BigWigsMods/packager@master
         with:
           args: -g wrath
  
-      # once cloned, we just run the GitHub Action for the packager project
-      - name: Package and release for Burning Crusade Classic
-        uses: BigWigsMods/packager@master
-        with:
-          args: -g bcc
- 
-      # once cloned, we just run the GitHub Action for the packager project
       - name: Package and release for Classic Era
         uses: BigWigsMods/packager@master
         with:
