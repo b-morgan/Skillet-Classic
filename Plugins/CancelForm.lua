@@ -59,7 +59,9 @@ end
 -- This function is called within the Skillet:UpdateTradeSkillWindow function
 --
 function plugin.ProcessQueue()
-	DA.DEBUG(0,"CFFC Plugin ProcessQueue")
+	if Skillet.db.profile.plugins.CFFC.enabled then
+		DA.DEBUG(0,"CFFC Plugin ProcessQueue")
+	end
 end
 
 Skillet:RegisterProcessQueuePlugin("CFFCPlugin")		-- we have an ProcessQueue function
