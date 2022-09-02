@@ -2,6 +2,7 @@ local addonName,addonTable = ...
 local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
 local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
 local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
+local isWrath = Skillet.build == "Wrath"
 local DA
 if isRetail then
 	DA = _G[addonName] -- for DebugAids.lua
@@ -276,11 +277,19 @@ function plugin.GetExtraText(skill, recipe)
 	if not recipe then return end
 	local itemID = recipe.itemID
 --
--- Check for Enchanting. Most recipes don't produce an item but
--- we still should get reagent prices.
+-- Check for Enchanting. 
+--   In Classic Era, Most recipes don't produce an item but we still should get reagent prices.
+--   In Wrath, Enchants can be applied to vellum to produce scrolls so use the scroll price instead.
 --
-	if recipe.tradeID == 7411 and itemID then
-		itemID = Skillet.EnchantSpellToItem[itemID] or 0
+	if recipe.tradeID == 7411 then
+		--DA.DEBUG(0,"GetExtraText: itemID= "..tostring(itemID)..", type= "..type(itemID))
+		if itemID then
+			itemID = Skillet.EnchantSpellToItem[itemID] or 0
+		end
+		if itemID == 0 then
+			--DA.DEBUG(0,"GetExtraText: recipe.name= "..tostring(recipe.name)..", recipe.spellID= "..tostring(recipe.spellID)..", recipe.scrollID= "..tostring(recipe.scrollID))
+			itemID = recipe.scrollID
+		end
 	end
 	if Skillet.db.profile.plugins.ATR.enabled and itemID then
 --
@@ -414,10 +423,16 @@ function plugin.RecipeNameSuffix(skill, recipe)
 -- Check for Enchanting. Most recipes don't produce an item but
 -- we still should get reagent prices.
 --
-	if recipe.tradeID == 7411 and itemID then
-		itemID = Skillet.EnchantSpellToItem[itemID] or 0
+	if recipe.tradeID == 7411 then
+		--DA.DEBUG(0,"RecipeNameSuffix: itemID= "..tostring(itemID)..", type= "..type(itemID))
+		if itemID then
+			itemID = Skillet.EnchantSpellToItem[itemID] or 0
+		end
+		if itemID == 0 then
+			--DA.DEBUG(0,"RecipeNameSuffix: recipe.name= "..tostring(recipe.name)..", recipe.spellID= "..tostring(recipe.spellID)..", recipe.scrollID= "..tostring(recipe.scrollID))
+			itemID = recipe.scrollID
+		end
 	end
-	--DA.DEBUG(0,"RecipeNameSuffix: itemID= "..tostring(itemID)..", type= "..type(itemID))
 	local itemName
 	if itemID then itemName = GetItemInfo(itemID) end
 	--DA.DEBUG(0,"RecipeNameSuffix: itemName= "..tostring(itemName)..", type= "..type(itemName))
@@ -550,7 +565,11 @@ function Skillet:AuctionatorSearch(whichOne)
 			shoppingListName = Skillet:GetRecipeName(recipeId)
 		end
 		if (shoppingListName) then
-			table.insert (items, shoppingListName)
+			if recipe.tradeID == 7411 then
+				table.insert (items, "Scroll of "..shoppingListName)
+			else
+				table.insert (items, shoppingListName)
+			end
 		end
 		local i
 		for i=1,#recipe.reagentData do
