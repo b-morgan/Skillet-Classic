@@ -1,4 +1,8 @@
 local addonName,addonTable = ...
+local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
+local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
+local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
+local isWrath = Skillet.build == "Wrath"
 local DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
@@ -663,9 +667,9 @@ function Skillet:TradeButton_OnEnter(button)
 	else
 		local rank, maxRank = data.rank, data.maxRank
 		GameTooltip:AddLine("["..tostring(rank).."/"..tostring(maxRank).."]",0,1,0)
---		if tradeID == self.currentTrade then
---			GameTooltip:AddLine(L["shift-click to link"])
---		end
+		if tradeID == self.currentTrade then
+			GameTooltip:AddLine(L["shift-click to link"])
+		end
 		local buttonIcon = _G[button:GetName().."Icon"]
 		local r,g,b = buttonIcon:GetVertexColor()
 		if g == 0 then
@@ -1404,8 +1408,8 @@ function Skillet:SkillButton_OnEnter(button)
 			altlink = GetSpellLink(skill.recipeID)
 			quantity = recipe.numMade
 		else
-			--DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe,1))
-			--DA.DEBUG(1,"skill= "..DA.DUMP1(skill,1))
+			DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe,1))
+			DA.DEBUG(1,"skill= "..DA.DUMP1(skill,1))
 		end
 		if Skillet.isCraft then
 --
@@ -1431,6 +1435,18 @@ function Skillet:SkillButton_OnEnter(button)
 					tip:AddLine(desc, 1,1,1, true)
 				end
 			end
+		elseif self.build == "Wrath" and self.currentTrade == 7411 and recipe.itemID == 0 then
+--
+-- Wrath Enchanting tooltip is built with special API calls
+--
+			tip:AddLine(skill.name, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, false);
+			if skillIndex then
+				tip:AddLine(" ")
+				local desc = GetTradeSkillDescription(skillIndex)
+				if (desc) then
+					tip:AddLine(desc, 1,1,1, true)
+				end
+			end
 		else
 --
 -- TradeSkill tooltip
@@ -1447,6 +1463,7 @@ function Skillet:SkillButton_OnEnter(button)
 				end
 			end
 		end
+
 		if IsShiftKeyDown() then
 			if recipe.itemID == 0 then
 				Skillet:Tooltip_ShowCompareItem(tip, GetInventoryItemLink("player", recipe.slot), "left")
@@ -1542,11 +1559,19 @@ function Skillet:SkillButton_OnEnter(button)
 	end
 	local text = string.format("[%s/%s/%s]", L["inventory"], L["bank"], L["craftable"])
 	tip:AddDoubleLine("\n", text)
-	local text = string.format("itemID= %d",recipe.itemID)
+	local item = string.format("itemID= %d",recipe.itemID)
+	local spell = string.format("spellID= %d",recipe.spellID)
+	local scroll = string.format("scrollID= %d",recipe.scrollID)
 	if Skillet.isCraft then
-		text = string.format("spellID= %d",recipe.itemID)
+		item = string.format("spellID= %d",recipe.itemID)
 	end
-	tip:AddDoubleLine("\n", text)
+	if recipe.itemID ~= 0 then
+		tip:AddDoubleLine(spell, item)
+	elseif recipe.scrollID then
+		tip:AddDoubleLine(spell, scroll)
+	else
+		tip:AddLine(spell)
+	end
 	tip:Show()
 	button.locked = false
 end
@@ -1575,6 +1600,8 @@ function Skillet:SetTradeSkillToolTip(skillIndex, buttonID)
 				Skillet:AddItemNotesToTooltip(GameTooltip, recipe.itemID)
 			end
 		end
+	elseif Skillet.build == "Wrath" and Skillet.currentTrade == 7411 and recipe.itemID == 0 then
+		GameTooltip:AddLine(GetTradeSkillDescription(skillIndex))
 	else
 		if recipe then
 			if recipe.itemID ~= 0 then
@@ -1806,8 +1833,10 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 --
 	if Skillet.isCraft then
 		texture = GetCraftIcon(skillIndex)
-	else
+	elseif recipe.itemID ~= 0 then
 		texture = GetItemIcon(recipe.itemID)
+	else
+		texture = GetTradeSkillIcon(skillIndex)
 	end
 	SkilletSkillIcon:SetNormalTexture(texture)
 	SkilletSkillIcon:Show()
