@@ -37,6 +37,7 @@ Skillet.project = WOW_PROJECT_ID
 local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
 local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
 local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
+local isWrath = Skillet.build == "Wrath"
 
 Skillet.isCraft = false			-- true for the Blizzard Craft UI, false for the Blizzard TradeSkill UI
 Skillet.lastCraft = false		-- help events know when to call ConfigureRecipeControls()
@@ -68,12 +69,13 @@ local defaults = {
 		display_shopping_list_at_bank = true,
 		display_shopping_list_at_auction = true,
 		display_shopping_list_at_merchant = true,
-		display_shopping_list_at_guildbank = false,		-- in BCC only
-		use_guildbank_as_alt = false,					-- in BCC only
+		display_shopping_list_at_guildbank = false,		-- not in Classic
+		use_guildbank_as_alt = false,					-- not in Classic
 		use_bank_as_alt = false,
 		use_blizzard_for_followers = false,				-- not in Classic
 		hide_blizzard_frame = true,						-- primarily for debugging
 		support_crafting = true,
+		ignore_change = false,							-- not in Classic
 		queue_crafts = false,
 		include_craftbuttons = true,
 		include_tradebuttons = true,
@@ -1029,22 +1031,24 @@ function Skillet:OnDisable()
 end
 
 function Skillet:IsTradeSkillLinked()
---[[
---
--- Not implemented in Classic
---
-	local isGuild = IsTradeSkillGuild()
-	local isLinked, linkedPlayer = IsTradeSkillLinked()
-	DA.DEBUG(0,"IsTradeSkillLinked, isGuild="..tostring(isGuild)..", isLinked="..tostring(isLinked)..", linkedPlayer="..tostring(linkedPlayer))
+	local isLinked = false
+	local linkedPlayer
+	local isGuild = false
+	if IsTradeSkillLinked then
+		isLinked, linkedPlayer = IsTradeSkillLinked()
+	end
+	if IsTradeSkillGuild then 
+		isGuild = IsTradeSkillGuild()
+	end
+	DA.DEBUG(0,"IsTradeSkillLinked, isLinked="..tostring(isLinked)..", linkedPlayer="..tostring(linkedPlayer)..", isGuild="..tostring(isGuild))
 	if isLinked or isGuild then
 		if not linkedPlayer then
 			if isGuild then
 				linkedPlayer = "Guild Recipes" -- This can be removed when InitializeDatabase gets smarter.
 			end
 		end
-		return true, linkedPlayer, isGuild
+		return isLinked, linkedPlayer, isGuild
 	end
-]]--
 	return false, nil, false
 end
 
@@ -1116,7 +1120,7 @@ function Skillet:SkilletShow()
 	end
 	DA.DEBUG(0,"name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
 	if name then self.currentTrade = self.tradeSkillIDsByName[name] end
-	if self:IsSupportedTradeskill(self.currentTrade) then
+	if self:IsSupportedTradeskill(self.currentTrade) and not self.linkedSkill then
 		DA.DEBUG(0,"SkilletShow: "..self.currentTrade..", name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
 		self.selectedSkill = nil
 		self.dataScanned = false
@@ -1141,6 +1145,7 @@ function Skillet:SkilletShow()
 		end
 --
 -- Processing will continue in SkilletShowWindow when the TRADE_SKILL_UPDATE or CRAFT_UPDATE event fires
+-- (Wrath needs a little help)
 --
 		if self.build == "Wrath" then
 			if self.isCraft then
@@ -1156,7 +1161,7 @@ function Skillet:SkilletShow()
 --
 		if self.castSpellID == 5149 then
 			return
-		elseif not self:IsModKey1Down() and not UnitAffectingCombat("player") then
+		elseif not self:IsModKey1Down() and not UnitAffectingCombat("player") and not self.linkedSkill then
 			DA.DEBUG(0,"SkilletShow: "..tostring(self.currentTrade).." ("..tostring(name)..") is not supported")
 			DA.DEBUG(0,"tradeSkillIDsByName= "..DA.DUMP(self.tradeSkillIDsByName))
 		end
@@ -1397,13 +1402,15 @@ function Skillet:ChangeTradeSkill(tradeID, tradeName)
 		if tradeID == 2575 then spellID = 2656 end		-- Ye old Mining vs. Smelting issue
 		local spell = self:GetTradeName(spellID)
 		DA.DEBUG(1,"tradeID= "..tostring(tradeID)..", tradeName= "..tostring(tradeName)..", Mining= "..tostring(Mining)..", Smelting= "..tostring(Smelting))
-		if not self.db.realm.tradeSkills[self.currentPlayer][tradeID].count or self.db.realm.tradeSkills[self.currentPlayer][tradeID].count < 1 then
-			DA.DEBUG(1,"ChangeTradeSkill: executing ChangeTrade("..tostring(tradeID).."), count= "..tostring(self.db.realm.tradeSkills[self.currentPlayer][tradeID].count)..", tradeName= "..tostring(tradeName))
-			self.db.realm.tradeSkills[self.currentPlayer][tradeID].count = 1
-			self.closingTrade = true
-			self:SkilletClose()
-			StaticPopup_Show("SKILLET_IGNORE_CHANGE")
-			return
+		if Skillet.db.profile.ignore_change or isClassic then
+			if not self.db.realm.tradeSkills[self.currentPlayer][tradeID].count or self.db.realm.tradeSkills[self.currentPlayer][tradeID].count < 1 then
+				DA.DEBUG(1,"ChangeTradeSkill: executing ChangeTrade("..tostring(tradeID).."), count= "..tostring(self.db.realm.tradeSkills[self.currentPlayer][tradeID].count)..", tradeName= "..tostring(tradeName))
+				self.db.realm.tradeSkills[self.currentPlayer][tradeID].count = 1
+				self.closingTrade = true
+				self:SkilletClose()
+				StaticPopup_Show("SKILLET_IGNORE_CHANGE")
+				return
+			end
 		end
 		DA.DEBUG(1,"ChangeTradeSkill: executing CastSpellByName("..tostring(spell)..")")
 		self.processingSpell = spell
