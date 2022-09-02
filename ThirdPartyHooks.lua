@@ -269,6 +269,7 @@ Recipe = {
 	["itemID"] = number
 	["tradeID"] = number
 	["spellID"] = number
+	["scrollID"] = number
 	["reagentData] = {table} with number of reagents for this recipe
 		[index 1] = Reagent
 		[index 2] = Reagent
