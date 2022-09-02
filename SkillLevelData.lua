@@ -94,7 +94,8 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 	local skillLevels = Skillet.db.global.SkillLevels
 	if itemID then 
 		if tonumber(itemID) ~= nil and itemID ~= 0 then
-			if self.isCraft or self.currentTrade == 7411 then  -- isCraft for Classic and BCC, Enchanting TradeID for retail
+			if self.isCraft or self.currentTrade == 7411 then  -- isCraft for Classic and BCC, Enchanting TradeID for Wrath
+				DA.DEBUG(1,"GetTradeSkillLevels: itemID= "..tostring(itemID)..", spellID= "..tostring(spellID)..")")
 				itemID = -itemID
 			end
 			self.indexTradeSkillLevel = itemID
@@ -182,7 +183,7 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 					return a, b, c, d
 				end
 			end
-		else
+		elseif tonumber(itemID) == nil then
 			DA.DEBUG(0,"GetTradeSkillLevels: "..tostring(itemID).." is not a number")
 			self.sourceTradeSkillLevel = 4
 			self.indexTradeSkillLevel = nil
