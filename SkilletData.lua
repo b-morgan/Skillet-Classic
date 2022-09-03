@@ -127,7 +127,7 @@ function Skillet:CollectTradeSkillData()
 				if self.build == "Wrath" and id == 7411 then
 					self.skillIsCraft[id] = false
 				else
-					self.skillIsCraft[i] = true
+					self.skillIsCraft[id] = true
 				end
 				self.tradeSkillIDsByName[name] = id
 				self.tradeSkillNamesByID[id] = name
@@ -1005,6 +1005,13 @@ local function ScanTrade()
 				local itemString = "0"
 				local itemLinkCraft = GetCraftItemLink(i)
 				itemLink = GetTradeSkillItemLink(i)
+				if itemLink and strfind(itemLink,"item::") then
+--
+-- itemLink is malformed, ignore it
+--
+					DA.WARN("ScanTrade: malformed itemLink, tradeID= "..tostring(tradeID)..", i= "..tostring(i)..", name= "..tostring(skillName)..", link= "..DA.PLINK(itemLink))
+					itemLink = nil
+				end
 --
 -- Enchants don't have an itemLink
 -- Use the recipeID instead (for GetItemInfo)
@@ -1449,10 +1456,17 @@ Skillet.scrollData = {
 	[34002] = 38938, -- Enchant Bracer - Lesser Assault
 	[34003] = 38939, -- Enchant Cloak - PvP Power
 	[34004] = 38940, -- Enchant Cloak - Greater Agility
+	[34005] = 38941, -- Enchant Cloak - Greater Arcane Resistance
+	[34006] = 38942, -- Enchant Cloak - Greater Shadow Resistance
 	[34007] = 38943, -- Enchant Boots - Cat's Swiftness
 	[34008] = 38944, -- Enchant Boots - Boar's Speed
 	[34009] = 38945, -- Enchant Shield - Major Stamina
 	[44383] = 38949, -- Enchant Shield - Resilience
+	[44483] = 38950, -- Enchant Cloak - Superior Frost Resistance
+	[44494] = 38956, -- Enchant Cloak - Superior Nature Resistance
+	[44556] = 38969, -- Enchant Cloak - Superior Fire Resistance
+	[44590] = 38977, -- Enchant Cloak - Superior Shadow Resistance
+	[44596] = 38982, -- Enchant Cloak - Superior Arcane Resistance
 	[46594] = 38999, -- Enchant Chest - Dodge
 	[47051] = 39000, -- Enchant Cloak - Greater Dodge
 	[7745] = 38772, -- Enchant 2H Weapon - Minor Impact
@@ -1493,6 +1507,7 @@ Skillet.scrollData = {
 	[7426] = 38767, -- Enchant Chest - Minor Absorption
 	[7428] = 38768, -- Enchant Bracer - Minor Dodge
 	[7443] = 38769, -- Enchant Chest - Minor Mana
+	[7454] = 38770, -- Enchant Cloak - Minor Resistance
 	[7457] = 38771, -- Enchant Bracer - Minor Stamina
 	[7748] = 38773, -- Enchant Chest - Lesser Health
 	[7766] = 38774, -- Enchant Bracer - Minor Spirit
@@ -1502,6 +1517,7 @@ Skillet.scrollData = {
 	[7782] = 38778, -- Enchant Bracer - Minor Strength
 	[7857] = 38782, -- Enchant Chest - Health
 	[7859] = 38783, -- Enchant Bracer - Lesser Spirit
+	[7861] = 38784, -- Enchant Cloak - Lesser Fire Resistance
 	[7863] = 38785, -- Enchant Boots - Minor Stamina
 	[7867] = 38786, -- Enchant Boots - Minor Agility
 	[13378] = 38787, -- Enchant Shield - Minor Stamina
@@ -1510,6 +1526,7 @@ Skillet.scrollData = {
 	[13464] = 38791, -- Enchant Shield - Lesser Protection
 	[13485] = 38792, -- Enchant Shield - Lesser Spirit
 	[13501] = 38793, -- Enchant Bracer - Lesser Stamina
+	[13522] = 38795, -- Enchant Cloak - Lesser Shadow Resistance
 	[13536] = 38797, -- Enchant Bracer - Lesser Strength
 	[13538] = 38798, -- Enchant Chest - Lesser Absorption
 	[13607] = 38799, -- Enchant Chest - Mana
@@ -1526,6 +1543,7 @@ Skillet.scrollData = {
 	[13644] = 38810, -- Enchant Boots - Lesser Stamina
 	[13646] = 38811, -- Enchant Bracer - Lesser Dodge
 	[13648] = 38812, -- Enchant Bracer - Stamina
+	[13657] = 38815, -- Enchant Cloak - Fire Resistance
 	[13659] = 38816, -- Enchant Shield - Spirit
 	[13661] = 38817, -- Enchant Bracer - Strength
 	[13663] = 38818, -- Enchant Chest - Greater Mana
@@ -1534,6 +1552,7 @@ Skillet.scrollData = {
 	[13698] = 38823, -- Enchant Gloves - Skinning
 	[13700] = 38824, -- Enchant Chest - Lesser Stats
 	[13746] = 38825, -- Enchant Cloak - Greater Defense
+	[13794] = 38826, -- Enchant Cloak - Resistance
 	[13815] = 38827, -- Enchant Gloves - Agility
 	[13817] = 38828, -- Enchant Shield - Stamina
 	[13822] = 38829, -- Enchant Bracer - Intellect
@@ -1549,6 +1568,7 @@ Skillet.scrollData = {
 	[13917] = 38841, -- Enchant Chest - Superior Mana
 	[13931] = 38842, -- Enchant Bracer - Dodge
 	[13935] = 38844, -- Enchant Boots - Agility
+	[13933] = 38843, -- Enchant Shield - Frost Resistance
 	[13939] = 38846, -- Enchant Bracer - Greater Strength
 	[13941] = 38847, -- Enchant Chest - Stats
 	[13945] = 38849, -- Enchant Bracer - Greater Stamina
@@ -1560,6 +1580,7 @@ Skillet.scrollData = {
 	[20011] = 38855, -- Enchant Bracer - Superior Stamina
 	[20012] = 38856, -- Enchant Gloves - Greater Agility
 	[20013] = 38857, -- Enchant Gloves - Greater Strength
+	[20014] = 38858, -- Enchant Cloak - Greater Resistance
 	[20015] = 38859, -- Enchant Cloak - Superior Defense
 	[20016] = 38860, -- Enchant Shield - Vitality
 	[20017] = 38861, -- Enchant Shield - Greater Stamina
@@ -1577,8 +1598,12 @@ Skillet.scrollData = {
 	[25078] = 38888, -- Enchant Gloves - Fire Power
 	[25079] = 38889, -- Enchant Gloves - Healing Power
 	[25080] = 38890, -- Enchant Gloves - Superior Agility
+	[25081] = 38891, -- Enchant Cloak - Greater Fire Resistance
+	[25082] = 38892, -- Enchant Cloak - Greater Nature Resistance
 	[25083] = 38893, -- Enchant Cloak - Stealth
 	[25084] = 38894, -- Enchant Cloak - Subtlety
+	[27947] = 38907, -- Enchant Shield - Resistance
+	[27962] = 38915, -- Enchant Cloak - Major Resistance
 	[44506] = 38960, -- Enchant Gloves - Gatherer
 	[63746] = 45628, -- Enchant Boots - Lesser Accuracy
 	[71692] = 50816, -- Enchant Gloves - Angler
