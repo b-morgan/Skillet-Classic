@@ -133,7 +133,7 @@ plugin.options =
 		useSearchExact = {
 			type = "toggle",
 			name = "useSearchExact",
-			desc = "Use MultiSearchExact instead of MultSearch in Auction House shopping list (retail only)",
+			desc = "Use MultiSearchExact instead of MultSearch in Auction House shopping list",
 			get = function()
 				return Skillet.db.profile.plugins.ATR.useSearchExact
 			end,
@@ -144,6 +144,21 @@ plugin.options =
 				end
 			end,
 			order = 7
+		},
+		exceptEnchanting = {
+			type = "toggle",
+			name = "exceptEnchanting",
+			desc = "Ignore useSearchExact for Enchanting",
+			get = function()
+				return Skillet.db.profile.plugins.ATR.exceptEnchanting
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.ATR.exceptEnchanting = value
+				if value then
+					Skillet.db.profile.plugins.ATR.exceptEnchanting = value
+				end
+			end,
+			order = 8
 		},
 		showProfitValue = {
 			type = "toggle",
@@ -158,7 +173,7 @@ plugin.options =
 					Skillet.db.profile.plugins.ATR.showProfitValue = value
 				end
 			end,
-			order = 8
+			order = 9
 		},
 		showProfitPercentage = {
 			type = "toggle",
@@ -173,7 +188,7 @@ plugin.options =
 					Skillet.db.profile.plugins.ATR.showProfitPercentage = value
 				end
 			end,
-			order = 9
+			order = 10
 		},
 		colorCode = {
 			type = "toggle",
@@ -188,7 +203,7 @@ plugin.options =
 					Skillet.db.profile.plugins.ATR.colorCode = value
 				end
 			end,
-			order = 10
+			order = 11
 		},
 		alwaysEnchanting = {
 			type = "toggle",
@@ -203,7 +218,7 @@ plugin.options =
 					Skillet.db.profile.plugins.ATR.alwaysEnchanting = value
 				end
 			end,
-			order = 11
+			order = 12
 		},
 		buyFactor = {
 			type = "range",
@@ -566,7 +581,11 @@ function Skillet:AuctionatorSearch(whichOne)
 		end
 		if (shoppingListName) then
 			if recipe.tradeID == 7411 then
-				table.insert (items, "Scroll of "..shoppingListName)
+				if Skillet.db.profile.plugins.ATR.useSearchExact and not Skillet.db.profile.plugins.ATR.exceptEnchanting then
+					table.insert (items, L["Scroll of"].." "..shoppingListName)
+				else
+					table.insert (items, shoppingListName)
+				end
 			else
 				table.insert (items, shoppingListName)
 			end
@@ -603,8 +622,13 @@ function Skillet:AuctionatorSearch(whichOne)
 		Atr_SelectPane(BUY_TAB)
 		Atr_SearchAH(shoppingListName, items)
 	elseif Skillet.db.profile.plugins.ATR.useSearchExact and Auctionator.API.v1.MultiSearchExact then
-		DA.DEBUG(0, "AuctionatorSearch: (exact) addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
-		Auctionator.API.v1.MultiSearchExact(addonName, items)
+		if recipe.tradeID == 7411 and Skillet.db.profile.plugins.ATR.exceptEnchanting then
+			DA.DEBUG(0, "AuctionatorSearch: addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
+			Auctionator.API.v1.MultiSearch(addonName, items)
+		else
+			DA.DEBUG(0, "AuctionatorSearch: (exact) addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
+			Auctionator.API.v1.MultiSearchExact(addonName, items)
+		end
 	elseif Auctionator.API.v1.MultiSearch then
 		DA.DEBUG(0, "AuctionatorSearch: addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
 		Auctionator.API.v1.MultiSearch(addonName, items)
