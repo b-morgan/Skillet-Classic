@@ -589,7 +589,7 @@ function Skillet:ConfigureRecipeControls()
 			SkilletEnchantButton:Disable()		-- because DoCraft is restricted
 			SkilletEnchantButton:Show()
 		end
-	elseif Skillet.build == "Wrath" and Skillet.currentTrade == 7411 then
+	elseif Skillet.currentTrade == 7411 then
 		if Skillet.db.profile.queue_crafts then
 			SkilletQueueButton:Show()
 			SkilletEmptyQueueButton:Show()
@@ -1435,7 +1435,7 @@ function Skillet:SkillButton_OnEnter(button)
 					tip:AddLine(desc, 1,1,1, true)
 				end
 			end
-		elseif self.build == "Wrath" and self.currentTrade == 7411 and recipe.itemID == 0 then
+		elseif self.currentTrade == 7411 and recipe.itemID == 0 then
 --
 -- Wrath Enchanting tooltip is built with special API calls
 --
@@ -1600,7 +1600,7 @@ function Skillet:SetTradeSkillToolTip(skillIndex, buttonID)
 				Skillet:AddItemNotesToTooltip(GameTooltip, recipe.itemID)
 			end
 		end
-	elseif Skillet.build == "Wrath" and Skillet.currentTrade == 7411 and recipe.itemID == 0 then
+	elseif Skillet.currentTrade == 7411 and recipe.itemID == 0 then
 		GameTooltip:AddLine(GetTradeSkillDescription(skillIndex))
 	else
 		if recipe then

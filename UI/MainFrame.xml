@@ -1161,6 +1161,7 @@
 						Skillet:InventoryFilterButtons_Hide()
 						SkilletSearchBox:SetText("")
 						SkilletSearchBox:ClearFocus()
+						Skillet.data.tooltipCache = {}
 					</OnClick>
 				</Scripts>
 			</Button>
