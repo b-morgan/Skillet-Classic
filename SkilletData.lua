@@ -338,9 +338,6 @@ function Skillet:GetAutoTargetMacro(additionalSpellId)
 		return "/cast "..(GetSpellInfo(additionalSpellId) or "")
 	end
 end
---
---  end of "features" not in Classic
---
 
 local DifficultyText = {
 	x = "unknown",
@@ -367,7 +364,6 @@ local skill_style_type = {
 	["header"]			= { r = 1.00, g = 0.82, b = 0,	  level = 0, alttext="",	cstring = "|cffffc800"},
 	["unavailable"]		= { r = 0.3, g = 0.3, b = 0.3,	  level = 6, alttext="",	cstring = "|cff606060"},
 }
-Skillet.skill_style_type = skill_style_type
 
 --
 -- adds an recipe source for an itemID (recipeID produces itemID)
