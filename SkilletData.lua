@@ -275,7 +275,7 @@ end
 --
 -- Enchants that produce items
 --
-local EnchantSpellToItem = {
+Skillet.EnchantSpellToItem = {
 	[14923] = 11287 , -- Lesser Magic Wand
 	[25124] = 20744 , -- Minor Wizard Oil
 	[14807] = 11288 , -- Greater Magic Wand
@@ -297,17 +297,12 @@ local EnchantSpellToItem = {
 	[28028] = 22459 , -- Void Sphere
 	[42615] = 22448 , -- Small Prismatic Shard
 }
-Skillet.EnchantSpellToItem = EnchantSpellToItem
 
 --
--- None of these "features" exist in Classic
+-- ItemIDs that can be produced by multiple professions
 --
-Skillet.scrollData = {
---[[
--- Scraped from WoWhead using the following javascript:
--- for (i=0; i<listviewitems.length; i++) console.log("["+listviewitems[i].sourcemore[0].ti+"] = "+listviewitems[i].id+", 
--- "+listviewitems[i].name.substr(1));
-]]--
+Skillet.duplicateItemID = {
+	[12655] = true		-- Enchanted Thorium Bar, Enchanting and Mining
 }
 
 Skillet.TradeSkillAutoTarget = {
@@ -721,6 +716,9 @@ local function CheckTradeID(tradeID, recipeID)
 		local oldTradeID, oldItemString, oldReagentString, oldToolString = string.split(" ",recipeDB[recipeID])
 		if oldTradeID ~= tostring(tradeID) then
 			DA.DEBUG(2,"CheckTradeID:  recipeID="..tostring(recipeID)..", oldTradeID="..tostring(oldTradeID)..", tradeID="..tostring(tradeID)..", tradeUpdate= "..tostring(Skillet.tradeUpdate)..", craftUpdate= "..tostring(Skillet.craftUpdate))
+			if Skillet.duplicateItemID[oldItemString] then
+				return false
+			end
 			return true
 		end
 	end
