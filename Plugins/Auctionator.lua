@@ -548,7 +548,8 @@ function Skillet:AuctionatorSearch(whichOne)
 	DA.DEBUG(0, "AuctionatorSearch("..tostring(whichOne)..")")
 	local shoppingListName
 	local items = {}
-	local recipe, recipeId = Skillet:GetRecipeDataByTradeIndex(Skillet.currentTrade, Skillet.selectedSkill)
+	local recipe = Skillet:GetRecipeDataByTradeIndex(Skillet.currentTrade, Skillet.selectedSkill)
+	DA.DEBUG(1,"AuctionatorSearch: recipe= "..DA.DUMP1(recipe))
 	if whichOne then
 		shoppingListName = L["Shopping List"]
 		local list = Skillet:GetShoppingList(nil, nil, false)
@@ -575,12 +576,13 @@ function Skillet:AuctionatorSearch(whichOne)
 		if recipe.tradeID == 7411 and itemID then
 			itemID = Skillet.EnchantSpellToItem[itemID] or 0
 		end
-		shoppingListName = GetItemInfo(itemID)
-		if (shoppingListName == nil) then
-			shoppingListName = Skillet:GetRecipeName(recipeId)
+		if itemID ~= 0 then
+			shoppingListName = GetItemInfo(itemID)
+		else
+			shoppingListName = recipe.name
 		end
 		if (shoppingListName) then
-			if recipe.tradeID == 7411 then
+			if recipe.tradeID == 7411 and not Skillet.isCraft then
 				if Skillet.db.profile.plugins.ATR.useSearchExact and not Skillet.db.profile.plugins.ATR.exceptEnchanting then
 					table.insert (items, L["Scroll of"].." "..shoppingListName)
 				else
