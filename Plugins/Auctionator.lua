@@ -548,6 +548,7 @@ function Skillet:AuctionatorSearch(whichOne)
 	DA.DEBUG(0, "AuctionatorSearch("..tostring(whichOne)..")")
 	local shoppingListName
 	local items = {}
+	local recipe, recipeId = Skillet:GetRecipeDataByTradeIndex(Skillet.currentTrade, Skillet.selectedSkill)
 	if whichOne then
 		shoppingListName = L["Shopping List"]
 		local list = Skillet:GetShoppingList(nil, nil, false)
@@ -564,7 +565,6 @@ function Skillet:AuctionatorSearch(whichOne)
 			end
 		end
 	else
-		local recipe, recipeId = Skillet:GetRecipeDataByTradeIndex(Skillet.currentTrade, Skillet.selectedSkill)
 		if not recipe then
 			return
 		end
