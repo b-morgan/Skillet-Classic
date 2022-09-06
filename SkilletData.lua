@@ -338,6 +338,9 @@ function Skillet:GetAutoTargetMacro(additionalSpellId)
 		return "/cast "..(GetSpellInfo(additionalSpellId) or "")
 	end
 end
+--
+--  end of "features" not in Classic
+--
 
 local DifficultyText = {
 	x = "unknown",
@@ -364,6 +367,7 @@ local skill_style_type = {
 	["header"]			= { r = 1.00, g = 0.82, b = 0,	  level = 0, alttext="",	cstring = "|cffffc800"},
 	["unavailable"]		= { r = 0.3, g = 0.3, b = 0.3,	  level = 6, alttext="",	cstring = "|cff606060"},
 }
+Skillet.skill_style_type = skill_style_type
 
 --
 -- adds an recipe source for an itemID (recipeID produces itemID)
@@ -1012,10 +1016,10 @@ local function ScanTrade()
 --
 				if not itemLink then
 					if itemLinkCraft then
-						DA.DEBUG(0,"ScanTrade: use itemLinkCraft instead")
+						--DA.DEBUG(2,"ScanTrade: use itemLinkCraft instead")
 						itemLink = itemLinkCraft
 					else
-						DA.DEBUG(0,"ScanTrade: use recipeID instead")
+						--DA.DEBUG(2,"ScanTrade: use recipeID instead")
 						itemLink = recipeID
 						recipe.itemID = 0
 						recipe.numMade = 1
@@ -1030,14 +1034,14 @@ local function ScanTrade()
 				end
 				if itemName then
 					local itemID, linkType = Skillet:GetItemIDFromLink(itemLink)
-					DA.DEBUG(0,"ScanTrade: i= "..tostring(i)..", itemID= "..tostring(itemID)..", linkType= "..tostring(linkType))
+					--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", itemID= "..tostring(itemID)..", linkType= "..tostring(linkType))
 					local minMade,maxMade = 1, 1
 					if not Skillet.isCraft then
 						minMade,maxMade = GetTradeSkillNumMade(i)
 					end
 					recipe.itemID = itemID
 					recipe.numMade = (minMade + maxMade)/2
-					DA.DEBUG(0,"ScanTrade: i= "..tostring(i)..", minMade= "..tostring(minMade)..", maxMade= "..tostring(maxMade))
+					--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", minMade= "..tostring(minMade)..", maxMade= "..tostring(maxMade))
 					if recipe.numMade > 1 then
 						itemString = itemID..":"..recipe.numMade
 					else
