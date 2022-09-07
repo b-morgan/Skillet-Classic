@@ -397,60 +397,6 @@ function Skillet:ItemDataAddUsedInRecipe(itemID,recipeID)
 	self.db.global.itemRecipeUsedIn[itemID][recipeID] = true
 end
 
---
--- goes thru the stored recipe list and collects reagent and item information as well as skill lookups
---
-function Skillet:CollectRecipeInformation()
-	for recipeID, recipeString in pairs(self.db.global.recipeDB) do
-		local tradeID, itemString, reagentString, toolString = string.split(" ",recipeString)
-		local itemID, numMade = 0, 1
-		local slot = nil
-		if itemString ~= "0" then
-			local a, b = string.split(":",itemString)
-			if a ~= "0" then
-				itemID, numMade = a,b
-			else
-				itemID = 0
-				numMade = 1
-				slot = tonumber(b)
-			end
-			if not numMade then
-				numMade = 1
-			end
-		end
-		itemID = tonumber(itemID)
-		if itemID ~= 0 then
-			self:ItemDataAddRecipeSource(itemID, recipeID)
-		end
-		if reagentString ~= "-" then
-			local reagentList = { string.split(":",reagentString) }
-			local numReagents = #reagentList / 2
-			for i=1,numReagents do
-				local reagentID = tonumber(reagentList[1 + (i-1)*2])
-				self:ItemDataAddUsedInRecipe(reagentID, recipeID)
-			end
-		end
-	end
-	for player,tradeList in pairs(self.db.realm.skillDB) do
-		self.data.skillIndexLookup[player] = {}
-		for trade,skillList in pairs(tradeList) do
-			for i=1,#skillList do
-				local skillString = self.db.realm.skillDB[player][trade][i]
-				if skillString then
-				--DA.DEBUG(0,"skillString= '"..skillString.."'")
-				local skillData = { string.split("@", skillString) }
-				--DA.DEBUG(0,"skillData= "..DA.DUMP1(skillData))
-					local skillHeader = { string.split(" ", skillData[1]) }
-					if skillHeader[1] ~= "header" or skillHeader[1] ~= "subheader" then
-						local recipeID = string.sub(skillData[1],2)
-						self.data.skillIndexLookup[player][recipeID] = i
-					end
-				end
-			end
-		end
-	end
-end
-
 --[[
 --
 -- Inscription 
@@ -505,8 +451,8 @@ function Skillet:GetRecipe(id)
 		if Skillet.data.recipeList[id] then
 			return Skillet.data.recipeList[id]
 		end
-		if Skillet.db.global.recipeDB[id] then
-			local recipeString = Skillet.db.global.recipeDB[id]
+		if Skillet.db.global.recipeDB[Skillet.currentTrade][id] then
+			local recipeString = Skillet.db.global.recipeDB[Skillet.currentTrade][id]
 			--DA.DEBUG(3,"recipeString= "..tostring(recipeString))
 			local tradeID, itemString, reagentString, toolString = string.split(" ",recipeString)
 			local itemID, numMade = 0, 1
@@ -708,23 +654,6 @@ function Skillet:CalculateCraftableCounts()
 end
 
 --
--- Sanity check that the tradeID matches
---
-local function CheckTradeID(tradeID, recipeID)
-	local recipeDB = Skillet.db.global.recipeDB
-	if recipeDB[recipeID] then
-		local oldTradeID, oldItemString, oldReagentString, oldToolString = string.split(" ",recipeDB[recipeID])
-		if oldTradeID ~= tostring(tradeID) then
-			DA.DEBUG(2,"CheckTradeID:  recipeID="..tostring(recipeID)..", oldTradeID="..tostring(oldTradeID)..", tradeID="..tostring(tradeID)..", tradeUpdate= "..tostring(Skillet.tradeUpdate)..", craftUpdate= "..tostring(Skillet.craftUpdate))
-			if Skillet.duplicateItemID[oldItemString] then
-				return false
-			end
-			return true
-		end
-	end
-end
-
---
 -- This is a local function only called from Skillet:ReScanTrade() which
 -- is defined after this one
 --
@@ -762,8 +691,6 @@ local function ScanTrade()
 				if not isExpanded then
 					ExpandTradeSkillSubClass(i)
 				end
-			elseif CheckTradeID(tradeID, skillName) then
-				return false
 			end
 		end
 	end
@@ -776,8 +703,6 @@ local function ScanTrade()
 				if not isExpanded then
 					ExpandCraftSubClass(i)
 				end
-			elseif CheckTradeID(tradeID, skillName) then
-				return false
 			end
 		end
 		numSkills = numCrafts
@@ -786,7 +711,10 @@ local function ScanTrade()
 -- From here on, just one loop variable needed
 --
 	DA.DEBUG(2,"ScanTrade: "..tostring(profession)..": "..tostring(tradeID).." "..numSkills.." recipes")
-	local recipeDB = Skillet.db.global.recipeDB
+	if not Skillet.db.global.recipeDB[tradeID] then
+		Skillet.db.global.recipeDB[tradeID] = {}
+	end
+	local recipeDB = Skillet.db.global.recipeDB[tradeID]
 	local skillDB = Skillet.db.realm.skillDB[player][tradeID]
 	local tradeSkill = Skillet.db.realm.tradeSkills[player][tradeID]
 	local skillData = Skillet.data.skillList[player][tradeID]
@@ -1070,10 +998,7 @@ local function ScanTrade()
 						Skillet.db.realm.invSlot[player][tradeID][itemID] = itemEquipLoc
 					end
 --[[
---
--- Not implemented in Classic
---
-				else
+				elseif not Skillet.isCraft then
 					recipe.numMade = 1
 					if Skillet.scrollData[recipeID] then
 						local itemID = Skillet.scrollData[recipeID]

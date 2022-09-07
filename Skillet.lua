@@ -302,7 +302,7 @@ function Skillet:OnInitialize()
 	local dataVersion = 5
 	local queueVersion = 1
 	local customVersion = 1
-	local recipeVersion = 3
+	local recipeVersion = 4
 	local _,wowBuild,_,wowVersion = GetBuildInfo();
 	self.wowBuild = wowBuild
 	self.wowVersion = wowVersion
@@ -430,6 +430,7 @@ end
 -- increment to trigger a call.
 --
 function Skillet:FlushAllData()
+	DA.DEBUG(0,"FlushAllData()");
 	Skillet.data = {}
 	Skillet.db.realm.tradeSkills = {}
 	Skillet.db.realm.auctionData = {}
@@ -450,6 +451,7 @@ end
 -- good cause.
 --
 function Skillet:FlushCustomData()
+	DA.DEBUG(0,"FlushCustomData()");
 	Skillet.db.profile.groupDB = {}
 	Skillet.db.profile.groupSN = {}
 end
@@ -460,6 +462,7 @@ end
 -- queue and should have minimal impact.
 --
 function Skillet:FlushQueueData()
+	DA.DEBUG(0,"FlushQueueData()");
 	Skillet.db.realm.queueData = {}
 	Skillet.db.realm.reagentsInQueue = {}
 end
@@ -471,6 +474,7 @@ end
 -- primary reason this function exists.
 --
 function Skillet:FlushRecipeData()
+	DA.DEBUG(0,"FlushRecipeData()");
 	Skillet.db.global.recipeDB = {}
 	Skillet.db.global.itemRecipeUsedIn = {}
 	Skillet.db.global.itemRecipeSource = {}
