@@ -451,7 +451,7 @@ function Skillet:GetRecipe(id)
 		if Skillet.data.recipeList[id] then
 			return Skillet.data.recipeList[id]
 		end
-		if Skillet.db.global.recipeDB[Skillet.currentTrade][id] then
+		if Skillet.currentTrade and Skillet.db.global.recipeDB[Skillet.currentTrade][id] then
 			local recipeString = Skillet.db.global.recipeDB[Skillet.currentTrade][id]
 			--DA.DEBUG(3,"recipeString= "..tostring(recipeString))
 			local tradeID, itemString, reagentString, toolString = string.split(" ",recipeString)
