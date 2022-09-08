@@ -501,9 +501,26 @@ end
 
 --
 -- Adds one item to the queue and then starts the queue
+-- If enchants are not being queued, clear all enchants from the queue
+-- before adding this one
 --
 function Skillet:EnchantItem()
 	DA.DEBUG(0,"EnchantItem()")
+	if not self.db.profile.queue_crafts then
+		local queue = self.db.realm.queueData[self.currentPlayer]
+		local qpos = #queue
+		repeat
+			local command = queue[qpos]
+			DA.DEBUG(1,"qpos= "..tostring(qpos)..", command= "..DA.DUMP1(command))
+			if command and command.op == "iterate" then
+				local recipe = self:GetRecipe(command.recipeID)
+				if recipe.tradeID == 7411 then
+					self:RemoveFromQueue(qpos)
+				end
+			end
+			qpos = qpos - 1
+		until qpos == 0
+	end
 	self:CreateItems(1)
 end
 
