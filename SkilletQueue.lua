@@ -240,7 +240,7 @@ end
 
 function Skillet:ClearQueue()
 	DA.DEBUG(0,"ClearQueue()")
-	if #self.db.realm.queueData[self.currentPlayer]>0 then
+	if #self.db.realm.queueData[self.currentPlayer] > 0 then
 		self.db.realm.queueData[self.currentPlayer] = {}
 		self.skippedQueue = {}
 		self.db.realm.reagentsInQueue[self.currentPlayer] = {}
@@ -508,18 +508,22 @@ function Skillet:EnchantItem()
 	DA.DEBUG(0,"EnchantItem()")
 	if not self.db.profile.queue_crafts then
 		local queue = self.db.realm.queueData[self.currentPlayer]
-		local qpos = #queue
-		repeat
-			local command = queue[qpos]
-			DA.DEBUG(1,"qpos= "..tostring(qpos)..", command= "..DA.DUMP1(command))
-			if command and command.op == "iterate" then
-				local recipe = self:GetRecipe(command.recipeID)
-				if recipe.tradeID == 7411 then
-					self:RemoveFromQueue(qpos)
-				end
+		if queue then
+			local qpos = #queue
+			DA.DEBUG(1,"EnchantItem: qpos= "..tostring(qpos))
+			if qpos > 0 then
+				repeat
+					local command = queue[qpos]
+					DA.DEBUG(1,"EnchantItem: qpos= "..tostring(qpos)..", command= "..DA.DUMP1(command))
+					if command and command.op == "iterate" then
+						if command.tradeID == 7411 then
+							self:RemoveFromQueue(qpos)
+						end
+					end
+					qpos = qpos - 1
+				until qpos <= 0
 			end
-			qpos = qpos - 1
-		until qpos == 0
+		end
 	end
 	self:CreateItems(1)
 end
@@ -730,6 +734,7 @@ function Skillet:ScanQueuedReagents()
 			end
 		end
 	end
+	--DA.DEBUG(1,"ScanQueuedReagents: reagentInQueue= "..DA.DUMP1(reagentsInQueue))
 	self.db.realm.reagentsInQueue[self.currentPlayer] = reagentsInQueue
 end
 
