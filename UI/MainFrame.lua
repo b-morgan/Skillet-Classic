@@ -2612,6 +2612,20 @@ function Skillet:ReagentButtonSkillSelect(player, id)
 end
 
 --
+-- Called when the reagent button is shift-clicked
+--
+function Skillet:ReagentButtonShiftClick(button, skillIndex, reagentIndex)
+	DA.DEBUG(0,"ReagentButtonShiftClick("..tostring(button)..", "..tostring(skillIndex)..", "..tostring(reagentIndex)..")")
+	local link = Skillet:GetTradeSkillReagentItemLink(skillIndex, reagentIndex)
+	if not ChatEdit_InsertLink(link) then
+		local name = GetItemInfo(link)
+		if SkilletSearchBox:HasFocus() then
+			SkilletSearchBox:SetText(name)
+		end
+	end
+end
+
+--
 -- Called when the reagent button is clicked
 --
 function Skillet:ReagentButtonOnClick(button, skillIndex, reagentIndex)
