@@ -248,6 +248,21 @@ plugin.options =
 			width = "double",
 			order = 21,
 		},
+		calcProfitAhTax = {
+			type = "toggle",
+			name = "calcProfitAhTax",
+			desc = "Calc profit after AH Tax(5%)",
+			get = function()
+				return Skillet.db.profile.plugins.ATR.calcProfitAhTax
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.ATR.calcProfitAhTax = value
+				if value then
+					Skillet.db.profile.plugins.ATR.calcProfitAhTax = value
+				end
+			end,
+			order = 22,
+		},
 	},
 }
 
@@ -408,7 +423,8 @@ function plugin.GetExtraText(skill, recipe)
 -- If we craft this item, will we make a profit?
 --
 		if buyout then
-			local profit = buyout - cost
+			local ah_tax = Skillet.db.profile.plugins.ATR.calcProfitAhTax and 0.95 or 1
+			local profit = buyout * ah_tax - cost
 			if Skillet.db.profile.plugins.ATR.showProfitValue or Skillet.db.profile.plugins.ATR.showProfitPercentage then
 				label = label.."\n"
 				extra_text = extra_text.."\n"
@@ -501,7 +517,8 @@ function plugin.RecipeNameSuffix(skill, recipe)
 			local markup = Skillet.db.profile.plugins.ATR.markup or markupDef
 			cost = cost * markup
 		end
-		profit = buyout - cost
+		local ah_tax = Skillet.db.profile.plugins.ATR.calcProfitAhTax and 0.95 or 1
+		profit = buyout * ah_tax - cost
 		if Skillet.db.profile.plugins.ATR.showProfitValue then
 			if Skillet.db.profile.plugins.ATR.useShort then
 				text = Skillet:FormatMoneyShort(profit, true, Skillet.db.profile.plugins.ATR.colorCode)
