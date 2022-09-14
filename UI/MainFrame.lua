@@ -1601,7 +1601,11 @@ function Skillet:SetTradeSkillToolTip(skillIndex, buttonID)
 			end
 		end
 	elseif Skillet.currentTrade == 7411 and recipe.itemID == 0 then
-		GameTooltip:AddLine(GetTradeSkillDescription(skillIndex))
+		if Skillet.db.profile.enchant_scrolls and recipe.scrollID then
+			GameTooltip:SetItemByID(recipe.scrollID)
+		else
+			GameTooltip:AddLine(GetTradeSkillDescription(skillIndex))
+		end
 	else
 		if recipe then
 			if recipe.itemID ~= 0 then
@@ -1835,6 +1839,8 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		texture = GetCraftIcon(skillIndex)
 	elseif recipe.itemID ~= 0 then
 		texture = GetItemIcon(recipe.itemID)
+	elseif Skillet.db.profile.enchant_scrolls and recipe.scrollID ~= 0 then
+		texture = GetItemIcon(recipe.scrollID)
 	else
 		texture = GetTradeSkillIcon(skillIndex)
 	end

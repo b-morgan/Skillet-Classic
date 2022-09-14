@@ -168,7 +168,11 @@ function Skillet:GetTradeSkillItemLink(index)
 		if self.isCraft then
 			link = GetCraftItemLink(index)
 		elseif self.currentTrade == 7411 and recipe.itemID == 0 then
-			link = GetTradeSkillRecipeLink(index)
+			if Skillet.db.profile.enchant_scrolls and recipe.scrollID then
+				_, link = GetItemInfo(recipe.scrollID)
+			else
+				link = GetTradeSkillRecipeLink(index)
+			end
 		else
 			_, link = GetItemInfo(recipe.itemID)
 		end
