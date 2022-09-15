@@ -167,6 +167,8 @@ function Skillet:GetTradeSkillItemLink(index)
 	if recipe then
 		if self.isCraft then
 			link = GetCraftItemLink(index)
+		elseif self.currentTrade == 7411 and recipe.itemID == 0 then
+			link = GetTradeSkillRecipeLink(index)
 		else
 			_, link = GetItemInfo(recipe.itemID)
 		end
