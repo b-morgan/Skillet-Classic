@@ -1530,4 +1530,6 @@ Skillet.scrollData = {
 	[44506] = 38960, -- Enchant Gloves - Gatherer
 	[63746] = 45628, -- Enchant Boots - Lesser Accuracy
 	[71692] = 50816, -- Enchant Gloves - Angler
+	[62257] = 44946, -- Scroll of Enchant Weapon - Titanguard
+	[44612] = 38985, -- Scroll of Enchant Gloves - Greater Blasting
 }
