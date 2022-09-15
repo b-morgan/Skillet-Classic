@@ -346,8 +346,21 @@ Skillet.options =
 						Skillet.db.profile.queue_crafts = value
 						Skillet:ConfigureRecipeControls()
 					end,
-					width = "full",
+					width = 1.5,
 					order = 34
+				},
+				enchant_scrolls = {
+					type = "toggle",
+					name = L["ENCHANTSCROLLSNAME"],
+					desc = L["ENCHANTSCROLLSDESC"],
+					get = function()
+						return Skillet.db.profile.enchant_scrolls
+					end,
+					set = function(self,value)
+						Skillet.db.profile.enchant_scrolls = value
+					end,
+					width = 1.5,
+					order = 35
 				},
 				include_tradebuttons = {
 					type = "toggle",
@@ -360,7 +373,7 @@ Skillet.options =
 						Skillet.db.profile.include_tradebuttons = value
 					end,
 					width = "full",
-					order = 35
+					order = 36
 				},
 				search_includes_reagents = {
 					type = "toggle",
@@ -374,7 +387,7 @@ Skillet.options =
 						Skillet.data.tooltipCache = {}
 					end,
 					width = "full",
-					order = 36
+					order = 37
 				},
 				use_guildbank_as_alt = {
 					hidden = isClassic,
@@ -389,7 +402,7 @@ Skillet.options =
 						Skillet:UpdateTradeSkillWindow()
 					end,
 					width = 1.5,
-					order = 37
+					order = 38
 				},
 				use_bank_as_alt = {
 					hidden = isClassic,
@@ -404,7 +417,7 @@ Skillet.options =
 						Skillet:UpdateTradeSkillWindow()
 					end,
 					width = 1.5,
-					order = 38
+					order = 39
 				},
 			}
 		},

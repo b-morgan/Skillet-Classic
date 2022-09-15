@@ -78,6 +78,7 @@ local defaults = {
 		ignore_change = false,							-- not in Classic
 		queue_crafts = false,
 		include_craftbuttons = true,
+		enchant_scrolls = false,
 		include_tradebuttons = true,
 		search_includes_reagents = true,
 		interrupt_clears_queue = false,
