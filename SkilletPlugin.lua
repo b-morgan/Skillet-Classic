@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Skillet.registeredPlugins = {}		-- plugins that have registered a function
 Skillet.updatePlugins = {}			-- each plugin will register if it has an Update function
-Skillet.processQueuePlugins = {}	-- each plugin will register if it has an ProcessQueue function
+Skillet.processQueuePlugins = {}	-- each plugin will register if it has a ProcessQueue function
 Skillet.displayDetailPlugins = {}	-- each plugin will register if it has a GetExtraText function
 Skillet.RecipeNamePrefixes = {}		-- each plugin will register, only one can be active
 Skillet.RecipeNameSuffixes = {}		-- each plugin will register, only one can be active
