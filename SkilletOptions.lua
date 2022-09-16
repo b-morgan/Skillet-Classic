@@ -350,6 +350,7 @@ Skillet.options =
 					order = 34
 				},
 				enchant_scrolls = {
+					hidden = isClassic,
 					type = "toggle",
 					name = L["ENCHANTSCROLLSNAME"],
 					desc = L["ENCHANTSCROLLSDESC"],
