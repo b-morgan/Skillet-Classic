@@ -314,9 +314,6 @@ function plugin.GetExtraText(skill, recipe)
 --
 	if recipe.tradeID == 7411 then
 		--DA.DEBUG(0,"GetExtraText: itemID= "..tostring(itemID)..", type= "..type(itemID))
-		if itemID then
-			itemID = Skillet.EnchantSpellToItem[itemID] or 0
-		end
 		if itemID == 0 then
 			--DA.DEBUG(0,"GetExtraText: recipe.name= "..tostring(recipe.name)..", recipe.spellID= "..tostring(recipe.spellID)..", recipe.scrollID= "..tostring(recipe.scrollID))
 			itemID = recipe.scrollID
@@ -457,9 +454,6 @@ function plugin.RecipeNameSuffix(skill, recipe)
 --
 	if recipe.tradeID == 7411 then
 		--DA.DEBUG(0,"RecipeNameSuffix: itemID= "..tostring(itemID)..", type= "..type(itemID))
-		if itemID then
-			itemID = Skillet.EnchantSpellToItem[itemID] or 0
-		end
 		if itemID == 0 then
 			--DA.DEBUG(0,"RecipeNameSuffix: recipe.name= "..tostring(recipe.name)..", recipe.spellID= "..tostring(recipe.spellID)..", recipe.scrollID= "..tostring(recipe.scrollID))
 			itemID = recipe.scrollID
@@ -591,9 +585,6 @@ function Skillet:AuctionatorSearch(whichOne)
 --
 -- Check for Enchanting and add the Enchant name if no item is produced.
 --
-		if recipe.tradeID == 7411 and itemID then
-			itemID = Skillet.EnchantSpellToItem[itemID] or 0
-		end
 		if itemID ~= 0 then
 			shoppingListName = GetItemInfo(itemID)
 		else

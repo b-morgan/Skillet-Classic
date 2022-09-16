@@ -175,9 +175,6 @@ function plugin.GetExtraText(skill, recipe)
 -- Check for Enchanting. Most recipes don't produce an item but
 -- we still should get reagent prices.
 --
-	if recipe.tradeID == 7411 and itemID then
-		itemID = Skillet.EnchantSpellToItem[itemID] or 0
-	end
 	if Skillet.db.profile.plugins.APS.enabled and itemID and Auctipus and Auctipus.API and Auctipus.API.GetAuctionBuyoutRange then
 		minBuyout, maxBuyout, daysElapsed = Auctipus.API.GetAuctionBuyoutRange(itemID)
 		local buyout = ( minBuyout or 0 ) * recipe.numMade
@@ -249,9 +246,6 @@ function plugin.RecipeNameSuffix(skill, recipe)
 -- Check for Enchanting. Most recipes don't produce an item but
 -- we still should get reagent prices.
 --
-	if recipe.tradeID == 7411 and itemID then
-		itemID = Skillet.EnchantSpellToItem[itemID] or 0
-	end
 	if Skillet.db.profile.plugins.APS.enabled and itemID and Auctipus and Auctipus.API and Auctipus.API.GetAuctionBuyoutRange then
 		minBuyout, maxBuyout, daysElapsed = Auctipus.API.GetAuctionBuyoutRange(itemID)
 		local buyout = ( minBuyout or 0 ) * recipe.numMade
