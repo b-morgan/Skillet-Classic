@@ -312,15 +312,16 @@ function plugin.GetExtraText(skill, recipe)
 --   In Classic Era, Most recipes don't produce an item but we still should get reagent prices.
 --   In Wrath, Enchants can be applied to vellum to produce scrolls so use the scroll price instead.
 --
-	if recipe.tradeID == 7411 then
-		--DA.DEBUG(0,"GetExtraText: itemID= "..tostring(itemID)..", type= "..type(itemID))
+	if Skillet.isCraft then
+		DA.DEBUG(0,"GetExtraText: itemID= "..tostring(itemID)..", type= "..type(itemID))
+		DA.DEBUG(0,"GetExtraText: recipe.name= "..tostring(recipe.name)..", recipe.spellID= "..tostring(recipe.spellID)..", recipe.scrollID= "..tostring(recipe.scrollID))
 		if itemID then
 			itemID = Skillet.EnchantSpellToItem[itemID] or 0
+			DA.DEBUG(0,"GetExtraText: Change via EnchantSpellToItem, itemID= "..tostring(itemID))
 		end
-		if itemID == 0 then
-			--DA.DEBUG(0,"GetExtraText: recipe.name= "..tostring(recipe.name)..", recipe.spellID= "..tostring(recipe.spellID)..", recipe.scrollID= "..tostring(recipe.scrollID))
-			itemID = recipe.scrollID
-		end
+	elseif recipe.tradeID == 7411 and itemID == 0 then
+		itemID = recipe.scrollID
+		DA.DEBUG(0,"GetExtraText: Change to scrollID, itemID= "..tostring(itemID))
 	end
 	if Skillet.db.profile.plugins.ATR.enabled and itemID then
 --
@@ -455,15 +456,16 @@ function plugin.RecipeNameSuffix(skill, recipe)
 -- Check for Enchanting. Most recipes don't produce an item but
 -- we still should get reagent prices.
 --
-	if recipe.tradeID == 7411 then
-		--DA.DEBUG(0,"RecipeNameSuffix: itemID= "..tostring(itemID)..", type= "..type(itemID))
+	if Skillet.isCraft then
+		DA.DEBUG(0,"RecipeNameSuffix: itemID= "..tostring(itemID)..", type= "..type(itemID))
+		DA.DEBUG(0,"RecipeNameSuffix: recipe.name= "..tostring(recipe.name)..", recipe.spellID= "..tostring(recipe.spellID)..", recipe.scrollID= "..tostring(recipe.scrollID))
 		if itemID then
 			itemID = Skillet.EnchantSpellToItem[itemID] or 0
+			DA.DEBUG(0,"RecipeNameSuffix: Change via EnchantSpellToItem, itemID= "..tostring(itemID))
 		end
-		if itemID == 0 then
-			--DA.DEBUG(0,"RecipeNameSuffix: recipe.name= "..tostring(recipe.name)..", recipe.spellID= "..tostring(recipe.spellID)..", recipe.scrollID= "..tostring(recipe.scrollID))
-			itemID = recipe.scrollID
-		end
+	elseif recipe.tradeID == 7411 and itemID == 0 then
+		itemID = recipe.scrollID
+		DA.DEBUG(0,"RecipeNameSuffix: Change to scrollID, itemID= "..tostring(itemID))
 	end
 	local itemName
 	if itemID then itemName = GetItemInfo(itemID) end
@@ -591,7 +593,7 @@ function Skillet:AuctionatorSearch(whichOne)
 --
 -- Check for Enchanting and add the Enchant name if no item is produced.
 --
-		if recipe.tradeID == 7411 and itemID then
+		if Skillet.isCraft and itemID then
 			itemID = Skillet.EnchantSpellToItem[itemID] or 0
 		end
 		if itemID ~= 0 then

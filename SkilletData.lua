@@ -276,7 +276,7 @@ end
 -- Enchants that produce items
 --
 Skillet.EnchantSpellToItem = {
-	[14923] = 11287 , -- Lesser Magic Wand
+	[14293] = 11287 , -- Lesser Magic Wand
 	[25124] = 20744 , -- Minor Wizard Oil
 	[14807] = 11288 , -- Greater Magic Wand
 	[25125] = 20745 , -- Minor Mana Oil
