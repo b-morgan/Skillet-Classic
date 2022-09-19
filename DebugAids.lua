@@ -65,6 +65,26 @@ function DA.CHAT(text)
 	print(DA.STATUS_COLOR..addonName..": "..text)
 end
 
+--
+-- If any logging is enabled, insert text into the debug log
+--
+function DA.MARK(text)
+	if DA.WarnLog or DA.DebugLogging or DA.TraceLog then
+		table.insert(DA.DebugLog,date().."(M): "..text)
+		if (table.getn(DA.DebugLog) > DA.MAXDEBUG) then
+			table.remove(DA.DebugLog,1)
+		end
+	end
+end
+
+--
+-- Print and MARK the text
+--
+function DA.MARK2(text)
+	print(text)
+	DA.MARK(text)
+end
+
 function DA.WARN(...)
 	if not DA.WarnLog and not DA.DebugLogging then return "" end
 	local text = ""
@@ -104,18 +124,6 @@ function DA.WARN(...)
 	table.insert(DA.DebugLog,date().."(W): "..text)
 	if (table.getn(DA.DebugLog) > DA.MAXDEBUG) then
 		table.remove(DA.DebugLog,1)
-	end
-end
-
---
--- If any logging is enabled, insert text into the debug log
---
-function DA.MARK(text)
-	if DA.WarnLog or DA.DebugLogging or DA.TraceLog then
-		table.insert(DA.DebugLog,date().."(M): "..text)
-		if (table.getn(DA.DebugLog) > DA.MAXDEBUG) then
-			table.remove(DA.DebugLog,1)
-		end
 	end
 end
 
