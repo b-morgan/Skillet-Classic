@@ -145,21 +145,6 @@ plugin.options =
 			end,
 			order = 7
 		},
-		exceptEnchanting = {
-			type = "toggle",
-			name = "exceptEnchanting",
-			desc = "Ignore useSearchExact for Enchanting",
-			get = function()
-				return Skillet.db.profile.plugins.ATR.exceptEnchanting
-			end,
-			set = function(self,value)
-				Skillet.db.profile.plugins.ATR.exceptEnchanting = value
-				if value then
-					Skillet.db.profile.plugins.ATR.exceptEnchanting = value
-				end
-			end,
-			order = 8
-		},
 		showProfitValue = {
 			type = "toggle",
 			name = "showProfitValue",
@@ -173,7 +158,7 @@ plugin.options =
 					Skillet.db.profile.plugins.ATR.showProfitValue = value
 				end
 			end,
-			order = 9
+			order = 8
 		},
 		showProfitPercentage = {
 			type = "toggle",
@@ -188,7 +173,7 @@ plugin.options =
 					Skillet.db.profile.plugins.ATR.showProfitPercentage = value
 				end
 			end,
-			order = 10
+			order = 9
 		},
 		colorCode = {
 			type = "toggle",
@@ -203,7 +188,7 @@ plugin.options =
 					Skillet.db.profile.plugins.ATR.colorCode = value
 				end
 			end,
-			order = 11
+			order = 10
 		},
 		alwaysEnchanting = {
 			type = "toggle",
@@ -218,7 +203,7 @@ plugin.options =
 					Skillet.db.profile.plugins.ATR.alwaysEnchanting = value
 				end
 			end,
-			order = 12
+			order = 11
 		},
 		calcProfitAhTax = {
 			type = "toggle",
@@ -233,7 +218,7 @@ plugin.options =
 					Skillet.db.profile.plugins.ATR.calcProfitAhTax = value
 				end
 			end,
-			order = 13,
+			order = 12,
 		},
 		buyFactor = {
 			type = "range",
@@ -591,7 +576,7 @@ function Skillet:AuctionatorSearch(whichOne)
 		end
 		local itemID = recipe.itemID
 --
--- Check for Enchanting and add the Enchant name if no item is produced.
+-- Check for Enchanting. For Wrath, Add the scroll for the enchant instead
 --
 		if Skillet.isCraft and itemID then
 			itemID = Skillet.EnchantSpellToItem[itemID] or 0
@@ -603,15 +588,17 @@ function Skillet:AuctionatorSearch(whichOne)
 		end
 		if (shoppingListName) then
 			if recipe.tradeID == 7411 and not Skillet.isCraft then
-				if Skillet.db.profile.plugins.ATR.useSearchExact and not Skillet.db.profile.plugins.ATR.exceptEnchanting then
-					table.insert (items, L["Scroll of"].." "..shoppingListName)
-				else
-					table.insert (items, shoppingListName)
+				if recipe.scrollID then
+					local scrollName = GetItemInfo(recipe.scrollID)
+					table.insert(items, scrollName)
 				end
 			else
-				table.insert (items, shoppingListName)
+				table.insert(items, shoppingListName)
 			end
 		end
+--
+-- Add the reagent names
+--
 		local i
 		for i=1,#recipe.reagentData do
 			local reagent = recipe.reagentData[i]
@@ -644,13 +631,8 @@ function Skillet:AuctionatorSearch(whichOne)
 		Atr_SelectPane(BUY_TAB)
 		Atr_SearchAH(shoppingListName, items)
 	elseif Skillet.db.profile.plugins.ATR.useSearchExact and Auctionator.API.v1.MultiSearchExact then
-		if recipe.tradeID == 7411 and Skillet.db.profile.plugins.ATR.exceptEnchanting then
-			DA.DEBUG(0, "AuctionatorSearch: addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
-			Auctionator.API.v1.MultiSearch(addonName, items)
-		else
-			DA.DEBUG(0, "AuctionatorSearch: (exact) addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
-			Auctionator.API.v1.MultiSearchExact(addonName, items)
-		end
+		DA.DEBUG(0, "AuctionatorSearch: (exact) addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
+		Auctionator.API.v1.MultiSearchExact(addonName, items)
 	elseif Auctionator.API.v1.MultiSearch then
 		DA.DEBUG(0, "AuctionatorSearch: addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
 		Auctionator.API.v1.MultiSearch(addonName, items)
