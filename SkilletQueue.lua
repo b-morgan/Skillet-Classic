@@ -568,13 +568,29 @@ function Skillet:UNIT_SPELLCAST_FAILED_QUIET(event, unit, castGUID, spellID)
 	self.castSpellName = GetSpellInfo(spellID)
 	DA.TRACE("tradeID= "..tostring(self.currentTrade)..", spellName= "..tostring(self.castSpellName)..", processingSpell= "..tostring(self.processingSpell))
 	if unit == "player" and self.processingSpell and self.processingSpell == self.castSpellName then
-		if TradeFrame:IsShown() then
+		if self.currentTrade == 7411 and TradeFrame:IsShown() then
 			DA.TRACE("TradeFrame:IsShown()")
+			self.tradeEnchant = true
 		else
 			Skillet:StopCast(self.castSpellName,false)
 		end
 	end
 end
+
+--
+-- Trade window close, the counts may need to be updated.
+-- This could be because an enchant has used up mats or the player
+-- may have received more mats.
+--
+function Skillet:TRADE_CLOSED()
+	DA.TRACE("TRADE_CLOSED()")
+	if self.currentTrade == 7411 and self.tradeEnchant then
+		self.tradeEnchant = false
+		Skillet:StopCast(self.castSpellName,true)
+	end
+	self:BAG_UPDATE("FAKE_BAG_UPDATE", 0)
+end
+
 
 function Skillet:UNIT_SPELLCAST_INTERRUPTED(event, unit, castGUID, spellID)
 	DA.TRACE("UNIT_SPELLCAST_INTERRUPTED("..tostring(unit)..", "..tostring(castGUID)..", "..tostring(spellID)..")")

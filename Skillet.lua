@@ -749,6 +749,7 @@ function Skillet:OnEnable()
 	self:RegisterEvent("TRADE_REQUEST_CANCEL")
 	self:RegisterEvent("TRADE_UPDATE");
 	self:RegisterEvent("TRADE_ACCEPT_UPDATE")
+
 --
 -- Debugging cleanup if enabled
 --
@@ -844,7 +845,7 @@ function Skillet:PLAYER_ENTERING_WORLD()
 end
 
 function Skillet:ADDON_ACTION_BLOCKED()
-	DA.TRACE("ADDON_ACTION_BLOCKED")
+	DA.TRACE("ADDON_ACTION_BLOCKED()")
 --	print("|cf0f00000Skillet-Classic|r: Combat lockdown restriction." ..
 --								  " Leave combat and try again.")
 --	self:HideAllWindows()
@@ -1286,20 +1287,20 @@ function Skillet:TRADE_MONEY_CHANGED()
 	DA.TRACE("TRADE_MONEY_CHANGED()")
 end
 
-function Skillet:TRADE_TARGET_ITEM_CHANGED()
-	DA.TRACE("TRADE_TARGET_ITEM_CHANGED()")
+function Skillet:TRADE_PLAYER_ITEM_CHANGED(event, tradeSlotIndex)
+	DA.TRACE("TRADE_PLAYER_ITEM_CHANGED( "..tostring(tradeSlotIndex).." )")
 end
 
-function Skillet:TRADE_PLAYER_ITEM_CHANGED()
-	DA.TRACE("TRADE_PLAYER_ITEM_CHANGED()")
+function Skillet:TRADE_TARGET_ITEM_CHANGED(event, tradeSlotIndex)
+	DA.TRACE("TRADE_TARGET_ITEM_CHANGED( "..tostring(tradeSlotIndex).." )")
 end
 
 function Skillet:TRADE_REPLACE_ENCHANT()
 	DA.TRACE("TRADE_REPLACE_ENCHANT()")
 end
 
-function Skillet:TRADE_POTENTIAL_BIND_ENCHANT()
-	DA.TRACE("TRADE_POTENTIAL_BIND_ENCHANT()")
+function Skillet:TRADE_POTENTIAL_BIND_ENCHANT(event, canBecomeBoundForTrade)
+	DA.TRACE("TRADE_POTENTIAL_BIND_ENCHANT( "..tostring(canBecomeBoundForTrade).." )")
 end
 
 function Skillet:TRADE_REQUEST()
@@ -1316,19 +1317,6 @@ end
 
 function Skillet:TRADE_ACCEPT_UPDATE()
 	DA.TRACE("TRADE_ACCEPT_UPDATE()")
-end
-
-function Skillet:TRADE_ACCEPT_UPDATE()
-	DA.TRACE("TRADE_ACCEPT_UPDATE()")
-end
-
---
--- Trade window close, the counts may need to be updated.
--- This could be because an enchant has used up mats or the player
--- may have received more mats.
---
-function Skillet:TRADE_CLOSED()
-	self:BAG_UPDATE("FAKE_BAG_UPDATE", 0)
 end
 
 local function indexBags()
