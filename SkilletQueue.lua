@@ -566,9 +566,13 @@ function Skillet:UNIT_SPELLCAST_FAILED_QUIET(event, unit, castGUID, spellID)
 	DA.TRACE("UNIT_SPELLCAST_FAILED_QUIET("..tostring(unit)..", "..tostring(castGUID)..", "..tostring(spellID)..")")
 	self.castSpellID = spellID
 	self.castSpellName = GetSpellInfo(spellID)
-	DA.TRACE("spellName= "..tostring(self.castSpellName)..", processingSpell= "..tostring(self.processingSpell))
+	DA.TRACE("tradeID= "..tostring(self.currentTrade)..", spellName= "..tostring(self.castSpellName)..", processingSpell= "..tostring(self.processingSpell))
 	if unit == "player" and self.processingSpell and self.processingSpell == self.castSpellName then
-		Skillet:StopCast(self.castSpellName,false)
+		if TradeFrame:IsShown() then
+			DA.TRACE("TradeFrame:IsShown()")
+		else
+			Skillet:StopCast(self.castSpellName,false)
+		end
 	end
 end
 

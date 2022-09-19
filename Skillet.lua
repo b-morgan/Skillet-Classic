@@ -705,7 +705,7 @@ function Skillet:OnEnable()
 	self:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
 	self:RegisterEvent("BANKFRAME_CLOSED")
 
-	if isBCC then
+	if not isClassic then
 		self:RegisterEvent("GUILDBANKFRAME_OPENED")
 		self:RegisterEvent("GUILDBANKBAGSLOTS_CHANGED")
 		self:RegisterEvent("GUILDBANKFRAME_CLOSED")
@@ -734,6 +734,21 @@ function Skillet:OnEnable()
 	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP")
 	self:RegisterEvent("UI_ERROR_MESSAGE")
 	self:RegisterEvent("UI_INFO_MESSAGE")
+--	self:RegisterEvent("GET_ITEM_INFO_RECEIVED");
+--
+-- more useful for debugging (for now)
+--
+	self:RegisterEvent("TRADE_SHOW");
+	self:RegisterEvent("TRADE_CLOSED")
+	self:RegisterEvent("TRADE_MONEY_CHANGED")
+	self:RegisterEvent("TRADE_TARGET_ITEM_CHANGED");
+	self:RegisterEvent("TRADE_PLAYER_ITEM_CHANGED")
+	self:RegisterEvent("TRADE_REPLACE_ENCHANT")
+	self:RegisterEvent("TRADE_POTENTIAL_BIND_ENCHANT");
+	self:RegisterEvent("TRADE_REQUEST")
+	self:RegisterEvent("TRADE_REQUEST_CANCEL")
+	self:RegisterEvent("TRADE_UPDATE");
+	self:RegisterEvent("TRADE_ACCEPT_UPDATE")
 --
 -- Debugging cleanup if enabled
 --
@@ -803,6 +818,7 @@ function Skillet:PLAYER_ENTERING_WORLD()
 	SkilletWho.wowBuild = wowBuild
 	SkilletWho.wowVersion = wowVersion
 	SkilletWho.guid = guid
+	SkilletWho.version = Skillet.version
 	if guid then
 		local kind, server, ID = strsplit("-", guid)
 		DA.DEBUG(1,"player="..tostring(player)..", faction="..tostring(faction)..", guid="..tostring(guid)..", server="..tostring(server))
@@ -1253,6 +1269,57 @@ function Skillet:UNIT_INVENTORY_CHANGED(event, unit)
 	if self.tradeSkillOpen then
 		self:AdjustInventory()
 	end
+end
+
+function Skillet:GET_ITEM_INFO_RECEIVED(event, itemID, success)
+	DA.TRACE("GET_ITEM_INFO_RECEIVED( "..tostring(itemID)..", "..tostring(success).." )")
+end
+
+--
+-- Trade window events (debugging only for now)
+--
+function Skillet:TRADE_SHOW()
+	DA.TRACE("TRADE_SHOW()")
+end
+
+function Skillet:TRADE_MONEY_CHANGED()
+	DA.TRACE("TRADE_MONEY_CHANGED()")
+end
+
+function Skillet:TRADE_TARGET_ITEM_CHANGED()
+	DA.TRACE("TRADE_TARGET_ITEM_CHANGED()")
+end
+
+function Skillet:TRADE_PLAYER_ITEM_CHANGED()
+	DA.TRACE("TRADE_PLAYER_ITEM_CHANGED()")
+end
+
+function Skillet:TRADE_REPLACE_ENCHANT()
+	DA.TRACE("TRADE_REPLACE_ENCHANT()")
+end
+
+function Skillet:TRADE_POTENTIAL_BIND_ENCHANT()
+	DA.TRACE("TRADE_POTENTIAL_BIND_ENCHANT()")
+end
+
+function Skillet:TRADE_REQUEST()
+	DA.TRACE("TRADE_REQUEST()")
+end
+
+function Skillet:TRADE_REQUEST_CANCEL()
+	DA.TRACE("TRADE_REQUEST_CANCEL()")
+end
+
+function Skillet:TRADE_UPDATE()
+	DA.TRACE("TRADE_UPDATE()")
+end
+
+function Skillet:TRADE_ACCEPT_UPDATE()
+	DA.TRACE("TRADE_ACCEPT_UPDATE()")
+end
+
+function Skillet:TRADE_ACCEPT_UPDATE()
+	DA.TRACE("TRADE_ACCEPT_UPDATE()")
 end
 
 --
