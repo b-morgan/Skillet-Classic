@@ -52,7 +52,7 @@ function Skillet:InventoryReagentCraftability(reagentID, playerOverride)
 					numCraftable = math.min(numCraftable, math.floor(numReagentCraftable/childReagent.numNeeded))
 					--DA.DEBUG(2,"numCraftable="..numCraftable)
 				end
-				numReagentsCrafted = numReagentsCrafted + numCraftable * childRecipe.numMade
+				numReagentsCrafted = numReagentsCrafted + numCraftable * (childRecipe.numMade or 1)
 				--DA.DEBUG(2,"numReagentsCrafted="..numReagentsCrafted)
 			end
 		end
