@@ -262,7 +262,7 @@ function Skillet:PrintSaved()
 			for qpos,command in pairs(queue) do
 				size = size + 1
 			end
-			print("name= "..tostring(name)..", size= "..tostring(size))
+			DA.MARK2("name= "..tostring(name)..", size= "..tostring(size))
 		end
 	end
 end
@@ -274,14 +274,14 @@ function Skillet:PrintQueue(name)
 	DA.DEBUG(0,"PrintQueue("..tostring(name)..")");
 	local queue
 	if name then
-		print("name= "..tostring(name))
+		DA.MARK2("name= "..tostring(name))
 		queue = self.db.profile.SavedQueues[name].queue
 	else
 		queue = self.db.realm.queueData[self.currentPlayer]
 	end
 	if queue then
 		for qpos,command in pairs(queue) do
-			print("qpos= "..tostring(qpos)..", skipped= "..tostring(self.skippedQueue[qpos])..", command= "..DA.DUMP1(command))
+			DA.MARK2("qpos= "..tostring(qpos)..", skipped= "..tostring(self.skippedQueue[qpos])..", command= "..DA.DUMP1(command))
 		end
 	end
 end
