@@ -531,7 +531,7 @@ function Skillet:PrintAuctionData()
 	if auctionData then
 		for itemID,count in pairs(auctionData) do
 			local itemName = GetItemInfo(itemID)
-			print("itemID= "..tostring(itemID).." ("..tostring(itemName).."), count= "..tostring(count))
+			DA.MARK2("itemID= "..tostring(itemID).." ("..tostring(itemName).."), count= "..tostring(count))
 		end
 	end
 end
