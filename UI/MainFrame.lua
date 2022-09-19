@@ -200,7 +200,7 @@ function Skillet:RestoreEnchantButton(show)
 end
 
 function Skillet:EnablePauseButton()
-	--DA.DEBUG(0,"EnablePauseButton()")
+	DA.DEBUG(0,"EnablePauseButton()")
 	if not self.isCraft then
 		SkilletStartQueueButton:Hide()
 		SkilletPauseQueueButton:Show()
@@ -209,7 +209,7 @@ function Skillet:EnablePauseButton()
 end
 
 function Skillet:DisablePauseButton()
-	--DA.DEBUG(0,"DisablePauseButton()")
+	DA.DEBUG(0,"DisablePauseButton()")
 	if not self.isCraft then
 		SkilletPauseQueueButton:Hide()
 		SkilletStartQueueButton:Show()
@@ -563,6 +563,9 @@ end
 function Skillet:ConfigureRecipeControls()
 	DA.DEBUG(0,"ConfigureRecipeControls()")
 	--DA.DEBUG(1,"ConfigureRecipeControls: build= "..tostring(Skillet.build)..", currentTrade= "..tostring(Skillet.currentTrade))
+	if self.queueCasting then
+		return
+	end
 	if Skillet.isCraft then
 		if Skillet.db.profile.queue_crafts then
 			SkilletQueueButton:Show()
