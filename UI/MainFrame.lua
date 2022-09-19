@@ -200,6 +200,7 @@ function Skillet:RestoreEnchantButton(show)
 end
 
 function Skillet:EnablePauseButton()
+	--DA.DEBUG(0,"EnablePauseButton()")
 	if not self.isCraft then
 		SkilletStartQueueButton:Hide()
 		SkilletPauseQueueButton:Show()
@@ -208,9 +209,10 @@ function Skillet:EnablePauseButton()
 end
 
 function Skillet:DisablePauseButton()
+	--DA.DEBUG(0,"DisablePauseButton()")
 	if not self.isCraft then
-		SkilletStartQueueButton:Show()
 		SkilletPauseQueueButton:Hide()
+		SkilletStartQueueButton:Show()
 	end
 end
 
@@ -618,6 +620,7 @@ function Skillet:ConfigureRecipeControls()
 		SkilletCreateAllButton:Show()
 		SkilletCreateButton:Show()
 		SkilletQueueParent:Show()
+		SkilletPauseQueueButton:Hide()
 		SkilletStartQueueButton:Show()
 		SkilletEmptyQueueButton:Show()
 		SkilletItemCountInputBox:Show()
