@@ -671,8 +671,8 @@ function Skillet:StopCast(spell, success)
 			end
 			if command.op == "iterate" then
 				command.count = command.count - 1
+				DA.DEBUG(0,"StopCast "..tostring(command.count))
 				if command.count < 1 then
-					DA.DEBUG(0,"StopCast "..tostring(command.count).." < 1")
 					self.queueCasting = false
 					self.processingSpell = nil
 					self.processingPosition = nil
