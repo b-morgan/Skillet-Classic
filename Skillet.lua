@@ -500,7 +500,6 @@ function Skillet:InitializeMissingVendorItems()
 		[4399]	= "Wooden Stock",
 		[3857]	= "Coal",
 		[52188] = "Jeweler's Setting",
-		[38682] = "Enchanting Vellum",
 	}
 end
 
@@ -1303,8 +1302,8 @@ function Skillet:TRADE_POTENTIAL_BIND_ENCHANT(event, canBecomeBoundForTrade)
 	DA.TRACE("TRADE_POTENTIAL_BIND_ENCHANT( "..tostring(canBecomeBoundForTrade).." )")
 end
 
-function Skillet:TRADE_REQUEST()
-	DA.TRACE("TRADE_REQUEST()")
+function Skillet:TRADE_REQUEST(event, name)
+	DA.TRACE("TRADE_REQUEST( "..tostring(name).." )")
 end
 
 function Skillet:TRADE_REQUEST_CANCEL()
@@ -1315,8 +1314,8 @@ function Skillet:TRADE_UPDATE()
 	DA.TRACE("TRADE_UPDATE()")
 end
 
-function Skillet:TRADE_ACCEPT_UPDATE()
-	DA.TRACE("TRADE_ACCEPT_UPDATE()")
+function Skillet:TRADE_ACCEPT_UPDATE(event, playerAccepted, targetAccepted)
+	DA.TRACE("TRADE_ACCEPT_UPDATE( "..tostring(playerAccepted)..", "..tostring(targetAccepted).." )")
 end
 
 local function indexBags()
