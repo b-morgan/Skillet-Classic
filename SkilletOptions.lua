@@ -360,8 +360,22 @@ Skillet.options =
 					set = function(self,value)
 						Skillet.db.profile.enchant_scrolls = value
 					end,
-					width = 1.5,
+					width = 1.0,
 					order = 35
+				},
+				use_higher_vellum = {
+					hidden = isClassic,
+					type = "toggle",
+					name = L["HIGHERVELLUMNAME"],
+					desc = L["HIGHERVELLUMDESC"],
+					get = function()
+						return Skillet.db.profile.use_higher_vellum
+					end,
+					set = function(self,value)
+						Skillet.db.profile.use_higher_vellum = value
+					end,
+					width = 1.0,
+					order = 36
 				},
 				include_tradebuttons = {
 					type = "toggle",
@@ -374,7 +388,7 @@ Skillet.options =
 						Skillet.db.profile.include_tradebuttons = value
 					end,
 					width = "full",
-					order = 36
+					order = 37
 				},
 				search_includes_reagents = {
 					type = "toggle",
@@ -388,7 +402,7 @@ Skillet.options =
 						Skillet.data.tooltipCache = {}
 					end,
 					width = "full",
-					order = 37
+					order = 38
 				},
 				use_guildbank_as_alt = {
 					hidden = isClassic,
@@ -403,7 +417,7 @@ Skillet.options =
 						Skillet:UpdateTradeSkillWindow()
 					end,
 					width = 1.5,
-					order = 38
+					order = 39
 				},
 				use_bank_as_alt = {
 					hidden = isClassic,
@@ -418,7 +432,7 @@ Skillet.options =
 						Skillet:UpdateTradeSkillWindow()
 					end,
 					width = 1.5,
-					order = 39
+					order = 40
 				},
 			}
 		},

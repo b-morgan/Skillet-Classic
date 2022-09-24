@@ -79,6 +79,7 @@ local defaults = {
 		queue_crafts = false,
 		include_craftbuttons = true,
 		enchant_scrolls = false,
+		use_higher_vellum = false,
 		include_tradebuttons = true,
 		search_includes_reagents = true,
 		interrupt_clears_queue = false,

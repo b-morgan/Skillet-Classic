@@ -310,19 +310,11 @@ Skillet.duplicateItemID = {
 -- can auto target (UseItemByName).
 --
 Skillet.TradeSkillAutoTarget = {
-	[7411] =  {	  -- Enchanting
-		[38682] = 1, -- Armor Vellum
-		[37602] = 1, -- Armor Vellum II
-		[43145] = 1, -- Armor Vellum III
-		[39349] = 1, -- Weapon Vellum
-		[39350] = 1, -- Weapon Vellum II
-		[43146] = 1, -- Weapon Vellum III
-	},
-	[31252] = {	  -- Prospecting
-		[2770]	= 5, --Copper Ore
-		[2771]	= 5, --Tin Ore
-		[2772]	= 5, --Iron Ore
-		[3858]	= 5, --Mithril Ore
+	[31252] = {  -- Prospecting
+		[2770] = 5, --Copper Ore
+		[2771] = 5, --Tin Ore
+		[2772] = 5, --Iron Ore
+		[3858] = 5, --Mithril Ore
 		[10620] = 5, --Thorium Ore
 		[23424] = 5, --Fel Iron Ore
 		[23425] = 5, --Adamantite Ore
@@ -344,13 +336,13 @@ Skillet.TradeSkillAutoTarget = {
 		[171831] = 5, -- Phaedrum Ore
 		[171832] = 5, -- Sinvyr Ore
 	},
-	[51005] = {	  -- Milling
-		[765]  = 5, -- Silverleaf
+	[51005] = {  -- Milling
+		[765] = 5, -- Silverleaf
+		[785] = 5, -- Mageroyal
 		[2449] = 5, -- Earthroot
 		[2447] = 5, -- Peacebloom
 		[2450] = 5, -- Briarthorn
 		[2453] = 5, -- Bruiseweed
-		[785]  = 5, -- Mageroyal
 		[3820] = 5, -- Stranglekelp
 		[2452] = 5, -- Swiftthistle
 		[3355] = 5, -- Wild Steelbloom
@@ -392,22 +384,49 @@ Skillet.TradeSkillAutoTarget = {
 		[36906] = 5, -- Icethorn
 		[36903] = 5, -- Adder\'s Tongue
 		[39970] = 5, -- Fire Leaf
-	}
+	},
+	[7411] =  {  -- Enchanting
+		[38682] = 1, -- Armor Vellum
+		[37602] = 1, -- Armor Vellum II
+		[43145] = 1, -- Armor Vellum III
+		[39349] = 1, -- Weapon Vellum
+		[39350] = 1, -- Weapon Vellum II
+		[43146] = 1, -- Weapon Vellum III
+	},
 }
 
 local defaultVellum = 38682
+Skillet.subVellum = {
+		[38682] = {37602, 43145}, -- Armor Vellum
+		[37602] = {43145}, -- Armor Vellum II
+		[39349] = {39350, 43146}, -- Weapon Vellum
+		[39350] = {43146}, -- Weapon Vellum II
+}
+
 local lastAutoTarget = {}
 function Skillet:GetAutoTargetItem(tradeID, spellID)
 	DA.DEBUG(0,"GetAutoTargetItem("..tostring(tradeID)..", "..tostring(spellID)..")")
 	local itemID, limit, count
 	if self.TradeSkillAutoTarget[tradeID] then
 		if not Skillet.isCraft and tradeID == 7411 then
-			itemID = Skillet.vellumData[spellID] or defaultVellum
-			DA.DEBUG(1,"GetAutoTargetItem: itemID= "..tostring(itemID))
-			limit	 = self.TradeSkillAutoTarget[tradeID][itemID]
+			itemID = self.vellumData[spellID] or defaultVellum
+			limit = self.TradeSkillAutoTarget[tradeID][itemID]
 			count = GetItemCount(itemID)
 			if count >= limit then
+				DA.DEBUG(1,"GetAutoTargetItem: itemID= "..tostring(itemID).." ("..tostring(GetItemInfo(itemID))..")")
 				return itemID
+			else
+				DA.DEBUG(1,"GetAutoTargetItem: need itemID= "..tostring(itemID).." ("..tostring(GetItemInfo(itemID))..")")
+				if self.db.profile.use_higher_vellum and self.subVellum[itemID] then
+					for i=1,#self.subVellum[itemID],1 do
+						local subItem = self.subVellum[itemID][i]
+						count = GetItemCount(subItem)
+						if count >= limit then
+							DA.DEBUG(1,"GetAutoTargetItem: found itemID= "..tostring(subItem).." ("..tostring(GetItemInfo(subItem))..")")
+							return subItem
+						end
+					end
+				end
 			end
 		else
 			itemID = lastAutoTarget[tradeID]
@@ -758,7 +777,7 @@ end
 -- is defined after this one
 --
 local function ScanTrade()
-	DA.DEBUG(2,"ScanTrade()")
+	DA.DEBUG(0,"ScanTrade()")
 	local profession, rank, maxRank
 	local numSkills, numCrafts
 	if Skillet.isCraft then
@@ -768,7 +787,7 @@ local function ScanTrade()
 		profession, rank, maxRank = GetTradeSkillLine()
 		numSkills = GetNumTradeSkills()
 	end
-	DA.DEBUG(2,"ScanTrade: profession= "..tostring(profession)..", rank= "..tostring(rank)..", maxRank= "..tostring(maxRank)..", numCrafts= "..tostring(numCrafts)..", numSkills= "..tostring(numSkills))
+	--DA.DEBUG(2,"ScanTrade: profession= "..tostring(profession)..", rank= "..tostring(rank)..", maxRank= "..tostring(maxRank)..", numCrafts= "..tostring(numCrafts)..", numSkills= "..tostring(numSkills))
 	if profession == "UNKNOWN" then
 		return false
 	end
@@ -783,10 +802,10 @@ local function ScanTrade()
 -- First, loop through all the recipe groups and make sure they are expanded
 --
 	if numSkills then
-		DA.DEBUG(2,"ScanTrade: Expanding Tradeskill Groups")
+		--DA.DEBUG(2,"ScanTrade: Expanding Tradeskill Groups")
 		for i = 1, numSkills do
 			local skillName, skillType, numAvailable, isExpanded = GetTradeSkillInfo(i)
-			DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
+			--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
 			if skillType == "header" or skillType == "subheader" then
 				if not isExpanded then
 					ExpandTradeSkillSubClass(i)
@@ -795,7 +814,7 @@ local function ScanTrade()
 		end
 	end
 	if numCrafts then
-		DA.DEBUG(2,"ScanTrade: Expanding Craft Groups")
+		--DA.DEBUG(2,"ScanTrade: Expanding Craft Groups")
 		for i = 1, numCrafts do
 			local skillName, skillType, numAvailable, isExpanded = GetCraftInfo(i)
 			DA.DEBUG(2,"ScanCraft: i= "..tostring(i)..", skillName= "..tostring(skillName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
@@ -810,7 +829,7 @@ local function ScanTrade()
 --
 -- From here on, just one loop variable needed
 --
-	DA.DEBUG(2,"ScanTrade: "..tostring(profession)..": "..tostring(tradeID).." "..numSkills.." recipes")
+	--DA.DEBUG(2,"ScanTrade: "..tostring(profession)..": "..tostring(tradeID).." "..numSkills.." recipes")
 	if not Skillet.db.global.recipeDB[tradeID] then
 		Skillet.db.global.recipeDB[tradeID] = {}
 	end
@@ -897,7 +916,7 @@ local function ScanTrade()
 		else
 			skillName, skillType, numAvailable, isExpanded = GetTradeSkillInfo(i)
 		end
-		DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", craftSubSpellName= "..tostring(craftSubSpellName)..", skillType="..tostring(skillType)..", numAvailable= "..tostring(numAvailable)..", isExpanded= "..tostring(isExpanded))
+		--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", craftSubSpellName= "..tostring(craftSubSpellName)..", skillType="..tostring(skillType)..", numAvailable= "..tostring(numAvailable)..", isExpanded= "..tostring(isExpanded))
 		if skillName then
 			if skillType == "header" or skillType == "subheader" then
 --
@@ -932,7 +951,7 @@ local function ScanTrade()
 				local recipeID
 				recipeID = skillName
 				if skillNameSeen[recipeID] then
-					DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", craftSubSpellName= "..tostring(craftSubSpellName).." is not unique")
+					--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", craftSubSpellName= "..tostring(craftSubSpellName).." is not unique")
 --
 -- Make an attempt to create a unique recipeID
 --
@@ -1006,7 +1025,7 @@ local function ScanTrade()
 						skillDBString = skillDBString.."@t="..toolString
 					end
 				end
-				DA.DEBUG(2,"ScanTrade: skillDB["..tostring(i).."] ("..tostring(recipeID)..") = "..tostring(skillDBString))
+				--DA.DEBUG(2,"ScanTrade: skillDB["..tostring(i).."] ("..tostring(recipeID)..") = "..tostring(skillDBString))
 				skillDB[i] = skillDBString
 				Skillet.data.skillIndexLookup[player][recipeID] = i
 				Skillet.data.recipeList[recipeID] = {}
@@ -1118,7 +1137,7 @@ local function ScanTrade()
 				else
 					numReagents = GetTradeSkillNumReagents(i)
 				end
-				DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", numReagents= "..tostring(numReagents))
+				--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", numReagents= "..tostring(numReagents))
 				for j=1, numReagents, 1 do
 					local reagentName, _, numNeeded
 					if Skillet.isCraft then
@@ -1126,7 +1145,7 @@ local function ScanTrade()
 					else
 						reagentName, _, numNeeded = GetTradeSkillReagentInfo(i,j)
 					end
-					DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", j= "..tostring(j)..", reagentName= "..tostring(reagentName)..", numNeeded= "..tostring(numNeeded))
+					--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", j= "..tostring(j)..", reagentName= "..tostring(reagentName)..", numNeeded= "..tostring(numNeeded))
 					local reagentID = 0
 					if reagentName then
 						local reagentLink
@@ -1135,7 +1154,7 @@ local function ScanTrade()
 						else
 							reagentLink = GetTradeSkillReagentItemLink(i,j)
 						end
-						DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", reagentLink= "..DA.PLINK(reagentLink))
+						--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", reagentLink= "..DA.PLINK(reagentLink))
 						reagentID = Skillet:GetItemIDFromLink(reagentLink)
 					else
 						gotNil = true
