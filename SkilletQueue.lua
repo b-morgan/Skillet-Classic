@@ -54,7 +54,6 @@ end
 --
 -- This is the simplest command:  iterate recipeID x count
 -- Given the tradeID and the recipeID (currently the recipe name)
--- the skillIndex can be calculated so it doesn't need to be saved.
 --
 function Skillet:QueueCommandIterate(recipeID, count)
 	DA.DEBUG(0,"QueueCommandIterate("..tostring(recipeID)..", "..tostring(count)..") currentTrade= "..tostring(self.currentTrade))
@@ -68,6 +67,7 @@ function Skillet:QueueCommandIterate(recipeID, count)
 	newCommand.tradeName = tradeName or ""
 	newCommand.recipeIndex = recipeIndex or 0
 	newCommand.count = count or 0
+	newCommand.spellID = recipe.spellID
 	return newCommand
 end
 
@@ -359,6 +359,7 @@ function Skillet:ProcessQueue(altMode)
 			self.queueCasting = true
 			DA.DEBUG(1,"command= "..DA.DUMP1(command)..", currentTrade= "..tostring(currentTrade))
 			local recipeID = command.recipeID
+			local spellID = command.spellID
 			local tradeID = command.tradeID
 			local tradeName = command.tradeName
 			local recipeIndex = command.recipeIndex
@@ -407,10 +408,10 @@ function Skillet:ProcessQueue(altMode)
 				DoTradeSkill(recipeIndex, count)
 			end
 --
--- if alt down/right click - auto use items / like vellums (not implemented in Classic)
+-- if alt down/right click - auto use items / like vellums
 --
 			if altMode then
-				local itemID = Skillet:GetAutoTargetItem(tradeID)
+				local itemID = Skillet:GetAutoTargetItem(tradeID, spellID)
 				if itemID then
 					DA.DEBUG(0,"UseItemByName("..tostring(itemID)..")")
 					UseItemByName(itemID)

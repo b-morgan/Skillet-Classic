@@ -14,12 +14,23 @@ end
 -- The following function can be used (/run Skillet:CountEnchants()) to check for missing items
 -- in either Skillet's or TradeSkillMaster's table of enchant recipe IDs to enchant (scroll) item IDs
 --
-function Skillet:CountEnchants()
-	local i,j = 0,0
-	local missing_scrollData2 = {}
-	local wrong_scrollData2 = {}
+function Skillet:CountEnchants(clear)
+	if clear then
+		Skillet.db.global.missing_scrollData = nil
+		Skillet.db.global.missing_scrollData2 = nil
+		Skillet.db.global.missing_vellumData2 = nil
+		Skillet.db.global.wrong_scrollData = nil
+		Skillet.db.global.wrong_scrollData2 = nil
+		Skillet.db.global.vellum_by_enchant = vellum_by_enchant
+		return
+	end
+	local i,j,k,m = 0,0,0,0
 	local missing_scrollData = {}
 	local wrong_scrollData = {}
+	local missing_scrollData2 = {}
+	local wrong_scrollData2 = {}
+	local missing_vellumData2 = {}
+	local vellum_by_enchant = {}
 	for rid,eid in pairs(Skillet.scrollData) do
 		i = i + 1
 		if not Skillet.scrollData2[rid] then
@@ -35,25 +46,35 @@ function Skillet:CountEnchants()
 		elseif Skillet.scrollData[rid] ~= eid then
 			table.insert(wrong_scrolldata, rid)
 		end
+		if not Skillet.vellumData2[rid] then
+			table.insert(missing_vellumData2, rid)
+		end
 	end
-	DA.CHAT("-----")
-	DA.CHAT("scrollData count= "..tostring(i)..", missing= "..DA.DUMP1(missing_scrollData))
-	DA.CHAT("scrollData wrong= "..DA.DUMP1(wrong_scrollData))
-	DA.CHAT("-----")
-	DA.CHAT("scrollData2 count= "..tostring(j)..", missing= "..DA.DUMP1(missing_scrollData2))
-	DA.CHAT("scrollData2 wrong= "..DA.DUMP1(wrong_scrollData2))
-	DA.CHAT("-----")
+	for rid,eid in pairs(Skillet.vellumData2) do
+		k = k + 1
+		if not vellum_by_enchant[eid] then
+			m = m + 1
+			vellum_by_enchant[eid] = {}
+		end
+		table.insert(vellum_by_enchant[eid],rid)
+	end
+	DA.MARK2("-----")
+	DA.MARK2("scrollData count= "..tostring(i)..", missing= "..tostring(#missing_scrollData)..", "..DA.DUMP1(missing_scrollData))
+	DA.MARK2("scrollData wrong= "..DA.DUMP1(wrong_scrollData))
+	DA.MARK2("-----")
+--	DA.MARK2("scrollData2 count= "..tostring(j)..", missing= "..tostring(#missing_scrollData2)..", "..DA.DUMP1(missing_scrollData2))
+	DA.MARK2("scrollData2 count= "..tostring(j)..", missing= "..tostring(#missing_scrollData2))
+	DA.MARK2("scrollData2 wrong= "..DA.DUMP1(wrong_scrollData2))
+	DA.MARK2("-----")
+	DA.MARK2("vellumData2 count= "..tostring(k)..", missing= "..tostring(#missing_vellumData2)..", "..DA.DUMP1(missing_vellumData2))
+	DA.MARK2("vellum_by_enchant count= "..tostring(m))
+	DA.MARK2("-----")
 	Skillet.db.global.missing_scrollData = missing_scrollData
 	Skillet.db.global.missing_scrollData2 = missing_scrollData2
+	Skillet.db.global.missing_vellumData2 = missing_vellumData2
 	Skillet.db.global.wrong_scrollData = wrong_scrollData
 	Skillet.db.global.wrong_scrollData2 = wrong_scrollData2
-end
-
-function Skillet:ClearMissingScrolls()
-	Skillet.db.global.missing_scrollData = nil
-	Skillet.db.global.missing_scrollData2 = nil
-	Skillet.db.global.wrong_scrollData = nil
-	Skillet.db.global.wrong_scrollData2 = nil
+	Skillet.db.global.vellum_by_enchant = vellum_by_enchant
 end
 
 Skillet.scrollData2 = {
@@ -316,4 +337,266 @@ Skillet.scrollData2 = {
 	[64441] = 46026,        -- Scroll of Enchant Weapon - Blade Ward
 	[64579] = 46098,        -- Scroll of Enchant Weapon - Blood Draining
 	[71692] = 50816,        -- Scroll of Enchant Gloves - Angler
+}
+
+Skillet.vellumData2 = {
+	[7418] = 38682, -- Enchant Bracer - Minor Health
+	[7420] = 38682, -- Enchant Chest - Minor Health
+	[7426] = 38682, -- Enchant Chest - Minor Absorption
+	[7428] = 38682, -- Enchant Bracer - Minor Deflection
+	[7443] = 38682, -- Enchant Chest - Minor Mana
+	[7454] = 38682, -- Enchant Cloak - Minor Resistance
+	[7457] = 38682, -- Enchant Bracer - Minor Stamina
+	[7745] = 39349, -- Enchant 2H Weapon - Minor Impact
+	[7748] = 38682, -- Enchant Chest - Lesser Health
+	[7766] = 38682, -- Enchant Bracer - Minor Spirit
+	[7771] = 38682, -- Enchant Cloak - Minor Protection
+	[7776] = 38682, -- Enchant Chest - Lesser Mana
+	[7779] = 38682, -- Enchant Bracer - Minor Agility
+	[7782] = 38682, -- Enchant Bracer - Minor Strength
+	[7786] = 39349, -- Enchant Weapon - Minor Beastslayer
+	[7788] = 39349, -- Enchant Weapon - Minor Striking
+	[7793] = 39349, -- Enchant 2H Weapon - Lesser Intellect
+	[7857] = 38682, -- Enchant Chest - Health
+	[7859] = 38682, -- Enchant Bracer - Lesser Spirit
+	[7861] = 38682, -- Enchant Cloak - Lesser Fire Resistance
+	[7863] = 38682, -- Enchant Boots - Minor Stamina
+	[7867] = 38682, -- Enchant Boots - Minor Agility
+	[13378] = 38682, -- Enchant Shield - Minor Stamina
+	[13380] = 39349, -- Enchant 2H Weapon - Lesser Spirit
+	[13419] = 38682, -- Enchant Cloak - Minor Agility
+	[13421] = 38682, -- Enchant Cloak - Lesser Protection
+	[13464] = 38682, -- Enchant Shield - Lesser Protection
+	[13485] = 38682, -- Enchant Shield - Lesser Spirit
+	[13501] = 38682, -- Enchant Bracer - Lesser Stamina
+	[13503] = 39349, -- Enchant Weapon - Lesser Striking
+	[13522] = 38682, -- Enchant Cloak - Lesser Shadow Resistance
+	[13529] = 39349, -- Enchant 2H Weapon - Lesser Impact
+	[13536] = 38682, -- Enchant Bracer - Lesser Strength
+	[13538] = 38682, -- Enchant Chest - Lesser Absorption
+	[13607] = 38682, -- Enchant Chest - Mana
+	[13612] = 38682, -- Enchant Gloves - Mining
+	[13617] = 38682, -- Enchant Gloves - Herbalism
+	[13620] = 38682, -- Enchant Gloves - Fishing
+	[13622] = 38682, -- Enchant Bracer - Lesser Intellect
+	[13626] = 38682, -- Enchant Chest - Minor Stats
+	[13631] = 38682, -- Enchant Shield - Lesser Stamina
+	[13635] = 38682, -- Enchant Cloak - Defense
+	[13637] = 38682, -- Enchant Boots - Lesser Agility
+	[13640] = 38682, -- Enchant Chest - Greater Health
+	[13642] = 38682, -- Enchant Bracer - Spirit
+	[13644] = 38682, -- Enchant Boots - Lesser Stamina
+	[13646] = 38682, -- Enchant Bracer - Lesser Deflection
+	[13648] = 38682, -- Enchant Bracer - Stamina
+	[13653] = 39349, -- Enchant Weapon - Lesser Beastslayer
+	[13655] = 39349, -- Enchant Weapon - Lesser Elemental Slayer
+	[13657] = 38682, -- Enchant Cloak - Fire Resistance
+	[13659] = 38682, -- Enchant Shield - Spirit
+	[13661] = 38682, -- Enchant Bracer - Strength
+	[13663] = 38682, -- Enchant Chest - Greater Mana
+	[13687] = 38682, -- Enchant Boots - Lesser Spirit
+	[13689] = 38682, -- Enchant Shield - Lesser Block
+	[13693] = 39349, -- Enchant Weapon - Striking
+	[13695] = 39349, -- Enchant 2H Weapon - Impact
+	[13698] = 38682, -- Enchant Gloves - Skinning
+	[13700] = 38682, -- Enchant Chest - Lesser Stats
+	[13746] = 38682, -- Enchant Cloak - Greater Defense
+	[13794] = 38682, -- Enchant Cloak - Resistance
+	[13815] = 38682, -- Enchant Gloves - Agility
+	[13817] = 38682, -- Enchant Shield - Stamina
+	[13822] = 38682, -- Enchant Bracer - Intellect
+	[13836] = 38682, -- Enchant Boots - Stamina
+	[13841] = 38682, -- Enchant Gloves - Advanced Mining
+	[13846] = 38682, -- Enchant Bracer - Greater Spirit
+	[13858] = 38682, -- Enchant Chest - Superior Health
+	[13868] = 38682, -- Enchant Gloves - Advanced Herbalism
+	[13882] = 38682, -- Enchant Cloak - Lesser Agility
+	[13887] = 38682, -- Enchant Gloves - Strength
+	[13890] = 38682, -- Enchant Boots - Minor Speed
+	[13898] = 39349, -- Enchant Weapon - Fiery Weapon
+	[13905] = 38682, -- Enchant Shield - Greater Spirit
+	[13915] = 39349, -- Enchant Weapon - Demonslaying
+	[13917] = 38682, -- Enchant Chest - Superior Mana
+	[13931] = 38682, -- Enchant Bracer - Deflection
+	[13933] = 38682, -- Enchant Shield - Frost Resistance
+	[13935] = 38682, -- Enchant Boots - Agility
+	[13937] = 39349, -- Enchant 2H Weapon - Greater Impact
+	[13939] = 38682, -- Enchant Bracer - Greater Strength
+	[13941] = 38682, -- Enchant Chest - Stats
+	[13943] = 39349, -- Enchant Weapon - Greater Striking
+	[13945] = 38682, -- Enchant Bracer - Greater Stamina
+	[13947] = 38682, -- Enchant Gloves - Riding Skill
+	[13948] = 38682, -- Enchant Gloves - Minor Haste
+	[20008] = 38682, -- Enchant Bracer - Greater Intellect
+	[20009] = 38682, -- Enchant Bracer - Superior Spirit
+	[20010] = 38682, -- Enchant Bracer - Superior Strength
+	[20011] = 38682, -- Enchant Bracer - Superior Stamina
+	[20012] = 38682, -- Enchant Gloves - Greater Agility
+	[20013] = 38682, -- Enchant Gloves - Greater Strength
+	[20014] = 38682, -- Enchant Cloak - Greater Resistance
+	[20015] = 38682, -- Enchant Cloak - Superior Defense
+	[20016] = 38682, -- Enchant Shield - Vitality
+	[20017] = 38682, -- Enchant Shield - Greater Stamina
+	[20020] = 38682, -- Enchant Boots - Greater Stamina
+	[20023] = 38682, -- Enchant Boots - Greater Agility
+	[20024] = 38682, -- Enchant Boots - Spirit
+	[20025] = 38682, -- Enchant Chest - Greater Stats
+	[20026] = 38682, -- Enchant Chest - Major Health
+	[20028] = 38682, -- Enchant Chest - Major Mana
+	[20029] = 39349, -- Enchant Weapon - Icy Chill
+	[20030] = 39349, -- Enchant 2H Weapon - Superior Impact
+	[20031] = 39349, -- Enchant Weapon - Superior Striking
+	[20032] = 39349, -- Enchant Weapon - Lifestealing
+	[20033] = 39349, -- Enchant Weapon - Unholy Weapon
+	[20034] = 39349, -- Enchant Weapon - Crusader
+	[20035] = 39349, -- Enchant 2H Weapon - Major Spirit
+	[20036] = 39349, -- Enchant 2H Weapon - Major Intellect
+	[21931] = 39349, -- Enchant Weapon - Winter's Might
+	[22749] = 39349, -- Enchant Weapon - Spellpower
+	[22750] = 39349, -- Enchant Weapon - Healing Power
+	[23799] = 39349, -- Enchant Weapon - Strength
+	[23800] = 39349, -- Enchant Weapon - Agility
+	[23801] = 38682, -- Enchant Bracer - Mana Regeneration
+	[23802] = 38682, -- Enchant Bracer - Healing Power
+	[23803] = 39349, -- Enchant Weapon - Mighty Spirit
+	[23804] = 39349, -- Enchant Weapon - Mighty Intellect
+	[25072] = 38682, -- Enchant Gloves - Threat
+	[25073] = 38682, -- Enchant Gloves - Shadow Power
+	[25074] = 38682, -- Enchant Gloves - Frost Power
+	[25078] = 38682, -- Enchant Gloves - Fire Power
+	[25079] = 38682, -- Enchant Gloves - Healing Power
+	[25080] = 38682, -- Enchant Gloves - Superior Agility
+	[25081] = 38682, -- Enchant Cloak - Greater Fire Resistance
+	[25082] = 38682, -- Enchant Cloak - Greater Nature Resistance
+	[25083] = 38682, -- Enchant Cloak - Stealth
+	[25084] = 38682, -- Enchant Cloak - Subtlety
+	[25086] = 37602, -- Enchant Cloak - Dodge
+	[27837] = 39349, -- Enchant 2H Weapon - Agility
+	[27899] = 37602, -- Enchant Bracer - Brawn
+	[27905] = 37602, -- Enchant Bracer - Stats
+	[27906] = 37602, -- Enchant Bracer - Major Defense
+	[27911] = 37602, -- Enchant Bracer - Superior Healing
+	[27913] = 37602, -- Enchant Bracer - Restore Mana Prime
+	[27914] = 37602, -- Enchant Bracer - Fortitude
+	[27917] = 37602, -- Enchant Bracer - Spellpower
+	[27944] = 37602, -- Enchant Shield - Tough Shield
+	[27945] = 37602, -- Enchant Shield - Intellect
+	[27946] = 37602, -- Enchant Shield - Shield Block
+	[27947] = 37602, -- Enchant Shield - Resistance
+	[27948] = 37602, -- Enchant Boots - Vitality
+	[27950] = 37602, -- Enchant Boots - Fortitude
+	[27951] = 37602, -- Enchant Boots - Dexterity
+	[27954] = 37602, -- Enchant Boots - Surefooted
+	[27957] = 37602, -- Enchant Chest - Exceptional Health
+	[27958] = 43145, -- Enchant Chest - Exceptional Mana
+	[27960] = 37602, -- Enchant Chest - Exceptional Stats
+	[27961] = 37602, -- Enchant Cloak - Major Armor
+	[27962] = 37602, -- Enchant Cloak - Major Resistance
+	[27967] = 39350, -- Enchant Weapon - Major Striking
+	[27968] = 39350, -- Enchant Weapon - Major Intellect
+	[27971] = 39350, -- Enchant 2H Weapon - Savagery
+	[27972] = 39350, -- Enchant Weapon - Potency
+	[27975] = 39350, -- Enchant Weapon - Major Spellpower
+	[27977] = 39350, -- Enchant 2H Weapon - Major Agility
+	[27981] = 39350, -- Enchant Weapon - Sunfire
+	[27982] = 39350, -- Enchant Weapon - Soulfrost
+	[27984] = 39350, -- Enchant Weapon - Mongoose
+	[28003] = 39350, -- Enchant Weapon - Spellsurge
+	[28004] = 39350, -- Enchant Weapon - Battlemaster
+	[33990] = 37602, -- Enchant Chest - Major Spirit
+	[33991] = 37602, -- Enchant Chest - Restore Mana Prime
+	[33992] = 37602, -- Enchant Chest - Major Resilience
+	[33993] = 37602, -- Enchant Gloves - Blasting
+	[33994] = 37602, -- Enchant Gloves - Precise Strikes
+	[33995] = 37602, -- Enchant Gloves - Major Strength
+	[33996] = 37602, -- Enchant Gloves - Assault
+	[33997] = 37602, -- Enchant Gloves - Major Spellpower
+	[33999] = 37602, -- Enchant Gloves - Major Healing
+	[34001] = 37602, -- Enchant Bracer - Major Intellect
+	[34002] = 37602, -- Enchant Bracer - Assault
+	[34003] = 37602, -- Enchant Cloak - Spell Penetration
+	[34004] = 37602, -- Enchant Cloak - Greater Agility
+	[34005] = 37602, -- Enchant Cloak - Greater Arcane Resistance
+	[34006] = 37602, -- Enchant Cloak - Greater Shadow Resistance
+	[34007] = 37602, -- Enchant Boots - Cat's Swiftness
+	[34008] = 37602, -- Enchant Boots - Boar's Speed
+	[34009] = 37602, -- Enchant Shield - Major Stamina
+	[34010] = 39350, -- Enchant Weapon - Major Healing
+	[42620] = 39350, -- Enchant Weapon - Greater Agility
+	[42974] = 43146, -- Enchant Weapon - Executioner
+	[44383] = 37602, -- Enchant Shield - Resilience
+	[44483] = 43145, -- Enchant Cloak - Superior Frost Resistance
+	[44484] = 43145, -- Enchant Gloves - Expertise
+	[44488] = 43145, -- Enchant Gloves - Precision
+	[44489] = 43145, -- Enchant Shield - Defense
+	[44492] = 43145, -- Enchant Chest - Mighty Health
+	[44494] = 43145, -- Enchant Cloak - Superior Nature Resistance
+	[44500] = 43145, -- Enchant Cloak - Superior Agility
+	[44506] = 43145, -- Enchant Gloves - Gatherer
+	[44508] = 43145, -- Enchant Boots - Greater Spirit
+	[44509] = 43145, -- Enchant Chest - Greater Mana Restoration
+	[44510] = 43146, -- Enchant Weapon - Exceptional Spirit
+	[44513] = 43145, -- Enchant Gloves - Greater Assault
+	[44524] = 43146, -- Enchant Weapon - Icebreaker
+	[44528] = 43145, -- Enchant Boots - Greater Fortitude
+	[44529] = 43145, -- Enchant Gloves - Major Agility
+	[44555] = 43145, -- Enchant Bracers - Exceptional Intellect
+	[44556] = 43145, -- Enchant Cloak - Superior Fire Resistance
+	[44575] = 43145, -- Enchant Bracers - Greater Assault
+	[44576] = 43146, -- Enchant Weapon - Lifeward
+	[44582] = 43145, -- Enchant Cloak - Spell Piercing
+	[44584] = 43145, -- Enchant Boots - Greater Vitality
+	[44588] = 43145, -- Enchant Chest - Exceptional Resilience
+	[44589] = 43145, -- Enchant Boots - Superior Agility
+	[44590] = 43145, -- Enchant Cloak - Superior Shadow Resistance
+	[44591] = 43145, -- Enchant Cloak - Titanweave
+	[44592] = 43145, -- Enchant Gloves - Exceptional Spellpower
+	[44593] = 43145, -- Enchant Bracers - Major Spirit
+	[44595] = 39350, -- Enchant 2H Weapon - Scourgebane
+	[44596] = 43145, -- Enchant Cloak - Superior Arcane Resistance
+	[44598] = 43145, -- Enchant Bracer - Expertise
+	[44616] = 43145, -- Enchant Bracers - Greater Stats
+	[44621] = 43146, -- Enchant Weapon - Giant Slayer
+	[44623] = 43145, -- Enchant Chest - Super Stats
+	[44625] = 43145, -- Enchant Gloves - Armsman
+	[44629] = 43146, -- Enchant Weapon - Exceptional Spellpower
+	[44630] = 43146, -- Enchant 2H Weapon - Greater Savagery
+	[44631] = 43145, -- Enchant Cloak - Shadow Armor
+	[44633] = 43146, -- Enchant Weapon - Exceptional Agility
+	[44635] = 43145, -- Enchant Bracers - Greater Spellpower
+	[46578] = 43146, -- Enchant Weapon - Deathfrost
+	[46594] = 37602, -- Enchant Chest - Defense
+	[47051] = 37602, -- Enchant Cloak - Steelweave
+	[47672] = 43145, -- Enchant Cloak - Mighty Armor
+	[47766] = 43145, -- Enchant Chest - Greater Defense
+	[47898] = 43145, -- Enchant Cloak - Greater Speed
+	[47899] = 43145, -- Enchant Cloak - Wisdom
+	[47900] = 43145, -- Enchant Chest - Super Health
+	[47901] = 43145, -- Enchant Boots - Tuskarr's Vitality
+	[59619] = 43146, -- Enchant Weapon - Accuracy
+	[59621] = 43146, -- Enchant Weapon - Berserking
+	[59625] = 43146, -- Enchant Weapon - Black Magic
+	[60606] = 43145, -- Enchant Boots - Assault
+	[60609] = 43145, -- Enchant Cloak - Speed
+	[60616] = 43145, -- Enchant Bracers - Striking
+	[60621] = 43146, -- Enchant Weapon - Greater Potency
+	[60623] = 43145, -- Enchant Boots - Icewalker
+	[60653] = 43145, -- Enchant Shield - Greater Intellect
+	[60663] = 43145, -- Enchant Cloak - Major Agility
+	[60668] = 43145, -- Enchant Gloves - Crusher
+	[60691] = 43146, -- Enchant 2H Weapon - Massacre
+	[60692] = 43145, -- Enchant Chest - Powerful Stats
+	[60707] = 43146, -- Enchant Weapon - Superior Potency
+	[60714] = 43146, -- Enchant Weapon - Mighty Spellpower
+	[60763] = 43145, -- Enchant Boots - Greater Assault
+	[60767] = 43145, -- Enchant Bracer - Superior Spellpower
+	[62256] = 43145, -- Enchant Bracer - Major Stamina
+	[62948] = 43146, -- Enchant Staff - Greater Spellpower
+	[62959] = 43146, -- Enchant Staff - Spellpower
+	[63746] = 38682, -- Enchant Boots - Lesser Accuracy
+	[64441] = 43146, -- Enchant Weapon - Blade Ward
+	[64579] = 43146, -- Enchant Weapon - Blood Draining
+	[71692] = 38682, -- Enchant Gloves - Angler
+	[62257] = 43146, -- Enchant Weapon - Titanguard
+	[44612] = 43145, -- Enchant Gloves - Greater Blasting
 }
