@@ -40,12 +40,13 @@ jobs:
 
       # once cloned, we just run the GitHub Action for the packager project
 
-      - name: Package and release for Wrath of the Lich King Classic
-        uses: BigWigsMods/packager@master
-        with:
-          args: -g wrath
- 
       - name: Package and release for Classic Era
         uses: BigWigsMods/packager@master
         with:
           args: -g classic
+
+      - name: Package and release for Wrath of the Lich King Classic
+        uses: BigWigsMods/packager@master
+        with:
+          args: -g wrath
+
