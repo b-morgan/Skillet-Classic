@@ -96,11 +96,11 @@ local function queueAppendReagent(command, reagentID, need, queueCraftables)
 	DA.DEBUG(1,"queueCraftables= "..tostring(queueCraftables)..", need= "..tostring(need)..", have= "..tostring(have))
 	if queueCraftables and need > have then
 		local recipeSource = Skillet.db.global.itemRecipeSource[reagentID]
-		DA.DEBUG(2,"recipeSource= "..DA.DUMP1(recipeSource))
+		--DA.DEBUG(2,"recipeSource= "..DA.DUMP1(recipeSource))
 		if recipeSource then
 			for recipeSourceID in pairs(recipeSource) do
 				local skillIndex = skillIndexLookup[recipeSourceID]
-				DA.DEBUG(3,"recipeSourceID= "..tostring(recipeSourceID)..", skillIndex= "..tostring(skillIndex))
+				--DA.DEBUG(3,"recipeSourceID= "..tostring(recipeSourceID)..", skillIndex= "..tostring(skillIndex))
 				if skillIndex then
 --
 -- Identify that this queue has craftable reagent requirements
@@ -118,7 +118,7 @@ local function queueAppendReagent(command, reagentID, need, queueCraftables)
 						Skillet:QueueAppendCommand(newCommand, queueCraftables)
 						break
 					else
-						DA.DEBUG(3,"Did Not Queue "..tostring(recipeSourceID).." ("..tostring(recipeSource.name)..")")
+						--DA.DEBUG(3,"Did Not Queue "..tostring(recipeSourceID).." ("..tostring(recipeSource.name)..")")
 					end
 				end
 			end -- for
@@ -180,7 +180,7 @@ end
 function Skillet:QueueAppendCommand(command, queueCraftables)
 	DA.DEBUG(0,"QueueAppendCommand("..DA.DUMP1(command)..", "..tostring(queueCraftables).."), level= "..tostring(command.level))
 	local recipe = self:GetRecipe(command.recipeID)
-	DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe))
+	--DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe))
 	if recipe then
 		if not command.level then
 			self.newInQueue = {}
@@ -194,7 +194,7 @@ function Skillet:QueueAppendCommand(command, queueCraftables)
 			DA.DEBUG(3,"reagent= "..DA.DUMP1(reagent))
 			queueAppendReagent(command, reagent.id, command.count * reagent.numNeeded, queueCraftables)
 		end -- for
-		DA.DEBUG(2,"newInQueue["..tostring(level).."]["..tostring(recipe.itemID).."]= "..tostring(self.newInQueue[level][recipe.itemID]).." ("..tostring(recipe.name)..")")
+		--DA.DEBUG(2,"newInQueue["..tostring(level).."]["..tostring(recipe.itemID).."]= "..tostring(self.newInQueue[level][recipe.itemID]).." ("..tostring(recipe.name)..")")
 		self.newInQueue[level][recipe.itemID] = (self.newInQueue[level][recipe.itemID] or 0) + command.count * (recipe.numMade or 0)
 --
 -- Enchants get queued at the front of the queue
@@ -305,7 +305,7 @@ function Skillet:ProcessQueue(altMode)
 --
 	repeat
 		command = queue[qpos]
-		DA.DEBUG(1,"qpos= "..tostring(qpos)..", command= "..DA.DUMP1(command))
+		--DA.DEBUG(1,"qpos= "..tostring(qpos)..", command= "..DA.DUMP1(command))
 		if command and command.op == "iterate" then
 			local recipe = self:GetRecipe(command.recipeID)
 			local craftable = true
@@ -325,11 +325,11 @@ function Skillet:ProcessQueue(altMode)
 					for i=1,#recipe.reagentData,1 do
 						local reagent = recipe.reagentData[i]
 						local reagentName = GetItemInfo(reagent.id) or reagent.id
-						DA.DEBUG(1,"id= "..tostring(reagent.id)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(reagent.numNeeded))
+						--DA.DEBUG(1,"id= "..tostring(reagent.id)..", reagentName="..tostring(reagentName)..", numNeeded="..tostring(reagent.numNeeded))
 						local numInBoth = GetItemCount(reagent.id, true)
 						local numInBags = GetItemCount(reagent.id, false)
 						local numInBank =  numInBoth - numInBags
-						DA.DEBUG(1,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
+						--DA.DEBUG(1,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
 						if numInBags < reagent.numNeeded then
 							Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded,"x",reagentName,"("..L["have"],numInBags..")")
 							self.skippedQueue[qpos] = true
@@ -357,7 +357,7 @@ function Skillet:ProcessQueue(altMode)
 	if command then
 		if command.op == "iterate" then
 			self.queueCasting = true
-			DA.DEBUG(1,"command= "..DA.DUMP1(command)..", currentTrade= "..tostring(currentTrade))
+			--DA.DEBUG(1,"command= "..DA.DUMP1(command)..", currentTrade= "..tostring(currentTrade))
 			local recipeID = command.recipeID
 			local spellID = command.spellID
 			local tradeID = command.tradeID
@@ -371,8 +371,9 @@ function Skillet:ProcessQueue(altMode)
 				return
 			end
 			local count = command.count
+			local itemID, missN
 			if self.currentTrade ~= tradeID and tradeName then
-				DA.DEBUG(1,"queue_crafts= "..tostring(self.db.profile.queue_crafts)..", skillIsCraft= "..tostring(self.skillIsCraft[tradeID]))
+				--DA.DEBUG(1,"queue_crafts= "..tostring(self.db.profile.queue_crafts)..", skillIsCraft= "..tostring(self.skillIsCraft[tradeID]))
 				if self.db.profile.queue_crafts and self.skillIsCraft[tradeID] then
 --
 -- Blizzard has restricted DoCraft(index) to anything but their own UI.
@@ -393,7 +394,7 @@ function Skillet:ProcessQueue(altMode)
 			self.processingSpell = self:GetRecipeName(recipeID)		-- In Classic, the recipeID is the recipeName
 			self.processingPosition = qpos
 			self.processingCommand = command
-			DA.DEBUG(1,"processingSpell= "..tostring(self.processingSpell)..", processingPosition= "..tostring(qpos)..", processingCommand= "..DA.DUMP1(command))
+			--DA.DEBUG(1,"processingSpell= "..tostring(self.processingSpell)..", processingPosition= "..tostring(qpos)..", processingCommand= "..DA.DUMP1(command))
 			if self.isCraft then
 				DA.DEBUG(1,"DoCraft(spell= "..tostring(recipeIndex)..", count= "..tostring(count)..") altMode= "..tostring(altMode))
 				if self.DoCraft then
@@ -403,7 +404,16 @@ function Skillet:ProcessQueue(altMode)
 					DA.WARN("DoCraft(spell= "..tostring(recipeIndex)..", count= "..tostring(count)..") altMode= "..tostring(altMode))
 				end
 			else
-				DA.DEBUG(1,"DoTradeSkill(spell= "..tostring(recipeIndex)..", count= "..tostring(count)..") altMode= "..tostring(altMode))
+				if altMode then
+					itemID, missN = Skillet:GetAutoTargetItem(tradeID, spellID)
+					if not itemID then
+						Skillet:Print(L["Skipping"],self.processingSpell,"-",L["need"],missN)
+						self.queueCasting = false
+						self:RemoveFromQueue(qpos)
+						return
+					end
+				end
+				--DA.DEBUG(1,"DoTradeSkill(spell= "..tostring(recipeIndex)..", count= "..tostring(count)..") altMode= "..tostring(altMode))
 				self:EnablePauseButton()
 				DoTradeSkill(recipeIndex, count)
 			end
@@ -411,12 +421,9 @@ function Skillet:ProcessQueue(altMode)
 -- if alt down/right click - auto use items / like vellums
 --
 			if altMode then
-				local itemID = Skillet:GetAutoTargetItem(tradeID, spellID)
-				if itemID then
-					DA.DEBUG(0,"UseItemByName("..tostring(itemID)..")")
-					UseItemByName(itemID)
-					self.queueCasting = false
-				end
+				--DA.DEBUG(0,"UseItemByName("..tostring(itemID)..")")
+				UseItemByName(itemID)
+				self.queueCasting = false
 			end
 			return
 		else
@@ -437,7 +444,7 @@ end
 --
 function Skillet:QueueItems(count)
 	DA.DEBUG(0,"QueueItems("..tostring(count)..")")
-	DA.DEBUG(1,"currentPlayer= "..tostring(self.currentPlayer)..", currentTrade= "..tostring(self.currentTrade)..", selectedSkill= "..tostring(self.selectedSkill))
+	--DA.DEBUG(1,"currentPlayer= "..tostring(self.currentPlayer)..", currentTrade= "..tostring(self.currentTrade)..", selectedSkill= "..tostring(self.selectedSkill))
 	if not self.selectedSkill then return 0 end
 	local skill = self:GetSkill(self.currentPlayer, self.currentTrade, self.selectedSkill)
 	if not skill then return 0 end
@@ -511,11 +518,11 @@ function Skillet:EnchantItem()
 		local queue = self.db.realm.queueData[self.currentPlayer]
 		if queue then
 			local qpos = #queue
-			DA.DEBUG(1,"EnchantItem: qpos= "..tostring(qpos))
+			--DA.DEBUG(1,"EnchantItem: qpos= "..tostring(qpos))
 			if qpos > 0 then
 				repeat
 					local command = queue[qpos]
-					DA.DEBUG(1,"EnchantItem: qpos= "..tostring(qpos)..", command= "..DA.DUMP1(command))
+					--DA.DEBUG(1,"EnchantItem: qpos= "..tostring(qpos)..", command= "..DA.DUMP1(command))
 					if command and command.op == "iterate" then
 						if command.tradeID == 7411 then
 							self:RemoveFromQueue(qpos)

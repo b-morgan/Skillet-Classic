@@ -109,7 +109,7 @@ function Skillet:CollectTradeSkillData()
 	for i=1,#TradeSkillList,1 do
 		local id = TradeSkillList[i]
 		local name = GetSpellInfo(id)
-		DA.DEBUG(2,"id= "..tostring(id)..", name= "..tostring(name))
+		--DA.DEBUG(2,"id= "..tostring(id)..", name= "..tostring(name))
 		if name then
 			table.insert(self.tradeSkillList,id)
 			self.skillIsCraft[id] = false
@@ -121,7 +121,7 @@ function Skillet:CollectTradeSkillData()
 		for i=1,#CraftList,1 do
 			local id = CraftList[i]
 			local name = GetSpellInfo(id)
-			DA.DEBUG(2,"id= "..tostring(id)..", name= "..tostring(name))
+			--DA.DEBUG(2,"id= "..tostring(id)..", name= "..tostring(name))
 			if name then
 				table.insert(self.tradeSkillList,id)
 				if self.build == "Wrath" and id == 7411 then
@@ -139,7 +139,7 @@ function Skillet:CollectTradeSkillData()
 		local loc = t[1]
 		local old = t[2]
 		local new = t[3]
-		DA.DEBUG(2,"id= "..tostring(id)..", loc= "..tostring(loc)..", old= "..tostring(old)..", new= "..tostring(new))
+		--DA.DEBUG(2,"id= "..tostring(id)..", loc= "..tostring(loc)..", old= "..tostring(old)..", new= "..tostring(new))
 		if loc == locale then
 			self.tradeSkillIDsByName[new] = id
 		end
@@ -406,28 +406,31 @@ Skillet.subVellum = {
 local lastAutoTarget = {}
 function Skillet:GetAutoTargetItem(tradeID, spellID)
 	DA.DEBUG(0,"GetAutoTargetItem("..tostring(tradeID)..", "..tostring(spellID)..")")
-	local itemID, limit, count
+	local itemID, limit, count, itemName
 	if self.TradeSkillAutoTarget[tradeID] then
 		if not Skillet.isCraft and tradeID == 7411 then
 			itemID = self.vellumData[spellID] or defaultVellum
 			limit = self.TradeSkillAutoTarget[tradeID][itemID]
+			itemName = GetItemInfo(itemID)
 			count = GetItemCount(itemID)
 			if count >= limit then
-				DA.DEBUG(1,"GetAutoTargetItem: itemID= "..tostring(itemID).." ("..tostring(GetItemInfo(itemID))..")")
-				return itemID
+				DA.DEBUG(1,"GetAutoTargetItem: itemID= "..tostring(itemID).." ("..tostring(itemName)..")")
+				return itemID, itemName
 			else
-				DA.DEBUG(1,"GetAutoTargetItem: need itemID= "..tostring(itemID).." ("..tostring(GetItemInfo(itemID))..")")
+				DA.DEBUG(1,"GetAutoTargetItem: need itemID= "..tostring(itemID).." ("..tostring(itemName)..")")
 				if self.db.profile.use_higher_vellum and self.subVellum[itemID] then
 					for i=1,#self.subVellum[itemID],1 do
 						local subItem = self.subVellum[itemID][i]
+						local subName = GetItemInfo(subItem)
 						count = GetItemCount(subItem)
 						if count >= limit then
-							DA.DEBUG(1,"GetAutoTargetItem: found itemID= "..tostring(subItem).." ("..tostring(GetItemInfo(subItem))..")")
-							return subItem
+							DA.DEBUG(1,"GetAutoTargetItem: found itemID= "..tostring(subItem).." ("..tostring(subName)..")")
+							return subItem, subName
 						end
 					end
 				end
 			end
+			return nil, itemName
 		else
 			itemID = lastAutoTarget[tradeID]
 			DA.DEBUG(1,"GetAutoTargetItem: itemID= "..tostring(itemID))
