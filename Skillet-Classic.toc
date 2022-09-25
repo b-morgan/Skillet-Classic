@@ -75,12 +75,14 @@ DebugAids.lua
 #### Plugins
 Plugins\BeanCounter.lua
 Plugins\Auctionator.lua
-Plugins\BootyBayGazette.lua
 Plugins\MissingTradeSkillsList.lua
 Plugins\AuctionDB.lua
 Plugins\Auctioneer.lua
 Plugins\AuctionLite.lua
-Plugins\CancelForm.lua
+Plugins\DataStoreAuctions.lua
+#### Obsolete or Unused Addons
+## Plugins\CancelForm.lua
+## Plugins\BootyBayGazette.lua
 #### Addons not ported to Classic
 ## Plugins\AckisRecipeList.lua
 ## Plugins\TradeSkillInfo.lua
