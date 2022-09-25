@@ -2283,7 +2283,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						self:RegisterForClicks("LeftButtonUp")
+						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
