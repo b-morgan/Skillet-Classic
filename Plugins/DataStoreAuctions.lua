@@ -59,10 +59,12 @@ function plugin.OnInitialize()
 		Skillet.db.profile.plugins.DSA.enabled = true
 	end
 	Skillet:AddPluginOptions(plugin.options)
-	for characterName, character in pairs(DataStore:GetCharacters()) do
-		--DA.DEBUG(0,"OnInitialize: characterName= "..tostring(characterName)..", character= "..tostring(character))
-		if CharacterName == Skillet.currentPlayer then
-			Skillet.DSAPlayer = character
+	if DataStore then
+		for characterName, character in pairs(DataStore:GetCharacters()) do
+			--DA.DEBUG(0,"OnInitialize: characterName= "..tostring(characterName)..", character= "..tostring(character))
+			if CharacterName == Skillet.currentPlayer then
+				Skillet.DSAPlayer = character
+			end
 		end
 	end
 end
