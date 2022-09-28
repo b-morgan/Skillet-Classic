@@ -754,14 +754,15 @@ function Skillet:OnEnable()
 -- Debugging cleanup if enabled
 --
 	self:RegisterEvent("PLAYER_LOGOUT")
-
 	self:RegisterEvent("PLAYER_LOGIN")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("NEW_RECIPE_LEARNED") -- arg1 = recipeID
 	self:RegisterEvent("SKILL_LINES_CHANGED") -- replacement for CHAT_MSG_SKILL?
 	self:RegisterEvent("LEARNED_SPELL_IN_TAB") -- arg1 = professionID
 
---	self:RegisterEvent("ADDON_ACTION_BLOCKED")
+	self:RegisterEvent("ADDON_ACTION_BLOCKED")
+	self:RegisterEvent("PLAYER_REGEN_DISABLED")
+	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 
 	self.bagsChanged = true
 	self.hideUncraftableRecipes = false
@@ -844,11 +845,26 @@ function Skillet:PLAYER_ENTERING_WORLD()
 	end
 end
 
+--
+-- Skillet-Classic doesn't do well in combat. These functions need to be
+-- flushed out to deal with it gracefully.
+--
 function Skillet:ADDON_ACTION_BLOCKED()
 	DA.TRACE("ADDON_ACTION_BLOCKED()")
 --	print("|cf0f00000Skillet-Classic|r: Combat lockdown restriction." ..
 --								  " Leave combat and try again.")
 --	self:HideAllWindows()
+end
+
+function Skillet:PLAYER_REGEN_DISABLED()
+	DA.TRACE("PLAYER_REGEN_DISABLED()")
+--	print("|cf0f00000Skillet-Classic|r: Combat lockdown restriction." ..
+--								  " Leave combat and try again.")
+--	self:HideAllWindows()
+end
+
+function Skillet:PLAYER_REGEN_ENABLED()
+	DA.TRACE("PLAYER_REGEN_ENABLED()")
 end
 
 function Skillet:PLAYER_LOGOUT()
