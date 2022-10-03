@@ -62,7 +62,7 @@ function plugin.OnInitialize()
 	if DataStore then
 		for characterName, character in pairs(DataStore:GetCharacters()) do
 			--DA.DEBUG(0,"OnInitialize: characterName= "..tostring(characterName)..", character= "..tostring(character))
-			if CharacterName == Skillet.currentPlayer then
+			if characterName == Skillet.currentPlayer then
 				Skillet.DSAPlayer = character
 			end
 		end
