@@ -1586,7 +1586,7 @@ end
 -- Sets the game tooltip item to the selected skill
 --
 function Skillet:SetTradeSkillToolTip(skillIndex, buttonID)
-	--DA.DEBUG(2,"SetTradeSkillToolTip("..tostring(skillIndex)..", "..tostring(buttonID)..")")
+	--DA.DEBUG(0,"SetTradeSkillToolTip("..tostring(skillIndex)..", "..tostring(buttonID)..")")
 	GameTooltip:ClearLines()
 	if Skillet.db.profile.scale_tooltip then
 		local uiScale = 1.0;
@@ -1612,6 +1612,8 @@ function Skillet:SetTradeSkillToolTip(skillIndex, buttonID)
 		else
 			GameTooltip:AddLine(GetTradeSkillDescription(skillIndex))
 		end
+	elseif recipe.itemID == 0 then
+		GameTooltip:AddLine(GetTradeSkillDescription(skillIndex))
 	else
 		if recipe then
 			if recipe.itemID ~= 0 then
@@ -1842,12 +1844,16 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 -- Get the icon
 --
 	if Skillet.isCraft then
+		--DA.DEBUG(1,"UpdateDetailsWindow: texture from GetCraftIcon("..tostring(GetTradeSkillIcon)..")")
 		texture = GetCraftIcon(skillIndex)
 	elseif recipe.itemID ~= 0 then
+		--DA.DEBUG(1,"UpdateDetailsWindow: texture from GetItemIcon("..tostring(recipe.itemID)..")")
 		texture = GetItemIcon(recipe.itemID)
 	elseif Skillet.db.profile.enchant_scrolls and recipe.scrollID ~= 0 then
+		--DA.DEBUG(1,"UpdateDetailsWindow: texture from GetItemIcon("..tostring(recipe.scrollID)..")")
 		texture = GetItemIcon(recipe.scrollID)
 	else
+		--DA.DEBUG(1,"UpdateDetailsWindow: texture from GetTradeSkillIcon("..tostring(GetTradeSkillIcon)..")")
 		texture = GetTradeSkillIcon(skillIndex)
 	end
 	SkilletSkillIcon:SetNormalTexture(texture)
