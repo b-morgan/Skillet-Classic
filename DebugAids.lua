@@ -85,6 +85,14 @@ function DA.MARK2(text)
 	DA.MARK(text)
 end
 
+--
+-- CHAT and MARK the text
+--
+function DA.MARK3(text)
+	DA.CHAT(text)
+	DA.MARK(text)
+end
+
 function DA.WARN(...)
 	if not DA.WarnLog and not DA.DebugLogging then return "" end
 	local text = ""

@@ -1156,36 +1156,36 @@ function Skillet:SkilletShow()
 	else
 		name, rank, maxRank = GetTradeSkillLine()
 	end
-	DA.DEBUG(0,"name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
+	--DA.DEBUG(0,"name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
 	if name then self.currentTrade = self.tradeSkillIDsByName[name] end
 	if self:IsSupportedTradeskill(self.currentTrade) and not self.linkedSkill then
 		DA.DEBUG(0,"SkilletShow: "..self.currentTrade..", name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
 		self.selectedSkill = nil
 		self.dataScanned = false
 		self.tradeSkillOpen = true
-		if self.isCraft then
-			if Skillet.db.profile.hide_blizzard_frame then
+		if self.db.profile.hide_blizzard_frame and not TSM_API then
+			if self.isCraft then
 				DA.DEBUG(0,"HideUIPanel(CraftFrame)")
 				Skillet.hideCraftFrame = true
 				HideUIPanel(CraftFrame)
 				if Skillet.tradeShow then
 					CloseTradeSkill()
 				end
-			end
-		elseif Skillet.db.profile.hide_blizzard_frame then
-			DA.DEBUG(0,"HideUIPanel(TradeSkillFrame)")
-			Skillet.hideTradeSkillFrame = true
-			HideUIPanel(TradeSkillFrame)
-			if Skillet.craftShow then
-				self:RestoreEnchantButton()
-				CloseCraft()
+			else
+				DA.DEBUG(0,"HideUIPanel(TradeSkillFrame)")
+				Skillet.hideTradeSkillFrame = true
+				HideUIPanel(TradeSkillFrame)
+				if Skillet.craftShow then
+					self:RestoreEnchantButton()
+					CloseCraft()
+				end
 			end
 		end
 --
 -- Processing will continue in SkilletShowWindow when the TRADE_SKILL_UPDATE or CRAFT_UPDATE event fires
 -- (Wrath needs a little help)
 --
-		if self.build == "Wrath" then
+		if isWrath then
 			if self.isCraft then
 				Skillet:CRAFT_UPDATE()
 			else
@@ -1224,11 +1224,11 @@ function Skillet:SkilletShowWindow()
 	if not self:RescanTrade() then
 		if TSM_API or ZygorGuidesViewerClassicSettings then
 			if TSM_API then
-				DA.CHAT(L["Conflict with the addon TradeSkillMaster"])
+				DA.MARK3(L["Conflict with the addon TradeSkillMaster"])
 				self.db.profile.TSM_API = true
 			end
 			if ZygorGuidesViewerClassicSettings then
-				DA.CHAT(L["Conflict with the addon Zygor Guides"])
+				DA.MARK3(L["Conflict with the addon Zygor Guides"])
 				self.db.profile.ZYGOR = true
 			end
 		else

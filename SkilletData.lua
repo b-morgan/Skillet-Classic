@@ -117,7 +117,7 @@ function Skillet:CollectTradeSkillData()
 			self.tradeSkillNamesByID[id] = name
 		end
 	end
-	if not TSM_API and self.db.profile.support_crafting then
+	if isWrath or (self.db.profile.support_crafting and not TSM_API) then
 		for i=1,#CraftList,1 do
 			local id = CraftList[i]
 			local name = GetSpellInfo(id)
