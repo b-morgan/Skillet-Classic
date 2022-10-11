@@ -12,7 +12,6 @@
 ## X-License GPL v3 or later
 ## X-Curse-Project-ID: 447401
 ## X-WoWI-ID: 25287
-## X-Tukui-ProjectID: 46
 ## X-Website: https://www.curseforge.com/wow/addons/skillet-classic
 ## SavedVariables: SkilletDB
 ## SavedVariablesPerCharacter: SkilletWho, SkilletDBPC, SkilletMemory, SkilletProfile
