@@ -950,7 +950,10 @@ function Skillet:UpdateShoppingListWindow(use_cached_recipes)
 -- sort by item
 --
 		table.sort(self.cachedShoppingList, function(a,b)
-			return (a.id > b.id)
+			local na, nb
+			na = GetItemInfo(a.id)
+			nb = GetItemInfo(b.id)
+			return nb > na
 		end)
 		if Skillet.db.profile.merge_items then
 --
