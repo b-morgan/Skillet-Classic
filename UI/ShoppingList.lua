@@ -28,6 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
 local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
 local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
+local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
 
 SKILLET_SHOPPING_LIST_HEIGHT = 16
 
@@ -108,12 +109,12 @@ local function createShoppingListFrame(self)
 	SkilletShowQueuesInItemOrder:SetChecked(Skillet.db.profile.item_order)
 	SkilletShowQueuesMergeItemsText:SetText(L["Merge items"])
 	SkilletShowQueuesMergeItems:SetChecked(Skillet.db.profile.merge_items)
-	if isBCC then
-		SkilletShowQueuesIncludeGuildText:SetText(L["Include guild"])
-		SkilletShowQueuesIncludeGuild:SetChecked(Skillet.db.profile.include_guild)
-	else
+	if isClassic then
 		SkilletShowQueuesIncludeGuildText:Hide()
 		SkilletShowQueuesIncludeGuild:Hide()
+	else
+		SkilletShowQueuesIncludeGuildText:SetText(L["Include guild"])
+		SkilletShowQueuesIncludeGuild:SetChecked(Skillet.db.profile.include_guild)
 	end
 --
 -- Button to retrieve items needed from the bank
