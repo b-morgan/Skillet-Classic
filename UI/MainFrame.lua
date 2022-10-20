@@ -1610,10 +1610,10 @@ function Skillet:SetTradeSkillToolTip(skillIndex, buttonID)
 		if Skillet.db.profile.enchant_scrolls and recipe.scrollID then
 			GameTooltip:SetItemByID(recipe.scrollID)
 		else
-			GameTooltip:AddLine(GetTradeSkillDescription(skillIndex))
+			GameTooltip:AddLine(GetTradeSkillDescription(skillIndex),NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true)
 		end
 	elseif recipe.itemID == 0 then
-		GameTooltip:AddLine(GetTradeSkillDescription(skillIndex))
+		GameTooltip:AddLine(GetTradeSkillDescription(skillIndex),NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true)
 	else
 		if recipe then
 			if recipe.itemID ~= 0 then
