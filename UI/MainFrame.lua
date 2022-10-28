@@ -1782,7 +1782,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 -- Fill the skill level bar
 --
 		if recipe.itemID and recipe.spellID then
-			--DA.DEBUG(0,"UpdateDetailsWindow: itemID= "..tostring(recipe.itemID)..", spellID= "..tostring(recipe.spellID))
+			--DA.DEBUG(1,"UpdateDetailsWindow: itemID= "..tostring(recipe.itemID)..", spellID= "..tostring(recipe.spellID))
 			local orange,yellow,green,gray = self:GetTradeSkillLevels(recipe.itemID, recipe.spellID)
 --
 -- Save the actual values
@@ -1808,16 +1808,14 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 -- Whether or not it is on cooldown.
 --
 		SkilletSkillCooldown:SetText("")
-		if not Skillet.isCraft then
-			local cooldown = GetTradeSkillCooldown(skillIndex)
-			if cooldown and cooldown > 0 then
-				SkilletSkillCooldown:SetText(COOLDOWN_REMAINING.." "..SecondsToTime(cooldown))
-			end
+		local cooldown
+		if Skillet.isCraft then
+			cooldown = GetCraftCooldown(skillIndex)
 		else
-			local cooldown = GetCraftCooldown(skillIndex)
-			if cooldown and cooldown > 0 then
-				SkilletSkillCooldown:SetText(COOLDOWN_REMAINING.." "..SecondsToTime(cooldown))
-			end
+			cooldown = GetTradeSkillCooldown(skillIndex)
+		end
+		if cooldown and cooldown > 0 then
+			SkilletSkillCooldown:SetText(COOLDOWN_REMAINING.." "..SecondsToTime(cooldown))
 		end
 	else
 		recipe = Skillet.unknownRecipe

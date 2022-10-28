@@ -151,7 +151,7 @@ Skillet.options =
 					set = function(self,value)
 						Skillet.db.profile.link_craftable_reagents = value
 					end,
-					width = "full",
+					width = 1.5,
 					order = 19
 				},
 				queue_craftable_reagents = {
@@ -167,6 +167,19 @@ Skillet.options =
 					width = 1.5,
 					order = 20
 				},
+				queue_tools = {
+					type = "toggle",
+					name = L["QUEUETOOLSNAME"],
+					desc = L["QUEUETOOLSDESC"],
+					get = function()
+						return Skillet.db.profile.queue_tools
+					end,
+					set = function(self,value)
+						Skillet.db.profile.queue_tools = value
+					end,
+					width = 1.5,
+					order = 21
+				},
 				ignore_banked_reagents = {
 					type = "toggle",
 					name = L["IGNOREBANKEDREAGENTSNAME"],
@@ -178,7 +191,7 @@ Skillet.options =
 						Skillet.db.profile.ignore_banked_reagents = value
 					end,
 					width = 1.5,
-					order = 21
+					order = 22
 				},
 --[[
 				queue_glyph_reagents = {

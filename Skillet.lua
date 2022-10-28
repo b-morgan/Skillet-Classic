@@ -62,6 +62,7 @@ local defaults = {
 		display_item_tooltip = true,					-- show item tooltip or recipe tooltip
 		link_craftable_reagents = true,
 		queue_craftable_reagents = true,
+		queue_tools = false,
 		ignore_banked_reagents = false,
 		queue_glyph_reagents = false,					-- not in Classic
 		display_required_level = false,

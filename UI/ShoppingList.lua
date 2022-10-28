@@ -1077,6 +1077,9 @@ function Skillet:DisplayShoppingList(atBank)
 	end
 	cache_list(self)
 	local frame = self.shoppingList
+	if Bagnon then
+		frame:SetFrameStrata("HIGH")
+	end
 	if not frame:IsVisible() then
 		frame:Show()
 	end
