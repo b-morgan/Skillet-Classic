@@ -136,15 +136,16 @@ local function queueAppendTools(command, queue)
 		tools = { GetTradeSkillTools(command.recipeIndex) }
 	end
 	if tools then
-		--DA.DEBUG(1,"queueAppendTools: #tools= "..tostring(#tools)..", tools= "..DA.DUMP1(tools))
+		DA.DEBUG(1,"queueAppendTools: #tools= "..tostring(#tools)..", tools= "..DA.DUMP1(tools))
 		local nt = #tools+1
 		if nt > 1 then
 			for t=2,nt,2 do
 				if not tools[t] then
-				local id = GetItemInfoInstant(tools[t-1])
-				queue[id] = -1
-				DA.DEBUG(1,"queueAppendTools: t= "..tostring(t)..", tool= "..tostring(tools[t-1])..", id= "..tostring(id))
-				--DA.DEBUG(2,"queueAppendTools: reagentsInQueue= "..DA.DUMP1(reagentsInQueue))
+					local id = GetItemInfoInstant(tools[t-1])
+					DA.DEBUG(1,"queueAppendTools: t= "..tostring(t)..", tool= "..tostring(tools[t-1])..", id= "..tostring(id))
+					if id then
+						queue[id] = -1
+					end
 				end
 			end
 		end
