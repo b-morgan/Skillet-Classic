@@ -220,6 +220,36 @@ plugin.options =
 			end,
 			order = 12,
 		},
+		journalatorE = {
+			type = "toggle",
+			name = "Journalator Extra",
+			desc = "Show Journalator statistics",
+			get = function()
+				return Skillet.db.profile.plugins.ATR.journalatorE
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.ATR.journalatorE = value
+				if value then
+					Skillet.db.profile.plugins.ATR.journalatorE = value
+				end
+			end,
+			order = 13,
+		},
+		journalatorS = {
+			type = "toggle",
+			name = "Journalator Suffix",
+			desc = "Show Journalator sales rate",
+			get = function()
+				return Skillet.db.profile.plugins.ATR.journalatorS
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.ATR.journalatorS = value
+				if value then
+					Skillet.db.profile.plugins.ATR.journalatorS = value
+				end
+			end,
+			order = 14,
+		},
 		buyFactor = {
 			type = "range",
 			name = "buyFactor",
@@ -424,6 +454,32 @@ function plugin.GetExtraText(skill, recipe)
 				extra_text = extra_text..profitPctText(profit,cost,9999).."%\n"
 			end
 		end
+--
+-- Show Journalator sales info
+--
+		if Journalator and Skillet.db.profile.plugins.ATR.journalatorE then
+				label = label.."\n"
+				extra_text = extra_text.."\n"
+				local itemName = GetItemInfo(itemID)
+				local salesRate, failedCount, lastSold, lastBought = Journalator.Tooltips.GetSalesInfo(itemName)
+				DA.DEBUG(0,"itemName= "..tostring(itemName)..", salesRate= "..tostring(salesRate)..", failedCount= "..tostring(failedCount)..", lastSold= "..tostring(lastSold)..", lastBought= "..tostring(lastBought))
+			if salesRate and string.find(salesRate,"%%") then
+				label = label.."   salesRate:\n"
+				extra_text = extra_text..tostring(salesRate).."\n"
+			end
+			if failedCount then
+				label = label.."   failedCount:\n"
+				extra_text = extra_text..tostring(failedCount).."\n"
+			end
+			if lastSold then
+				label = label.."   lastSold:\n"
+				extra_text = extra_text..Skillet:FormatMoneyFull(lastSold, true).."\n"
+			end
+			if lastBought then
+				label = label.."   lastBought:\n"
+				extra_text = extra_text..Skillet:FormatMoneyFull(lastBought, true).."\n"
+			end
+		end
 	end
 	return label, extra_text
 end
@@ -533,6 +589,19 @@ function plugin.RecipeNameSuffix(skill, recipe)
 		elseif Skillet.db.profile.plugins.ATR.onlyPositive and profit <= 0 then
 			text = nil
 		end
+--
+-- Show Journalator salesRate
+--
+		if Journalator and Skillet.db.profile.plugins.ATR.journalatorS then
+			local salesRate, failedCount, lastSold, lastBought = Journalator.Tooltips.GetSalesInfo(itemName)
+			if salesRate and string.find(salesRate,"%%") then
+				if text then
+					text = text.." ["..tostring(salesRate).."]"
+				else
+					text = "["..tostring(salesRate).."]"
+				end
+			end
+		end
 	end
 	--DA.DEBUG(0,"RecipeNameSuffix: text= "..tostring(text)..", profit= "..tostring(profit))
 	recipe.suffix = profit
@@ -557,7 +626,11 @@ function Skillet:AuctionatorSearch(whichOne)
 	DA.DEBUG(1,"AuctionatorSearch: recipe= "..DA.DUMP1(recipe))
 	if whichOne then
 		shoppingListName = L["Shopping List"]
-		local list = Skillet:GetShoppingList(nil, nil, false)
+		local name = nil
+		if not Skillet.db.profile.include_alts then
+			name = Skillet.currentPlayer
+		end
+		local list = Skillet:GetShoppingList(name, Skillet.db.profile.same_faction, Skillet.db.profile.include_guild)
 		if not list or #list == 0 then
 			DA.DEBUG(0,"AuctionatorSearch: Shopping List is empty")
 			return
