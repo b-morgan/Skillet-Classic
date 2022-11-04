@@ -250,6 +250,21 @@ plugin.options =
 			end,
 			order = 14,
 		},
+		journalatorC = {
+			type = "toggle",
+			name = "Journalator Count",
+			desc = "Show Journalator success count",
+			get = function()
+				return Skillet.db.profile.plugins.ATR.journalatorC
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.ATR.journalatorC = value
+				if value then
+					Skillet.db.profile.plugins.ATR.journalatorC = value
+				end
+			end,
+			order = 15,
+		},
 		buyFactor = {
 			type = "range",
 			name = "buyFactor",
@@ -458,24 +473,42 @@ function plugin.GetExtraText(skill, recipe)
 -- Show Journalator sales info
 --
 		if Journalator and Skillet.db.profile.plugins.ATR.journalatorE then
-				label = label.."\n"
-				extra_text = extra_text.."\n"
-				local itemName = GetItemInfo(itemID)
-				local salesRate, failedCount, lastSold, lastBought = Journalator.Tooltips.GetSalesInfo(itemName)
-				DA.DEBUG(0,"itemName= "..tostring(itemName)..", salesRate= "..tostring(salesRate)..", failedCount= "..tostring(failedCount)..", lastSold= "..tostring(lastSold)..", lastBought= "..tostring(lastBought))
+			label = label.."\n"
+			extra_text = extra_text.."\n"
+			local itemName = GetItemInfo(itemID)
+			local salesRate, successCount, failedCount, lastSold, lastBought
+			if Journalator.API and itemName then
+				successCount = Journalator.API.v1.GetRealmSuccessCountByItemName(addonName, itemName)
+				failedCount = Journalator.API.v1.GetRealmFailureCountByItemName(addonName, itemName)
+				if successCount > 0 then
+					salesRate = string.format("%.0d", successCount / (successCount + failedCount) * 100).."%"
+				else
+					salesRate = nil
+				end
+				lastSold = Journalator.API.v1.GetRealmLastSoldByItemName(addonName, itemName)
+				lastBought = Journalator.API.v1.GetRealmLastBoughtByItemName(addonName, itemName)
+				--DA.DEBUG(0,"itemName= "..tostring(itemName)..", successCount= "..tostring(successCount)..", failedCount= "..tostring(failedCount)..", lastSold= "..tostring(lastSold)..", lastBought= "..tostring(lastBought))
+			else
+				salesRate, failedCount, lastSold, lastBought = Journalator.Tooltips.GetSalesInfo(itemName)
+				--DA.DEBUG(0,"itemName= "..tostring(itemName)..", salesRate= "..tostring(salesRate)..", failedCount= "..tostring(failedCount)..", lastSold= "..tostring(lastSold)..", lastBought= "..tostring(lastBought))
+			end
 			if salesRate and string.find(salesRate,"%%") then
 				label = label.."   salesRate:\n"
 				extra_text = extra_text..tostring(salesRate).."\n"
 			end
-			if failedCount then
+			if successCount and successCount > 0 then
+				label = label.."   successCount:\n"
+				extra_text = extra_text..tostring(successCount).."\n"
+			end
+			if failedCount and failedCount > 0 then
 				label = label.."   failedCount:\n"
 				extra_text = extra_text..tostring(failedCount).."\n"
 			end
-			if lastSold then
+			if lastSold and lastSold > 0 then
 				label = label.."   lastSold:\n"
 				extra_text = extra_text..Skillet:FormatMoneyFull(lastSold, true).."\n"
 			end
-			if lastBought then
+			if lastBought and lastBought > 0 then
 				label = label.."   lastBought:\n"
 				extra_text = extra_text..Skillet:FormatMoneyFull(lastBought, true).."\n"
 			end
@@ -590,15 +623,38 @@ function plugin.RecipeNameSuffix(skill, recipe)
 			text = nil
 		end
 --
--- Show Journalator salesRate
+-- Show Journalator salesRate or successCount
 --
 		if Journalator and Skillet.db.profile.plugins.ATR.journalatorS then
-			local salesRate, failedCount, lastSold, lastBought = Journalator.Tooltips.GetSalesInfo(itemName)
-			if salesRate and string.find(salesRate,"%%") then
-				if text then
-					text = text.." ["..tostring(salesRate).."]"
+			local salesRate, successCount, failedCount, lastSold, lastBought
+			if Journalator.API then
+				successCount = Journalator.API.v1.GetRealmSuccessCountByItemName(addonName, itemName)
+				failedCount = Journalator.API.v1.GetRealmFailureCountByItemName(addonName, itemName)
+				if successCount > 0 then
+					salesRate = string.format("%.0d", successCount / (successCount + failedCount) * 100).."%"
 				else
-					text = "["..tostring(salesRate).."]"
+					salesRate = nil
+				end
+				--DA.DEBUG(0,"itemName= "..tostring(itemName)..", successCount= "..tostring(successCount)..", failedCount= "..tostring(failedCount)..", salesRate= "..tostring(salesRate))
+			else
+				salesRate, failedCount, lastSold, lastBought = Journalator.Tooltips.GetSalesInfo(itemName)
+				--DA.DEBUG(0,"itemName= "..tostring(itemName)..", salesRate= "..tostring(salesRate)..", failedCount= "..tostring(failedCount)..", lastSold= "..tostring(lastSold)..", lastBought= "..tostring(lastBought))
+			end
+			if Skillet.db.profile.plugins.ATR.journalatorC then
+				if successCount and successCount > 0 then
+					if text then
+						text = text.." ["..tostring(successCount).."]"
+					else
+						text = "["..tostring(successCount).."]"
+					end
+				end
+			else
+				if salesRate and string.find(salesRate,"%%") then
+					if text then
+						text = text.." ["..tostring(salesRate).."]"
+					else
+						text = "["..tostring(salesRate).."]"
+					end
 				end
 			end
 		end
