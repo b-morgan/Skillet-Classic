@@ -472,7 +472,7 @@ function plugin.GetExtraText(skill, recipe)
 --
 -- Show Journalator sales info
 --
-		if Journalator and Skillet.db.profile.plugins.ATR.journalatorE then
+		if addonName and Journalator and Skillet.db.profile.plugins.ATR.journalatorE then
 			label = label.."\n"
 			extra_text = extra_text.."\n"
 			local itemName = GetItemInfo(itemID)
@@ -488,7 +488,7 @@ function plugin.GetExtraText(skill, recipe)
 				lastSold = Journalator.API.v1.GetRealmLastSoldByItemName(addonName, itemName)
 				lastBought = Journalator.API.v1.GetRealmLastBoughtByItemName(addonName, itemName)
 				--DA.DEBUG(0,"itemName= "..tostring(itemName)..", successCount= "..tostring(successCount)..", failedCount= "..tostring(failedCount)..", lastSold= "..tostring(lastSold)..", lastBought= "..tostring(lastBought))
-			else
+			elseif itemName then
 				salesRate, failedCount, lastSold, lastBought = Journalator.Tooltips.GetSalesInfo(itemName)
 				--DA.DEBUG(0,"itemName= "..tostring(itemName)..", salesRate= "..tostring(salesRate)..", failedCount= "..tostring(failedCount)..", lastSold= "..tostring(lastSold)..", lastBought= "..tostring(lastBought))
 			end
@@ -625,7 +625,7 @@ function plugin.RecipeNameSuffix(skill, recipe)
 --
 -- Show Journalator salesRate or successCount
 --
-		if Journalator and Skillet.db.profile.plugins.ATR.journalatorS then
+		if addonName and itemName and Journalator and Skillet.db.profile.plugins.ATR.journalatorS then
 			local salesRate, successCount, failedCount, lastSold, lastBought
 			if Journalator.API then
 				successCount = Journalator.API.v1.GetRealmSuccessCountByItemName(addonName, itemName)
