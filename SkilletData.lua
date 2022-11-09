@@ -519,11 +519,11 @@ function Skillet:ItemDataAddUsedInRecipe(itemID,recipeID)
 	self.db.global.itemRecipeUsedIn[itemID][recipeID] = true
 end
 
---[[
+
 --
 -- Inscription 
 --
-local topink = 113111				-- Warbinder's Ink
+local topink = 43126				-- Ink of the Sea
 local specialVendorItems = {
 	[37101] = {1, topink},			--Ivory Ink
 	[39469] = {1, topink},			--Moonglow Ink
@@ -533,19 +533,13 @@ local specialVendorItems = {
 	[43120] = {1, topink},			--Celestial Ink
 	[43122] = {1, topink},			--Shimmering Ink
 	[43124] = {1, topink},			--Ethereal Ink
-	[43126] = {1, topink},			--Ink of the Sea
-	[61978] = {1, topink},			--Blackfallow Ink
-	[79254] = {1, topink},			--Ink of Dreams
+--	[43126] = {1, topink},			--Ink of the Sea
+--	[61978] = {1, topink},			--Blackfallow Ink
+--	[79254] = {1, topink},			--Ink of Dreams
 
 	[43127] = {10, topink},			--Snowfall Ink
-	[61981] = {10, topink},			--Inferno Ink
-	[79255] = {10, topink},			--Starlight Ink
-}
-]]--
---
--- No special items in Classic (yet)
---
-local specialVendorItems = {
+--	[61981] = {10, topink},			--Inferno Ink
+--	[79255] = {10, topink},			--Starlight Ink
 }
 Skillet.SpecialVendorItems = specialVendorItems
 
