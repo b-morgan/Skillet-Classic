@@ -377,7 +377,7 @@ function Skillet:CollapseAll()
 end
 
 --
--- Builds a sorted and fitlered list of recipes for the
+-- Builds a sorted and filtered list of recipes for the
 -- currently selected tradekskill and sorting method
 -- if no sorting, then headers will be included
 --
@@ -388,6 +388,11 @@ function Skillet:AddRecipeSorter(text, sorter)
 		"Usage Skillet:AddRecipeSorter(text, sorter), text must be a string")
 	assert(sorter and type(sorter) == "function",
 		"Usage Skillet:AddRecipeSorter(text, sorter), sorter must be a function")
+	for _,entry in pairs(sorters) do
+		if entry.name == text then
+			return
+		end
+	end
 	table.insert(sorters, {["name"]=text, ["sorter"]=sorter})
 end
 
