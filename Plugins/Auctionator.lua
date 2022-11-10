@@ -327,7 +327,7 @@ function plugin.SortMostSold(skill,a,b)
 		itemNameA = GetItemInfo(recipeA.itemID)
 	end
 	if recipeB.scrollID then
-		itemNameA = GetItemInfo(recipeB.scrollID)
+		itemNameB = GetItemInfo(recipeB.scrollID)
 	elseif recipeB.itemID then
 		itemNameB = GetItemInfo(recipeB.itemID)
 	end
