@@ -303,6 +303,32 @@ local buyFactorDef = 4
 local markupDef = 1.05
 local ahtaxDef = 0.95
 
+local function NOSORT(tradeskill,a,b)
+	return (a.skillIndex or 0) < (b.skillIndex or 0)
+end
+
+function plugin.SortMostSold(skill,a,b)
+	if a.subGroup or b.subGroup then
+		return NOSORT(skill, a, b)
+	end
+	local recipeA, recipeB, itemNameA, itemNameB, successCountA, successCountB
+	recipeA = Skillet:GetRecipe(a.recipeID)
+	recipeB = Skillet:GetRecipe(b.recipeID)
+	if recipeA.itemID then
+		itemNameA = GetItemInfo(recipeA.itemID)
+	end
+	if recipeB.itemID then
+		itemNameB = GetItemInfo(recipeB.itemID)
+	end
+	if Journalator.API and itemNameA and itemNameB then
+		successCountA = Journalator.API.v1.GetRealmSuccessCountByItemName(addonName, itemNameA)
+		successCountB = Journalator.API.v1.GetRealmSuccessCountByItemName(addonName, itemNameB)
+	end
+	successCountA = successCountA or 0
+	successCountB = successCountB or 0
+	return (successCountA > successCountB)
+end
+
 function plugin.OnInitialize()
 	if not Skillet.db.profile.plugins.ATR then
 		Skillet.db.profile.plugins.ATR = {}
@@ -314,6 +340,9 @@ function plugin.OnInitialize()
 		Skillet.db.profile.plugins.ATR.showProfitValue = true
 	end
 	Skillet:AddPluginOptions(plugin.options)
+	if Journalator and Journalator.API then
+		Skillet:AddRecipeSorter("ATR: "..L["Most Sold"], plugin.SortMostSold)
+	end
 end
 
 local function profitPctText(profit,cost,limit)
