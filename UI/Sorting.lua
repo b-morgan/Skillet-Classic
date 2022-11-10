@@ -169,7 +169,7 @@ local function sort_recipe_by_suffix(tradeskill, a, b)
 end
 
 local function SkillIsFilteredOut(skillIndex)
-	DA.DEBUG(1,"SkillIsFilteredOut("..tostring(skillIndex)..")")
+	--DA.DEBUG(1,"SkillIsFilteredOut("..tostring(skillIndex)..")")
 	local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, skillIndex)
 	--DA.DEBUG(1,"skill= "..DA.DUMP1(skill,1))
 	local recipe = Skillet:GetRecipe(skill.id)
@@ -179,7 +179,7 @@ local function SkillIsFilteredOut(skillIndex)
 --
 -- It's a header, don't filter here
 --
-		DA.DEBUG(1,"Detected header")
+		--DA.DEBUG(1,"Detected header")
 		return false
 	end
 --
@@ -187,7 +187,7 @@ local function SkillIsFilteredOut(skillIndex)
 --
 	if skill_style_type[skill.difficulty] then
 		if skill_style_type[skill.difficulty].level < (Skillet:GetTradeSkillOption("filterLevel") or 4) then
-			DA.DEBUG(1,"Detected trivial")
+			--DA.DEBUG(1,"Detected trivial")
 			return true
 		end
 	end
@@ -199,7 +199,7 @@ local function SkillIsFilteredOut(skillIndex)
 		   not (skill.numRecursive > 0 and Skillet:GetTradeSkillOption("filterInventory-crafted")) and
 		   not (skill.numCraftableVendor > 0 and Skillet:GetTradeSkillOption("filterInventory-vendor")) and
 		   not (skill.numCraftableAlts > 0 and Skillet:GetTradeSkillOption("filterInventory-alts")) then
-			DA.DEBUG(1,"Detected uncraftable")
+			--DA.DEBUG(1,"Detected uncraftable")
 			return true
 		end
 	end
@@ -215,7 +215,7 @@ local function SkillIsFilteredOut(skillIndex)
 	if Skillet.recipeFilters then
 		for _,f in pairs(Skillet.recipeFilters) do
 			if f.filterMethod(f.namespace, skillIndex) then
-				DA.DEBUG(1,"Detected recipeFilter")
+				--DA.DEBUG(1,"Detected recipeFilter")
 				return true
 			end
 		end
@@ -225,55 +225,55 @@ local function SkillIsFilteredOut(skillIndex)
 --
 	local searchtext = Skillet:GetTradeSkillOption("searchtext")
 	if searchtext and searchtext ~= "" then
-		DA.DEBUG(1,"Searching for '"..tostring(searchtext).."'")
+		--DA.DEBUG(1,"Searching for '"..tostring(searchtext).."'")
 		local filter = string.lower(searchtext)
 		local nameOnly = false
 		if string.sub(filter,1,1) == "!" then
 			filter = string.sub(filter,2)
-			DA.DEBUG(1,"Searching nameOnly")
+			--DA.DEBUG(1,"Searching nameOnly")
 			nameOnly = true
 		end
 		local word
 		local name = ""
 		local tooltip = _G["SkilletParsingTooltip"]
 		if tooltip == nil then
-			DA.DEBUG(1,"Creating SkilletParsingTooltip")
+			--DA.DEBUG(1,"Creating SkilletParsingTooltip")
 			tooltip = CreateFrame("GameTooltip", "SkilletParsingTooltip", _G["ANCHOR_NONE"], "GameTooltipTemplate")
 			tooltip:SetOwner(WorldFrame, "ANCHOR_NONE");
 		end
 		local searchText = recipe.name
 		if not nameOnly then
-			DA.DEBUG(1,"Searching name and tooltip")
+			--DA.DEBUG(1,"Searching name and tooltip")
 			if not Skillet.data.tooltipCache or Skillet.data.tooltipCachedTrade ~= Skillet.currentTrade then
 				Skillet.data.tooltipCachedTrade = Skillet.currentTrade
 				Skillet.data.tooltipCache = {}
 			end
 			if not Skillet.data.tooltipCache[recipeID] then
-				DA.DEBUG(1,"Setup tooltipCache["..tostring(recipeID).."]")
+				--DA.DEBUG(1,"Setup tooltipCache["..tostring(recipeID).."]")
 				if skillIndex then
 					if Skillet.isCraft then
 						local spellFocus = GetCraftSpellFocus(skillIndex) -- BuildColoredListString(GetCraftSpellFocus(skillIndex))
-						DA.DEBUG(1,"spellFocus= "..tostring(spellFocus))
+						--DA.DEBUG(1,"spellFocus= "..tostring(spellFocus))
 						if spellFocus then
 							searchText = searchText.." "..string.lower(tostring(spellFocus))
 						end
 						local about = GetCraftDescription(skillIndex)
-						DA.DEBUG(1,"about= "..tostring(about))
+						--DA.DEBUG(1,"about= "..tostring(about))
 						if about then
 							searchText = searchText.." "..string.lower(tostring(about))
 						end
 					elseif Skillet.currentTrade == 7411 then
-						DA.DEBUG(1,"skillIndex= "..tostring(skillIndex).." ("..tostring(recipe.name)..")")
+						--DA.DEBUG(1,"skillIndex= "..tostring(skillIndex).." ("..tostring(recipe.name)..")")
 						local desc = GetTradeSkillDescription(skillIndex)
 						if desc then
-							DA.DEBUG(1,"desc= "..tostring(desc))
+							--DA.DEBUG(1,"desc= "..tostring(desc))
 							searchText = searchText.." "..string.lower(desc)
 						end
 					else
-						DA.DEBUG(1,"skillIndex= "..tostring(skillIndex).." ("..tostring(recipe.name)..")")
+						--DA.DEBUG(1,"skillIndex= "..tostring(skillIndex).." ("..tostring(recipe.name)..")")
 						tooltip:SetTradeSkillItem(skillIndex)
 						local tiplines = tooltip:NumLines()
-						DA.DEBUG(1,"Found "..tostring(tiplines).." tiplines")
+						--DA.DEBUG(1,"Found "..tostring(tiplines).." tiplines")
 						for i=1, tiplines, 1 do
 							searchText = searchText.." "..string.lower(_G["SkilletParsingTooltipTextLeft"..i]:GetText() or " ")
 							searchText = searchText.." "..string.lower(_G["SkilletParsingTooltipTextRight"..i]:GetText() or " ")
@@ -285,29 +285,29 @@ local function SkillIsFilteredOut(skillIndex)
 						local reagent = recipe.reagentData[i]
 						if reagent then
 							local itemName = GetItemInfo(reagent.id) or reagent.id
-							DA.DEBUG(1,"Adding '"..tostring(itemName).."'")
+							--DA.DEBUG(1,"Adding '"..tostring(itemName).."'")
 							searchText = searchText.." "..string.lower(itemName)
 						end
 					end
 				end
-				DA.DEBUG(1,"Setting searchText")
+				--DA.DEBUG(1,"Setting searchText")
 				Skillet.data.tooltipCache[recipeID] = searchText
 			else
-				DA.DEBUG(1,"Using tooltipCache["..tostring(recipeID).."]")
+				--DA.DEBUG(1,"Using tooltipCache["..tostring(recipeID).."]")
 				searchText = Skillet.data.tooltipCache[recipeID]
 			end
 		end
 		if searchText then 
-			DA.DEBUG(1,"Searching searchText= "..tostring(searchText))
+			--DA.DEBUG(1,"Searching searchText= "..tostring(searchText))
 			searchText = string.lower(searchText)
 			local wordList = { string.split(" ",filter) }
 			for v,word in pairs(wordList) do
-				DA.DEBUG(2,"word= '"..tostring(word).."'")
+				--DA.DEBUG(2,"word= '"..tostring(word).."'")
 				if string.find(searchText, word, 1, true) == nil then
-					DA.DEBUG(2,"not found")
+					--DA.DEBUG(2,"not found")
 					return true
 				end
-				DA.DEBUG(2,"found")
+				--DA.DEBUG(2,"found")
 			end
 		end
 	end
@@ -451,7 +451,7 @@ end
 function Skillet:SortAndFilterRecipes() -- SAFR: 
 	local skillListKey = Skillet.currentPlayer..":"..Skillet.currentTrade..":"..Skillet.currentGroupLabel
 	local numSkills = Skillet:GetNumSkills(Skillet.currentPlayer, Skillet.currentTrade)
-	DA.DEBUG(0,"SortAndFilterRecipes(), skillListKey= "..tostring(skillListKey))
+	--DA.DEBUG(0,"SortAndFilterRecipes(), skillListKey= "..tostring(skillListKey))
 	if not Skillet.data.sortedSkillList then
 		--DA.DEBUG(1,"SAFR: Skillet.data.sortedSkillList = {}")
 		Skillet.data.sortedSkillList = {}
@@ -470,7 +470,7 @@ function Skillet:SortAndFilterRecipes() -- SAFR:
 	Skillet:FilterDropDown_OnLoad()
 	local searchtext = Skillet:GetTradeSkillOption("searchtext")
 	local groupLabel = Skillet.currentGroupLabel
-	DA.DEBUG(1,"SAFR: searchtext="..tostring(searchtext)..", groupLabel="..tostring(groupLabel))
+	--DA.DEBUG(1,"SAFR: searchtext="..tostring(searchtext)..", groupLabel="..tostring(groupLabel))
 	if searchtext and searchtext ~= "" or groupLabel == "Flat" then
 --
 -- No prep necessary, just loop through the list and filter or search as directed
@@ -495,7 +495,7 @@ function Skillet:SortAndFilterRecipes() -- SAFR:
 						Skillet.selectedSkill = nil
 					end
 				else
-					DA.DEBUG(2,"SAFR: i= "..tostring(i).." is a header")
+					--DA.DEBUG(2,"SAFR: i= "..tostring(i).." is a header")
 				end
 			end
 		end	-- for
