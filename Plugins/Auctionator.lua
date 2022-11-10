@@ -307,25 +307,40 @@ local function NOSORT(tradeskill,a,b)
 	return (a.skillIndex or 0) < (b.skillIndex or 0)
 end
 
+--
+-- Sort by the Journalator API function GetRealmSuccessCountByItemName
+--
+-- For enchanting, use the scrollID instead of the itemID
+--
 function plugin.SortMostSold(skill,a,b)
 	if a.subGroup or b.subGroup then
 		return NOSORT(skill, a, b)
 	end
 	local recipeA, recipeB, itemNameA, itemNameB, successCountA, successCountB
 	recipeA = Skillet:GetRecipe(a.recipeID)
+	--DA.DEBUG(0,"SortMostSold: recipeA= "..DA.DUMP1(recipeA))
 	recipeB = Skillet:GetRecipe(b.recipeID)
-	if recipeA.itemID then
+	--DA.DEBUG(0,"SortMostSold: recipeB= "..DA.DUMP1(recipeB))
+	if recipeA.scrollID then
+		itemNameA = GetItemInfo(recipeA.scrollID)
+	elseif recipeA.itemID then
 		itemNameA = GetItemInfo(recipeA.itemID)
 	end
-	if recipeB.itemID then
+	if recipeB.scrollID then
+		itemNameA = GetItemInfo(recipeB.scrollID)
+	elseif recipeB.itemID then
 		itemNameB = GetItemInfo(recipeB.itemID)
 	end
+	--DA.DEBUG(0,"SortMostSold: itemNameA= "..tostring(itemNameA)..", raw itemNameB= "..tostring(itemNameB))
 	if Journalator.API and itemNameA and itemNameB then
 		successCountA = Journalator.API.v1.GetRealmSuccessCountByItemName(addonName, itemNameA)
 		successCountB = Journalator.API.v1.GetRealmSuccessCountByItemName(addonName, itemNameB)
 	end
 	successCountA = successCountA or 0
 	successCountB = successCountB or 0
+	if successCountA > 0 and successCountB > 0 then
+		--DA.DEBUG(0,"SortMostSold: successCountA= "..tostring(successCountA)..", successCountB= "..tostring(successCountB))
+	end
 	return (successCountA > successCountB)
 end
 
