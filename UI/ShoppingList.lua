@@ -726,7 +726,7 @@ end
 -- GUILDBANKBAGSLOTS_CHANGED and BAG_UPDATE_DELAYED events have fired.
 --
 local function processGuildQueue(where)
-	DA.DEBUG(1,"processGuildQueue("..where..")")
+	--DA.DEBUG(1,"processGuildQueue("..where..")")
 	local guildQueue = Skillet.guildQueue
 	if Skillet.guildBusy then
 		while true do
@@ -737,8 +737,8 @@ local function processGuildQueue(where)
 				local v = queueitem["list"]
 				local i = queueitem["i"]
 				local item = queueitem["item"]
-				DA.DEBUG(2,"j=",j,", v=",DA.DUMP1(v))
-				DA.DEBUG(2,"i=",i,", item=",DA.DUMP1(item))
+				--DA.DEBUG(2,"j=",j,", v=",DA.DUMP1(v))
+				--DA.DEBUG(2,"i=",i,", item=",DA.DUMP1(item))
 				Skillet.gotGuildbankEvent = false
 				Skillet.gotBagUpdateEvent = false
 				local moved = getItemFromGuildBank(id, item.bag, item.slot, v.count)
@@ -832,7 +832,7 @@ function Skillet:GetReagentsFromBanks()
 			if incAlts or v.player == name then
 				for i,item in pairs(bank) do
 					if item.id == id then
-						DA.DEBUG(2,"i=",i,", item=",DA.DUMP1(item))
+						--DA.DEBUG(2,"i=",i,", item=",DA.DUMP1(item))
 						if item.count > 0 and v.count > 0 then
 							table.insert(bankQueue, {
 								["id"]    = id,
@@ -858,15 +858,15 @@ function Skillet:GetReagentsFromBanks()
 -- Do things using a queue and events.
 --
 	if guildbankFrameOpen then
-		DA.DEBUG(0,"#list=",#list)
+		--DA.DEBUG(0,"#list=",#list)
 		local guildQueue = Skillet.guildQueue
 		for j,v in pairs(list) do
-			DA.DEBUG(2,"j=",j,", v=",DA.DUMP1(v))
+			--DA.DEBUG(2,"j=",j,", v=",DA.DUMP1(v))
 			local id = v.id
 			if incAlts or v.player == name then
 				for i,item in pairs(guildbank) do
 					if item.id == id then
-						DA.DEBUG(2,"i=",i,", item=",DA.DUMP1(item))
+						--DA.DEBUG(2,"i=",i,", item=",DA.DUMP1(item))
 						if item.count > 0 and v.count > 0 then
 							table.insert(guildQueue, {
 								["id"]    = id,
