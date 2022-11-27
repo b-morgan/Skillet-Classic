@@ -377,10 +377,6 @@ function Skillet:CollapseAll()
 end
 
 --
--- Builds a sorted and filtered list of recipes for the
--- currently selected tradekskill and sorting method
--- if no sorting, then headers will be included
---
 -- Adds the sorting routine to the list of sorting routines.
 --
 function Skillet:AddRecipeSorter(text, sorter)
@@ -405,7 +401,6 @@ function Skillet:InitializeSorting()
 	table.insert(sorters, 1, {["name"]=L["None"], ["sorter"]=sort_recipe_by_index})
 	table.insert(sorters, 2, {["name"]=L["By Name"], ["sorter"]=sort_recipe_by_name})
 	table.insert(sorters, 3, {["name"]=L["By Difficulty"], ["sorter"]=sort_recipe_by_skill_level})
---	table.insert(sorters, 4, {["name"]=L["By Skill Level"], ["sorter"]=sort_recipe_by_skill_level})
 	table.insert(sorters, 4, {["name"]=L["By Item Level"], ["sorter"]=sort_recipe_by_item_level})
 	table.insert(sorters, 5, {["name"]=L["By Quality"], ["sorter"]=sort_recipe_by_item_quality})
 	table.insert(sorters, 6, {["name"]=L["By Suffix"], ["sorter"]=sort_recipe_by_suffix})
@@ -451,7 +446,7 @@ end
 function Skillet:SortAndFilterRecipes() -- SAFR: 
 	local skillListKey = Skillet.currentPlayer..":"..Skillet.currentTrade..":"..Skillet.currentGroupLabel
 	local numSkills = Skillet:GetNumSkills(Skillet.currentPlayer, Skillet.currentTrade)
-	--DA.DEBUG(0,"SortAndFilterRecipes(), skillListKey= "..tostring(skillListKey))
+	DA.DEBUG(0,"SortAndFilterRecipes(), skillListKey= "..tostring(skillListKey))
 	if not Skillet.data.sortedSkillList then
 		--DA.DEBUG(1,"SAFR: Skillet.data.sortedSkillList = {}")
 		Skillet.data.sortedSkillList = {}
