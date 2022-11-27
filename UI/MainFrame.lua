@@ -689,11 +689,13 @@ function Skillet:TradeButton_OnEnter(button)
 end
 
 function Skillet:TradeButtonAdditional_OnEnter(button)
+	--DA.DEBUG(0,"TradeButtonAdditional_OnEnter("..tostring(button)..")")
+	--DA.DEBUG(1,"TradeButtonAdditional_OnEnter: button= "..DA.DUMP1(button))
 	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 	GameTooltip:ClearLines()
 	local spellID = button:GetID()
 	GameTooltip:AddLine(GetSpellInfo(spellID))
-	local itemID = Skillet:GetAutoTargetItem(spellID)
+	local itemID = Skillet:GetAutoTargetItem(self.currentTrade, spellID)
 	if itemID and IsAltKeyDown() then
 		GameTooltip:AddLine("/use "..GetItemInfo(itemID))
 	end
@@ -701,6 +703,7 @@ function Skillet:TradeButtonAdditional_OnEnter(button)
 end
 
 function Skillet:TradeButton_OnClick(this,button)
+	--DA.DEBUG(0,"TradeButton_OnClick("..DA.DUMP1(this)..", "..tostring(button)..")")
 	local name = this:GetName()
 	local _, player, tradeID = string.split("-", name)
 	tradeID = tonumber(tradeID)
@@ -732,8 +735,15 @@ function Skillet:TradeButton_OnClick(this,button)
 	GameTooltip:Hide()
 end
 
+function Skillet:TradeButtonAdditional_OnClick(this,button)
+	DA.DEBUG(0,"TradeButtonAdditional_OnClick("..DA.DUMP1(this)..", "..tostring(button)..")")
+	local name = this:GetName()
+	DA.DEBUG(0,"TradeButtonAdditional_OnClick: name= "..tostring(name))
+	GameTooltip:Hide()
+end
+
 function Skillet:CreateAdditionalButtonsList()
-	DA.DEBUG(3,"CreateAdditionalButtonsList()")
+	--DA.DEBUG(0,"CreateAdditionalButtonsList()")
 	Skillet.AdditionalButtonsList = {}
 	local seenButtons = {}
 	local tradeSkillList = self.tradeSkillList
@@ -749,11 +759,12 @@ function Skillet:CreateAdditionalButtonsList()
 					table.insert(Skillet.AdditionalButtonsList, additionalSpellTab)
 					seenButtons[spellID] = true
 				end
-			end
+			end		-- additionalSpellTab
 		else
 			--DA.DEBUG(3,"tradeID= "..tostring(tradeID).." has no ranks")
-		end
+		end		-- ranks
 	end		-- for
+	--DA.DEBUG(0,"CreateAdditionalButtonsList: AdditionalButtonsList= "..DA.DUMP(Skillet.AdditionalButtonsList))
 end
 
 function Skillet:UpdateTradeButtons(player)
@@ -835,8 +846,12 @@ function Skillet:UpdateTradeButtons(player)
 		self:CreateAdditionalButtonsList()
 	end
 --
--- Iterate thru the list of additional skills and
--- add buttons for each one
+-- Iterate thru the list of additional skills and add buttons for each one
+--
+-- Each entry is {spellID, "Name", isToy, isPet, isKnown}
+--   isToy is true if the spellID is a toyID instead
+--   isPet is true if the name is a pet
+--   isKnown is true if the spellID must be known by the player.
 --
 	for i=1,#Skillet.AdditionalButtonsList,1 do
 		local additionalSpellTab = Skillet.AdditionalButtonsList[i]
@@ -925,7 +940,7 @@ function Skillet:UpdateTradeSkillWindow()
 		self.dataScanned = self:RescanTrade()
 		self:SortAndFilterRecipes()
 	end
-	if not self.data.sortedSkillList[skillListKey] then
+	if not self.data.sortedSkillList or not self.data.sortedSkillList[skillListKey] then
 		numTradeSkills = self:SortAndFilterRecipes()
 		if not numTradeSkills or numTradeSkills < 1 then
 			numTradeSkills = 0
@@ -1319,7 +1334,7 @@ function Skillet:UpdateTradeSkillWindow()
 		SkilletFrameEmptySpace:SetPoint("TOPLEFT",SkilletSkillListParent,"TOPLEFT")
 	end
 	SkilletFrameEmptySpace:SetPoint("BOTTOMRIGHT",SkilletSkillListParent,"BOTTOMRIGHT")
-	--DA.DEBUG(3,"UpdateTradeSkillWindow Complete")
+	DA.DEBUG(3,"UpdateTradeSkillWindow Complete")
 end
 
 --
