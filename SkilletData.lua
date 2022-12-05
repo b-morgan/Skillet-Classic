@@ -1204,6 +1204,7 @@ local function ScanTrade()
 --
 	Skillet:InventoryScan()
 	Skillet:CalculateCraftableCounts()
+	Skillet:SortAndFilterRecipes()
 	--DA.DEBUG(2,"ScanTrade: Complete, numSkills= "..tostring(numSkills)..", numHeaders= "..tostring(numHeaders))
 --
 -- return a boolean:
