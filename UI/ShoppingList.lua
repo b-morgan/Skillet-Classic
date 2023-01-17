@@ -85,9 +85,7 @@ local function createShoppingListFrame(self)
 	titlebar2:SetPoint("TOPLEFT",titlebar,"BOTTOMLEFT",0,0)
 	titlebar2:SetPoint("TOPRIGHT",titlebar,"BOTTOMRIGHT",0,0)
 	titlebar2:SetHeight(13)
-	titlebar:SetGradientAlpha("VERTICAL",r*0.6,g*0.6,b*0.6,1,r,g,b,1)
 	titlebar:SetColorTexture(r,g,b,1)
-	titlebar2:SetGradientAlpha("VERTICAL",r*0.9,g*0.9,b*0.9,1,r*0.6,g*0.6,b*0.6,1)
 	titlebar2:SetColorTexture(r,g,b,1)
 	local title = CreateFrame("Frame",nil,frame)
 	title:SetPoint("TOPLEFT",titlebar,"TOPLEFT",0,0)
@@ -313,11 +311,30 @@ local function indexBank()
 --	local bankBags = {-1,5,6,7,8,9,10,11,-3}
 	local bankBags = {-1,5,6,7,8,9,10,11}		-- In Classic, there is no reagent bank
 	for _, container in pairs(bankBags) do
-		for i = 1, GetContainerNumSlots(container), 1 do
-			local item = GetContainerItemLink(container, i)
+		local slots
+		if isClassic then
+			slots = GetContainerNumSlots(container)
+		else
+			slots = C_Container.GetContainerNumSlots(container)
+		end
+		for i = 1, slots, 1 do
+			local item
+			if isClassic then
+				item = GetContainerItemLink(container, i)
+			else
+				item = C_Container.GetContainerItemLink(container, i)
+			end
 			if item then
-				local _,count = GetContainerItemInfo(container, i)
-				local id = Skillet:GetItemIDFromLink(item)
+				local info, id, count
+				if isClassic then
+					info, count = GetContainerItemInfo(container, i)
+					id = Skillet:GetItemIDFromLink(item)
+				else
+					info = C_Container.GetContainerItemInfo(container, i)
+					--DA.DEBUG(2,"info="..DA.DUMP1(info))
+					id = info.itemID
+					count = info.stackCount
+				end
 				local name = string.match(item,"%[.+%]")
 				if name then 
 					name = string.sub(name,2,-2)	-- remove the brackets
@@ -573,7 +590,7 @@ local function findBagForItem(itemID, count)
 	local _, _, _, _, _, _, _, itemStackCount = GetItemInfo(itemID)
 	for container = 0, 4, 1 do
 		if isNormalBag(container) then
-			local bag_size = GetContainerNumSlots(container) -- 0 if there is no bag
+			local bag_size = C_Container.GetContainerNumSlots(container) -- 0 if there is no bag
 			--DA.DEBUG(1, "findBagForItem: container= "..tostring(container)..", bag_size= "..tostring(bag_size))
 			for slot = 1, bag_size, 1 do
 				local bagitem = GetContainerItemID(container, slot)

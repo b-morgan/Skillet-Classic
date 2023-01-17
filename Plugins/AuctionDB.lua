@@ -1,5 +1,14 @@
 local addonName,addonTable = ...
-local DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
+local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
+local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
+local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
+local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
+local DA
+if isRetail then
+	DA = _G[addonName] -- for DebugAids.lua
+else
+	DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
+end
 --[[
 Skillet: A tradeskill window replacement.
 
@@ -170,7 +179,15 @@ function plugin.GetExtraText(skill, recipe)
 	local auctionData = {}
 	if Skillet.db.profile.plugins.AHDB.enabled and itemID and AuctionDB and AuctionDB.AHGetAuctionInfoByLink then
 		local itemName, itemLink = GetItemInfo(itemID)
+		if not itemLink then 
+			DA.DEBUG(0,"GetExtraText: itemLink is nil")
+			return
+		end
 		auctionData = AuctionDB:AHGetAuctionInfoByLink(itemLink)
+		if not auctionData then
+			DA.DEBUG(0,"GetExtraText: auctionData is nil")
+			return
+		end
 		local buyout = ( auctionData.minBuyout or 0 ) * recipe.numMade
 		if buyout then
 			extra_text = Skillet:FormatMoneyFull(buyout, true)
@@ -238,7 +255,15 @@ function plugin.RecipeNameSuffix(skill, recipe)
 	local auctionData = {}
 	if Skillet.db.profile.plugins.AHDB.enabled and itemID and AuctionDB and AuctionDB.AHGetAuctionInfoByLink then
 		local itemName, itemLink = GetItemInfo(itemID)
+		if not itemLink then 
+			DA.DEBUG(0,"GetExtraText: itemLink is nil")
+			return
+		end
 		auctionData = AuctionDB:AHGetAuctionInfoByLink(itemLink)
+		if not auctionData then
+			DA.DEBUG(0,"GetExtraText: auctionData is nil")
+			return
+		end
 		local buyout = ( auctionData.minBuyout or 0 ) * recipe.numMade
 		if Skillet.db.profile.plugins.AHDB.reagentPrices then
 			local cost = 0

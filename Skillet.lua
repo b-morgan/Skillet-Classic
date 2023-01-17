@@ -1344,11 +1344,30 @@ local function indexBags()
 		local data = {}
 		local bags = {0,1,2,3,4}
 		for _, container in pairs(bags) do
-			for i = 1, GetContainerNumSlots(container), 1 do
-				local item = GetContainerItemLink(container, i)
-				if item then
-					local _,count = GetContainerItemInfo(container, i)
-					local id = Skillet:GetItemIDFromLink(item)
+		local slots
+		if isClassic then
+			slots = GetContainerNumSlots(container)
+		else
+			slots = C_Container.GetContainerNumSlots(container)
+		end
+		for i = 1, slots, 1 do
+			local item
+			if isClassic then
+				item = GetContainerItemLink(container, i)
+			else
+				item = C_Container.GetContainerItemLink(container, i)
+			end
+			if item then
+				local info, id, count
+				if isClassic then
+					info, count = GetContainerItemInfo(container, i)
+					id = Skillet:GetItemIDFromLink(item)
+				else
+					info = C_Container.GetContainerItemInfo(container, i)
+					--DA.DEBUG(2,"info="..DA.DUMP1(info))
+					id = info.itemID
+					count = info.stackCount
+				end
 					local name = string.match(item,"%[.+%]")
 					if name then 
 						name = string.sub(name,2,-2)	-- remove the brackets

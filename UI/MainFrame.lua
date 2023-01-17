@@ -261,9 +261,7 @@ function Skillet:CreateTradeSkillWindow()
 	titlebar2:SetPoint("TOPLEFT",titlebar,"BOTTOMLEFT",0,0)
 	titlebar2:SetPoint("TOPRIGHT",titlebar,"BOTTOMRIGHT",0,0)
 	titlebar2:SetHeight(13)
-	titlebar:SetGradientAlpha("VERTICAL",r*0.6,g*0.6,b*0.6,1,r,g,b,1)
 	titlebar:SetColorTexture(r,g,b,1)
-	titlebar2:SetGradientAlpha("VERTICAL",r*0.9,g*0.9,b*0.9,1,r*0.6,g*0.6,b*0.6,1)
 	titlebar2:SetColorTexture(r,g,b,1)
 
 	local title = CreateFrame("Frame",nil,frame)
@@ -1857,7 +1855,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 -- Get the icon
 --
 	if Skillet.isCraft then
-		--DA.DEBUG(1,"UpdateDetailsWindow: texture from GetCraftIcon("..tostring(GetTradeSkillIcon)..")")
+		--DA.DEBUG(1,"UpdateDetailsWindow: texture from GetCraftIcon("..tostring(GetCraftIcon)..")")
 		texture = GetCraftIcon(skillIndex)
 	elseif recipe.itemID ~= 0 then
 		--DA.DEBUG(1,"UpdateDetailsWindow: texture from GetItemIcon("..tostring(recipe.itemID)..")")
@@ -1869,8 +1867,12 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 		--DA.DEBUG(1,"UpdateDetailsWindow: texture from GetTradeSkillIcon("..tostring(GetTradeSkillIcon)..")")
 		texture = GetTradeSkillIcon(skillIndex)
 	end
-	SkilletSkillIcon:SetNormalTexture(texture)
-	SkilletSkillIcon:Show()
+	if texture then
+		SkilletSkillIcon:SetNormalTexture(texture)
+		SkilletSkillIcon:Show()
+	else
+		SkilletSkillIcon:Hide()
+	end
 --
 -- Check for Auction House
 --
@@ -3409,9 +3411,7 @@ function Skillet:CreateStandaloneQueueFrame()
 	titlebar2:SetPoint("TOPLEFT",titlebar,"BOTTOMLEFT",0,0)
 	titlebar2:SetPoint("TOPRIGHT",titlebar,"BOTTOMRIGHT",0,0)
 	titlebar2:SetHeight(13)
-	titlebar:SetGradientAlpha("VERTICAL",r*0.6,g*0.6,b*0.6,1,r,g,b,1)
 	titlebar:SetColorTexture(r,g,b,1)
-	titlebar2:SetGradientAlpha("VERTICAL",r*0.9,g*0.9,b*0.9,1,r*0.6,g*0.6,b*0.6,1)
 	titlebar2:SetColorTexture(r,g,b,1)
 	local title = CreateFrame("Frame",nil,frame)
 	title:SetPoint("TOPLEFT",titlebar,"TOPLEFT",0,0)

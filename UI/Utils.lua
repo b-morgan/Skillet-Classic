@@ -15,6 +15,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
+local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
+local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
+local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
+local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
+
 -- Handy utilities for Skillet UI methods.
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
@@ -117,11 +122,16 @@ local function createInfoBox()
 	createInfoBox = nil
 end
 
+--
 -- Adds resizing to a window. Resizing is both width and height from the
 -- lower right corner only
+--
 function Skillet:EnableResize(frame, min_width, min_height, refresh_method)
-	-- lets play the resize me game!
-	frame:SetMinResize(min_width,min_height) -- magic numbers
+	if isClassic then
+		frame:SetMinResize(min_width,min_height) -- magic numbers
+	else
+		frame:SetResizeBounds(min_width, min_height) -- magic numbers
+	end
 	local sizer_se = CreateFrame("Frame", frame:GetName() .. "_SizerSoutheast", frame)
 	sizer_se:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",0,0)
 	sizer_se:SetWidth(25)
