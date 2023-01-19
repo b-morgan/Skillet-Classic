@@ -687,12 +687,15 @@ function Skillet:OnEnable()
 		self:RegisterEvent("CRAFT_UPDATE")			-- craft event
 		self:RegisterEvent("UNIT_PET_TRAINING_POINTS")	-- craft event
 	end
-	self:RegisterEvent("UNIT_INVENTORY_CHANGED") 	-- Not sure if this is helpful but we will track it.
 	self:RegisterEvent("UNIT_PORTRAIT_UPDATE")		-- Not sure if this is helpful but we will track it.
 	self:RegisterEvent("SPELLS_CHANGED")			-- Not sure if this is helpful but we will track it.
+	self:RegisterEvent("BAG_OPEN")					-- Not sure if this is helpful but we will track it.
+	self:RegisterEvent("BAG_CLOSED")				-- Not sure if this is helpful but we will track it.
+	self:RegisterEvent("BAG_CONTAINER_UPDATE")		-- Not sure if this is helpful but we will track it.
 
 	self:RegisterEvent("BAG_UPDATE") 				-- Fires for both bag and bank updates.
-	self:RegisterEvent("BAG_UPDATE_DELAYED")		-- Fires after all applicable BAG_UPADTE events for a specific action have been fired.
+	self:RegisterEvent("BAG_UPDATE_DELAYED")		-- Fires after all applicable BAG_UPDATE events for a specific action have been fired.
+	self:RegisterEvent("UNIT_INVENTORY_CHANGED")	-- BAG_UPDATE_DELAYED seems to have disappeared in WotLK (Wrath) 3.4.1. Using this instead.
 --
 -- MERCHANT_SHOW, MERCHANT_HIDE, MERCHANT_UPDATE events needed for auto buying.
 --
@@ -1274,21 +1277,6 @@ function Skillet:SkilletClose()
 	self.closingTrade = nil
 end
 
-function Skillet:BAG_OPEN(event, bagID)				-- Fires when a non-inventory container is opened.
-	DA.TRACE("BAG_OPEN( "..tostring(bagID).." )")	-- We don't really care
-end
-
-function Skillet:BAG_CLOSED(event, bagID)			-- Fires when the whole bag is removed from 
-	DA.TRACE("BAG_CLOSED( "..tostring(bagID).." )")	-- inventory or bank. We don't really care. 
-end
-
-function Skillet:UNIT_INVENTORY_CHANGED(event, unit)
-	DA.TRACE("UNIT_INVENTORY_CHANGED( "..tostring(unit).." )")
-	if self.tradeSkillOpen then
-		self:AdjustInventory()
-	end
-end
-
 function Skillet:GET_ITEM_INFO_RECEIVED(event, itemID, success)
 	DA.TRACE("GET_ITEM_INFO_RECEIVED( "..tostring(itemID)..", "..tostring(success).." )")
 end
@@ -1334,141 +1322,6 @@ end
 
 function Skillet:TRADE_ACCEPT_UPDATE(event, playerAccepted, targetAccepted)
 	DA.TRACE("TRADE_ACCEPT_UPDATE( "..tostring(playerAccepted)..", "..tostring(targetAccepted).." )")
-end
-
-local function indexBags()
-	DA.TRACE("indexBags()")
-	local player = Skillet.currentPlayer
-	if player then
-		local details = {}
-		local data = {}
-		local bags = {0,1,2,3,4}
-		for _, container in pairs(bags) do
-		local slots
-		if isClassic then
-			slots = GetContainerNumSlots(container)
-		else
-			slots = C_Container.GetContainerNumSlots(container)
-		end
-		for i = 1, slots, 1 do
-			local item
-			if isClassic then
-				item = GetContainerItemLink(container, i)
-			else
-				item = C_Container.GetContainerItemLink(container, i)
-			end
-			if item then
-				local info, id, count
-				if isClassic then
-					info, count = GetContainerItemInfo(container, i)
-					id = Skillet:GetItemIDFromLink(item)
-				else
-					info = C_Container.GetContainerItemInfo(container, i)
-					--DA.DEBUG(2,"info="..DA.DUMP1(info))
-					id = info.itemID
-					count = info.stackCount
-				end
-					local name = string.match(item,"%[.+%]")
-					if name then 
-						name = string.sub(name,2,-2)	-- remove the brackets
-					else
-						name = item						-- when all else fails, use the link
-					end
-					if id then
-						table.insert(details, {
-							["bag"] = container,
-							["slot"] = i,
-							["id"] = id,
-							["name"] = name,
-							["count"] = count,
-						})
-						if not data[id] then
-							data[id] = 0
-						end
-						data[id] = data[id] + count
-					end
-				end
-			end
-		Skillet.db.realm.bagData[player] = data
-		Skillet.db.realm.bagDetails[player] = details
-		end
-	end
-end
-
---
--- So we can track when the players inventory changes and update craftable counts
---
-function Skillet:BAG_UPDATE(event, bagID)
-	DA.TRACE("BAG_UPDATE( "..bagID.." )")
-	if bagID >= 0 and bagID <= 4 then
-		self.bagsChanged = true				-- an inventory bag update, do nothing until BAG_UPDATE_DELAYED.
-	end
-	if UnitAffectingCombat("player") then
-		return
-	end
-	local showing = false
-	if self.tradeSkillFrame and self.tradeSkillFrame:IsVisible() then
-		showing = true
-	end
-	if self.shoppingList and self.shoppingList:IsVisible() then
-		showing = true
-	end
-	if showing then
-		if bagID == -1 or bagID >= 5 then
---
--- a bank update, process it in ShoppingList.lua
---
-			Skillet:BANK_UPDATE(event,bagID) -- Looks like an event but its not.
-		end
-	end
-end
-
---
--- Event fires after all applicable BAG_UPDATE events for a specific action have been fired.
--- It doesn't happen as often as BAG_UPDATE so its a better event for us to use.
---
-function Skillet:BAG_UPDATE_DELAYED(event)
-	DA.TRACE("BAG_UPDATE_DELAYED")
-	if Skillet.bagsChanged and not UnitAffectingCombat("player") then
-		indexBags()
-		Skillet.bagsChanged = false
-	end
-	if Skillet.bankBusy then
-		DA.DEBUG(1,"BAG_UPDATE_DELAYED and bankBusy")
-		Skillet.gotBagUpdateEvent = true
-		if Skillet.gotBankEvent and Skillet.gotBagUpdateEvent then
-			Skillet:UpdateBankQueue("bag update") -- Implemented in ShoppingList.lua
-		end
-	end
---[[
-	if Skillet.guildBusy then
-		DA.DEBUG(1,"BAG_UPDATE_DELAYED and guildBusy")
-		Skillet.gotBagUpdateEvent = true
-		if Skillet.gotGuildbankEvent and Skillet.gotBagUpdateEvent then
-			Skillet:UpdateGuildQueue("bag update")
-		end
-	end
-]]--
-	local scanned = false
-	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
-		Skillet:InventoryScan()
-		scanned = true
-		Skillet:UpdateTradeSkillWindow()
-	end
-	if Skillet.shoppingList and Skillet.shoppingList:IsVisible() then
-		if not scanned then
-			Skillet:InventoryScan()
-			scanned = true
-		end
-		Skillet:UpdateShoppingListWindow(false)
-	end
-	if MerchantFrame and MerchantFrame:IsVisible() then
-		if not scanned then
-			Skillet:InventoryScan()
-			scanned = true
-		end
-		self:UpdateMerchantFrame()
-	end
 end
 
 --
