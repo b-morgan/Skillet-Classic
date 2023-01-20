@@ -458,7 +458,7 @@ function Skillet:ResetTradeSkillWindow()
 			local button = buttons[i]
 			if button then
 				button:ClearAllPoints()
-				button:SetParent("SkilletFrame")
+				button:SetParent(SkilletFrame)
 				button:SetPoint("TOPLEFT", last_button, "BOTTOMLEFT", 0, -1)
 				button:Hide()
 				button:SetAlpha(0)
