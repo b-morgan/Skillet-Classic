@@ -689,9 +689,9 @@ function Skillet:OnEnable()
 	end
 	self:RegisterEvent("UNIT_PORTRAIT_UPDATE")		-- Not sure if this is helpful but we will track it.
 	self:RegisterEvent("SPELLS_CHANGED")			-- Not sure if this is helpful but we will track it.
-	self:RegisterEvent("BAG_OPEN")					-- Not sure if this is helpful but we will track it.
-	self:RegisterEvent("BAG_CLOSED")				-- Not sure if this is helpful but we will track it.
-	self:RegisterEvent("BAG_CONTAINER_UPDATE")		-- Not sure if this is helpful but we will track it.
+--	self:RegisterEvent("BAG_OPEN")					-- Not sure if this is helpful but we will track it.
+--	self:RegisterEvent("BAG_CLOSED")				-- Not sure if this is helpful but we will track it.
+--	self:RegisterEvent("BAG_CONTAINER_UPDATE")		-- Not sure if this is helpful but we will track it.
 
 	self:RegisterEvent("BAG_UPDATE") 				-- Fires for both bag and bank updates.
 	self:RegisterEvent("BAG_UPDATE_DELAYED")		-- Fires after all applicable BAG_UPDATE events for a specific action have been fired.
