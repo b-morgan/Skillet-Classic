@@ -67,7 +67,9 @@ local function createIgnoreListFrame(self)
 	end
 	frame:SetBackdrop(FrameBackdrop)
 	frame:SetBackdropColor(0.1, 0.1, 0.1)
-	-- A title bar stolen from the Ace2 Waterfall window.
+--
+-- A title bar stolen from the Ace2 Waterfall window.
+--
 	local r,g,b = 0, 0.7, 0; -- dark green
 	local titlebar = frame:CreateTexture(nil,"BACKGROUND")
 	local titlebar2 = frame:CreateTexture(nil,"BACKGROUND")
@@ -77,7 +79,9 @@ local function createIgnoreListFrame(self)
 	titlebar2:SetPoint("TOPLEFT",titlebar,"BOTTOMLEFT",0,0)
 	titlebar2:SetPoint("TOPRIGHT",titlebar,"BOTTOMRIGHT",0,0)
 	titlebar2:SetHeight(13)
+	titlebar:SetGradient("VERTICAL", CreateColor(r*0.6,g*0.6,b*0.6,1), CreateColor(r,g,b,1))
 	titlebar:SetColorTexture(r,g,b,1)
+	titlebar2:SetGradient("VERTICAL", CreateColor(r*0.9,g*0.9,b*0.9,1), CreateColor(r*0.6,g*0.6,b*0.6,1))
 	titlebar2:SetColorTexture(r,g,b,1)
 	local title = CreateFrame("Frame",nil,frame)
 	title:SetPoint("TOPLEFT",titlebar,"TOPLEFT",0,0)
