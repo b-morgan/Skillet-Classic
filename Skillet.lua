@@ -184,14 +184,14 @@ end
 -- Called with events that should have an existing profile.
 --
 function Skillet:RefreshConfig(event, database, profile)
-	DA.CHAT("RefreshConfig("..tostring(event)..", "..tostring(profile)..")")
+	DA.MARK3("RefreshConfig("..tostring(event)..", "..tostring(profile)..")")
 end
 
 --
 -- Called with events that need the profile created.
 --
 function Skillet:InitializeProfile(event, database, profile)
-	DA.CHAT("InitializeProfile("..tostring(event)..", "..tostring(profile)..")")
+	DA.MARK3("InitializeProfile("..tostring(event)..", "..tostring(profile)..")")
 	self:ConfigureProfile()
 	self:ConfigurePlayerProfile()
 end
@@ -240,14 +240,8 @@ function Skillet:ConfigurePlayerProfile()
 	end
 	if not self.db.profile.plugins then
 		self.db.profile.plugins = {}
+		self:InitializePlugins()
 	end
-	if self.db.profile.plugins.recipeNamePlugin then
-		if not self.db.profile.plugins.recipeNameSuffix then
-			self.db.profile.plugins.recipeNameSuffix = self.db.profile.plugins.recipeNamePlugin
-		end
-		self.db.profile.plugins.recipeNamePlugin = nil
-	end
-	self:InitializePlugins()
 end
 
 --
@@ -422,6 +416,7 @@ StaticPopupDialogs["SKILLET_IGNORE_CHANGE"] = {
 -- Now do the character initialization
 --
 	self:InitializeDatabase(UnitName("player"))
+	self:InitializePlugins()
 end
 
 --
@@ -1067,7 +1062,8 @@ end
 -- Called when the addon is disabled
 --
 function Skillet:OnDisable()
-	--DA.DEBUG(0,"OnDisable()");
+	--DA.DEBUG(0,"OnDisable()")
+	self:DisablePlugins()
 	self:UnregisterAllEvents()
 	self:EnableBlizzardFrame()
 end

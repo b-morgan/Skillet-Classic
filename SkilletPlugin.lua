@@ -227,8 +227,8 @@ end
 function Skillet:InitializePlugins()
 	DA.DEBUG(0,"InitializePlugins()")
 	for k,v in pairs(Skillet.registeredPlugins) do
-		--DA.DEBUG(1,"k= "..tostring(k)..", v= "..tostring(v))
 		if v and v.OnInitialize then
+			DA.DEBUG(1,"InitializePlugins: k= "..tostring(k)..", v= "..tostring(v))
 			v.OnInitialize()
 		end
 	end
@@ -237,9 +237,19 @@ end
 function Skillet:EnablePlugins()
 	DA.DEBUG(0,"EnablePlugins()")
 	for k,v in pairs(Skillet.registeredPlugins) do
-		DA.DEBUG(1,"k= "..tostring(k)..", v= "..tostring(v))
 		if v and v.OnEnable then
+			DA.DEBUG(1,"EnablePlugins: k= "..tostring(k)..", v= "..tostring(v))
 			v.OnEnable()
+		end
+	end
+end
+
+function Skillet:DisablePlugins()
+	DA.DEBUG(0,"DisablePlugins()")
+	for k,v in pairs(Skillet.registeredPlugins) do
+		if v and v.OnDisable then
+			DA.DEBUG(1,"DisablePlugins: k= "..tostring(k)..", v= "..tostring(v))
+			v.OnDisable()
 		end
 	end
 end
