@@ -259,9 +259,9 @@ function Skillet:PrintTradeSkillLevels(itemID, spellID)
 	--DA.DEBUG(0,"PrintTradeSkillLevels("..tostring(itemID)..", "..tostring(spellID)..")")
 	if itemID then
 		local orange, yellow, green, gray = self:GetTradeSkillLevels(itemID, spellID)
-		DA.CHAT("PrintTradeSkillLevels: itemID= "..tostring(itemID)..", spellID= "..tostring(spellID))
-		DA.CHAT("PrintTradeSkillLevels: index= "..tostring(self.indexTradeSkillLevel)..", source= "..tostring(self.sourceTradeSkillLevel))
-		DA.CHAT("PrintTradeSkillLevels: levels= "..tostring(orange).."/"..tostring(yellow).."/"..tostring(green).."/"..tostring(gray))
+		DA.MARK3("PrintTradeSkillLevels: itemID= "..tostring(itemID)..", spellID= "..tostring(spellID))
+		DA.MARK3("PrintTradeSkillLevels: index= "..tostring(self.indexTradeSkillLevel)..", source= "..tostring(self.sourceTradeSkillLevel))
+		DA.MARK3("PrintTradeSkillLevels: levels= "..tostring(orange).."/"..tostring(yellow).."/"..tostring(green).."/"..tostring(gray))
 	end
 end
 

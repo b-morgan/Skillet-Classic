@@ -128,7 +128,7 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex)
 					numCraftAlts = math.min(numCraftAlts, math.floor(reagentAvailableAlts/numNeeded))
 				end
 			else								-- no data means no craftability
-				DA.CHAT(L["reagent id seems corrupt!"])
+				DA.MARK3(L["reagent id seems corrupt!"])
 				numCraft = 0
 				numCraftable = 0
 				numCraftVendor = 0
