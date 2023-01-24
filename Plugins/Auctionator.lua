@@ -514,6 +514,7 @@ function plugin.SortByPercent(skill,a,b)
 end
 
 function plugin.OnInitialize()
+	--DA.DEBUG(0,"ATR:OnInitialize()")
 	if not Skillet.db.profile.plugins.ATR then
 		Skillet.db.profile.plugins.ATR = {}
 		Skillet.db.profile.plugins.ATR.enabled = true
@@ -747,7 +748,7 @@ end
 function plugin.RecipeNameSuffix(skill, recipe)
 	local text, buyout, cost, profit, percentage
 	if not recipe then return end
-	DA.DEBUG(0,"RecipeNameSuffix: recipe= "..DA.DUMP1(recipe,1))
+	--DA.DEBUG(0,"RecipeNameSuffix: recipe= "..DA.DUMP1(recipe,1))
 	local itemID = recipe.itemID
 --
 -- Check for Enchanting. Most recipes don't produce an item but
