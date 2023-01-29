@@ -17,6 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
+local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
+local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
+local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
+local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
+
 SKILLET_IGNORE_LIST_HEIGHT = 16
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
@@ -43,7 +48,7 @@ local ControlBackdrop  = {
 	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
 	tile = true, tileSize = 16, edgeSize = 16,
 	insets = { left = 3, right = 3, top = 3, bottom = 3 }
-}-- Additional things to used to modify the XML created frame
+}
 local FrameBackdrop = {
 	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
 	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -75,14 +80,19 @@ local function createIgnoreListFrame(self)
 	local titlebar2 = frame:CreateTexture(nil,"BACKGROUND")
 	titlebar:SetPoint("TOPLEFT",frame,"TOPLEFT",3,-4)
 	titlebar:SetPoint("TOPRIGHT",frame,"TOPRIGHT",-3,-4)
+	titlebar:SetColorTexture(r,g,b,1)
 	titlebar:SetHeight(13)
 	titlebar2:SetPoint("TOPLEFT",titlebar,"BOTTOMLEFT",0,0)
 	titlebar2:SetPoint("TOPRIGHT",titlebar,"BOTTOMRIGHT",0,0)
-	titlebar2:SetHeight(13)
-	titlebar:SetGradient("VERTICAL", CreateColor(r*0.6,g*0.6,b*0.6,1), CreateColor(r,g,b,1))
-	titlebar:SetColorTexture(r,g,b,1)
-	titlebar2:SetGradient("VERTICAL", CreateColor(r*0.9,g*0.9,b*0.9,1), CreateColor(r*0.6,g*0.6,b*0.6,1))
 	titlebar2:SetColorTexture(r,g,b,1)
+	titlebar2:SetHeight(13)
+	if isClassic then
+		titlebar:SetGradientAlpha("VERTICAL",r*0.6,g*0.6,b*0.6,1,r,g,b,1)
+		titlebar2:SetGradientAlpha("VERTICAL",r*0.9,g*0.9,b*0.9,1,r*0.6,g*0.6,b*0.6,1)
+	else
+		titlebar:SetGradient("VERTICAL", CreateColor(r*0.6,g*0.6,b*0.6,1), CreateColor(r,g,b,1))
+		titlebar2:SetGradient("VERTICAL", CreateColor(r*0.9,g*0.9,b*0.9,1), CreateColor(r*0.6,g*0.6,b*0.6,1))
+	end
 	local title = CreateFrame("Frame",nil,frame)
 	title:SetPoint("TOPLEFT",titlebar,"TOPLEFT",0,0)
 	title:SetPoint("BOTTOMRIGHT",titlebar2,"BOTTOMRIGHT",0,0)
@@ -108,14 +118,13 @@ local function createIgnoreListFrame(self)
 	backdrop:SetBackdropBorderColor(0.6, 0.6, 0.6)
 	backdrop:SetBackdropColor(0.05, 0.05, 0.05)
 	backdrop:SetResizable(true)
-	local ignoreListLocation = {
-		prefix = "ignoreListLocation_"
-	}
-
 --
 -- Ace Window manager library, allows the window position (and size)
 -- to be automatically saved
 --
+	local ignoreListLocation = {
+		prefix = "ignoreListLocation_"
+	}
 	local windowManager = LibStub("LibWindow-1.1")
 	windowManager.RegisterConfig(frame, self.db.profile, ignoreListLocation)
 	windowManager.RestorePosition(frame)  -- restores scale also
@@ -180,7 +189,7 @@ function Skillet:ClearIgnoreList(player)
 	--DA.DEBUG(0,"clear ignore list for: "..(player or "all players"))
 	for i=1,#playerList,1 do
 		local player = playerList[i]
-		DA.DEBUG(1,"player: "..player)
+		--DA.DEBUG(1,"player: "..player)
 		self.db.realm.userIgnoredMats[player] = {}
 	end
 	self:UpdateIgnoreListWindow()
@@ -209,7 +218,7 @@ function Skillet:UpdateIgnoreListWindow()
 	self.cachedIgnoreList = self:GetIgnoreList()
 	local numItems = #self.cachedIgnoreList
 	if not self.ignoreList or not self.ignoreList:IsVisible() then
-		DA.DEBUG(0,"No ignoreList visible so return")
+		--DA.DEBUG(0,"No ignoreList visible so return")
 		return
 	end
 	self:UpdateIgnoreListButton()
