@@ -12,6 +12,7 @@
 ## X-License GPL v3 or later
 ## X-Curse-Project-ID: 447401
 ## X-WoWI-ID: 25287
+## X-Wago-ID: Mj6jqMNR
 ## X-Website: https://www.curseforge.com/wow/addons/skillet-classic
 ## SavedVariables: SkilletDB
 ## SavedVariablesPerCharacter: SkilletWho, SkilletDBPC, SkilletMemory, SkilletProfile
