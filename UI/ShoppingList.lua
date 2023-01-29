@@ -165,7 +165,7 @@ local function createShoppingListFrame(self)
 --
 -- lets play the resize me game!
 --
-	Skillet:EnableResize(frame, 300, 165, Skillet.UpdateShoppingListWindow)
+	Skillet:EnableResize(frame, 385, 170, Skillet.UpdateShoppingListWindow)
 --
 -- so hitting [ESC] will close the window
 --
@@ -175,11 +175,11 @@ end
 
 function Skillet:ShoppingListButton_OnEnter(button)
 	local name, link, quality = GetItemInfo(button.id)
-	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 	if link then
+		GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 		GameTooltip:SetHyperlink(link)
+		GameTooltip:Show()
 	end
-	GameTooltip:Show()
 	CursorUpdate(button)
 end
 
@@ -210,10 +210,16 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
 	--DA.DEBUG(0,"GetShoppingList("..tostring(player)..", "..tostring(sameFaction)..", "..tostring(includeGuildbank)..")")
 	self:InventoryScan()
 	local curPlayer = self.currentPlayer
+	if not self.db.realm.faction then
+		self.db.realm.faction = {}
+	end
+	if not self.db.realm.faction[curPlayer] then
+		self.db.realm.faction[curPlayer] = UnitFactionGroup("player")
+	end
 	local curFaction = self.db.realm.faction[curPlayer] 
 	local curGuild = GetGuildInfo("player")
-	if not Skillet.db.global.cachedGuildbank then
-		Skillet.db.global.cachedGuildbank = {}
+	if not self.db.global.cachedGuildbank then
+		self.db.global.cachedGuildbank = {}
 	end
 	local cachedGuildbank = Skillet.db.global.cachedGuildbank
 	local list = {}
@@ -492,7 +498,7 @@ end
 -- So we can track when the players inventory changes and update craftable counts
 --
 function Skillet:BAG_UPDATE(event, bagID)
-	DA.TRACE("BAG_UPDATE( "..bagID.." )")
+	DA.TRACE2("BAG_UPDATE( "..bagID.." )")
 	if bagID >= 0 and bagID <= 4 then
 		self.bagsChanged = true				-- an inventory bag update, do nothing until BAG_UPDATE_DELAYED.
 	end
@@ -503,10 +509,19 @@ function Skillet:BAG_UPDATE(event, bagID)
 	if self.tradeSkillFrame and self.tradeSkillFrame:IsVisible() then
 		showing = true
 	end
+	if MerchantFrame and MerchantFrame:IsVisible() then
+		-- may need to update the button on the merchant frame window ...
+		self:UpdateMerchantFrame()
+	end
 	if self.shoppingList and self.shoppingList:IsVisible() then
 		showing = true
 	end
 	if showing then
+		if bagID >= 0 and bagID <= 4 then
+--
+-- an inventory bag update, do nothing (wait for the BAG_UPDATE_DELAYED).
+--
+		end
 		if bagID == -1 or bagID >= 5 then
 --
 -- a bank update, process it in ShoppingList.lua
@@ -514,6 +529,10 @@ function Skillet:BAG_UPDATE(event, bagID)
 			Skillet:BANK_UPDATE(event,bagID) -- Looks like an event but its not.
 		end
 	end
+--
+-- Schedule a fake BAG_UPDATE_DELAYED "event" just in case Blizzard forgets
+--
+	self:ScheduleTimer("BAG_UPDATE_DELAYED",1.0)
 end
 
 --
@@ -522,6 +541,10 @@ end
 --
 function Skillet:BAG_UPDATE_DELAYED(event)
 	DA.TRACE("BAG_UPDATE_DELAYED")
+--
+-- Only need one event so cancel the fake if it exists.
+--
+	self:CancelTimer("BAG_UPDATE_DELAYED")
 	if Skillet.bagsChanged and not UnitAffectingCombat("player") then
 		indexBags()
 		Skillet.bagsChanged = false
@@ -533,7 +556,6 @@ function Skillet:BAG_UPDATE_DELAYED(event)
 			Skillet:UpdateBankQueue("bag update")
 		end
 	end
---[[
 	if Skillet.guildBusy then
 		DA.DEBUG(1,"BAG_UPDATE_DELAYED and guildBusy")
 		Skillet.gotBagUpdateEvent = true
@@ -541,7 +563,6 @@ function Skillet:BAG_UPDATE_DELAYED(event)
 			Skillet:UpdateGuildQueue("bag update")
 		end
 	end
-]]--
 	local scanned = false
 	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
 		Skillet:InventoryScan()
@@ -650,14 +671,6 @@ function Skillet:GUILDBANKFRAME_CLOSED()
 	DA.TRACE("GUILDBANKFRAME_CLOSED")
 	guildbankFrameOpen = false
 	self:HideShoppingList()
-end
-
---
--- Called when the cursor has changed (should only be needed while debugging)
---
-function Skillet:CURSOR_UPDATE()
-	local type, data, subType, subData = GetCursorInfo()
-	--DA.DEBUG(3,"CURSOR_UPDATE - type=",type,", data=",data,", subType=",subType)
 end
 
 --
@@ -1076,7 +1089,7 @@ function Skillet:GetReagentsFromBanks()
 -- Do things using a queue and events.
 --
 	if guildbankFrameOpen then
-		--DA.DEBUG(0,"#list=",#list)
+		--DA.DEBUG(0,"Guildbank #list=",#list)
 		local guildQueue = Skillet.guildQueue
 		for j,v in pairs(list) do
 			--DA.DEBUG(2,"j=",j,", v=",DA.DUMP1(v))
@@ -1170,8 +1183,8 @@ function Skillet:UpdateShoppingListWindow(use_cached_recipes)
 --
 		table.sort(self.cachedShoppingList, function(a,b)
 			local na, nb
-			na = GetItemInfo(a.id)
-			nb = GetItemInfo(b.id)
+			na = GetItemInfo(a.id) or ""
+			nb = GetItemInfo(b.id) or ""
 			return nb > na
 		end)
 		if Skillet.db.profile.merge_items then
