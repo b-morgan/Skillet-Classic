@@ -9,6 +9,7 @@ if isRetail then
 else
 	DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
 end
+local tek = tekDebug and tekDebug:GetFrame("Skillet")
 --
 -- Chat and Debugging Aids
 --
@@ -61,6 +62,7 @@ DA.DebugLevel = 1
 DA.TableDump = false
 DA.TraceShow = false
 DA.TraceLog = false
+DA.TraceLog2 = false
 DA.ProfileShow = false
 DA.DebugLog = {} -- Add to SavedVariables for debugging
 DA.MAXDEBUG = 4000
@@ -70,6 +72,13 @@ DA.STATUS_COLOR = "|c0033CCFF"
 DA.DEBUG_COLOR  = "|c00A0FF00"
 DA.TRACE_COLOR  = "|c0000FFA0"
 DA.WARN_COLOR   = "|c0000FFE0"
+
+local function tekD(text)
+	print(text)
+	if tek then 
+		tek:AddMessage(text)
+	end
+end
 
 function DA.CHAT(text)
 	print(DA.STATUS_COLOR..addonName..": "..text)
@@ -137,7 +146,7 @@ function DA.WARN(...)
 		end
 	end
 	if (DA.WarnShow or DA.DebugShow) then
-		print(DA.WARN_COLOR..addonName..": "..text)
+		tekD(DA.WARN_COLOR..addonName..": "..text)
 	end
 	table.insert(DA.DebugLog,date().."(W): "..text)
 	if (table.getn(DA.DebugLog) > DA.MAXDEBUG) then
@@ -194,7 +203,7 @@ function DA.DEBUG(...)
 	elseif dlevel < 1 then dlevel = 1
 	elseif dlevel > 9 then dlevel = 10 end
 	if (DA.DebugShow and level < dlevel) then
-		print(DA.DEBUG_COLOR..addonName..": "..text)
+		tekD(DA.DEBUG_COLOR..addonName..": "..text)
 	end
 	if (not DA.LogLevel or level < dlevel) then
 		table.insert(DA.DebugLog,date().."(D"..level.."): "..text)
@@ -202,6 +211,11 @@ function DA.DEBUG(...)
 			table.remove(DA.DebugLog,1)
 		end
 	end
+end
+
+function DA.TRACE2(...)
+	if not DA.TraceLog2 then return "" end
+	DA.TRACE(...)
 end
 
 function DA.TRACE(...)
@@ -238,7 +252,7 @@ function DA.TRACE(...)
 		end
 	end
 	if (DA.TraceShow) then
-		print(DA.TRACE_COLOR..addonName..": "..text)
+		tekD(DA.TRACE_COLOR..addonName..": "..text)
 	end
 	table.insert(DA.DebugLog,date().."(T): "..text)
 	if (table.getn(DA.DebugLog) > DA.MAXDEBUG) then
@@ -256,7 +270,7 @@ function DA.DUMP(o,m,n)
 		local s
 		local i = ""
 		if n then
-			i = string.rep(" ",n)
+			i = string.rep("  ",n)
 		else
 			n = 0
 		end
@@ -271,7 +285,7 @@ function DA.DUMP(o,m,n)
 				s = s..i..'['..k..'] = '..DA.DUMP(v,m,n+1)..'\n'
 			end
 		end
-		return s..i..'}\n'
+		return string.gsub(s..i..'}\n',"\n\n","\n")
 	else
 		return tostring(o)
 	end
@@ -345,7 +359,7 @@ end
 function DA.DebugAidsStatus()
 	print("WarnShow= "..tostring(DA.WarnShow)..", WarnLog= "..tostring(DA.WarnLog))
 	print("DebugShow= "..tostring(DA.DebugShow)..", DebugLogging= "..tostring(DA.DebugLogging)..", DebugLevel= "..tostring(DA.DebugLevel))
-	print("TraceShow= "..tostring(DA.TraceShow)..", TraceLog= "..tostring(DA.TraceLog))
+	print("TraceShow= "..tostring(DA.TraceShow)..", TraceLog= "..tostring(DA.TraceLog)..", TraceLog2= "..tostring(DA.TraceLog2))
 	print("ProfileShow= "..tostring(DA.ProfileShow))
 	print("TableDump= "..tostring(DA.TableDump))
 	print("LogLevel= "..tostring(DA.LogLevel))

@@ -214,6 +214,7 @@ function Skillet:ConfigureProfile()
 	Skillet.TableDump = Skillet.db.profile.TableDump
 	Skillet.TraceShow = Skillet.db.profile.TraceShow
 	Skillet.TraceLog = Skillet.db.profile.TraceLog
+	Skillet.TraceLog2 = Skillet.db.profile.TraceLog2
 	Skillet.ProfileShow = Skillet.db.profile.ProfileShow
 --
 -- Profile variable to control Skillet fixes for Blizzard bugs.
@@ -690,7 +691,12 @@ function Skillet:OnEnable()
 
 	self:RegisterEvent("BAG_UPDATE") 				-- Fires for both bag and bank updates.
 	self:RegisterEvent("BAG_UPDATE_DELAYED")		-- Fires after all applicable BAG_UPDATE events for a specific action have been fired.
-	self:RegisterEvent("UNIT_INVENTORY_CHANGED")	-- BAG_UPDATE_DELAYED seems to have disappeared in WotLK (Wrath) 3.4.1. Using this instead.
+	self:RegisterEvent("UNIT_INVENTORY_CHANGED")	-- BAG_UPDATE_DELAYED seems to have disappeared. Using this instead.
+--
+-- Events that replace *_SHOW and *_CLOSED by adding a PlayerInteractionType parameter
+--
+--	self:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_SHOW")
+--	self:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_HIDE")
 --
 -- MERCHANT_SHOW, MERCHANT_HIDE, MERCHANT_UPDATE events needed for auto buying.
 --
@@ -1109,6 +1115,16 @@ end
 --
 function Skillet:IsModKey2Down()
 	if not Skillet.db.profile.nomodkeys and IsControlKeyDown() then
+		return true
+	end
+	return false
+end
+
+--
+-- Make modifier key to alter some behaviors optional.
+--
+function Skillet:IsModKey3Down()
+	if not Skillet.db.profile.nomodkeys and IsAltKeyDown() then
 		return true
 	end
 	return false
