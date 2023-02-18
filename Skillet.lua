@@ -418,6 +418,7 @@ StaticPopupDialogs["SKILLET_IGNORE_CHANGE"] = {
 --
 	self:InitializeDatabase(UnitName("player"))
 	self:InitializePlugins()
+	self.NewsGUI:Initialize()
 end
 
 --

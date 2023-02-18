@@ -59,6 +59,8 @@ Locale\Locale-zhTW.lua
 Skillet.lua
 SkilletOptions.lua
 SkilletData.lua
+SkilletNewsGUI.lua
+SkilletNewsData.lua
 SkilletARL.lua
 TradeskillInfo.lua
 SkilletQueue.lua
