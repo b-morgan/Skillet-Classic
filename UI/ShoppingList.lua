@@ -221,11 +221,14 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
 		self.db.realm.faction[curPlayer] = UnitFactionGroup("player")
 	end
 	local curFaction = self.db.realm.faction[curPlayer] 
-	local curGuild = GetGuildInfo("player")
 	if not self.db.global.cachedGuildbank then
 		self.db.global.cachedGuildbank = {}
 	end
-	local cachedGuildbank = Skillet.db.global.cachedGuildbank
+	local cachedGuildbank = self.db.global.cachedGuildbank
+	local curGuild = GetGuildInfo("player")
+	if curGuild and not cachedGuildbank[curGuild] then
+		cachedGuildbank[curGuild] = {}
+	end
 	local list = {}
 	local playerList
 	local usedInventory = {}  -- only use the items from each player once
@@ -244,9 +247,6 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
 	local usedInventory = {}  -- only use the items from each player once
 	if not usedInventory[curPlayer] then
 		usedInventory[curPlayer] = {}
-	end
-	if curGuild and not cachedGuildbank[curGuild] then
-		cachedGuildbank[curGuild] = {}
 	end
 	for i=1,#playerList,1 do
 		local player = playerList[i]
@@ -452,8 +452,14 @@ local function indexGuildBank(tab)
 -- This means it is broken if this account is in guilds on 
 -- different realms (not connected) with the same name.
 --
-	local guildName = GetGuildInfo("player")
-	local cachedGuildbank = Skillet.db.global.cachedGuildbank
+	if not self.db.global.cachedGuildbank then
+		self.db.global.cachedGuildbank = {}
+	end
+	local cachedGuildbank = self.db.global.cachedGuildbank
+	local curGuild = GetGuildInfo("player")
+	if curGuild and not cachedGuildbank[curGuild] then
+		cachedGuildbank[curGuild] = {}
+	end
 	local name, icon, isViewable, canDeposit, numWithdrawals, remainingWithdrawals = GetGuildBankTabInfo(tab);
 	DA.DEBUG(1,"indexGuildBank tab="..tab..", isViewable="..tostring(isViewable)..", numWithdrawals="..numWithdrawals)
 	if(isViewable and numWithdrawals~=0) then
@@ -469,10 +475,10 @@ local function indexGuildBank(tab)
 						["id"]  = id,
 						["count"] = count,
 					})
-					if not cachedGuildbank[guildName][id] then
-						cachedGuildbank[guildName][id] = 0
+					if not cachedGuildbank[curGuild][id] then
+						cachedGuildbank[curGuild][id] = 0
 					end
-					cachedGuildbank[guildName][id] = cachedGuildbank[guildName][id] + count
+					cachedGuildbank[curGuild][id] = cachedGuildbank[curGuild][id] + count
 				end
 			end
 		end
