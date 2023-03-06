@@ -33,6 +33,11 @@ Skillet.NewsData = {
 					{ header = "Commands", body = "Add \"/skillet news\" to open (or close) the news frame" },
 				},
 			},
+			{	name = "Fixes",
+				data = {
+					{ header = "Shoppinglist", body = "Fix #141" },
+				},
+			},
 		},
 	},
 	{	version = "1.65",
