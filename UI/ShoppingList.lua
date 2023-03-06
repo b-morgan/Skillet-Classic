@@ -452,10 +452,10 @@ local function indexGuildBank(tab)
 -- This means it is broken if this account is in guilds on 
 -- different realms (not connected) with the same name.
 --
-	if not self.db.global.cachedGuildbank then
-		self.db.global.cachedGuildbank = {}
+	local cachedGuildbank = Skillet.db.global.cachedGuildbank
+	if not cachedGuildbank then
+		cachedGuildbank = {}
 	end
-	local cachedGuildbank = self.db.global.cachedGuildbank
 	local curGuild = GetGuildInfo("player")
 	if curGuild and not cachedGuildbank[curGuild] then
 		cachedGuildbank[curGuild] = {}
