@@ -797,7 +797,7 @@ function Skillet:UpdateTradeButtons(player)
 			end
 		end
 		--DA.DEBUG(3,"tradeLink= "..tostring(tradeLink))
-		if ranks and tradeID ~= MINING then
+		if self:IsSupportedTradeskill(tradeID) and ranks and tradeID ~= MINING then
 			local spellName, _, spellIcon = GetSpellInfo(tradeID)
 			if tradeID == SMELTING then
 				spellName = GetSpellInfo(MINING)
