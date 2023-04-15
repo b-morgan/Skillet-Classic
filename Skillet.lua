@@ -29,10 +29,9 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 Skillet.L = L
 
 -- Get version info from the .toc file
-local MAJOR_VERSION = GetAddOnMetadata("Skillet-Classic", "Version");
-local ADDON_BUILD = ((select(4, GetBuildInfo())) < 20000 and "Classic") or ((select(4, GetBuildInfo())) < 30000 and "BCC") or ((select(4, GetBuildInfo())) < 40000 and "Wrath") or "Retail"
-Skillet.version = MAJOR_VERSION
-Skillet.build = ADDON_BUILD
+Skillet.version = GetAddOnMetadata("Skillet-Classic", "Version")
+Skillet.interface = select(4, GetBuildInfo())
+Skillet.build = (Skillet.interface < 20000 and "Classic") or (Skillet.interface < 30000 and "BCC") or (Skillet.interface < 40000 and "Wrath") or "Retail"
 Skillet.project = WOW_PROJECT_ID
 local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
 local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
@@ -276,9 +275,6 @@ function Skillet:OnInitialize()
 --
 -- Clean up obsolete data
 --
-	if self.db.global.cachedGuildbank then
-		self.db.global.cachedGuildbank = nil
-	end
 
 --
 -- Change the dataVersion when (major) code changes
@@ -353,6 +349,9 @@ function Skillet:OnInitialize()
 	end
 	if not self.db.global.cachedGuildbank then
 		self.db.global.cachedGuildbank = {}
+	end
+	if not self.db.global.customPrice then
+		self.db.global.customPrice = {}
 	end
 
 --

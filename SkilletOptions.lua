@@ -1373,6 +1373,85 @@ Skillet.options =
 			end,
 			order = 103
 		},
+--
+-- commands to manage the custom reagent price table
+--
+		customadd = {
+			type = 'input',
+			name = "customadd",
+			desc = "Add a custom price for a reagent",
+			get = function()
+				return value
+			end,
+			set = function(self,value)
+				if not (UnitAffectingCombat("player")) then
+					if value then
+						local item, id, price
+						DA.DEBUG(0,"value= "..value)
+						item, price = string.split(",",value)
+						if string.find(item,"|H") then
+							id = Skillet:GetItemIDFromLink(item)
+						else
+							id = tonumber(item)
+						end
+						name, link = GetItemInfo(id)
+						price = tonumber(price)
+						DA.DEBUG(0,"id= "..tostring(id)..", name= "..tostring(name)..", price= "..tostring(price)..", link= "..link)
+						Skillet.db.global.customPrice[id] = { ["name"] = name, ["value"] = price }
+						end
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
+												  " Leave combat and try again.")
+				end
+			end,
+			order = 105
+		},
+		customdel = {
+			type = 'input',
+			name = "customdel",
+			desc = "Delete a custom reagent",
+			get = function()
+				return value
+			end,
+			set = function(self,value)
+				if not (UnitAffectingCombat("player")) then
+					if value then
+						local id
+						DA.DEBUG(0,"value= "..value)
+						if string.find(value,"|H") then
+							id = Skillet:GetItemIDFromLink(value)
+						else
+							id = tonumber(value)
+						end
+						Skillet.db.global.customPrice[id] = nil
+						end
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
+												  " Leave combat and try again.")
+				end
+			end,
+			order = 106
+		},
+		customshow = {
+			type = 'execute',
+			name = "customshow",
+			desc = "Print the custom reagent price table",
+			func = function()
+				for id,entry in pairs(Skillet.db.global.customPrice) do
+					print("id= "..tostring(id)..", name= "..tostring(entry.name)..", value= "..tostring(entry.value))
+				end
+			end,
+			order = 107
+		},
+		customclear = {
+			type = 'execute',
+			name = "customclear",
+			desc = "Clear the custom reagent price table",
+			func = function()
+				Skillet.db.global.customPrice = {}
+			end,
+			order = 108
+		},
 
 --
 -- command to reset the position of the major Skillet frames
