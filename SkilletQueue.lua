@@ -176,10 +176,10 @@ function Skillet:AddToQueue(command, first)
 			end
 		end
 	elseif queue and #queue>0 then
-		local i=#queue
 --
 --check last item in queue - add current if they are the same
 --
+		local i=#queue
 		if queue[i].op == "iterate" and queue[i].recipeID == command.recipeID then
 			queue[i].count = queue[i].count + command.count
 		else
