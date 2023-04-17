@@ -321,14 +321,14 @@ plugin.options =
 		customPrice = {
 			type = "toggle",
 			name = "customPrice",
-			desc = "Show minimum and maximum buyout values",
+			desc = "Substitute customPrice table values for Auctionator price values",
 			get = function()
 				return Skillet.db.profile.plugins.ATR.customPrice
 			end,
 			set = function(self,value)
 				Skillet.db.profile.plugins.ATR.customPrice = value
 			end,
-			order = 22
+			order = 23
 		},
 		buyFactor = {
 			type = "range",
@@ -470,14 +470,15 @@ local function GetReagentData(reagent)
 			value = 0
 		end
 		if Skillet.db.profile.plugins.ATR.customPrice then
-			local customPrice = Skillet.db.global.customPrice
+			local server = Skillet.data.server or 0
+			local customPrice = Skillet.db.global.customPrice[server]
 			if customPrice and customPrice[id] then
 				--DA.DEBUG(0,"GetReagentData: id= "..tostring(id)..", "..DA.DUMP1(customPrice[id]))
-				if customPrice[id].name ~= name then
+				if customPrice[id].name and customPrice[id].name ~= name then
 					--DA.DEBUG(0,"GetReagentData: name mismatch: "..tostring(name)..", "..tostring(customPrice[id].name))
 					customPrice[id].name = name
 				end
-				if customPrice[id].value < value then
+				if customPrice[id].value and customPrice[id].value < value then
 					--DA.DEBUG(0,"GetReagentData: substitute: "..tostring(customPrice[id].value).." for: "..tostring(value))
 					value = customPrice[id].value
 					custom = " |cffff8040*|r"
@@ -1166,8 +1167,3 @@ function Skillet:AuctionatorSearch(whichOne)
 		Auctionator.API.v1.MultiSearch(addonName, items)
 	end
 end
-
-plugin.custom = {
-[14343] = {name = "Small Brilliant Shard", value = 10101},	-- 1g 1s 1c
-[16202] = {name = "Lesser Eternal Essense", value = 20099},	-- 2g 0s 99c
-}

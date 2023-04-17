@@ -842,6 +842,10 @@ function Skillet:PLAYER_ENTERING_WORLD()
 				self.db.global.server[server] = {}
 			end
 			self.db.global.server[server][realm] = player
+
+			if not self.db.global.customPrice[server] then
+				self.db.global.customPrice[server] = {}
+			end
 			if not self.db.global.faction[server] then
 				self.db.global.faction[server] = {}
 			end

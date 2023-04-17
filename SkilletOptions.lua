@@ -1379,7 +1379,7 @@ Skillet.options =
 		customadd = {
 			type = 'input',
 			name = "customadd",
-			desc = "Add a custom price for a reagent",
+			desc = "Add a custom price for a reagent (customadd id|link,price)",
 			get = function()
 				return value
 			end,
@@ -1387,6 +1387,7 @@ Skillet.options =
 				if not (UnitAffectingCombat("player")) then
 					if value then
 						local item, id, price
+						local server = Skillet.data.server or 0
 						DA.DEBUG(0,"value= "..value)
 						item, price = string.split(",",value)
 						if string.find(item,"|H") then
@@ -1397,7 +1398,7 @@ Skillet.options =
 						name, link = GetItemInfo(id)
 						price = tonumber(price)
 						DA.DEBUG(0,"id= "..tostring(id)..", name= "..tostring(name)..", price= "..tostring(price)..", link= "..link)
-						Skillet.db.global.customPrice[id] = { ["name"] = name, ["value"] = price }
+						Skillet.db.global.customPrice[server][id] = { ["name"] = name, ["value"] = price }
 						end
 				else
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
@@ -1409,7 +1410,7 @@ Skillet.options =
 		customdel = {
 			type = 'input',
 			name = "customdel",
-			desc = "Delete a custom reagent",
+			desc = "Delete a custom reagent (customdel id|link)",
 			get = function()
 				return value
 			end,
@@ -1417,13 +1418,14 @@ Skillet.options =
 				if not (UnitAffectingCombat("player")) then
 					if value then
 						local id
+						local server = Skillet.data.server or 0
 						DA.DEBUG(0,"value= "..value)
 						if string.find(value,"|H") then
 							id = Skillet:GetItemIDFromLink(value)
 						else
 							id = tonumber(value)
 						end
-						Skillet.db.global.customPrice[id] = nil
+						Skillet.db.global.customPrice[server][id] = nil
 						end
 				else
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction." ..
@@ -1437,7 +1439,8 @@ Skillet.options =
 			name = "customshow",
 			desc = "Print the custom reagent price table",
 			func = function()
-				for id,entry in pairs(Skillet.db.global.customPrice) do
+				local server = Skillet.data.server or 0
+				for id,entry in pairs(Skillet.db.global.customPrice[server]) do
 					print("id= "..tostring(id)..", name= "..tostring(entry.name)..", value= "..tostring(entry.value))
 				end
 			end,
@@ -1448,7 +1451,8 @@ Skillet.options =
 			name = "customclear",
 			desc = "Clear the custom reagent price table",
 			func = function()
-				Skillet.db.global.customPrice = {}
+				local server = Skillet.data.server or 0
+				Skillet.db.global.customPrice[server] = {}
 			end,
 			order = 108
 		},
