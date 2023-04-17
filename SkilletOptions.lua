@@ -1386,7 +1386,7 @@ Skillet.options =
 			set = function(self,value)
 				if not (UnitAffectingCombat("player")) then
 					if value then
-						local item, id, price
+						local item, id, price, name, link
 						local server = Skillet.data.server or 0
 						DA.DEBUG(0,"value= "..value)
 						item, price = string.split(",",value)
@@ -1397,7 +1397,7 @@ Skillet.options =
 						end
 						name, link = GetItemInfo(id)
 						price = tonumber(price)
-						DA.DEBUG(0,"id= "..tostring(id)..", name= "..tostring(name)..", price= "..tostring(price)..", link= "..link)
+						DA.DEBUG(0,"id= "..tostring(id)..", name= "..tostring(name)..", price= "..tostring(price)..", link= "..tostring(link))
 						Skillet.db.global.customPrice[server][id] = { ["name"] = name, ["value"] = price }
 						end
 				else
