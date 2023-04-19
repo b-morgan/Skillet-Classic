@@ -139,30 +139,6 @@ plugin.options =
 			end,
 			order = 8
 		},
-		suffixBuyout = {
-			type = "toggle",
-			name = "suffixBuyout",
-			desc = "Show buyout value",
-			get = function()
-				return Skillet.db.profile.plugins.ATR.suffixBuyout
-			end,
-			set = function(self,value)
-				Skillet.db.profile.plugins.ATR.suffixBuyout = value
-			end,
-			order = 9
-		},
-		suffixCost = {
-			type = "toggle",
-			name = "suffixCost",
-			desc = "Show cost value",
-			get = function()
-				return Skillet.db.profile.plugins.ATR.suffixCost
-			end,
-			set = function(self,value)
-				Skillet.db.profile.plugins.ATR.suffixCost = value
-			end,
-			order = 10
-		},
 		extraProfitValue = {
 			type = "toggle",
 			name = "extraProfitValue",
@@ -173,19 +149,7 @@ plugin.options =
 			set = function(self,value)
 				Skillet.db.profile.plugins.ATR.extraProfitValue = value
 			end,
-			order = 11
-		},
-		suffixProfitValue = {
-			type = "toggle",
-			name = "suffixProfitValue",
-			desc = "Show profit value",
-			get = function()
-				return Skillet.db.profile.plugins.ATR.suffixProfitValue
-			end,
-			set = function(self,value)
-				Skillet.db.profile.plugins.ATR.suffixProfitValue = value
-			end,
-			order = 12
+			order = 9
 		},
 		extraProfitPercentage = {
 			type = "toggle",
@@ -197,20 +161,94 @@ plugin.options =
 			set = function(self,value)
 				Skillet.db.profile.plugins.ATR.extraProfitPercentage = value
 			end,
-			order = 13
+			order = 10
 		},
-		suffixProfitPercentage = {
-			type = "toggle",
-			name = "suffixProfitPercentage",
-			desc = "Show profit as percentage",
-			get = function()
-				return Skillet.db.profile.plugins.ATR.suffixProfitPercentage
-			end,
-			set = function(self,value)
-				Skillet.db.profile.plugins.ATR.suffixProfitPercentage = value
-			end,
-			order = 14
+--[[
+		header = {
+			type = "header",
+			name = L["Suffix"],
+			order = 11
 		},
+			suffixBuyout = {
+				type = "toggle",
+				name = L["Buyout"],
+				desc = "Show buyout value",
+				get = function()
+					return Skillet.db.profile.plugins.ATR.suffixBuyout
+				end,
+				set = function(self,value)
+					Skillet.db.profile.plugins.ATR.suffixBuyout = value
+				end,
+				width = 0.6,
+				order = 12
+			},
+			suffixCost = {
+				type = "toggle",
+				name = L["Cost"],
+				desc = "Show cost value",
+				get = function()
+					return Skillet.db.profile.plugins.ATR.suffixCost
+				end,
+				set = function(self,value)
+					Skillet.db.profile.plugins.ATR.suffixCost = value
+				end,
+				width = 0.6,
+				order = 13
+			},
+			suffixProfitValue = {
+				type = "toggle",
+				name = L["Profit"],
+				desc = "Show profit value",
+				get = function()
+					return Skillet.db.profile.plugins.ATR.suffixProfitValue
+				end,
+				set = function(self,value)
+					Skillet.db.profile.plugins.ATR.suffixProfitValue = value
+				end,
+				width = 0.6,
+				order = 14
+			},
+			suffixProfitPercentage = {
+				type = "toggle",
+				name = L["Percent"],
+				desc = "Show profit as percentage",
+				get = function()
+					return Skillet.db.profile.plugins.ATR.suffixProfitPercentage
+				end,
+				set = function(self,value)
+					Skillet.db.profile.plugins.ATR.suffixProfitPercentage = value
+				end,
+				width = 0.6,
+				order = 15
+			},
+--]]
+--[
+		suffix = {
+			type = "select",
+			name = "Suffix",
+			desc = "Primary suffix text",
+			order = 1,
+			get = function() 
+				return Skillet.db.profile.plugins.ATR.suffix
+			end,
+			set = function(_, value)
+				Skillet.db.profile.plugins.ATR.suffix = value
+				Skillet.db.profile.plugins.ATR.suffixBuyout = (value == 1)
+				Skillet.db.profile.plugins.ATR.suffixCost = (value == 2)
+				Skillet.db.profile.plugins.ATR.suffixProfitValue = (value == 3)
+				Skillet.db.profile.plugins.ATR.suffixProfitPercentage = (value == 4)
+			end,
+			values = {
+			[1] = L["Buyout"], 
+			[2] = L["Cost"],
+			[3] = L["Profit"],
+			[4] = L["Percent"],
+			},
+			width = 0.5,
+			style = "radio", -- "dropdown"
+			order = 11
+		},
+--]]
 		colorCode = {
 			type = "toggle",
 			name = "colorCode",
@@ -221,8 +259,10 @@ plugin.options =
 			set = function(self,value)
 				Skillet.db.profile.plugins.ATR.colorCode = value
 			end,
-			order = 15
+--			width = "full",
+			order = 20
 		},
+--[[
 		alwaysEnchanting = {
 			type = "toggle",
 			name = "alwaysEnchanting",
@@ -233,8 +273,9 @@ plugin.options =
 			set = function(self,value)
 				Skillet.db.profile.plugins.ATR.alwaysEnchanting = value
 			end,
-			order = 16
+			order = 21
 		},
+--]]
 		calcProfitAhTax = {
 			type = "toggle",
 			name = "calcProfitAhTax",
@@ -245,7 +286,7 @@ plugin.options =
 			set = function(self,value)
 				Skillet.db.profile.plugins.ATR.calcProfitAhTax = value
 			end,
-			order = 17
+			order = 22
 		},
 		journalatorE = {
 			type = "toggle",
@@ -260,27 +301,12 @@ plugin.options =
 			set = function(self,value)
 				Skillet.db.profile.plugins.ATR.journalatorE = value
 			end,
-			order = 18
-		},
-		journalatorS = {
-			type = "toggle",
-			name = "Journalator Suffix",
-			desc = "Show Journalator sales rate",
-			hidden = function()
-				return not Journalator
-			end,
-			get = function()
-				return Skillet.db.profile.plugins.ATR.journalatorS
-			end,
-			set = function(self,value)
-				Skillet.db.profile.plugins.ATR.journalatorS = value
-			end,
-			order = 19
+			order = 23
 		},
 		journalatorC = {
 			type = "toggle",
 			name = "Journalator Count",
-			desc = "Show Journalator success count",
+			desc = "Show Journalator success count suffix",
 			hidden = function()
 				return not Journalator
 			end,
@@ -290,7 +316,22 @@ plugin.options =
 			set = function(self,value)
 				Skillet.db.profile.plugins.ATR.journalatorC = value
 			end,
-			order = 20
+			order = 24
+		},
+		journalatorS = {
+			type = "toggle",
+			name = "Journalator Sales Rate",
+			desc = "Show Journalator sales rate suffix",
+			hidden = function()
+				return not Journalator
+			end,
+			get = function()
+				return Skillet.db.profile.plugins.ATR.journalatorS
+			end,
+			set = function(self,value)
+				Skillet.db.profile.plugins.ATR.journalatorS = value
+			end,
+			order = 25
 		},
 		qualityBuyout = {
 			hidden = not isRetail,
@@ -303,7 +344,7 @@ plugin.options =
 			set = function(self,value)
 				Skillet.db.profile.plugins.ATR.qualityBuyout = value
 			end,
-			order = 21
+			order = 26
 		},
 		minmaxBuyout = {
 			hidden = not isRetail,
@@ -316,7 +357,7 @@ plugin.options =
 			set = function(self,value)
 				Skillet.db.profile.plugins.ATR.minmaxBuyout = value
 			end,
-			order = 22
+			order = 27
 		},
 		customPrice = {
 			type = "toggle",
@@ -328,7 +369,7 @@ plugin.options =
 			set = function(self,value)
 				Skillet.db.profile.plugins.ATR.customPrice = value
 			end,
-			order = 23
+			order = 28
 		},
 		buyFactor = {
 			type = "range",
@@ -387,6 +428,31 @@ local function IsATRSort()
 	--DA.DEBUG(0,"IsATRSort= "..tostring(found))
 	return found
 end
+
+local function IsJNLSort()
+	local sortmethod = Skillet:GetTradeSkillOption("sortmethod")
+	local found = string.find(sortmethod,"JNL:") 
+	--DA.DEBUG(0,"IsJNLSort= "..tostring(found))
+	return found
+end
+
+local function SetATRsuffix(recipe)
+	--DA.DEBUG(0,"SetATRsuffix: recipe= "..DA.DUMP1(recipe,1))
+	if Skillet.db.profile.plugins.ATR.suffixBuyout then
+		--DA.DEBUG(0,"SetATRsuffix: buyout= "..tostring(recipe.buyout))
+		return recipe.buyout
+	elseif Skillet.db.profile.plugins.ATR.suffixCost then
+		--DA.DEBUG(0,"SetATRsuffix: cost= "..tostring(recipe.cost))
+		return recipe.cost
+	elseif Skillet.db.profile.plugins.ATR.suffixProfitValue then
+		--DA.DEBUG(0,"SetATRsuffix: profit= "..tostring(recipe.profit))
+		return recipe.profit
+	elseif Skillet.db.profile.plugins.ATR.suffixProfitPercentage then
+		--DA.DEBUG(0,"SetATRsuffix: percentage= "..tostring(recipe.percentage))
+		return recipe.percentage
+	end
+end
+
 
 local function GetMinMaxBuyout(recipe)
 	local minBuyout = 999999999999
@@ -563,45 +629,10 @@ local function GetRecipeData(recipe)
 		recipe.cost = cost
 		recipe.profit = profit
 		recipe.percentage = percentage
-		recipe.suffix = profit
+--		recipe.mostsold = successCount
+--		recipe.salesrate = salesRate
+		recipe.suffix = SetATRsuffix(recipe)
 	end
-end
-
---
--- Sort by the Journalator API function GetRealmSuccessCountByItemName
---
--- For enchanting, use the scrollID instead of the itemID
---
-function plugin.SortMostSold(skill,a,b)
-	if a.subGroup or b.subGroup then
-		return NOSORT(skill, a, b)
-	end
-	local recipeA, recipeB, itemNameA, itemNameB, successCountA, successCountB
-	recipeA = Skillet:GetRecipe(a.recipeID)
-	--DA.DEBUG(0,"SortMostSold: recipeA= "..DA.DUMP1(recipeA))
-	recipeB = Skillet:GetRecipe(b.recipeID)
-	--DA.DEBUG(0,"SortMostSold: recipeB= "..DA.DUMP1(recipeB))
-	if recipeA.scrollID then
-		itemNameA = GetItemInfo(recipeA.scrollID)
-	elseif recipeA.itemID then
-		itemNameA = GetItemInfo(recipeA.itemID)
-	end
-	if recipeB.scrollID then
-		itemNameB = GetItemInfo(recipeB.scrollID)
-	elseif recipeB.itemID then
-		itemNameB = GetItemInfo(recipeB.itemID)
-	end
-	--DA.DEBUG(0,"SortMostSold: itemNameA= "..tostring(itemNameA)..", raw itemNameB= "..tostring(itemNameB))
-	if Journalator.API and itemNameA and itemNameB then
-		successCountA = Journalator.API.v1.GetRealmSuccessCountByItemName(addonName, itemNameA)
-		successCountB = Journalator.API.v1.GetRealmSuccessCountByItemName(addonName, itemNameB)
-	end
-	successCountA = successCountA or 0
-	successCountB = successCountB or 0
-	if successCountA > 0 and successCountB > 0 then
-		--DA.DEBUG(0,"SortMostSold: successCountA= "..tostring(successCountA)..", successCountB= "..tostring(successCountB))
-	end
-	return (successCountA > successCountB)
 end
 
 --
@@ -700,6 +731,90 @@ function plugin.SortByPercent(skill,a,b)
 	return (percentA > percentB)
 end
 
+--
+-- Sort by the Journalator API function GetRealmSuccessCountByItemName
+--
+-- For enchanting, use the scrollID instead of the itemID
+--
+function plugin.SortMostSold(skill,a,b)
+	if a.subGroup or b.subGroup then
+		return NOSORT(skill, a, b)
+	end
+	local recipeA, recipeB, itemNameA, itemNameB, successCountA, successCountB
+	recipeA = Skillet:GetRecipe(a.recipeID)
+	--DA.DEBUG(0,"SortMostSold: recipeA= "..DA.DUMP1(recipeA))
+	recipeB = Skillet:GetRecipe(b.recipeID)
+	--DA.DEBUG(0,"SortMostSold: recipeB= "..DA.DUMP1(recipeB))
+	if recipeA.scrollID then
+		itemNameA = GetItemInfo(recipeA.scrollID)
+	elseif recipeA.itemID then
+		itemNameA = GetItemInfo(recipeA.itemID)
+	end
+	if recipeB.scrollID then
+		itemNameB = GetItemInfo(recipeB.scrollID)
+	elseif recipeB.itemID then
+		itemNameB = GetItemInfo(recipeB.itemID)
+	end
+	--DA.DEBUG(0,"SortMostSold: itemNameA= "..tostring(itemNameA)..", itemNameB= "..tostring(itemNameB))
+	successCountA = 0
+	successCountB = 0
+	if Journalator and Journalator.API and itemNameA and itemNameB then
+		successCountA = Journalator.API.v1.GetRealmSuccessCountByItemName(addonName, itemNameA)
+		successCountB = Journalator.API.v1.GetRealmSuccessCountByItemName(addonName, itemNameB)
+	end
+	if successCountA > 0 and successCountB > 0 then
+		--DA.DEBUG(0,"SortMostSold: successCountA= "..tostring(successCountA)..", successCountB= "..tostring(successCountB))
+	end
+	return (successCountA > successCountB)
+end
+
+--
+-- Sort by the Sales Rate using the Journalator API functions
+--   GetRealmSuccessCountByItemName and GetRealmFailureCountByItemName
+--
+-- For enchanting, use the scrollID instead of the itemID
+--
+function plugin.SortSalesRate(skill,a,b)
+	if a.subGroup or b.subGroup then
+		return NOSORT(skill, a, b)
+	end
+	local recipeA, recipeB, itemNameA, itemNameB, successCountA, successCountB
+	local failedCountA, failedCountB, salesRateA, salesRateB
+	recipeA = Skillet:GetRecipe(a.recipeID)
+	--DA.DEBUG(0,"SortSalesRate: recipeA= "..DA.DUMP1(recipeA))
+	recipeB = Skillet:GetRecipe(b.recipeID)
+	--DA.DEBUG(0,"SortSalesRate: recipeB= "..DA.DUMP1(recipeB))
+	if recipeA.scrollID then
+		itemNameA = GetItemInfo(recipeA.scrollID)
+	elseif recipeA.itemID then
+		itemNameA = GetItemInfo(recipeA.itemID)
+	end
+	if recipeB.scrollID then
+		itemNameB = GetItemInfo(recipeB.scrollID)
+	elseif recipeB.itemID then
+		itemNameB = GetItemInfo(recipeB.itemID)
+	end
+	--DA.DEBUG(0,"SortSalesRate: itemNameA= "..tostring(itemNameA)..", itemNameB= "..tostring(itemNameB))
+	salesRateA = 0
+	salesRateB = 0
+	if Journalator and Journalator.API and itemNameA and itemNameB then
+		successCountA = Journalator.API.v1.GetRealmSuccessCountByItemName(addonName, itemNameA)
+		failedCountA = Journalator.API.v1.GetRealmFailureCountByItemName(addonName, itemNameA)
+		successCountB = Journalator.API.v1.GetRealmSuccessCountByItemName(addonName, itemNameB)
+		failedCountB = Journalator.API.v1.GetRealmFailureCountByItemName(addonName, itemNameB)
+		if successCountA > 0 then
+			salesRateA = successCountA / (successCountA + failedCountA) * 100
+		end
+		if successCountB > 0 then
+			salesRateB = successCountB / (successCountB + failedCountB) * 100
+		end
+	end
+	if salesRateA > 0 and salesRateB > 0 then
+		--DA.DEBUG(0,"SortSalesRate: salesRateA= "..tostring(salesRateA)..", salesRateB= "..tostring(salesRateB))
+	end
+	return (salesRateA > salesRateB)
+end
+
 function plugin.OnInitialize()
 	--DA.DEBUG(0,"ATR:OnInitialize()")
 	if not Skillet.db.profile.plugins.ATR then
@@ -718,6 +833,7 @@ function plugin.OnInitialize()
 	Skillet:AddRecipeSorter("ATR: "..L["Percent"], plugin.SortByPercent)
 	if Journalator and Journalator.API then
 		Skillet:AddRecipeSorter("JNL: "..L["Most Sold"], plugin.SortMostSold)
+		Skillet:AddRecipeSorter("JNL: "..L["Sales Rate"], plugin.SortSalesRate)
 	end
 end
 
@@ -910,10 +1026,13 @@ function plugin.GetExtraText(skill, recipe)
 end
 
 --
--- Returns a text representation of profit, numerical value of profit (for sorting purposes)
+-- Returns a text string suffix
 --
 function plugin.RecipeNameSuffix(skill, recipe)
 	local text, buyout, cost, profit, percentage
+	local successCount = 0
+	local failedCount = 0
+	local salesRate = nil
 	if not recipe then return end
 	--DA.DEBUG(0,"RecipeNameSuffix: recipe= "..DA.DUMP1(recipe,1))
 	local itemID = recipe.itemID
@@ -957,35 +1076,50 @@ function plugin.RecipeNameSuffix(skill, recipe)
 		profit = buyout * ah_tax - cost
 		percentage = profit * 100 / cost
 
+		if addonName and Journalator and Journalator.API then
+			if itemName then
+				successCount = Journalator.API.v1.GetRealmSuccessCountByItemName(addonName, itemName)
+				failedCount = Journalator.API.v1.GetRealmFailureCountByItemName(addonName, itemName)
+				if (successCount + failedCount) > 0 then
+					salesRate = string.format("%2.0f", successCount / (successCount + failedCount) * 100).."%"
+				else
+					salesRate = string.format("%2.0f", 0).."%"
+				end
+			end
+			--DA.DEBUG(0, "RecipeNameSuffix: successCount="..tostring(successCount)..", failedCount="..tostring(failedCount)..", salesRate="..tostring(salesRate))
+		end
+
 --
 -- When one of our sorts is active, the suffix is the sort value
 -- If none of our sorts is active, the suffix is determined by the option settings
 --
 		local getSort = GetATRSort()
-		local isSort = IsATRSort()
+		local isSortA = IsATRSort()
+		local isSortJ = IsJNLSort()
+		local isSort = isSortA or isSortJ
 		--DA.DEBUG(1, "RecipeNameSuffix: GetATRSort="..tostring(getSort)..", IsATRSort= "..tostring(isSort))
-		if getSort == "ATR: "..L["Buyout"] or (not isSort and Skillet.db.profile.plugins.ATR.suffixBuyout) then
+		if getSort == "ATR: "..L["Buyout"] or ((not isSortA or isSortJ) and Skillet.db.profile.plugins.ATR.suffixBuyout) then
 			--DA.DEBUG(1, "RecipeNameSuffix: GetATRSort="..tostring(getSort)..", IsATRSort= "..tostring(isSort)..", suffixBuyout= "..tostring(Skillet.db.profile.plugins.ATR.suffixBuyout))
 			if Skillet.db.profile.plugins.ATR.useShort then
 				text = Skillet:FormatMoneyShort(buyout, true, Skillet.db.profile.plugins.ATR.colorCode)
 			else
 				text = Skillet:FormatMoneyFull(buyout, true, Skillet.db.profile.plugins.ATR.colorCode)
 			end
-		elseif getSort == "ATR: "..L["Cost"] or (not isSort and Skillet.db.profile.plugins.ATR.suffixCost) then
+		elseif getSort == "ATR: "..L["Cost"] or ((not isSortA or isSortJ) and Skillet.db.profile.plugins.ATR.suffixCost) then
 			--DA.DEBUG(1, "RecipeNameSuffix: GetATRSort="..tostring(getSort)..", IsATRSort= "..tostring(isSort)..", suffixCost= "..tostring(Skillet.db.profile.plugins.ATR.suffixCost))
 			if Skillet.db.profile.plugins.ATR.useShort then
 				text = Skillet:FormatMoneyShort(cost, true, Skillet.db.profile.plugins.ATR.colorCode)
 			else
 				text = Skillet:FormatMoneyFull(cost, true, Skillet.db.profile.plugins.ATR.colorCode)
 			end
-		elseif getSort == "ATR: "..L["Profit"] or (not isSort and Skillet.db.profile.plugins.ATR.suffixProfitValue) then
+		elseif getSort == "ATR: "..L["Profit"] or ((not isSortA or isSortJ) and Skillet.db.profile.plugins.ATR.suffixProfitValue) then
 			--DA.DEBUG(1, "RecipeNameSuffix: GetATRSort="..tostring(getSort)..", IsATRSort= "..tostring(isSort)..", suffixProfitValue= "..tostring(Skillet.db.profile.plugins.ATR.suffixProfitValue))
 			if Skillet.db.profile.plugins.ATR.useShort then
 				text = Skillet:FormatMoneyShort(profit, true, Skillet.db.profile.plugins.ATR.colorCode)
 			else
 				text = Skillet:FormatMoneyFull(profit, true, Skillet.db.profile.plugins.ATR.colorCode)
 			end
-		elseif getSort == "ATR: "..L["Percent"] or (not isSort and Skillet.db.profile.plugins.ATR.suffixProfitPercentage) then
+		elseif getSort == "ATR: "..L["Percent"] or ((not isSortA or isSortJ) and Skillet.db.profile.plugins.ATR.suffixProfitPercentage) then
 			--DA.DEBUG(1, "RecipeNameSuffix: GetATRSort="..tostring(getSort)..", IsATRSort= "..tostring(isSort)..", suffixProfitPercentage= "..tostring(Skillet.db.profile.plugins.ATR.suffixProfitPercentage))
 			if text then
 				text = text.." ("..profitPctText(profit,cost,999).."%)"
@@ -993,9 +1127,27 @@ function plugin.RecipeNameSuffix(skill, recipe)
 				text = "("..profitPctText(profit,cost,999).."%)"
 			end
 		end
+		if Journalator and Skillet.db.profile.plugins.ATR.journalatorC then
+			--DA.DEBUG(1, "RecipeNameSuffix: GetATRSort="..tostring(getSort)..", IsATRSort= "..tostring(isSort)..", journalatorC= "..tostring(Skillet.db.profile.plugins.ATR.journalatorC))
+				if text then
+					text = text.." ["..string.format("%3.0f", successCount).."]"
+				else
+					text = "["..string.format("%3.0f", successCount).."]"
+				end
+		end
+		if Journalator and Skillet.db.profile.plugins.ATR.journalatorS then
+			--DA.DEBUG(1, "RecipeNameSuffix: GetATRSort="..tostring(getSort)..", IsATRSort= "..tostring(isSort)..", journalatorS= "..tostring(Skillet.db.profile.plugins.ATR.journalatorS))
+			if salesRate and string.find(salesRate,"%%") then
+				if text then
+					text = text.." ["..tostring(salesRate).."]"
+				else
+					text = "["..tostring(salesRate).."]"
+				end
+			end
+		end
 --
 -- Enchants don't have any profit so if checked, always display the (negative) cost.
---
+--[[
 		if recipe.tradeID == 7411 then
 			if not Skillet.db.profile.plugins.ATR.alwaysEnchanting then
 				if not isSort and Skillet.db.profile.plugins.ATR.onlyPositive and profit <= 0 then
@@ -1005,48 +1157,15 @@ function plugin.RecipeNameSuffix(skill, recipe)
 		elseif not isSort and Skillet.db.profile.plugins.ATR.onlyPositive and profit <= 0 then
 			text = nil
 		end
---
--- Show Journalator salesRate or successCount
---
-		if addonName and itemName and Journalator and Skillet.db.profile.plugins.ATR.journalatorS then
-			local salesRate, successCount, failedCount, lastSold, lastBought
-			if Journalator.API then
-				successCount = Journalator.API.v1.GetRealmSuccessCountByItemName(addonName, itemName)
-				failedCount = Journalator.API.v1.GetRealmFailureCountByItemName(addonName, itemName)
-				if successCount > 0 then
-					salesRate = string.format("%.0d", successCount / (successCount + failedCount) * 100).."%"
-				else
-					salesRate = nil
-				end
-				--DA.DEBUG(0,"itemName= "..tostring(itemName)..", successCount= "..tostring(successCount)..", failedCount= "..tostring(failedCount)..", salesRate= "..tostring(salesRate))
-			else
-				salesRate, failedCount, lastSold, lastBought = Journalator.Tooltips.GetSalesInfo(itemName)
-				--DA.DEBUG(0,"itemName= "..tostring(itemName)..", salesRate= "..tostring(salesRate)..", failedCount= "..tostring(failedCount)..", lastSold= "..tostring(lastSold)..", lastBought= "..tostring(lastBought))
-			end
-			if Skillet.db.profile.plugins.ATR.journalatorC then
-				if successCount and successCount > 0 then
-					if text then
-						text = text.." ["..tostring(successCount).."]"
-					else
-						text = "["..tostring(successCount).."]"
-					end
-				end
-			else
-				if salesRate and string.find(salesRate,"%%") then
-					if text then
-						text = text.." ["..tostring(salesRate).."]"
-					else
-						text = "["..tostring(salesRate).."]"
-					end
-				end
-			end
-		end
+--]]
 	end
-	--DA.DEBUG(0,"RecipeNameSuffix: text= "..tostring(text)..", buyout= "..tostring(buyout)..", profit= "..tostring(profit)..", percentage= "..tostring(percentage))
 	recipe.buyout = buyout
+	recipe.cost = cost
 	recipe.profit = profit
 	recipe.percentage = percentage
-	recipe.suffix = profit
+	recipe.mostsold = successCount
+	recipe.salesrate = salesRate
+	recipe.suffix = SetATRsuffix(recipe)
 	return text
 end
 
