@@ -802,7 +802,7 @@ function Skillet:PLAYER_ENTERING_WORLD()
 	local className, classFile, classId = UnitClass("player")
 	local locale = GetLocale()
 	local _,wowBuild,_,wowVersion = GetBuildInfo();
-	local guid = UnitGUID("player")		-- example: guid="Player-970-0002FD64" kind=="Player" server=="970" ID="0002FD64" 
+	local guid = UnitGUID("player")		-- example: guid="Player-970-0002FD64" kind=="Player" server=="970" ID="0002FD64"
 --
 -- PLAYER_ENTERING_WORLD happens on login and when changing zones so
 -- only save the time of the first one.
@@ -836,6 +836,9 @@ function Skillet:PLAYER_ENTERING_WORLD()
 --
 		self.db.realm.guid[player]= guid
 		if (server) then
+			if not self.data then
+				self.data = {}
+			end
 			self.data.server = server
 			self.data.realm = realm
 			if not self.db.global.server[server] then
