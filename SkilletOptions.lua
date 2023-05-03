@@ -1441,10 +1441,22 @@ Skillet.options =
 			func = function()
 				local server = Skillet.data.server or 0
 				for id,entry in pairs(Skillet.db.global.customPrice[server]) do
-					print("id= "..tostring(id)..", name= "..tostring(entry.name)..", value= "..tostring(entry.value))
+					print(tostring(entry.name)..", "..Skillet:FormatMoneyFull(entry.value,true))
 				end
 			end,
 			order = 107
+		},
+		customdump = {
+			type = 'execute',
+			name = "customdump",
+			desc = "Print the custom reagent price table",
+			func = function()
+				local server = Skillet.data.server or 0
+				for id,entry in pairs(Skillet.db.global.customPrice[server]) do
+					print("id= "..tostring(id)..", name= "..tostring(entry.name)..", value= "..tostring(entry.value))
+				end
+			end,
+			order = 108
 		},
 		customclear = {
 			type = 'execute',
@@ -1454,7 +1466,7 @@ Skillet.options =
 				local server = Skillet.data.server or 0
 				Skillet.db.global.customPrice[server] = {}
 			end,
-			order = 108
+			order = 109
 		},
 
 --
