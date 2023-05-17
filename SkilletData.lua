@@ -1117,18 +1117,6 @@ local function ScanTrade()
 						Skillet.db.realm.invSlot[player][tradeID].name[itemEquipLoc] = numInvSlot[itemEquipLoc]
 						Skillet.db.realm.invSlot[player][tradeID][itemID] = itemEquipLoc
 					end
---[[
-				elseif not Skillet.isCraft then
-					recipe.numMade = 1
-					if Skillet.scrollData[recipeID] then
-						local itemID = Skillet.scrollData[recipeID]
-						recipe.itemID = itemID
-						itemString = itemID
-						Skillet:ItemDataAddRecipeSource(itemID,recipeID)	-- add a cross reference for the source of particular items
-					else
-						recipe.itemID = 0									-- indicates an enchant
-					end
-]]--
 				end
 				local reagentString = "-"
 				local reagentData = {}
