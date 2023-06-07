@@ -837,7 +837,11 @@ local function getItemFromBank(itemID, bag, slot, count)
 		local tobag, toslot = findBagForItem(itemID, num_moved)
 		--DA.DEBUG(1,"tobag=", tobag, " toslot=", toslot, " findBagForItem(", itemID, num_moved,")")
 		if not tobag then
-			Skillet:Print(L["Could not find bag space for"]..": "..GetContainerItemLink(bag, slot))
+			if isClassic then
+				Skillet:Print(L["Could not find bag space for"]..": "..GetContainerItemLink(bag, slot))
+			else
+				Skillet:Print(L["Could not find bag space for"]..": "..C_Container.GetContainerItemLink(bag, slot))
+			end
 			ClearCursor()
 			return 0
 		end
