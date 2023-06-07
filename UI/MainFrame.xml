@@ -2044,6 +2044,26 @@
 				</Scripts>
 			</Button>
 			<!--
+			# Auctionator button
+			-->
+			<Button name="SkilletAuctionatorButton" inherits="UIPanelButtonTemplate" text="Auctionator" parent="SkilletFrame">
+				<Size>
+					<AbsDimension x="90" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="SkilletRecipeNotesButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Skillet:AuctionatorSearch()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<!--
 			#
 			# A button that takes you back to the previous recipe
 			#
@@ -2218,26 +2238,6 @@
 						</Offset>
 					</Anchor>
 				</Anchors>
-			</Button>
-			<!--
-			# Auctionator button
-			-->
-			<Button name="SkilletAuctionatorButton" inherits="UIPanelButtonTemplate" text="Auctionator" parent="SkilletFrame">
-				<Size>
-					<AbsDimension x="85" y="22"/>
-				</Size>
-				<Anchors>
-					<Anchor point="BOTTOMLEFT" relativeTo="SkilletReagentParent" relativePoint="BOTTOMLEFT">
-						<Offset>
-							<AbsDimension x="2" y="2"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						Skillet:AuctionatorSearch()
-					</OnClick>
-				</Scripts>
 			</Button>
 			<!--
 			#
