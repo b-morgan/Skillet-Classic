@@ -696,8 +696,8 @@ function Skillet:OnEnable()
 --
 -- Events that replace *_SHOW and *_CLOSED by adding a PlayerInteractionType parameter
 --
---	self:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_SHOW")
---	self:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_HIDE")
+	self:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_SHOW")
+	self:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_HIDE")
 --
 -- MERCHANT_SHOW, MERCHANT_HIDE, MERCHANT_UPDATE events needed for auto buying.
 --
@@ -1070,6 +1070,45 @@ end
 
 function Skillet:UNIT_PET_TRAINING_POINTS()
 	DA.TRACE("UNIT_PET_TRAINING_POINTS")
+end
+
+--
+-- Dragonflight replacement for *_SHOW events
+--
+function Skillet:PLAYER_INTERACTION_MANAGER_FRAME_SHOW(event,interactionType)
+	DA.TRACE("PLAYER_INTERACTION_MANAGER_FRAME_SHOW("..tostring(interactionType)..")")
+	if interactionType == Enum.PlayerInteractionType.Merchant then -- 5
+--		Skillet:Skillet:MERCHANT_SHOW()
+		Skillet:MerchantShow()
+	end
+	if interactionType == Enum.PlayerInteractionType.Banker then -- 8
+		Skillet:BANKFRAME_OPENED()
+	end
+	if interactionType == Enum.PlayerInteractionType.GuildBanker then -- 10
+		Skillet:GUILDBANKFRAME_OPENED()
+	end
+	if interactionType == Enum.PlayerInteractionType.Auctioneer then -- 21
+		Skillet:AUCTION_HOUSE_SHOW()
+	end
+end
+
+--
+-- Dragonflight replacement for *_CLOSED events
+--
+function Skillet:PLAYER_INTERACTION_MANAGER_FRAME_HIDE(event,interactionType)
+	DA.TRACE("PLAYER_INTERACTION_MANAGER_FRAME_HIDE("..tostring(interactionType)..")")
+	if interactionType == Enum.PlayerInteractionType.Merchant then -- 5
+--		Skillet:MERCHANT_CLOSED()
+	end
+	if interactionType == Enum.PlayerInteractionType.Banker then -- 8
+		Skillet:BANKFRAME_CLOSED()
+	end
+	if interactionType == Enum.PlayerInteractionType.GuildBanker then -- 10
+		Skillet:GUILDBANKFRAME_CLOSED()
+	end
+	if interactionType == Enum.PlayerInteractionType.Auctioneer then -- 21
+		Skillet:AUCTION_HOUSE_CLOSED()
+	end
 end
 
 --
