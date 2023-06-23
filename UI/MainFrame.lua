@@ -3507,3 +3507,12 @@ function Skillet:AddButtonToTradeskillWindow(button)
 	end
 	return SkilletFrame
 end
+
+function Skillet:ScrollFrame_OnLoad(frame)
+	if isClassic then 
+		ScrollFrame_OnLoad(frame)
+	else
+		UIPanelScrollFrame_OnLoad(frame)
+	end
+end
+

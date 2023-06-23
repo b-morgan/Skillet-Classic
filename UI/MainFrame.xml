@@ -1267,7 +1267,7 @@
 						end
 					</OnVerticalScroll>
 					<OnLoad>
-						UIPanelScrollFrame_OnLoad(self)
+						Skillet:ScrollFrame_OnLoad(self)
 						self:RegisterForDrag("LeftButton")
 					</OnLoad>
 				</Scripts>
