@@ -174,33 +174,15 @@ end
 -- many times
 --
 function Skillet:UpdateMerchantFrame()
-	Skillet:MERCHANT_SHOW()
+--	Skillet:MERCHANT_SHOW()
+	Skillet:MerchantShow()
 end
 
 --
--- Merchant window opened. This method can be called multiple
--- times if needed, and it can be called even if a merchant window
--- is not open.
+-- Merchant window opened
 --
 function Skillet:MERCHANT_SHOW()
-	if MerchantFrame and not MerchantFrame:IsVisible() then
-		-- called when the merchant frame is not visible, this is a no-op
-		return
-	end
-	merchant_inventory = {}
-	if Skillet.db.profile.vendor_buy_button or Skillet.db.profile.vendor_auto_buy then
-		update_merchant_inventory()
-	end
-	if Skillet.db.profile.vendor_auto_buy then
-		if not self.autoPurchaseComplete then
-			self.autoPurchaseComplete = true		-- annoying lag causes multiple purchases because merchant frame shows again before our bags update
-			self:BuyRequiredReagents()
-		else
-			update_merchant_buy_button()
-		end
-	elseif Skillet.db.profile.vendor_buy_button then
-		update_merchant_buy_button()
-	end
+	DA.TRACE("MERCHANT_SHOW()")
 end
 
 --
@@ -220,6 +202,33 @@ function Skillet:MERCHANT_CLOSED()
 	merchant_inventory = {}
 	self.autoPurchaseComplete = nil
 	self:HideShoppingList()
+end
+
+--
+-- Merchant window opened. This method can be called multiple
+-- times if needed, and it can be called even if a merchant window
+-- is not open.
+--
+function Skillet:MerchantShow()
+	--DA.DEBUG(0,"MerchantShow()")
+	if MerchantFrame and not MerchantFrame:IsVisible() then
+		DA.DEBUG(1,"MerchantFrame= "..tostring(MerchantFrame)..", IsVisible= "..tostring(MerchantFrame:IsVisible()))
+		return
+	end
+	merchant_inventory = {}
+	if Skillet.db.profile.vendor_buy_button or Skillet.db.profile.vendor_auto_buy then
+		update_merchant_inventory()
+	end
+	if Skillet.db.profile.vendor_auto_buy then
+		if not self.autoPurchaseComplete then
+			self.autoPurchaseComplete = true		-- annoying lag causes multiple purchases because merchant frame shows again before our bags update
+			self:BuyRequiredReagents()
+		else
+			update_merchant_buy_button()
+		end
+	elseif Skillet.db.profile.vendor_buy_button then
+		update_merchant_buy_button()
+	end
 end
 
 --
