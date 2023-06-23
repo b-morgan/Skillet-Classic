@@ -696,8 +696,10 @@ function Skillet:OnEnable()
 --
 -- Events that replace *_SHOW and *_CLOSED by adding a PlayerInteractionType parameter
 --
-	self:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_SHOW")
-	self:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_HIDE")
+	if isWrath then
+		self:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_SHOW")
+		self:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_HIDE")
+	end
 --
 -- MERCHANT_SHOW, MERCHANT_HIDE, MERCHANT_UPDATE events needed for auto buying.
 --

@@ -23,6 +23,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 local PT = LibStub("LibPeriodicTable-3.1")
 
+local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
+local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
+local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
+local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
+
 local merchant_inventory = {}
 
 --
@@ -174,7 +179,6 @@ end
 -- many times
 --
 function Skillet:UpdateMerchantFrame()
---	Skillet:MERCHANT_SHOW()
 	Skillet:MerchantShow()
 end
 
@@ -183,6 +187,9 @@ end
 --
 function Skillet:MERCHANT_SHOW()
 	DA.TRACE("MERCHANT_SHOW()")
+	if isClassic then
+		Skillet:MerchantShow()
+	end
 end
 
 --
