@@ -490,7 +490,7 @@ local function GetBuyout(recipe)
 	end
 	if isRetail and Skillet.db.profile.plugins.ATR.minmaxBuyout then
 		minBuyout, maxBuyout = GetMinMaxBuyout(recipe)
-		if Skillet.db.char.best_quality then
+		if Skillet.db.profile.best_quality then
 			buyout = maxBuyout
 		else
 			buyout = minBuyout
@@ -500,7 +500,7 @@ local function GetBuyout(recipe)
 			buyout = (Atr_GetAuctionBuyout(itemID) or 0) * recipe.numMade
 		elseif Auctionator and Auctionator.API.v1 then
 			if isRetail then
-				if Skillet.db.char.best_quality then
+				if Skillet.db.profile.best_quality then
 					outputItemInfo = C_TradeSkillUI.GetRecipeOutputItemData(recipe.spellID, {}, nil, 8)
 				else
 					outputItemInfo = C_TradeSkillUI.GetRecipeOutputItemData(recipe.spellID, {}, nil, 4)
