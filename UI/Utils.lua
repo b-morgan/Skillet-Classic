@@ -127,7 +127,7 @@ end
 -- lower right corner only
 --
 function Skillet:EnableResize(frame, min_width, min_height, refresh_method)
-	if isClassic then
+	if Skillet.build == "Classic" then
 		frame:SetMinResize(min_width,min_height) -- magic numbers
 	else
 		frame:SetResizeBounds(min_width, min_height) -- magic numbers

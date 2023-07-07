@@ -94,7 +94,7 @@ local function createShoppingListFrame(self)
 	titlebar2:SetPoint("TOPRIGHT",titlebar,"BOTTOMRIGHT",0,0)
 	titlebar2:SetColorTexture(r,g,b,1)
 	titlebar2:SetHeight(13)
-	if isClassic then
+	if Skillet.build == "Classic" then
 		titlebar:SetGradientAlpha("VERTICAL",r*0.6,g*0.6,b*0.6,1,r,g,b,1)
 		titlebar2:SetGradientAlpha("VERTICAL",r*0.9,g*0.9,b*0.9,1,r*0.6,g*0.6,b*0.6,1)
 	else
@@ -325,21 +325,21 @@ local function indexBags()
 		local bags = {0,1,2,3,4}
 		for _, container in pairs(bags) do
 		local slots
-		if isClassic then
-			slots = GetContainerNumSlots(container)
-		else
-			slots = C_Container.GetContainerNumSlots(container)
-		end
+			if GetContainerNumSlots then
+				slots = GetContainerNumSlots(container)
+			else
+				slots = C_Container.GetContainerNumSlots(container)
+			end
 		for i = 1, slots, 1 do
 			local item
-			if isClassic then
+			if GetContainerItemLink then
 				item = GetContainerItemLink(container, i)
 			else
 				item = C_Container.GetContainerItemLink(container, i)
 			end
 			if item then
 				local info, id, count
-				if isClassic then
+				if GetContainerItemInfo then
 					info, count = GetContainerItemInfo(container, i)
 					id = Skillet:GetItemIDFromLink(item)
 				else
@@ -390,21 +390,21 @@ local function indexBank()
 	local bankBags = {-1,5,6,7,8,9,10,11}		-- In Classic, there is no reagent bank
 	for _, container in pairs(bankBags) do
 		local slots
-		if isClassic then
+		if GetContainerNumSlots then
 			slots = GetContainerNumSlots(container)
 		else
 			slots = C_Container.GetContainerNumSlots(container)
 		end
 		for i = 1, slots, 1 do
 			local item
-			if isClassic then
+			if GetContainerItemLink then
 				item = GetContainerItemLink(container, i)
 			else
 				item = C_Container.GetContainerItemLink(container, i)
 			end
 			if item then
 				local info, id, count
-				if isClassic then
+				if GetContainerItemInfo then
 					info, count = GetContainerItemInfo(container, i)
 					id = Skillet:GetItemIDFromLink(item)
 				else
@@ -757,7 +757,7 @@ local function findBagForItem(itemID, count)
 	local _, _, _, _, _, _, _, itemStackCount = GetItemInfo(itemID)
 	for container = 0, 4, 1 do
 		local bagSize, freeSlots, bagType
-		if isClassic then
+		if GetContainerNumSlots then
 			bagSize = GetContainerNumSlots(container)
 			freeSlots, bagType = GetContainerNumFreeSlots(container)
 		else
@@ -767,21 +767,18 @@ local function findBagForItem(itemID, count)
 		--DA.DEBUG(1, "findBagForItem: container= "..tostring(container)..", bagSize= "..tostring(bagSize)..", freeSlots= "..tostring(freeSlots)..", bagType= "..tostring(bagType))
 		if bagType == 0 then
 			for slot = 1, bagSize, 1 do
-				local bagItem, info, num_in_bag, locked
-				if isClassic then
+				local info, bagItem, num_in_bag, locked
+				if GetContainerItemID then
 					bagItem = GetContainerItemID(container, slot)
 					info, num_in_bag, locked  = GetContainerItemInfo(container, slot)
 				else
-					bagItem = C_Container.GetContainerItemLink(container, slot)
+					info = C_Container.GetContainerItemInfo(container, slot)
+					--DA.DEBUG(1, "findBagForItem: container= "..tostring(container)..", slot= "..tostring(slot)..", info= "..DA.DUMP1(info))
+					bagItem = info.itemID
+					num_in_bag = info.stackCount
+					locked = info.isLocked
 				end
 				if bagItem then
-					if not isClassic then
-						info = C_Container.GetContainerItemInfo(container, slot)
-						--DA.DEBUG(1, "findBagForItem: container= "..tostring(container)..", slot= "..tostring(slot)..", info= "..DA.DUMP1(info))
-						bagItem = info.itemID
-						num_in_bag = info.stackCount
-						locked = info.isLocked
-					end
 					if itemID == bagItem then
 --
 -- found some of the same, it is a full stack or locked?
@@ -808,7 +805,7 @@ local function getItemFromBank(itemID, bag, slot, count)
 	--DA.DEBUG(0,"getItemFromBank(", itemID, bag, slot, count,")")
 	ClearCursor()
 	local info, available
-	if isClassic then
+	if GetContainerItemInfo then
 		info, available = GetContainerItemInfo(bag, slot)
 	else
 		info = C_Container.GetContainerItemInfo(bag, slot)
@@ -819,7 +816,7 @@ local function getItemFromBank(itemID, bag, slot, count)
 	if available then
 		if available == 1 or count >= available then
 			--DA.DEBUG(1,"PickupContainerItem(",bag,", ", slot,")")
-			if isClassic then
+			if PickupContainerItem then
 				PickupContainerItem(bag, slot)
 			else
 				C_Container.PickupContainerItem(bag, slot)
@@ -827,7 +824,7 @@ local function getItemFromBank(itemID, bag, slot, count)
 			num_moved = available
 		else
 			--DA.DEBUG(1,"SplitContainerItem(",bag, slot, count,")")
-			if isClassic then
+			if SplitContainerItem then
 				SplitContainerItem(bag, slot, count)
 			else
 				C_Container.SplitContainerItem(bag, slot, count)
@@ -837,7 +834,7 @@ local function getItemFromBank(itemID, bag, slot, count)
 		local tobag, toslot = findBagForItem(itemID, num_moved)
 		--DA.DEBUG(1,"tobag=", tobag, " toslot=", toslot, " findBagForItem(", itemID, num_moved,")")
 		if not tobag then
-			if isClassic then
+			if GetContainerItemLink then
 				Skillet:Print(L["Could not find bag space for"]..": "..GetContainerItemLink(bag, slot))
 			else
 				Skillet:Print(L["Could not find bag space for"]..": "..C_Container.GetContainerItemLink(bag, slot))
@@ -850,7 +847,7 @@ local function getItemFromBank(itemID, bag, slot, count)
 			PutItemInBackpack()
 		else
 			--DA.DEBUG(1,"PutItemInBag(",ContainerIDToInventoryID(tobag),")")
-			if isClassic then
+			if ContainerIDToInventoryID then
 				PutItemInBag(ContainerIDToInventoryID(tobag))
 			else
 				PutItemInBag(C_Container.ContainerIDToInventoryID(tobag))
@@ -886,7 +883,7 @@ local function getItemFromGuildBank(itemID, bag, slot, count)
 			return 0
 		else
 			--DA.DEBUG(1,"getItemFromGuildBank: PickupContainerItem("..tostring(tobag)..", "..tostring(toslot)..")")
-			if isClassic then
+			if PickupContainerItem then
 				PickupContainerItem(tobag, toslot) -- actually puts the item in the bag
 			else
 				C_Container.PickupContainerItem(tobag, toslot)

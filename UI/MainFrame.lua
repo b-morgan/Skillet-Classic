@@ -263,7 +263,7 @@ function Skillet:CreateTradeSkillWindow()
 	titlebar2:SetPoint("TOPRIGHT",titlebar,"BOTTOMRIGHT",0,0)
 	titlebar2:SetColorTexture(r,g,b,1)
 	titlebar2:SetHeight(13)
-	if isClassic then
+	if Skillet.build == "Classic" then
 		titlebar:SetGradientAlpha("VERTICAL",r*0.6,g*0.6,b*0.6,1,r,g,b,1)
 		titlebar2:SetGradientAlpha("VERTICAL",r*0.9,g*0.9,b*0.9,1,r*0.6,g*0.6,b*0.6,1)
 	else
@@ -3428,7 +3428,7 @@ function Skillet:CreateStandaloneQueueFrame()
 	titlebar2:SetPoint("TOPRIGHT",titlebar,"BOTTOMRIGHT",0,0)
 	titlebar2:SetColorTexture(r,g,b,1)
 	titlebar2:SetHeight(13)
-	if isClassic then
+	if SetGradientAlpha then
 		titlebar:SetGradientAlpha("VERTICAL",r*0.6,g*0.6,b*0.6,1,r,g,b,1)
 		titlebar2:SetGradientAlpha("VERTICAL",r*0.9,g*0.9,b*0.9,1,r*0.6,g*0.6,b*0.6,1)
 	else

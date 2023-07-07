@@ -32,7 +32,7 @@ Skillet.L = L
 local GetAddOnMetadata = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
 Skillet.version = GetAddOnMetadata("Skillet-Classic", "Version")
 Skillet.interface = select(4, GetBuildInfo())
-Skillet.build = (Skillet.interface < 20000 and "Classic") or (Skillet.interface < 30000 and "BCC") or (Skillet.interface < 40000 and "Wrath") or "Retail"
+Skillet.build = (Skillet.interface < 11404 and "Classic") or (Skillet.interface < 20000 and "Classic2") or (Skillet.interface < 30000 and "BCC") or (Skillet.interface < 40000 and "Wrath") or "Retail"
 Skillet.project = WOW_PROJECT_ID
 local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
 local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
@@ -1250,7 +1250,7 @@ function Skillet:SkilletShow()
 -- Processing will continue in SkilletShowWindow when the TRADE_SKILL_UPDATE or CRAFT_UPDATE event fires
 -- (Wrath needs a little help)
 --
-		if isWrath then
+		if self.build ~= "Classic" then
 			if self.isCraft then
 				Skillet:CRAFT_UPDATE()
 			else
