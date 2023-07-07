@@ -774,9 +774,11 @@ local function findBagForItem(itemID, count)
 				else
 					info = C_Container.GetContainerItemInfo(container, slot)
 					--DA.DEBUG(1, "findBagForItem: container= "..tostring(container)..", slot= "..tostring(slot)..", info= "..DA.DUMP1(info))
-					bagItem = info.itemID
-					num_in_bag = info.stackCount
-					locked = info.isLocked
+					if info then
+						bagItem = info.itemID
+						num_in_bag = info.stackCount
+						locked = info.isLocked
+					end
 				end
 				if bagItem then
 					if itemID == bagItem then
