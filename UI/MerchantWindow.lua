@@ -187,9 +187,7 @@ end
 --
 function Skillet:MERCHANT_SHOW()
 	DA.TRACE("MERCHANT_SHOW()")
-	if isClassic then
-		Skillet:MerchantShow()
-	end
+	C_Timer.After(0.1,  function() Skillet:MerchantShow() end)	-- Delay because 1.14.4 fires event before frame is visible
 end
 
 --
