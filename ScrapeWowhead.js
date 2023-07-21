@@ -1,6 +1,6 @@
 /*
 ======== Instructions ========
-1) Go to a profession recipe page. Example: https://tbc.wowhead.com/alchemy#recipes
+1) Go to a profession recipe page. Example: https://wotlk.wowhead.com/alchemy#recipes
 2) Open inspector
 3) Go to console tab
 4) Paste the following code
