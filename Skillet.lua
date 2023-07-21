@@ -166,7 +166,7 @@ function Skillet:EnableBlizzardFrame()
 		self.BlizzardTradeSkillFrame = nil
 		TradeSkillFrame:SetScript("OnHide", Skillet.tradeSkillHide)
 		Skillet.tradeSkillHide = nil
-		ShowUIPanel(TradeSkillFrame)
+--		ShowUIPanel(TradeSkillFrame)
 	end
 	if self.BlizzardCraftFrame ~= nil then
 		if (not IsAddOnLoaded("Blizzard_CraftUI")) then
@@ -176,7 +176,7 @@ function Skillet:EnableBlizzardFrame()
 		CraftFrame:SetScript("OnHide", Skillet.craftHide)
 		self.craftHide = nil
 		self:RestoreEnchantButton(true)
-		ShowUIPanel(CraftFrame)
+--		ShowUIPanel(CraftFrame)
 	end
 end
 
@@ -1154,9 +1154,9 @@ end
 --
 function Skillet:IsModKey1Down()
 	if not Skillet.db.profile.nomodkeys and IsShiftKeyDown() then
-		return true
+		return not Skillet.db.profile.invertshiftkey
 	end
-	return false
+	return Skillet.db.profile.invertshiftkey
 end
 
 --

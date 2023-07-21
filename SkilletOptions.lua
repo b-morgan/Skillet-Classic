@@ -979,6 +979,18 @@ Skillet.options =
 			end,
 			order = 76
 		},
+		invertshiftkey = {
+			type = "toggle",
+			name = "InvertShiftKey",
+			desc = "Invert sense of shift to open the Blizzard frames",
+			get = function()
+				return Skillet.db.profile.invertshiftkey
+			end,
+			set = function(self,value)
+				Skillet.db.profile.invertshiftkey = value
+			end,
+			order = 76
+		},
 --
 -- commands to print and initialize skill data (SkillLevelData.lua)
 --
