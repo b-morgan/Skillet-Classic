@@ -127,11 +127,7 @@ end
 -- lower right corner only
 --
 function Skillet:EnableResize(frame, min_width, min_height, refresh_method)
-	if Skillet.build == "Classic" then
-		frame:SetMinResize(min_width,min_height) -- magic numbers
-	else
-		frame:SetResizeBounds(min_width, min_height) -- magic numbers
-	end
+	frame:SetResizeBounds(min_width, min_height) -- magic numbers
 	local sizer_se = CreateFrame("Frame", frame:GetName() .. "_SizerSoutheast", frame)
 	sizer_se:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",0,0)
 	sizer_se:SetWidth(25)

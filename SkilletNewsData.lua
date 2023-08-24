@@ -25,6 +25,16 @@ local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
 
 Skillet.NewsName = "Skillet-Classic News"
 Skillet.NewsData = {
+	{	version = "1.76",
+		data = {
+			{	name = "Fixes",
+				data = {
+					{ header = "Compatibility", body = "More updates for 1.14.4 compatibility" },
+					{ header = "Plugins", body = "Fix error when Auctionator plugin is enabled but addon is not" },
+				},
+			},
+		},
+	},
 	{	version = "1.75",
 		data = {
 			{	name = "Changes",

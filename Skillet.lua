@@ -1248,14 +1248,11 @@ function Skillet:SkilletShow()
 		end
 --
 -- Processing will continue in SkilletShowWindow when the TRADE_SKILL_UPDATE or CRAFT_UPDATE event fires
--- (Wrath needs a little help)
 --
-		if self.build ~= "Classic" then
-			if self.isCraft then
-				Skillet:CRAFT_UPDATE()
-			else
-				Skillet:TRADE_SKILL_UPDATE()
-			end
+		if self.isCraft then
+			Skillet:CRAFT_UPDATE()
+		else
+			Skillet:TRADE_SKILL_UPDATE()
 		end
 	else
 --

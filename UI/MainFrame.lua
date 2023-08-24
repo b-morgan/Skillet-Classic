@@ -263,13 +263,8 @@ function Skillet:CreateTradeSkillWindow()
 	titlebar2:SetPoint("TOPRIGHT",titlebar,"BOTTOMRIGHT",0,0)
 	titlebar2:SetColorTexture(r,g,b,1)
 	titlebar2:SetHeight(13)
-	if Skillet.build == "Classic" then
-		titlebar:SetGradientAlpha("VERTICAL",r*0.6,g*0.6,b*0.6,1,r,g,b,1)
-		titlebar2:SetGradientAlpha("VERTICAL",r*0.9,g*0.9,b*0.9,1,r*0.6,g*0.6,b*0.6,1)
-	else
-		titlebar:SetGradient("VERTICAL", CreateColor(r*0.6,g*0.6,b*0.6,1), CreateColor(r,g,b,1))
-		titlebar2:SetGradient("VERTICAL", CreateColor(r*0.9,g*0.9,b*0.9,1), CreateColor(r*0.6,g*0.6,b*0.6,1))
-	end
+	titlebar:SetGradient("VERTICAL", CreateColor(r*0.6,g*0.6,b*0.6,1), CreateColor(r,g,b,1))
+	titlebar2:SetGradient("VERTICAL", CreateColor(r*0.9,g*0.9,b*0.9,1), CreateColor(r*0.6,g*0.6,b*0.6,1))
 	local title = CreateFrame("Frame",nil,frame)
 	title:SetPoint("TOPLEFT",titlebar,"TOPLEFT",0,0)
 	title:SetPoint("BOTTOMRIGHT",titlebar2,"BOTTOMRIGHT",0,0)
@@ -3509,10 +3504,6 @@ function Skillet:AddButtonToTradeskillWindow(button)
 end
 
 function Skillet:ScrollFrame_OnLoad(frame)
-	if isClassic then 
-		ScrollFrame_OnLoad(frame)
-	else
-		UIPanelScrollFrame_OnLoad(frame)
-	end
+	UIPanelScrollFrame_OnLoad(frame)
 end
 
