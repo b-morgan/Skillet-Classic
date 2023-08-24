@@ -512,7 +512,7 @@ local function GetBuyout(recipe)
 				buyout = (Auctionator.API.v1.GetAuctionPriceByItemID(addonName, itemID) or 0) * recipe.numMade
 			end
 		else
-			return
+			return 0
 		end
 	end
 	return buyout
