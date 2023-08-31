@@ -69,17 +69,17 @@ local CraftList = {
 --  a table of locale specific translations by id
 -- needed to fix Blizzard inconsistent translations
 --
--- [tradeID] = {locale, old, new}
+-- {tradeID, locale, old, new}
 --   locale is what GetLocale() returns
 --   old is the return from GetSpellInfo(tradeID)
 --   new is the return from GetTradeSkillLine() when the tradeskill / craft is opened
 --
 local TranslateList = {
-	[4036] = {"frFR", "Ingénieur", "Ingénierie"},			-- engineering
-	[3273] = {"frFR", "Premiers soins", "Secourisme"},		-- first aid
-	[2108] = {"esES", "Peletería", "Marroquinería"},		-- leatherworking
-	[3908] = {"esES", "Sastrería", "Costura"},				-- tailoring
-	[2108] = {"koKR", "가죽세공", "가죽 세공"},					-- leatherworking
+	{4036, "frFR", "Ingénieur", "Ingénierie"},			-- engineering
+	{3273, "frFR", "Premiers soins", "Secourisme"},		-- first aid
+	{2108, "esES", "Peletería", "Marroquinería"},		-- leatherworking
+	{3908, "esES", "Sastrería", "Costura"},				-- tailoring
+	{2108, "koKR", "가죽세공", "가죽 세공"},					-- leatherworking
 }
 
 Skillet.AdditionalAbilities = {
@@ -135,10 +135,11 @@ function Skillet:CollectTradeSkillData()
 		end
 	end
 	local locale = GetLocale()
-	for id,t in pairs(TranslateList) do
-		local loc = t[1]
-		local old = t[2]
-		local new = t[3]
+	for _,t in pairs(TranslateList) do
+		local id = t[1]
+		local loc = t[2]
+		local old = t[3]
+		local new = t[4]
 		--DA.DEBUG(2,"id= "..tostring(id)..", loc= "..tostring(loc)..", old= "..tostring(old)..", new= "..tostring(new))
 		if loc == locale then
 			self.tradeSkillIDsByName[new] = id

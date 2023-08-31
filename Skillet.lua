@@ -1221,23 +1221,23 @@ function Skillet:SkilletShow()
 	else
 		name, rank, maxRank = GetTradeSkillLine()
 	end
-	--DA.DEBUG(0,"name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
+	DA.DEBUG(1,"SkilletShow: name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
 	if name then self.currentTrade = self.tradeSkillIDsByName[name] end
 	if self:IsSupportedTradeskill(self.currentTrade) and not self.linkedSkill then
-		DA.DEBUG(0,"SkilletShow: "..self.currentTrade..", name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
+		DA.DEBUG(1,"SkilletShow: (supported)"..self.currentTrade..", name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
 		self.selectedSkill = nil
 		self.dataScanned = false
 		self.tradeSkillOpen = true
 		if self.db.profile.hide_blizzard_frame and not TSM_API then
 			if self.isCraft then
-				DA.DEBUG(0,"HideUIPanel(CraftFrame)")
+				DA.DEBUG(1,"SkilletShow: HideUIPanel(CraftFrame)")
 				Skillet.hideCraftFrame = true
 				HideUIPanel(CraftFrame)
 				if Skillet.tradeShow then
 					CloseTradeSkill()
 				end
 			else
-				DA.DEBUG(0,"HideUIPanel(TradeSkillFrame)")
+				DA.DEBUG(1,"SkilletShow: HideUIPanel(TradeSkillFrame)")
 				Skillet.hideTradeSkillFrame = true
 				HideUIPanel(TradeSkillFrame)
 				if Skillet.craftShow then
@@ -1259,11 +1259,12 @@ function Skillet:SkilletShow()
 -- give Hunter Beast Training a pass
 -- for everything else bring up the appropriate Blizzard UI
 --
+		DA.DEBUG(1,"SkilletShow: (unsupported)"..self.currentTrade..", name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
 		if self.castSpellID == 5149 then
 			return
 		elseif not self:IsModKey1Down() and not UnitAffectingCombat("player") and not self.linkedSkill then
-			DA.DEBUG(0,"SkilletShow: "..tostring(self.currentTrade).." ("..tostring(name)..") is not supported")
-			DA.DEBUG(0,"tradeSkillIDsByName= "..DA.DUMP(self.tradeSkillIDsByName))
+			DA.DEBUG(1,"SkilletShow: "..tostring(self.currentTrade).." ("..tostring(name)..") is not supported")
+			DA.DEBUG(1,"SkilletShow: tradeSkillIDsByName= "..DA.DUMP(self.tradeSkillIDsByName))
 		end
 		self:HideAllWindows()
 		if self.isCraft then
