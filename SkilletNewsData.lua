@@ -25,6 +25,20 @@ local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
 
 Skillet.NewsName = "Skillet-Classic News"
 Skillet.NewsData = {
+	{	version = "1.78",
+		data = {
+			{	name = "New Feature",
+				data = {
+					{ header = "Option", body = "Add option to play a sound when the processing queue is emptied" },
+				},
+			},
+			{	name = "Changes",
+				data = {
+					{ header = "TOC", body = "Update TOC" },
+				},
+			},
+		},
+	},
 	{	version = "1.77",
 		data = {
 			{	name = "Fixes",

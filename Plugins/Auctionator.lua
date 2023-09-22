@@ -515,7 +515,7 @@ local function GetBuyout(recipe)
 			return 0
 		end
 	end
-	return buyout
+	return buyout or 0
 end
 
 local function GetReagentData(reagent)

@@ -84,6 +84,7 @@ local defaults = {
 		include_tradebuttons = true,
 		search_includes_reagents = true,
 		interrupt_clears_queue = false,
+		sound_on_empty_queue = false,
 		clamp_to_screen = true,
 		scale_tooltip = false,
 		transparency = 1.0,
@@ -1224,7 +1225,7 @@ function Skillet:SkilletShow()
 	DA.DEBUG(1,"SkilletShow: name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
 	if name then self.currentTrade = self.tradeSkillIDsByName[name] end
 	if self:IsSupportedTradeskill(self.currentTrade) and not self.linkedSkill then
-		DA.DEBUG(1,"SkilletShow: (supported)"..tostring(self.currentTrade)..", name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
+		DA.DEBUG(1,"SkilletShow: (supported)"..self.currentTrade..", name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
 		self.selectedSkill = nil
 		self.dataScanned = false
 		self.tradeSkillOpen = true
@@ -1259,7 +1260,7 @@ function Skillet:SkilletShow()
 -- give Hunter Beast Training a pass
 -- for everything else bring up the appropriate Blizzard UI
 --
-		DA.DEBUG(1,"SkilletShow: (unsupported)"..tostring(self.currentTrade)..", name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
+		DA.DEBUG(1,"SkilletShow: (unsupported)"..self.currentTrade..", name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
 		if self.castSpellID == 5149 then
 			return
 		elseif not self:IsModKey1Down() and not UnitAffectingCombat("player") and not self.linkedSkill then

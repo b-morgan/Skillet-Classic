@@ -263,6 +263,7 @@ function Skillet:RemoveFromQueue(index)
 	end
 	table.remove(queue, index)
 	self:AdjustInventory()
+	return #queue or 0
 end
 
 function Skillet:ClearQueue()
@@ -732,8 +733,11 @@ function Skillet:StopCast(spell, success)
 					self.processingSpell = nil
 					self.processingPosition = nil
 					self.processingCommand = nil
-					self:RemoveFromQueue(qpos)
-					DA.DEBUG(0,"removed successful queue command at "..tostring(qpos))
+					local qsize = self:RemoveFromQueue(qpos)
+					if self.db.profile.sound_on_empty_queue and qsize == 0 then
+						PlaySoundFile("Sound/Creature/Peon/PeonBuildingComplete1.ogg", "Master")
+					end
+					DA.DEBUG(0,"removed successful queue command at "..tostring(qpos)..", qsize= "..tostring(qsize))
 				end
 			end
 		else
