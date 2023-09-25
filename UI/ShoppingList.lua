@@ -600,7 +600,7 @@ function Skillet:BANK_UPDATE(event,bagID)
 		DA.DEBUG(1, "BANK_UPDATE and bankBusy")
 		Skillet.gotBankEvent = true
 		if Skillet.gotBankEvent and Skillet.gotBagUpdateEvent then
-			processBankQueue("bank update")
+			Skillet:UpdateBankQueue("bank update")
 		end
 	end
 end
@@ -895,8 +895,8 @@ end
 -- Called once to get things started and then is called after both
 -- BANK_UPDATE (subset of BAG_UPDATE) and BAG_UPDATE_DELAYED events have fired.
 --
-local function processBankQueue(where)
-	--DA.DEBUG(1,"processBankQueue("..where..")")
+function Skillet:UpdateBankQueue(where)
+	--DA.DEBUG(1,"UpdateBankQueue("..where..")")
 	local bankQueue = Skillet.bankQueue
 	if Skillet.bankBusy then
 		--DA.DEBUG(1,"BANK_UPDATE and bankBusy")
@@ -924,9 +924,6 @@ local function processBankQueue(where)
 			end
 		end
 	end
-end
-function Skillet:UpdateBankQueue(where)
-	processBankQueue(where)
 end
 
 --
@@ -1029,7 +1026,7 @@ function Skillet:PLAYERBANKSLOTS_CHANGED(event,slot)
 		DA.DEBUG(1,"PLAYERBANKSLOTS_CHANGED and bankBusy")
 		Skillet.gotBankEvent = true
 		if Skillet.gotBankEvent and Skillet.gotBagUpdateEvent then
-			processBankQueue("bag update")
+			Skillet:UpdateBankQueue("bag update")
 		end
 	end
 end
@@ -1044,7 +1041,7 @@ function Skillet:PLAYERREAGENTBANKSLOTS_CHANGED(event,slot)
 		DA.DEBUG(1,"PLAYERREAGENTBANKSLOTS_CHANGED and bankBusy")
 		Skillet.gotBankEvent = true
 		if Skillet.gotBankEvent and Skillet.gotBagUpdateEvent then
-			processBankQueue("bag update")
+			Skillet:UpdateBankQueue("bag update")
 		end
 	end
 end
@@ -1084,7 +1081,7 @@ function Skillet:GetReagentsFromBanks()
 							})
 							if not Skillet.bankBusy then
 								Skillet.bankBusy = true
-								processBankQueue("get reagents")
+								Skillet:UpdateBankQueue("get reagents")
 							end
 						end
 					end

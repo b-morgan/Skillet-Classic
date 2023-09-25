@@ -37,6 +37,11 @@ Skillet.NewsData = {
 					{ header = "TOC", body = "Update TOC" },
 				},
 			},
+			{	name = "Fixes",
+				data = {
+					{ header = "ShoppingList", body = "Fix undefined function" },
+				},
+			},
 		},
 	},
 	{	version = "1.77",
