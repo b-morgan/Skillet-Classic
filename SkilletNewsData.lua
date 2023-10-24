@@ -25,6 +25,20 @@ local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
 
 Skillet.NewsName = "Skillet-Classic News"
 Skillet.NewsData = {
+	{	version = "1.79",
+		data = {
+			{	name = "New Feature",
+				data = {
+					{ header = "Option", body = "Add chat command to display Auctionator / Journalator API results" },
+				},
+			},
+			{	name = "Changes",
+				data = {
+					{ header = "Plugins", body = "Adjust debugs in Auctionator plugin" },
+				},
+			},
+		},
+	},
 	{	version = "1.78",
 		data = {
 			{	name = "New Feature",
