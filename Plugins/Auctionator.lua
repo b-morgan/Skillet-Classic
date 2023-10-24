@@ -945,7 +945,7 @@ function plugin.GetExtraText(skill, recipe)
 			cost = cost + value
 		end
 		if recipe.modifiedData then
-			--DA.DEBUG(0,"GetRecipeData: modifiedData= "..DA.DUMP(recipe.modifiedData))
+			--DA.DEBUG(0,"GetExtraText: modifiedData= "..DA.DUMP(recipe.modifiedData))
 			for i=1,#recipe.modifiedData do
 				local value, needed, id, name, custom = GetReagentData(recipe.modifiedData[i])
 				value = AddExtraText(value, needed, id, name, custom)
@@ -1013,28 +1013,28 @@ function plugin.GetExtraText(skill, recipe)
 				end
 				lastSold = Journalator.API.v1.GetRealmLastSoldByItemName(addonName, itemName)
 				lastBought = Journalator.API.v1.GetRealmLastBoughtByItemName(addonName, itemName)
-				--DA.DEBUG(0,"itemName= "..tostring(itemName)..", successCount= "..tostring(successCount)..", failedCount= "..tostring(failedCount)..", lastSold= "..tostring(lastSold)..", lastBought= "..tostring(lastBought))
+				--DA.DEBUG(0,"GetExtraText(1): itemName= "..tostring(itemName)..", successCount= "..tostring(successCount)..", failedCount= "..tostring(failedCount)..", lastSold= "..tostring(lastSold)..", lastBought= "..tostring(lastBought))
 			elseif itemName then
 				salesRate, failedCount, lastSold, lastBought = Journalator.Tooltips.GetSalesInfo(itemName)
-				--DA.DEBUG(0,"itemName= "..tostring(itemName)..", salesRate= "..tostring(salesRate)..", failedCount= "..tostring(failedCount)..", lastSold= "..tostring(lastSold)..", lastBought= "..tostring(lastBought))
+				--DA.DEBUG(0,"GetExtraText(2): itemName= "..tostring(itemName)..", salesRate= "..tostring(salesRate)..", failedCount= "..tostring(failedCount)..", lastSold= "..tostring(lastSold)..", lastBought= "..tostring(lastBought))
 			end
-			if salesRate and string.find(salesRate,"%%") then
+			if salesRate and (string.find(salesRate,"%%") or DA.DebugShow) then
 				label = label.."   salesRate:\n"
 				extra_text = extra_text..tostring(salesRate).."\n"
 			end
-			if successCount and successCount > 0 then
+			if successCount and (successCount > 0  or DA.DebugShow) then
 				label = label.."   successCount:\n"
 				extra_text = extra_text..tostring(successCount).."\n"
 			end
-			if failedCount and failedCount > 0 then
+			if failedCount and (failedCount > 0 or DA.DebugShow) then
 				label = label.."   failedCount:\n"
 				extra_text = extra_text..tostring(failedCount).."\n"
 			end
-			if lastSold and lastSold > 0 then
+			if lastSold and (lastSold > 0 or DA.DebugShow) then
 				label = label.."   lastSold:\n"
 				extra_text = extra_text..Skillet:FormatMoneyFull(lastSold, true).."\n"
 			end
-			if lastBought and lastBought > 0 then
+			if lastBought and (lastBought > 0 or DA.DebugShow) then
 				label = label.."   lastBought:\n"
 				extra_text = extra_text..Skillet:FormatMoneyFull(lastBought, true).."\n"
 			end
@@ -1054,6 +1054,7 @@ function plugin.RecipeNameSuffix(skill, recipe)
 	if not recipe then return end
 	--DA.DEBUG(0,"RecipeNameSuffix: recipe= "..DA.DUMP1(recipe,1))
 	local itemID = recipe.itemID
+	--DA.DEBUG(0,"RecipeNameSuffix: itemID= "..tostring(itemID)..", type= "..type(itemID))
 --
 -- Check for Enchanting. Most recipes don't produce an item but
 -- we still should get reagent prices.
@@ -1104,7 +1105,7 @@ function plugin.RecipeNameSuffix(skill, recipe)
 					salesRate = string.format("%2.0f", 0).."%"
 				end
 			end
-			--DA.DEBUG(0, "RecipeNameSuffix: successCount="..tostring(successCount)..", failedCount="..tostring(failedCount)..", salesRate="..tostring(salesRate))
+			--DA.DEBUG(0, "RecipeNameSuffix: itemName= "..tostring(itemName)..", successCount="..tostring(successCount)..", failedCount="..tostring(failedCount)..", salesRate="..tostring(salesRate))
 		end
 
 --
