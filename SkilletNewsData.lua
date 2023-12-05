@@ -25,6 +25,20 @@ local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
 
 Skillet.NewsName = "Skillet-Classic News"
 Skillet.NewsData = {
+	{	version = "1.81",
+		data = {
+			{	name = "New Feature",
+				data = {
+					{ header = "Option", body = "Shift-Click detail icon to send item link to chat\nAlt-Click detail icon to send actual reagents needed to chat\nCtrl-Alt-Click to send basic reagents to chat" },
+				},
+			},
+			{	name = "Changes",
+				data = {
+					{ header = "Links", body = "Remove tooltip "to link" messages if no link can be created" },
+				},
+			},
+		},
+	},
 	{	version = "1.80",
 		data = {
 			{	name = "Changes",
