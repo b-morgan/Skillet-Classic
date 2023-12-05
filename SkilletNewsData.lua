@@ -34,7 +34,7 @@ Skillet.NewsData = {
 			},
 			{	name = "Changes",
 				data = {
-					{ header = "Links", body = "Remove tooltip "to link" messages if no link can be created" },
+					{ header = "Links", body = "Remove tooltip 'to link' messages if no link can be created" },
 				},
 			},
 		},
