@@ -64,6 +64,7 @@ local defaults = {
 		queue_craftable_reagents = true,
 		queue_tools = false,
 		ignore_banked_reagents = false,
+		ignore_queued_reagents = false,
 		queue_glyph_reagents = false,					-- not in Classic
 		display_required_level = false,
 		display_item_level = false,
@@ -94,7 +95,8 @@ local defaults = {
 		SavedQueues = {},
 		include_alts = true,	-- Display alt's items in shopping list
 		same_faction = true,	-- Display same faction alt items only
-		item_order =  false,	-- Order shopping list by item
+		ignore_on_hand = false,	-- Ignore items in inventory
+		item_order = false,		-- Order shopping list by item
 		merge_items = false,	-- Merge same shopping list items together
 		include_guild = false,	-- Use the contents of the Guild Bank
 	},

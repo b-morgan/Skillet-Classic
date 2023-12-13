@@ -188,6 +188,19 @@ Skillet.options =
 					width = 1.5,
 					order = 22
 				},
+				ignore_queued_reagents = {
+					type = "toggle",
+					name = L["IGNOREQUEUEDREAGENTSNAME"],
+					desc = L["IGNOREQUEUEDREAGENTSDESC"],
+					get = function()
+						return Skillet.db.profile.ignore_queued_reagents
+					end,
+					set = function(self,value)
+						Skillet.db.profile.ignore_queued_reagents = value
+					end,
+					width = 1.5,
+					order = 22
+				},
 --[[
 				queue_glyph_reagents = {
 					type = "toggle",

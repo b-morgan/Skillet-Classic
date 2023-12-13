@@ -27,9 +27,11 @@ Skillet.NewsName = "Skillet-Classic News"
 Skillet.NewsData = {
 	{	version = "1.81",
 		data = {
-			{	name = "New Feature",
+			{	name = "New Features",
 				data = {
-					{ header = "Option", body = "Shift-Click detail icon to send item link to chat\nAlt-Click detail icon to send actual reagents needed to chat\nCtrl-Alt-Click to send basic reagents to chat" },
+					{ header = "Links", body = "Shift-Click detail icon to send item link to chat\nAlt-Click detail icon to send actual reagents needed to chat\nCtrl-Alt-Click to send basic reagents to chat" },
+					{ header = "Queuing", body = "Ignore queued reagents. Queuing recipes which share reagents will queue all of them" },
+					{ header = "Shopping", body = "Ignore items on hand. The shopping list will reflect everything needed to process the queue" },
 				},
 			},
 			{	name = "Changes",
