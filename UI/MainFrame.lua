@@ -895,7 +895,7 @@ function Skillet:UpdateTradeButtons(player)
 	--DA.DEBUG(3,"UpdateTradeButtons complete")
 end
 
-function SkilletPluginDropdown_OnClick(this)
+local function SkilletPluginDropdown_OnClick(this)
 	--DA.DEBUG(0,"SkilletPluginDropdown_OnClick()")
 	local oldScript = this.oldButton:GetScript("OnClick")
 	oldScript(this)
@@ -2761,51 +2761,104 @@ local function recurseReagents(orecipe, oi, recipe, level)
 	DA.DEBUG(0,"recurseReagents("..tostring(orecipe.name)..", "..tostring(oi)..", "..tostring(recipe.name)..", "..tostring(level)..")")
 	--DA.DEBUG(1,"recurseReagents: orecipe= "..DA.DUMP1(orecipe))
 	--DA.DEBUG(1,"recurseReagents: recipe= "..DA.DUMP1(recipe))
+--
+-- Check for wild, out of control recursion
+--
+	local reagentLinkList = {}
+	if level > 10 then
+		Skillet.wildRecursion = true
+		return {}
+	end
 	for i = 1, #recipe.reagentData, 1 do
 		if level == 1 then oi = i end
 		local oreagent = orecipe.reagentData[oi]
 		local reagent = recipe.reagentData[i]
 		--DA.DEBUG(1,"recurseReagents: reagent= "..DA.DUMP1(reagent))
 		if reagent and reagent.id then
-			local reagentName, reagentLink, recipeSource, reagentIndex
+			local reagentName, reagentLink, recipeSource, reagentRecipe, reagentIndex
 			reagentName, reagentLink = GetItemInfo(reagent.id)
 			recipeSource = Skillet.db.global.itemRecipeSource[reagent.id]
 			--DA.DEBUG(1,"recurseReagents: recipeSource= "..DA.DUMP1(recipeSource))
 			if recipeSource then
-				for recipeSourceID in pairs(recipeSource) do
-					reagentRecipe = Skillet:GetRecipe(recipeSourceID)
-					--DA.DEBUG(2,"recurseReagents: recipeSourceID= "..tostring(recipeSourceID)..", reagentRecipe= "..DA.DUMP1(reagentRecipe))
-					reagentIndex = Skillet.data.skillIndexLookup[Skillet.currentPlayer][recipeSourceID]
-					--DA.DEBUG(2,"recurseReagents: recipeSourceID= "..tostring(recipeSourceID)..", reagentIndex= "..tostring(reagentIndex))
+				local rsc = 1
+				for rs in pairs(recipeSource) do
+					reagentRecipe = Skillet:GetRecipe(rs)
+					--DA.DEBUG(2,"recurseReagents: rsc= "..tostring(rsc)..", rs= "..tostring(rs)..", reagentRecipe= "..DA.DUMP1(reagentRecipe))
+					reagentIndex = Skillet.data.skillIndexLookup[Skillet.currentPlayer][rs]
+					--DA.DEBUG(2,"recurseReagents: rsc= "..tostring(rsc)..", rs= "..tostring(rs)..", reagentIndex= "..tostring(reagentIndex))
+					rsc = rsc + 1
 				end
-			end
-			--DA.DEBUG(1,"recurseReagents: reagentLink= "..DA.DUMP1(reagentLink))
-			if reagentLink then
-				if level < 10 then
-					if reagentIndex then
-						recurseReagents(orecipe, oi, reagentRecipe, level+1)
+				--DA.DEBUG(1,"recurseReagents: rsc= "..tostring(rsc))
+				--DA.DEBUG(1,"recurseReagents: reagentLink= "..DA.PLINK(reagentLink))
+				if reagentLink then
+					if not reagentLinkList[reagent.id] then
+						reagentLinkList[reagent.id] = {}
 					end
-				else
-					Skillet.wildRecursion = true
-					return
+					reagentLinkList[reagent.id].level = level
+					reagentLinkList[reagent.id].reagentIndex = i
+					reagentLinkList[reagent.id].reagentID = reagent.id
+					reagentLinkList[reagent.id].reagentName = reagentName
+					reagentLinkList[reagent.id].reagentLink = reagentLink
+					reagentLinkList[reagent.id].numNeeded = reagent.numNeeded
+					reagentLinkList[reagent.id].recipeID = recipe.itemID
+					reagentLinkList[reagent.id].recipeName = recipe.name
+
+					reagentLinkList[reagent.id].orecipeIndex = oi
+					reagentLinkList[reagent.id].oreagentID = oreagent.id
+					reagentLinkList[reagent.id].oreagentName = oreagent.name
+					if reagentRecipe then
+						reagentLinkList[reagent.id].tradeID = reagentRecipe.tradeID
+						if reagentIndex then
+							reagentLinkList[reagent.id].crafted = recurseReagents(orecipe, oi, reagentRecipe, level+1)
+						end
+					end
+				end -- reagentLink
+			else
+				if not reagentLinkList[reagent.id] then
+					reagentLinkList[reagent.id] = {}
 				end
-				if not Skillet.reagentLinkList[oreagent.id] then
-					Skillet.reagentLinkList[oreagent.id] = {}
+				reagentLinkList[reagent.id].level = level
+				reagentLinkList[reagent.id].reagentIndex = i
+				reagentLinkList[reagent.id].reagentID = reagent.id
+				reagentLinkList[reagent.id].reagentName = reagentName
+				reagentLinkList[reagent.id].reagentLink = reagentLink
+				reagentLinkList[reagent.id].numNeeded = reagent.numNeeded
+				reagentLinkList[reagent.id].recipeID = recipe.itemID
+				reagentLinkList[reagent.id].recipeName = recipe.name
+			end -- recipeSource
+		end -- reagent and reagent.id
+	end -- for
+	return reagentLinkList
+end
+
+local function combineCrafted(level, reagentName, numNeeded, reagent)
+	DA.DEBUG(0,"combineCrafted("..tostring(level)..", "..tostring(reagentName)..", "..tostring(numNeeded)..", reagent)")
+--	DA.DEBUG(1,"combineCrafted: reagent= "..DA.DUMP(reagent)
+	if reagent then 
+		local combinedList = {}
+		for r,m in pairs(reagent) do
+			if m.crafted then
+				local list = combineCrafted(level+1, m.reagentName, m.numNeeded, m.crafted)
+				--DA.DEBUG(1,"combineCrafted: adding list= "..DA.DUMP1(list))
+				for k,v in pairs(list) do 
+					v.numNeeded = numNeeded * v.numNeeded
+					combinedList[k] = v 
 				end
-				if not Skillet.reagentLinkList[oreagent.id][level] then
-					Skillet.reagentLinkList[oreagent.id][level] = {}
+			else
+				if not combinedList[r] then
+					combinedList[r] = {}
 				end
-				Skillet.reagentLinkList[oreagent.id][level].reagentID = reagent.id
-				Skillet.reagentLinkList[oreagent.id][level].reagentIndex = i
-				Skillet.reagentLinkList[oreagent.id][level].reagentName = reagentName
-				Skillet.reagentLinkList[oreagent.id][level].reagentLink = reagentLink
-				Skillet.reagentLinkList[oreagent.id][level].numNeeded = reagent.numNeeded
-				Skillet.reagentLinkList[oreagent.id][level].tradeID = reagentRecipe.tradeID
-				Skillet.reagentLinkList[oreagent.id][level].recipeID = recipe.itemID
-				Skillet.reagentLinkList[oreagent.id][level].recipeName = recipe.name
-				Skillet.reagentLinkList[oreagent.id][level].orecipeIndex = oi
+				--DA.DEBUG(1,"combineCrafted: adding reagent= "..tostring(r))
+				combinedList[r].reagentID = m.reagentID
+				combinedList[r].reagentLink = m.reagentLink
+				combinedList[r].numNeeded = numNeeded * m.numNeeded
 			end
 		end
+		DA.DEBUG(1,"combineCrafted: combinedList= "..DA.DUMP1(combinedList))
+		return combinedList
+	else
+		DA.DEBUG(0,"combineCrafted: nil reagent") 
+		return {[0] = {reagentID = 0, reagentLink = nil, numNeeded = 1}}
 	end
 end
 
@@ -2818,7 +2871,7 @@ function Skillet:ReagentsLinkOnClick(button, skillIndex, recurse)
 	if not self.db.profile.link_craftable_reagents then
 		return
 	end
-	local skillIndexLookup = Skillet.data.skillIndexLookup[Skillet.currentPlayer]
+	local skillIndexLookup = self.data.skillIndexLookup[Skillet.currentPlayer]
 	local recipe = self:GetRecipeDataByTradeIndex(self.currentTrade, skillIndex)
 	--DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe))
 --
@@ -2828,213 +2881,58 @@ function Skillet:ReagentsLinkOnClick(button, skillIndex, recurse)
 --
 -- Step 1: Build a multi-level table of reagents
 --
-		self.reagentLinkList = {}
-		recurseReagents(recipe, 0, recipe, 1)
+		self.reagentLinkList = recurseReagents(recipe, 0, recipe, 1)
 		if self.wildRecursion then 
 			DA.WARN("recurseReagents() gone wild")
 			return
 		end
 		DA.DEBUG(1,"reagentLinkList= "..DA.DUMP(self.reagentLinkList))
---[[
-reagentLinkList= {
-[10558] =   {
-  [1] =     {
-      ['reagentID'] = 10558
-      ['orecipeIndex'] = 4
-      ['recipeName'] = Goblin Mortar
-      ['reagentName'] = Gold Power Core
-      ['recipeID'] = 10577
-      ['reagentIndex'] = 4
-      ['tradeID'] = 4036
-      ['reagentLink'] = |cffffffff|Hitem:10558::::::::31:::::::::|h[Gold Power Core]|h|r
-      ['numNeeded'] = 1
-      }
-  [2] =     {
-      ['reagentID'] = 3577
-      ['orecipeIndex'] = 4
-      ['recipeName'] = Gold Power Core
-      ['reagentName'] = Gold Bar
-      ['recipeID'] = 10558
-      ['reagentIndex'] = 1
-      ['tradeID'] = 4036
-      ['reagentLink'] = |cff1eff00|Hitem:3577::::::::31:::::::::|h[Gold Bar]|h|r
-      ['numNeeded'] = 1
-      }
-  }
-[10559] =   {
-  [1] =     {
-      ['reagentID'] = 10559
-      ['orecipeIndex'] = 1
-      ['recipeName'] = Goblin Mortar
-      ['reagentName'] = Mithril Tube
-      ['recipeID'] = 10577
-      ['reagentIndex'] = 1
-      ['tradeID'] = 4036
-      ['reagentLink'] = |cffffffff|Hitem:10559::::::::31:::::::::|h[Mithril Tube]|h|r
-      ['numNeeded'] = 2
-      }
-  [2] =     {
-      ['reagentID'] = 3860
-      ['orecipeIndex'] = 1
-      ['recipeName'] = Mithril Tube
-      ['reagentName'] = Mithril Bar
-      ['recipeID'] = 10559
-      ['reagentIndex'] = 1
-      ['tradeID'] = 4036
-      ['reagentLink'] = |cffffffff|Hitem:3860::::::::31:::::::::|h[Mithril Bar]|h|r
-      ['numNeeded'] = 3
-      }
-  }
-[3860] =   {
-  [1] =     {
-      ['reagentID'] = 3860
-      ['orecipeIndex'] = 2
-      ['recipeName'] = Goblin Mortar
-      ['reagentName'] = Mithril Bar
-      ['recipeID'] = 10577
-      ['reagentIndex'] = 2
-      ['tradeID'] = 4036
-      ['reagentLink'] = |cffffffff|Hitem:3860::::::::31:::::::::|h[Mithril Bar]|h|r
-      ['numNeeded'] = 4
-      }
-  }
-[10505] =   {
-  [1] =     {
-      ['reagentID'] = 10505
-      ['orecipeIndex'] = 3
-      ['recipeName'] = Goblin Mortar
-      ['reagentName'] = Solid Blasting Powder
-      ['recipeID'] = 10577
-      ['reagentIndex'] = 3
-      ['tradeID'] = 4036
-      ['reagentLink'] = |cffffffff|Hitem:10505::::::::31:::::::::|h[Solid Blasting Powder]|h|r
-      ['numNeeded'] = 5
-      }
-  [2] =     {
-      ['reagentID'] = 7912
-      ['orecipeIndex'] = 3
-      ['recipeName'] = Solid Blasting Powder
-      ['reagentName'] = Solid Stone
-      ['recipeID'] = 10505
-      ['reagentIndex'] = 1
-      ['tradeID'] = 4036
-      ['reagentLink'] = |cffffffff|Hitem:7912::::::::31:::::::::|h[Solid Stone]|h|r
-      ['numNeeded'] = 2
-      }
-  }
-[7068] =   {
-  [1] =     {
-      ['reagentID'] = 7068
-      ['orecipeIndex'] = 5
-      ['recipeName'] = Goblin Mortar
-      ['reagentName'] = Elemental Fire
-      ['recipeID'] = 10577
-      ['reagentIndex'] = 5
-      ['tradeID'] = 4036
-      ['reagentLink'] = |cffffffff|Hitem:7068::::::::31:::::::::|h[Elemental Fire]|h|r
-      ['numNeeded'] = 1
-      }
-  }
-}
---]]
 --
 -- Step 2: Combine the levels
 --
 		self.reagentBasicList = {}
 		for r,m in pairs(self.reagentLinkList) do
-			DA.DEBUG(0,"reagent= "..tostring(r))
---			DA.DEBUG(0,"  m= "..DA.DUMP(m))
-			if not self.reagentBasicList[r] then
-				self.reagentBasicList[r] = {}
-			end
-			DA.DEBUG(0,"originalName= "..tostring(m[1].reagentName))
-			self.reagentBasicList[r].reagentOrig = m[1].reagentName
-			for n in pairs(m) do
-				DA.DEBUG(0,"  level="..tostring(n)..", reagentID= "..tostring(m[n].reagentID))
-				self.reagentBasicList[r].reagentID = m[n].reagentID
-				self.reagentBasicList[r].reagentName = m[n].reagentName
-				self.reagentBasicList[r].reagentLink = m[n].reagentLink
-				DA.DEBUG(0,"numNeeded= "..tostring(m[n].numNeeded))
-				if n > 1 then
---					self.reagentBasicList[r].numNeeded = (self.reagentBasicList[r].numNeeded or 0) + m[n].numNeeded * self.reagentLinkList[r][n-1].numNeeded
-					self.reagentBasicList[r].numNeeded = m[n].numNeeded * self.reagentLinkList[r][n-1].numNeeded
-				else
-					self.reagentBasicList[r].numNeeded = (self.reagentBasicList[r].numNeeded or 0) + m[n].numNeeded
+			if m.crafted then
+				local combinedList = combineCrafted(1, m.reagentName, m.numNeeded, m.crafted)
+				for s,n in pairs(combinedList) do
+					DA.DEBUG(1,"Step 2: adding s= "..tostring(s))
+					if not self.reagentBasicList[s] then
+						self.reagentBasicList[s] = {}
+					end
+					self.reagentBasicList[s].reagentID = n.reagentID
+					self.reagentBasicList[s].reagentName = n.reagentName
+					self.reagentBasicList[s].reagentLink = n.reagentLink
+					DA.DEBUG(1,"Step 2: s.numNeeded= "..tostring(self.reagentBasicList[s].numNeeded))
+					DA.DEBUG(1,"Step 2: n.numNeeded= "..tostring(n.numNeeded))
+					self.reagentBasicList[s].numNeeded = (self.reagentBasicList[s].numNeeded or 0) + n.numNeeded
 				end
+			else
+				DA.DEBUG(1,"Step 2: adding r= "..tostring(r))
+				if not self.reagentBasicList[r] then
+					self.reagentBasicList[r] = {}
+				end
+				self.reagentBasicList[r].reagentID = m.reagentID
+				self.reagentBasicList[r].reagentName = m.reagentName
+				self.reagentBasicList[r].reagentLink = m.reagentLink
+				self.reagentBasicList[r].numNeeded =  m.numNeeded
 			end
 		end
 		DA.DEBUG(1,"reagentBasicList= "..DA.DUMP(self.reagentBasicList))
---[[
-Skillet-Classic: reagentBasicList= {
-[10558] =   {
-  ['reagentOrig'] = Gold Power Core
-  ['reagentName'] = Gold Bar
-  ['reagentID'] = 3577
-  ['reagentLink'] = [Gold Bar]
-  ['numNeeded'] = 1
-  }
-[10559] =   {
-  ['reagentOrig'] = Mithril Tube
-  ['reagentName'] = Mithril Bar
-  ['reagentID'] = 3860
-  ['reagentLink'] = [Mithril Bar]
-  ['numNeeded'] = 6
-  }
-[3860] =   {
-  ['reagentOrig'] = Mithril Bar
-  ['reagentName'] = Mithril Bar
-  ['reagentID'] = 3860
-  ['reagentLink'] = [Mithril Bar]
-  ['numNeeded'] = 4
-  }
-[10505] =   {
-  ['reagentOrig'] = Solid Blasting Powder
-  ['reagentName'] = Solid Stone
-  ['reagentID'] = 7912
-  ['reagentLink'] = [Solid Stone]
-  ['numNeeded'] = 10
-  }
-[7068] =   {
-  ['reagentOrig'] = Elemental Fire
-  ['reagentName'] = Elemental Fire
-  ['reagentID'] = 7068
-  ['reagentLink'] = [Elemental Fire]
-  ['numNeeded'] = 1
-  }
-}
---]]
 --
 -- Step 3: Combine the duplicates
 --
 		self.reagentCombinedList = {}
 		for r,m in pairs(self.reagentBasicList) do
-			if not self.reagentCombinedList[m.reagentID] then
-				self.reagentCombinedList[m.reagentID] = {}
+			if m.reagentID then
+				if not self.reagentCombinedList[m.reagentID] then
+					self.reagentCombinedList[m.reagentID] = {}
+				end
+				self.reagentCombinedList[m.reagentID].reagentLink = m.reagentLink
+				self.reagentCombinedList[m.reagentID].numNeeded = (self.reagentCombinedList[m.reagentID].numNeeded or 0) + m.numNeeded
 			end
-			self.reagentCombinedList[m.reagentID].reagentLink = m.reagentLink
-			self.reagentCombinedList[m.reagentID].numNeeded = (self.reagentCombinedList[m.reagentID].numNeeded or 0) + m.numNeeded
 		end
 		DA.DEBUG(1,"reagentCombinedList= "..DA.DUMP(self.reagentCombinedList))
---[[
-reagentCombinedList= {
-[3577] =   {
-  ['reagentLink'] = [Gold Bar]
-  ['numNeeded'] = 1
-  }
-[7068] =   {
-  ['reagentLink'] = [Elemental Fire]
-  ['numNeeded'] = 1
-  }
-[3860] =   {
-  ['reagentLink'] = [Mithril Bar]
-  ['numNeeded'] = 10
-  }
-[7912] =   {
-  ['reagentLink'] = [Solid Stone]
-  ['numNeeded'] = 10
-  }
-}
---]]
+
 --
 -- Step 4: Output the results
 --
