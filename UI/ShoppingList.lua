@@ -112,6 +112,8 @@ local function createShoppingListFrame(self)
 	SkilletShowQueuesFromAllAlts:SetChecked(Skillet.db.profile.include_alts)
 	SkilletShowQueuesFromSameFactionText:SetText(L["Same faction"])
 	SkilletShowQueuesFromSameFaction:SetChecked(Skillet.db.profile.same_faction)
+	SkilletShowQueuesIgnoreOnHandText:SetText(L["Ignore on hand"])
+	SkilletShowQueuesIgnoreOnHand:SetChecked(Skillet.db.profile.ignore_on_hand)
 	SkilletShowQueuesInItemOrderText:SetText(L["Order by item"])
 	SkilletShowQueuesInItemOrder:SetChecked(Skillet.db.profile.item_order)
 	SkilletShowQueuesMergeItemsText:SetText(L["Merge items"])
@@ -273,12 +275,8 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
 						usedInventory[curPlayer][id] = true
 					end
 				end
-				deficit = deficit + numInBoth + numInBothCurrent
-				if curGuild and not cachedGuildbank[curGuild][id] then
-					cachedGuildbank[curGuild][id] = 0
-				end
-				if not usedGuild[id] then
-					usedGuild[id] = 0
+				if not self.db.profile.ignore_on_hand then
+					deficit = deficit + numInBoth + numInBothCurrent
 				end
 --
 -- If the Guildbank should be included then
@@ -286,13 +284,22 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
 -- only count guild bank items when not at the guild bank because
 -- we might start using them.
 --
-				if includeGuildbank and curGuild and not guildbankFrameOpen then
-					DA.DEBUG(2,"deficit=",deficit,"cachedGuildbank=",cachedGuildbank[curGuild][id],"usedGuild=",usedGuild[id])
-					local temp = -1 * math.min(deficit,0) -- calculate exactly how many are needed
-					deficit = deficit + cachedGuildbank[curGuild][id] - usedGuild[id]
-					usedGuild[id] = usedGuild[id] + temp  -- keep track how many have been used
-					usedGuild[id] = math.min(usedGuild[id], cachedGuildbank[curGuild][id]) -- but don't use more than there is
+				if curGuild and not cachedGuildbank[curGuild][id] then
+					cachedGuildbank[curGuild][id] = 0
 				end
+				if not usedGuild[id] then
+					usedGuild[id] = 0
+				end
+				if not self.db.profile.ignore_on_hand then
+					if includeGuildbank and curGuild and not guildbankFrameOpen then
+						DA.DEBUG(2,"deficit=",deficit,"cachedGuildbank=",cachedGuildbank[curGuild][id],"usedGuild=",usedGuild[id])
+						local temp = -1 * math.min(deficit,0) -- calculate exactly how many are needed
+						deficit = deficit + cachedGuildbank[curGuild][id] - usedGuild[id]
+						usedGuild[id] = usedGuild[id] + temp  -- keep track how many have been used
+						usedGuild[id] = math.min(usedGuild[id], cachedGuildbank[curGuild][id]) -- but don't use more than there is
+					end
+				end
+
 				if deficit < 0 then
 					local entry = { ["id"] = id, ["count"] = -deficit, ["player"] = player, ["value"] = 0, ["source"] = "?" }
 					table.insert(list, entry)
@@ -1131,6 +1138,10 @@ end
 
 function Skillet:ShoppingListToggleSameFaction()
 	Skillet.db.profile.same_faction = not Skillet.db.profile.same_faction
+end
+
+function Skillet:ShoppingListToggleIgnoreOnHand()
+	Skillet.db.profile.ignore_on_hand = not Skillet.db.profile.ignore_on_hand
 end
 
 function Skillet:ShoppingListToggleItemOrder()
