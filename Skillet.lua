@@ -481,6 +481,7 @@ function Skillet:FlushRecipeData()
 	Skillet.db.global.recipeDB = {}
 	Skillet.db.global.itemRecipeUsedIn = {}
 	Skillet.db.global.itemRecipeSource = {}
+	Skillet.db.global.SkillLevels = nil
 	Skillet.db.realm.skillDB = {}
 	Skillet.db.realm.subClass = {}
 	Skillet.db.realm.invSlot = {}
