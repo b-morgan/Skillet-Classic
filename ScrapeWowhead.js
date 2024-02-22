@@ -10,7 +10,7 @@
 recipes = {}; // spellID => skill_levels
 counter = {}; // just keep track of keys
 
-is_enchanting = document.location.pathname.endsWith('enchanting');
+is_enchanting = document.location.pathname.endsWith('/enchanting');
 is_alchemy    = document.location.pathname.endsWith('/alchemy');
 // TODO: any other special cases needed?
 
