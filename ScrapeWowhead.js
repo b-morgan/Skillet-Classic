@@ -104,7 +104,7 @@ function print_skill_levels() {
 
     // Bust out any spells that were stashed as itemID==0
     // all enchanting and a few others
-    var spells = recipes[0];
+    var spells = recipes[0] || {};
     // clear it out
     delete recipes[0];
     
