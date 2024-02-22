@@ -10,8 +10,9 @@
 recipes = {}; // spellID => skill_levels
 counter = {}; // just keep track of keys
 
-is_enchanting = (document.location.pathname == '/enchanting');
-is_alchemy    = (document.location.pathname == '/alchemy');
+is_enchanting = document.location.pathname.endsWith('/enchanting');
+is_alchemy    = document.location.pathname.endsWith('/alchemy');
+// TODO: any other special cases needed?
 
 function get_skill_levels() {
     $('#tab-recipes .listview-row').each(function(i, row){
@@ -20,14 +21,24 @@ function get_skill_levels() {
         // Is always the spell link for all professions
         var $second_link = $(row).find('td:nth-child(2) a');
 
-        var spellID = $second_link[0].href.match(/spell=[0-9]*/)[0].split('=')[1];
-        var itemID  = 0; // placeholder for enchanting
+        try {
+             var spellID = $second_link[0].href.match(/spell=[0-9]*/)[0].split('=')[1];
+        } catch(err) {
+             console.log('Error parsing second_link: ', $second_link[0].href, ' for: ', $second_link.text());
+        }
+        var itemID  = 0; // placeholder for enchanting & other pure spells
 
         // Skip basic campfire, not a real recipe
         if (spellID == 818) { return; }
-        
-        if (!is_enchanting) {
-            itemID = $first_link[0].href.match(/item=[0-9]*/)[0].split('=')[1];
+
+        // enchanting will always have 2x spell links, so always skip those
+        // but some other professions also have spells, so handle those properly
+        if (!is_enchanting && $first_link[0].href.includes('item=')) {
+            try {
+               itemID = $first_link[0].href.match(/item=[0-9]*/)[0].split('=')[1];
+            } catch(err) {
+               console.log('Error parsing first_link: ', $first_link[0].href, ' for: ', $second_link.text());
+            }
         }
         // Make the ids integers
         spellID = +spellID;
@@ -91,29 +102,33 @@ function get_skill_levels() {
 function print_skill_levels() {
     var arr = [];
 
-    if (is_enchanting) {
-        recipes = recipes[0]; // bust out of the placeholder itemID
-        $.each(recipes, function(spellID, val){
-            // [-spellID] = "A/B/C/D",  (enchanting only)
-            arr.push('[-' + spellID + '] = "' + val.join('/') + '"');
+    // Bust out any spells that were stashed as itemID==0
+    // all enchanting and a few others
+    var spells = recipes[0];
+    // clear it out
+    delete recipes[0];
+    
+    $.each(spells, function(spellID, val){
+        // [-spellID] = "A/B/C/D",  (mostly enchanting)
+        arr.push('[-' + spellID + '] = "' + val.join('/') + '"');
+    });
+
+    $.each(recipes, function(itemID, spells){
+        if (Object.keys(spells).length == 1) { // 99% of cases
+            var val = Object.values(spells)[0];
+            // Don't use a nested table when only one spell per item
+            // [itemID] = "A/B/C/D",
+            arr.push('[' + itemID + '] = "' + val.join('/') + '"');
+            return;
+        }
+        // [itemID] = { [spellID] = "A/B/C/D", [spellID] = "A/B/C/D" },
+        var inner = [];
+        $.each(spells, function(spellID, val){
+            inner.push('[' + spellID + '] = "' + val.join('/') + '"');
         });
-    } else {
-        $.each(recipes, function(itemID, spells){
-            if (Object.keys(spells).length == 1) { // 99% of cases
-                var val = Object.values(spells)[0];
-                // Don't use a nested table when only one spell per item
-                // [itemID] = "A/B/C/D",
-                arr.push('[' + itemID + '] = "' + val.join('/') + '"');
-                return;
-            }
-            // [itemID] = { [spellID] = "A/B/C/D", [spellID] = "A/B/C/D" },
-            var inner = [];
-            $.each(spells, function(spellID, val){
-                inner.push('[' + spellID + '] = "' + val.join('/') + '"');
-            });
-            arr.push('[' + itemID + '] = {' + inner.join(', ') + '}');
-        });
-    }
+        arr.push('[' + itemID + '] = {' + inner.join(', ') + '}');
+    });
+
     arr.push(''); // Pad the end so we have a comma on every line
     console.log(arr.join(',\n'));
 }
