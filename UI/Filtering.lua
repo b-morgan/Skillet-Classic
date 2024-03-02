@@ -37,7 +37,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 --   Skillet.db.realm.invSlot[player][tradeID].selected
 --
 function Skillet:RecipeFilter(skillIndex)
-	--DA.DEBUG(1,"RecipeFilter("..tostring(skillIndex)..")")
+	--DA.DEBUG(0,"RecipeFilter("..tostring(skillIndex)..")")
 	local skill = Skillet:GetSkill(Skillet.currentPlayer, Skillet.currentTrade, skillIndex)
 	--DA.DEBUG(1,"skill= "..DA.DUMP1(skill,1))
 	local recipe = Skillet:GetRecipe(skill.id)
@@ -61,17 +61,19 @@ function Skillet:RecipeFilter(skillIndex)
 		--DA.DEBUG(1,"RecipeFilter: not filtering anything")
 		return false
 	end
+	DA.DEBUG(1,"RecipeFilter: itemID= "..tostring(itemID)..", subClass= "..tostring(subClass[itemID])..", invSlot= "..tostring(invSlot[itemID]))
+	DA.DEBUG(1,"RecipeFilter: subClass.selected= "..tostring(subClass.selected)..", invSlot.selected= "..tostring(invSlot.selected))
 	if subClass[itemID] == subClass.selected or invSlot[itemID] == invSlot.selected then
 --
 -- filtering active, return only items that meet the criteria
 --
-		--DA.DEBUG(1,"RecipeFilter: filtering active, item met the criteria")
+		DA.DEBUG(1,"RecipeFilter: filtering active, "..tostring(recipe.name).." met the criteria")
 		return false
 	end
 --
 -- filtering active, item did not meet the criteria
 --
-	--DA.DEBUG(1,"RecipeFilter: filtering active, item did not meet the criteria")
+	DA.DEBUG(1,"RecipeFilter: filtering active, "..tostring(recipe.name).." did not meet the criteria")
 	return true
 end
 

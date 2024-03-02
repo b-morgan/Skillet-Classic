@@ -1110,6 +1110,10 @@ local function ScanTrade()
 						Skillet.db.realm.subClass[player][tradeID][itemID] = itemSubType
 					end
 					if itemEquipLoc then
+						if itemEquipLoc == "INVTYPE_ROBE" then
+							DA.DEBUG(2,"ScanTrade: Changing itemEquipLoc from INVTYPE_ROBE to INVTYPE_CHEST")
+							itemEquipLoc = "INVTYPE_CHEST"
+						end
 						if not Skillet.db.realm.invSlot[player][tradeID].name then
 							Skillet.db.realm.invSlot[player][tradeID].name = {}
 							Skillet.db.realm.invSlot[player][tradeID].selected = "None"

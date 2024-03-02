@@ -300,7 +300,7 @@ function Skillet:OnInitialize()
 	local dataVersion = 5
 	local queueVersion = 1
 	local customVersion = 1
-	local recipeVersion = 4
+	local recipeVersion = 5
 	local _,wowBuild,_,wowVersion = GetBuildInfo();
 	self.wowBuild = wowBuild
 	self.wowVersion = wowVersion

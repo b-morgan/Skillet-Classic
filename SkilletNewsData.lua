@@ -31,6 +31,9 @@ Skillet.NewsData = {
 				data = {
 					{ header = "Skill Levels", body = "Update for WotLK recipes" },
 				},
+				data = {
+					{ header = "Slot Filter", body = "Change itemEquipLoc from INVTYPE_ROBE to INVTYPE_CHEST" },
+				},
 			},
 		},
 	},
