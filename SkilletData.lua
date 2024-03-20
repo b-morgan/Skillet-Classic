@@ -839,7 +839,6 @@ local function ScanTrade()
 		return false
 	end
 	local lastHeader = nil
-	local gotNil = false
 	local currentGroup = nil
 	local mainGroup = Skillet:RecipeGroupNew(player,tradeID,"Blizzard")
 	mainGroup.locked = true
@@ -894,6 +893,8 @@ local function ScanTrade()
 --		s = 0
 --	end
 	local skillNameSeen = {}
+	local missingReagentLink = {}
+	local missingReagentName = {}
 	for i = s, numSkills, 1 do
 		local skillName, craftSubSpellName, skillType, numAvailable, isExpanded, subSpell, extra
 		if Skillet.isCraft then
@@ -1149,10 +1150,24 @@ local function ScanTrade()
 							reagentLink = GetTradeSkillReagentItemLink(i,j)
 						end
 						--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", reagentLink= "..DA.PLINK(reagentLink))
-						reagentID = Skillet:GetItemIDFromLink(reagentLink)
+--
+-- If the reagent is not in the client's cache, the link will be nil. 
+-- This failure could be recovered with some fancy coding.
+--
+						if reagentLink then
+							reagentID = Skillet:GetItemIDFromLink(reagentLink)
+						else
+							missingReagentLink[reagentName] = {}
+							missingReagentLink[reagentName].skillId = i
+							missingReagentLink[reagentName].reagentId = j
+						end
 					else
-						gotNil = true
-						break
+--
+-- The ...ReagentInfo call failed. Not sure if this can be recovered.
+--
+						missingReagentName[recipeID] = {}
+						missingReagentName[recipeID].skillId = i
+						missingReagentName[recipeID].reagentId = j
 					end
 					reagentData[j] = {}
 					reagentData[j].id = reagentID
@@ -1173,14 +1188,24 @@ local function ScanTrade()
 					recipeDB[recipeID] = recipeString
 				elseif recipeDB[recipeID] ~= recipeString then
 --
--- Another sanity check. A change of tradeID should have already been caught.
+-- This entry doesn't match an existing entry. Check to see what is different
 --
 					local oldTradeID, oldItemString, oldReagentString, oldToolString = string.split(" ",recipeDB[recipeID])
 					if oldItemString == itemString and oldReagentString == reagentString and oldToolString == toolString then
+--
+-- TradeID is different but everything else is the same
+--					
 						DA.WARN("ScanTrade: recipeID="..tostring(recipeID)..", oldTradeID="..tostring(oldTradeID)..", tradeID="..tostring(tradeID).." (match)")
 					elseif oldTradeID ~= tostring(tradeID) then
+--
+-- TradeID and something else is different
+--
 						DA.WARN("ScanTrade:  recipeID="..tostring(recipeID)..", oldTradeID="..tostring(oldTradeID)..", tradeID="..tostring(tradeID).." (no match)")
 					end
+--
+-- TradeID is good but something else is different. 
+-- This happens most often when a previous scan encountered a reagent item not cached yet
+--
 					DA.WARN("ScanTrade: replacing recipeID="..tostring(recipeID)..", '"..tostring(recipeDB[recipeID]).."' with '"..tostring(recipeString).."'")
 					recipeDB[recipeID] = recipeString
 				end
@@ -1206,14 +1231,24 @@ local function ScanTrade()
 --
 -- return a boolean:
 --   true means we got good data for this profession (skill)
---   false means there was no data available
+--   false means there was no data available or missing data
 -- Note: Enchanting (the only Craft) has no headers
 --
 	if not Skillet.isCraft and numHeaders == 0 then
-		skillData.scanned = false
+		Skillet.scanTradeReason = 1
 		return false
 	end
-	skillData.scanned = true
+	if #missingReagentLink > 0 then
+		DA.DEBUG(2,"ScanTrade: missingReagentLink= "..DA.DUMP(missingReagentLink))
+		Skillet.scanTradeReason = 2
+		return false
+	end
+	if #missingReagentName > 0 then
+		DA.DEBUG(2,"ScanTrade: missingReagentName= "..DA.DUMP(missingReagentName))
+		Skillet.scanTradeReason = 3
+		return false
+	end
+	Skillet.scanTradeReason = nil
 	return true
 end
 
