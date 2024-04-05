@@ -34,6 +34,9 @@ Skillet.NewsData = {
 				data = {
 					{ header = "Slot Filter", body = "Change itemEquipLoc from INVTYPE_ROBE to INVTYPE_CHEST" },
 				},
+				data = {
+					{ header = "TOC", body = "Update TOC" },
+				},
 			},
 		},
 	},

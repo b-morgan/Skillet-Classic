@@ -40,7 +40,6 @@ local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
 local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
 local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
 -- local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATA_CLASSIC
-local isCata = true
 
 Skillet.isCraft = false			-- true for the Blizzard Craft UI, false for the Blizzard TradeSkill UI
 Skillet.lastCraft = false		-- help events know when to call ConfigureRecipeControls()
@@ -143,7 +142,6 @@ Skillet.unknownRecipe = {
 
 function Skillet:DisableBlizzardFrame()
 	DA.DEBUG(0,"DisableBlizzardFrame()")
---	if isCata then return end
 	if self.BlizzardTradeSkillFrame == nil then
 		if (not IsAddOnLoaded("Blizzard_TradeSkillUI")) then
 			LoadAddOn("Blizzard_TradeSkillUI");
@@ -157,16 +155,17 @@ function Skillet:DisableBlizzardFrame()
 		if (not IsAddOnLoaded("Blizzard_CraftUI")) then
 			LoadAddOn("Blizzard_CraftUI");
 		end
-		self.BlizzardCraftFrame = CraftFrame
-		self.craftHide = CraftFrame:GetScript("OnHide")
-		CraftFrame:SetScript("OnHide", nil)
-		HideUIPanel(CraftFrame)
+		if CraftFrame then
+			self.BlizzardCraftFrame = CraftFrame
+			self.craftHide = CraftFrame:GetScript("OnHide")
+			CraftFrame:SetScript("OnHide", nil)
+			HideUIPanel(CraftFrame)
+		end
 	end
 end
 
 function Skillet:EnableBlizzardFrame()
 	DA.DEBUG(0,"EnableBlizzardFrame()")
---	if isCata then return end
 	if self.BlizzardTradeSkillFrame ~= nil then
 		if (not IsAddOnLoaded("Blizzard_TradeSkillUI")) then
 			LoadAddOn("Blizzard_TradeSkillUI");
