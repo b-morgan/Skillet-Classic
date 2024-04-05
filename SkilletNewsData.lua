@@ -37,6 +37,9 @@ Skillet.NewsData = {
 				data = {
 					{ header = "TOC", body = "Update TOC" },
 				},
+				data = {
+					{ header = "TradeSkill", body = "Better handling of scan trade errors" },
+				},
 			},
 		},
 	},
