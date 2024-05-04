@@ -835,10 +835,10 @@ function Skillet:UpdateTradeButtons(player)
 			if tradeID == SMELTING then tradeID = MINING end
 			if tradeID == self.currentTrade then
 				button:SetChecked(true)
-				if self.data.skillList[player][tradeID] and self.data.skillList[player][tradeID].scanned then
-					buttonIcon:SetVertexColor(1,1,1)
-				else
+				if self.data.skillList[player][tradeID] and self.data.skillList[player][tradeID].scanTradeReason then
 					buttonIcon:SetVertexColor(1,0,0)
+				else
+					buttonIcon:SetVertexColor(1,1,1)
 				end
 			else
 				button:SetChecked(false)
@@ -1820,6 +1820,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 -- Fill the skill level bar
 --
 		if recipe.itemID and recipe.spellID then
+			--DA.DEBUG(1,"UpdateDetailsWindow: recipe= "..DA.DUMP1(recipe))
 			--DA.DEBUG(1,"UpdateDetailsWindow: itemID= "..tostring(recipe.itemID)..", spellID= "..tostring(recipe.spellID))
 			local orange,yellow,green,gray = self:GetTradeSkillLevels(recipe.itemID, recipe.spellID)
 --
