@@ -349,17 +349,23 @@ function Skillet:OnInitialize()
 	if not self.db.global.MissingVendorItems then
 		self:InitializeMissingVendorItems()
 	end
-	if not self.db.global.MissingSkillLevels then
-		self.db.global.MissingSkillLevels = {}
-	end
-	if not self.db.global.SkillLevels then
-		self:InitializeSkillLevels()
-	end
 	if not self.db.global.cachedGuildbank then
 		self.db.global.cachedGuildbank = {}
 	end
 	if not self.db.global.customPrice then
 		self.db.global.customPrice = {}
+	end
+--
+-- Initialize the Skill Levels data if any of the tables are missing
+--
+	if not self.db.global.MissingSkillLevels then
+		self.db.global.MissingSkillLevels = {}
+	end
+	if not self.db.global.SkillLineAbility_era then
+		self:InitializeSkillLevels()
+	end
+	if not self.db.global.SkillLineAbility_cata then
+		self:InitializeSkillLevels()
 	end
 
 --
@@ -489,6 +495,7 @@ function Skillet:FlushRecipeData()
 	Skillet.db.realm.skillDB = {}
 	Skillet.db.realm.subClass = {}
 	Skillet.db.realm.invSlot = {}
+	Skillet:InitializeSkillLevels()
 end
 
 --

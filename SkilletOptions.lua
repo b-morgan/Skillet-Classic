@@ -1052,6 +1052,30 @@ Skillet.options =
 			end,
 			order = 78
 		},
+		altskilllevels = {
+			type = "toggle",
+			name = "AltSkillLevels",
+			desc = "Use Alternate Skill Levels",
+			get = function()
+				return Skillet.db.profile.altskilllevels
+			end,
+			set = function(self,value)
+				Skillet.db.profile.altskilllevels = value
+			end,
+			order = 78
+		},
+		baseskilllevel = {
+			type = "toggle",
+			name = "BaseSkillLevel",
+			desc = "Use Alternate Base Skill Level",
+			get = function()
+				return Skillet.db.profile.baseskilllevel
+			end,
+			set = function(self,value)
+				Skillet.db.profile.baseskilllevel = value
+			end,
+			order = 78
+		},
 		news = {
 			type = 'execute',
 			name = "Display news",

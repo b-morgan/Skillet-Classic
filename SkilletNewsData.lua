@@ -26,6 +26,21 @@ local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
 
 Skillet.NewsName = "Skillet-Classic News"
 Skillet.NewsData = {
+	{	version = "1.86",
+		data = {
+			{	name = "Changes",
+				data = {
+					{ header = "TradeSkill", body = "Fix scan trade bug" },
+				},
+				data = {
+					{ header = "TOC", body = "Add CraftInfoAnywhere optional dependency" },
+				},
+				data = {
+					{ header = "Skill Levels", body = "Use data from Wago Tools and CraftInfoAnywhere\nto create separate tables for Classic Era and Classic Cataclysm\n" },
+				},
+			},
+		},
+	},
 	{	version = "1.85",
 		data = {
 			{	name = "Changes",
