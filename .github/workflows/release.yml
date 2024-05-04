@@ -45,11 +45,6 @@ jobs:
         with:
           args: -g classic
 
-      - name: Package and release for Wrath of the Lich King Classic
-        uses: BigWigsMods/packager@master
-        with:
-          args: -g wrath
-
       - name: Package and release for Cataclysm Classic
         uses: BigWigsMods/packager@master
         with:
