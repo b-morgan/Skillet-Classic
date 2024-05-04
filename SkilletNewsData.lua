@@ -26,16 +26,22 @@ local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
 
 Skillet.NewsName = "Skillet-Classic News"
 Skillet.NewsData = {
+	{	version = "1.87",
+		data = {
+			{	name = "Changes",
+				data = {
+					{ header = "News", body = "Update News" },
+					{ header = "Skill Levels", body = "Fix error when CraftInfoAnywhere is not loaded" },
+				},
+			},
+		},
+	},
 	{	version = "1.86",
 		data = {
 			{	name = "Changes",
 				data = {
 					{ header = "TradeSkill", body = "Fix scan trade bug" },
-				},
-				data = {
 					{ header = "TOC", body = "Add CraftInfoAnywhere optional dependency" },
-				},
-				data = {
 					{ header = "Skill Levels", body = "Use data from Wago Tools and CraftInfoAnywhere\nto create separate tables for Classic Era and Classic Cataclysm\n" },
 				},
 			},
@@ -64,14 +70,8 @@ Skillet.NewsData = {
 			{	name = "Changes",
 				data = {
 					{ header = "Skill Levels", body = "Update for WotLK recipes" },
-				},
-				data = {
 					{ header = "Slot Filter", body = "Change itemEquipLoc from INVTYPE_ROBE to INVTYPE_CHEST" },
-				},
-				data = {
 					{ header = "TOC", body = "Update TOC" },
-				},
-				data = {
 					{ header = "TradeSkill", body = "Better handling of scan trade errors" },
 				},
 			},

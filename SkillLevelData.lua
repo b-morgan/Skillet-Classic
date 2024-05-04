@@ -181,8 +181,9 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 				end
 --
 -- Choose the best value(s)
+-- (e will be nil if CraftInfoAnywhere is not loaded or the Wago Tools table(s) have no data)
 --
-				if self.db.profile.altskilllevels then
+				if e and self.db.profile.altskilllevels then
 					if self.db.profile.baseskilllevel then
 						a = e
 					end
