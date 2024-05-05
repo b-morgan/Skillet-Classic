@@ -158,6 +158,7 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 					b = (tonumber(b) or 0) + rb
 					c = (tonumber(c) or 0) + rb
 					d = (tonumber(d) or 0) + rb
+					self.sourceTradeSkillLevel = 1
 				end
 				if levelsByRecipe and type(levelsByRecipe) == 'string' then
 					e,f,g,h = string.split("/", levelsByRecipe)
@@ -165,8 +166,10 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 					f = (tonumber(f) or 0) + rb
 					g = (tonumber(g) or 0) + rb
 					h = (tonumber(h) or 0) + rb
-					self.sourceTradeSkillLevel = 1
 				end
+--
+-- For debugging, report the differences
+--
 				if a ~= e then
 					DA.DEBUG(1,"GetTradeSkillLevels: a= "..tostring(a)..", e= "..tostring(e))
 				end
@@ -181,9 +184,9 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 				end
 --
 -- Choose the best value(s)
--- (e will be nil if CraftInfoAnywhere is not loaded or the Wago Tools table(s) have no data)
+-- (levelsByRecipe will be nil if CraftInfoAnywhere is not loaded or the Wago Tools table(s) have no data)
 --
-				if e and self.db.profile.altskilllevels then
+				if levelsByRecipe and self.db.profile.altskilllevels then
 					if self.db.profile.baseskilllevel then
 						a = e
 					end
