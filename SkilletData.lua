@@ -1085,6 +1085,7 @@ local function ScanTrade()
 				end
 				if itemName then
 					local itemID, linkType = Skillet:GetItemIDFromLink(itemLink)
+					itemID = itemID or 0
 					--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", itemID= "..tostring(itemID)..", linkType= "..tostring(linkType))
 					local minMade,maxMade = 1, 1
 					if not Skillet.isCraft then
