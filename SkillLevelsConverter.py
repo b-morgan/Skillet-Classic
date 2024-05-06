@@ -2,11 +2,10 @@
 #
 # SkillLevelsConverter.py
 #
-# This program takes two file name arguments on the command line which are
+# This program takes up to three file name arguments on the command line which are
 # .csv tables from https://wago.tools/db2/SkillLineAbility. 
-# The first file should be from "Classic Era" and the second from "Classic" (see https://wago.tools).
 #
-# The output will be two .lua tables containing the data for inclusion in Skillet-Classic's SkillLevelData.lua
+# The output will be .lua tables containing the data for inclusion in Skillet-Classic's SkillLevelData.lua
 #
 
 import sys
@@ -59,27 +58,46 @@ def spells_list_write(file_name):
 #
 # Initialize the data storage
 #
-spell_to_skill_line = {}
-min_skill_line_rank = {}
-trivial_skill_line_rank_low = {}
-trivial_skill_line_rank_high = {}
+if len(sys.argv) < 2:
+	print("Usage:")
+	exit()
+
+if len(sys.argv) >= 2:
+	spell_to_skill_line = {}
+	min_skill_line_rank = {}
+	trivial_skill_line_rank_low = {}
+	trivial_skill_line_rank_high = {}
 
 #
 # Read the data from the .csv file
 #
-spells_list_read(sys.argv[1])
+	spells_list_read(sys.argv[1])
+	print(str(len(spell_to_skill_line))+" records processed")
 #
 # Change the input file name extension and write the data
 #
-spells_list_write(sys.argv[1])
+	spells_list_write(sys.argv[1])
 
 #
 # Initialize the data storage again and repeat the process
 #
-spell_to_skill_line = {}
-min_skill_line_rank = {}
-trivial_skill_line_rank_low = {}
-trivial_skill_line_rank_high = {}
+if len(sys.argv) >= 3:
+	spell_to_skill_line = {}
+	min_skill_line_rank = {}
+	trivial_skill_line_rank_low = {}
+	trivial_skill_line_rank_high = {}
 
-spells_list_read(sys.argv[2])
-spells_list_write(sys.argv[2])
+	spells_list_read(sys.argv[2])
+	print(str(len(spell_to_skill_line))+" records processed")
+	spells_list_write(sys.argv[2])
+
+if len(sys.argv) >= 4:
+	spell_to_skill_line = {}
+	min_skill_line_rank = {}
+	trivial_skill_line_rank_low = {}
+	trivial_skill_line_rank_high = {}
+
+	spells_list_read(sys.argv[3])
+	print(str(len(spell_to_skill_line))+" records processed")
+	spells_list_write(sys.argv[3])
+	
