@@ -3971,6 +3971,7 @@ Skillet.db.global.SkillLevels = {
 [34722] = "400/400/430/470",
 }
 Skillet.db.global.SkillLineAbility_era = {
+--@version-classic@
 [2149] = '1/40/55/70',
 [2153] = '30/45/60/75',
 [2152] = '1/30/45/60',
@@ -5344,8 +5345,10 @@ Skillet.db.global.SkillLineAbility_era = {
 [448085] = '1/250/255/260',
 [448624] = '1/120/125/130',
 [451706] = '1/250/255/260',
+--@end-version-classic@
 }
 Skillet.db.global.SkillLineAbility_cata = {
+--@version-cata@
 [2149] = '1/40/55/70',
 [2153] = '30/45/60/75',
 [2152] = '1/30/45/60',
@@ -9642,8 +9645,10 @@ Skillet.db.global.SkillLineAbility_cata = {
 [405005] = '1/390/397/405',
 [413897] = '1/390/397/405',
 [414814] = '1/390/397/405',
+--@end-version-cata@
 }
 Skillet.db.global.SkillLineAbility_retail = {
+--@version-retail@
 [2018] = '1/1/1/1',
 [2108] = '1/1/1/1',
 [2149] = '1/40/55/70',
@@ -19190,5 +19195,6 @@ Skillet.db.global.SkillLineAbility_retail = {
 [422337] = '1/100/100/100',
 [422338] = '1/100/100/100',
 [422330] = '1/100/100/100',
+--@end-version-retail@
 }
 end
