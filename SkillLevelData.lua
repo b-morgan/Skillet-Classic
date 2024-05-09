@@ -189,6 +189,7 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 					b = f
 					c = g
 					d = h
+					DA.DEBUG(1,"GetTradeSkillLevels: levelsReturned= "..tostring(a).."/"..tostring(b).."/"..tostring(c).."/"..tostring(d))
 					self.sourceTradeSkillLevel = 2
 					return a, b, c, d
 				elseif levels then
