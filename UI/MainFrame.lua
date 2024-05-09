@@ -1823,6 +1823,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 			--DA.DEBUG(1,"UpdateDetailsWindow: recipe= "..DA.DUMP1(recipe))
 			--DA.DEBUG(1,"UpdateDetailsWindow: itemID= "..tostring(recipe.itemID)..", spellID= "..tostring(recipe.spellID))
 			local orange,yellow,green,gray = self:GetTradeSkillLevels(recipe.itemID, recipe.spellID)
+			--DA.DEBUG(1,"UpdateDetailsWindow: orange= "..tostring(orange)..", yellow= "..tostring(yellow)..", green= "..tostring(green)..", gray= "..tostring(gray))
 --
 -- Save the actual values
 --
@@ -2343,6 +2344,19 @@ function Skillet:SkillButton_CutSelected()
 	DA.DEBUG(0,"SkillButton_CutSelected()")
 	Skillet:SkillButton_CopySelected()
 	Skillet:SkillButton_DeleteSelected()
+end
+
+function Skillet:SkillButton_QueueSelected()
+	DA.DEBUG(0,"SkillButton_QueueSelected()")
+	local skillListKey = self.currentPlayer..":"..self.currentTrade..":"..self.currentGroupLabel
+	local sortedSkillList = self.data.sortedSkillList[skillListKey]
+	for i=1,sortedSkillList.count do
+		if sortedSkillList[i].selected and not (sortedSkillList[i].parentIndex and sortedSkillList[sortedSkillList[i].parentIndex].selected) then
+			self.selectedSkill = sortedSkillList[i].skillIndex
+			self:QueueItems(1)
+			DA.DEBUG(1,"queuing "..(sortedSkillList[i].name or "nil"))
+		end
+	end
 end
 
 function Skillet:SkillButton_NewGroup()
@@ -3199,6 +3213,10 @@ local skillMenuList = {
 		hasArrow = true,
 		menuList = skillMenuIgnore,
 	},
+	{
+		text = L["Queue"],
+		func = function() Skillet:SkillButton_QueueSelected() end,
+	},
 }
 
 local skillMenuListLocked = {
@@ -3231,6 +3249,10 @@ local skillMenuListLocked = {
 		text = L["Ignore"],
 		hasArrow = true,
 		menuList = skillMenuIgnore,
+	},
+	{
+		text = L["Queue"],
+		func = function() Skillet:SkillButton_QueueSelected() end,
 	},
 }
 
@@ -3279,6 +3301,10 @@ local skillMenuListClassic = {
 		hasArrow = true,
 		menuList = skillMenuIgnore,
 	},
+	{
+		text = L["Queue"],
+		func = function() Skillet:SkillButton_QueueSelected() end,
+	},
 }
 
 local skillMenuListClassicLocked = {
@@ -3307,6 +3333,10 @@ local skillMenuListClassicLocked = {
 		text = L["Ignore"],
 		hasArrow = true,
 		menuList = skillMenuIgnore,
+	},
+	{
+		text = L["Queue"],
+		func = function() Skillet:SkillButton_QueueSelected() end,
 	},
 }
 
@@ -3732,4 +3762,3 @@ end
 function Skillet:ScrollFrame_OnLoad(frame)
 	UIPanelScrollFrame_OnLoad(frame)
 end
-

@@ -1,0 +1,5 @@
+<Bindings>
+	<Binding name="Process Queue" category="Skillet">
+		Skillet:ProcessQueue(false)
+	</Binding>
+</Bindings>
