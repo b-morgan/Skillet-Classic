@@ -177,42 +177,28 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 					h = (tonumber(h) or 0) + rb
 				end
 --
--- For debugging, report the differences
---
-				local diff = false
-				if a ~= e then
-					DA.DEBUG(1,"GetTradeSkillLevels: a= "..tostring(a)..", e= "..tostring(e))
-				end
-				if b ~= f then
-					DA.DEBUG(1,"GetTradeSkillLevels: b= "..tostring(b)..", f= "..tostring(f))
-					diff = true
-				end
-				if c ~= g then
-					DA.DEBUG(1,"GetTradeSkillLevels: c= "..tostring(c)..", g= "..tostring(g))
-					diff = true
-				end
-				if d ~= h then
-					DA.DEBUG(1,"GetTradeSkillLevels: d= "..tostring(b)..", h= "..tostring(h))
-					diff = true
-				end
---
 -- Choose the best value(s)
--- (levelsByRecipe will be nil if CraftInfoAnywhere is not loaded or the Wago Tools table(s) have no data)
+-- levels will be nil if there is no Wowhead data
+-- levelsByRecipe will be nil if CraftInfoAnywhere is not loaded or the Wago Tools table(s) have no data
+-- if both values are available, Wowhead orange value is more accurate than the Wago Tools data
 --
---				if levelsByRecipe and self.db.profile.altskilllevels then
-				if levelsByRecipe then
+				if levels and levelsByRecipe then
 					if self.db.profile.baseskilllevel then
 						a = e
 					end
 					b = f
 					c = g
 					d = h
+					self.sourceTradeSkillLevel = 2
+					return a, b, c, d
+				elseif levels then
 					DA.DEBUG(1,"GetTradeSkillLevels: levelsReturned= "..tostring(a).."/"..tostring(b).."/"..tostring(c).."/"..tostring(d))
-					if diff then
-						self.sourceTradeSkillLevel = 2
-					end
+					return a, b, c, d
+				elseif levelsByRecipe then
+					DA.DEBUG(1,"GetTradeSkillLevels: levelsReturned= "..tostring(e).."/"..tostring(f).."/"..tostring(g).."/"..tostring(h))
+					self.sourceTradeSkillLevel = 2
+					return e, f, g, h
 				end
-				return a, b, c, d
 			end
 --
 -- The TradeskillInfo addon seems to be more accurate than LibPeriodicTable-3.1
@@ -3971,7 +3957,7 @@ Skillet.db.global.SkillLevels = {
 [34722] = "400/400/430/470",
 }
 Skillet.db.global.SkillLineAbility_era = {
---@version-classic@
+--[====[@version-classic@
 [2149] = '1/40/55/70',
 [2153] = '30/45/60/75',
 [2152] = '1/30/45/60',
@@ -5345,7 +5331,7 @@ Skillet.db.global.SkillLineAbility_era = {
 [448085] = '1/250/255/260',
 [448624] = '1/120/125/130',
 [451706] = '1/250/255/260',
---@end-version-classic@
+--@end-version-classic@]====]
 }
 Skillet.db.global.SkillLineAbility_cata = {
 --@version-cata@
@@ -9648,7 +9634,7 @@ Skillet.db.global.SkillLineAbility_cata = {
 --@end-version-cata@
 }
 Skillet.db.global.SkillLineAbility_retail = {
---@version-retail@
+--[====[@version-retail@
 [2018] = '1/1/1/1',
 [2108] = '1/1/1/1',
 [2149] = '1/40/55/70',
@@ -19195,6 +19181,6 @@ Skillet.db.global.SkillLineAbility_retail = {
 [422337] = '1/100/100/100',
 [422338] = '1/100/100/100',
 [422330] = '1/100/100/100',
---@end-version-retail@
+--@end-version-retail@]====]
 }
 end
