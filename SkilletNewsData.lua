@@ -30,7 +30,8 @@ Skillet.NewsData = {
 		data = {
 			{	name = "Changes",
 				data = {
-					{ header = "Skill Levels", body = "Add conditional data" },
+					{ header = "Skill Levels", body = "Add conditional data\nFix issue #171" },
+					{ header = "Automation", body = "Add right click 'Queue' selected recipes\nAdd keybinding for 'Process' button" },
 				},
 			},
 		},
