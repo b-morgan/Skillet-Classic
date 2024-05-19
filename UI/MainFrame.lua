@@ -1275,7 +1275,7 @@ function Skillet:UpdateTradeSkillWindow()
 -- show the count of the item currently owned that the recipe will produce
 --
 				if showOwned and self.currentPlayer == UnitName("player") then
-					local numowned = (self.db.realm.auctionData[self.currentPlayer][recipe.itemID] or 0) + GetItemCount(recipe.itemID,true)
+					local numowned = (self.db.realm.auctionData[self.currentPlayer][recipe.itemID] or 0) + GetItemCount(recipe.itemID or 0,true)
 					if numowned > 0 then
 						if numowned >= 1000 then
 							numowned = "##"
