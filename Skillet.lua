@@ -884,16 +884,14 @@ end
 --
 function Skillet:ADDON_ACTION_BLOCKED()
 	DA.TRACE("ADDON_ACTION_BLOCKED()")
---	print("|cf0f00000Skillet-Classic|r: Combat lockdown restriction." ..
---								  " Leave combat and try again.")
---	self:HideAllWindows()
+	DA.MARK3("|cf0f00000Skillet-Classic|r: Combat lockdown restriction. Leave combat and try again.")
+	self:HideAllWindows()
 end
 
 function Skillet:PLAYER_REGEN_DISABLED()
 	DA.TRACE("PLAYER_REGEN_DISABLED()")
---	print("|cf0f00000Skillet-Classic|r: Combat lockdown restriction." ..
---								  " Leave combat and try again.")
---	self:HideAllWindows()
+	DA.MARK3("|cf0f00000Skillet-Classic|r: Combat lockdown restriction. Leave combat and try again.")
+	self:HideAllWindows()
 end
 
 function Skillet:PLAYER_REGEN_ENABLED()
@@ -1017,6 +1015,10 @@ end
 
 function Skillet:TRADE_SKILL_SHOW()
 	DA.TRACE("TRADE_SKILL_SHOW")
+	if UnitAffectingCombat("player") then
+		DA.MARK3(0,"|cff8888ffSkillet|r: Combat lockdown restriction.".." Leave combat and try again.")
+		return
+	end
 	Skillet.tradeUpdate = 0
 	DA.TRACE("TRADE_SKILL_SHOW: hideTradeSkillFrame= "..tostring(Skillet.hideTradeSkillFrame))
 	if Skillet.hideTradeSkillFrame then
@@ -1037,6 +1039,10 @@ end
 
 function Skillet:CRAFT_SHOW()
 	DA.TRACE("CRAFT_SHOW")
+	if UnitAffectingCombat("player") then
+		DA.MARK3(0,"|cff8888ffSkillet|r: Combat lockdown restriction.".." Leave combat and try again.")
+		return
+	end
 	if Skillet.castSpellID == 5149 then
 --
 -- Beast Training opened
