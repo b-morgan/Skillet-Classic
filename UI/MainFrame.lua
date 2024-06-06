@@ -1522,6 +1522,9 @@ function Skillet:SkillButton_OnEnter(button)
 --
 --	Add Skillet specific information to the tooltip
 --
+	if not recipe.itemID then
+		recipe.itemID = 0
+	end	
 	local num, numrecursive, numwvendor, numwalts, numbags, numbank = 0, 0, 0, 0, 0, 0
 	if skill.skillData then
 		num, numrecursive, numwvendor, numwalts = get_craftable_counts(skill.skillData, recipe.numMade)
