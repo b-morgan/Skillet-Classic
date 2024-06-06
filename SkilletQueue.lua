@@ -653,8 +653,12 @@ function Skillet:UNIT_SPELLCAST_STOP(event, unit, sGUID, spellID)
 	self.castSpellID = spellID
 	self.castSpellName = GetSpellInfo(spellID)
 	DA.TRACE("spellName= "..tostring(self.castSpellName)..", processingSpell= "..tostring(self.processingSpell))
-	if unit == "player" and self.processingSpell and self.processingSpell == self.castSpellName then
-		Skillet:StopCast(self.castSpellName,true)
+	if unit == "player" and self.processingSpell then
+		if self.processingSpell == self.castSpellName then
+			Skillet:StopCast(self.castSpellName,true)
+		elseif string.find(self.processingSpell,self.castSpellName) then
+			Skillet:StopCast(self.processingSpell,true)
+		end
 	end
 end
 
