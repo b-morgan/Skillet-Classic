@@ -385,6 +385,7 @@ Skillet.options =
 					width = 1.0,
 					order = 35
 				},
+--[[
 				use_higher_vellum = {
 					hidden = isClassic,
 					type = "toggle",
@@ -399,6 +400,7 @@ Skillet.options =
 					width = 1.0,
 					order = 36
 				},
+]]--
 				include_tradebuttons = {
 					type = "toggle",
 					name = L["TRADEBUTTONSNAME"],

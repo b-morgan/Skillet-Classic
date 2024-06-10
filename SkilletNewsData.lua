@@ -32,6 +32,7 @@ Skillet.NewsData = {
 				data = {
 					{ header = "Queue Processing", body = "Fix issue #176" },
 					{ header = "Combat Crafting", body = "Partial fix for issue #114" },
+					{ header = "Enchanting", body = "Update Enchanting Scroll data" },
 				},
 			},
 		},

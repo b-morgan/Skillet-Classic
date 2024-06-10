@@ -1,14 +1,10 @@
-## Interface: 10000
-## Interface-Classic: 11502
-## Interface-BCC: 20504
-## Interface-Wrath: 30403
-## Interface-Cata: 40400
+## Interface: 40400
 ## Title: Skillet-Classic |cff7fff7f -Ace3-|r
 ## Notes: A replacement tradeskill window
 ## Notes-esES: Una sustitucion de la ventana de Habilidades de Comercio
 ## Notes-ruRU: Заменяет окно профессий на более функциональное.
 ## Author: bsmorgan
-## Version: @project-version@
+## Version: 1.92-alpha1
 ## X-Category: Tradeskill
 ## X-License GPL v3 or later
 ## X-Curse-Project-ID: 447401
@@ -60,6 +56,7 @@ Locale\Locale-zhTW.lua
 Skillet.lua
 SkilletOptions.lua
 SkilletData.lua
+## SkilletData2.lua
 SkilletNewsGUI.lua
 SkilletNewsData.lua
 SkilletARL.lua
