@@ -1890,7 +1890,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 	elseif recipe.itemID ~= 0 then
 		--DA.DEBUG(1,"UpdateDetailsWindow: texture from GetItemIcon("..tostring(recipe.itemID)..")")
 		texture = GetItemIcon(recipe.itemID)
-	elseif Skillet.db.profile.enchant_scrolls and recipe.scrollID ~= 0 then
+	elseif Skillet.db.profile.enchant_scrolls and recipe.scrollID ~= 0 and recipe.scrollID ~= nil then --for ring enchants recipe.scrollID is nil.
 		--DA.DEBUG(1,"UpdateDetailsWindow: texture from GetItemIcon("..tostring(recipe.scrollID)..")")
 		texture = GetItemIcon(recipe.scrollID)
 	else
