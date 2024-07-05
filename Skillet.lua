@@ -884,14 +884,16 @@ end
 --
 function Skillet:ADDON_ACTION_BLOCKED()
 	DA.TRACE("ADDON_ACTION_BLOCKED()")
-	DA.MARK3("|cf0f00000Skillet-Classic|r: Combat lockdown restriction. Leave combat and try again.")
-	self:HideAllWindows()
+	if self:HideAllWindows() then
+		DA.MARK3("|cf0f00000Skillet-Classic|r: Combat lockdown restriction. Leave combat and try again.")
+	end
 end
 
 function Skillet:PLAYER_REGEN_DISABLED()
 	DA.TRACE("PLAYER_REGEN_DISABLED()")
-	DA.MARK3("|cf0f00000Skillet-Classic|r: Combat lockdown restriction. Leave combat and try again.")
-	self:HideAllWindows()
+	if self:HideAllWindows() then
+		DA.MARK3("|cf0f00000Skillet-Classic|r: Combat lockdown restriction. Leave combat and try again.")
+	end
 end
 
 function Skillet:PLAYER_REGEN_ENABLED()
