@@ -1116,7 +1116,7 @@ function Skillet:UpdateTradeSkillWindow()
 			suffixText:Hide()
 			skillRankBar:Hide()
 			if self.db.profile.display_required_level or self.db.profile.display_item_level then
-				levelText:SetWidth(skill.depth*8+20)
+				levelText:SetWidth(math.max(skill.depth*8+20,28))
 			else
 				levelText:SetWidth(skill.depth*8)
 			end
