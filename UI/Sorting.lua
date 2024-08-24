@@ -74,24 +74,29 @@ local function sort_recipe_by_skill_level(tradeskill, a, b)
 end
 
 local function sort_recipe_by_item_level(tradeskill, a, b)
+	local left_r, left, right_r, right, _
 	while a.subGroup and #a.subGroup.entries>0 do
 		a = a.subGroup.entries[1]
 	end
 	while b.subGroup and #b.subGroup.entries>0 do
 		b = b.subGroup.entries[1]
 	end
-	local left_r = Skillet:GetRecipe(a.recipeID)
-	local right_r = Skillet:GetRecipe(b.recipeID)
-	local left  = Skillet:GetLevelRequiredToUse(left_r.itemID)
-	local right = Skillet:GetLevelRequiredToUse(right_r.itemID)
+	left_r = Skillet:GetRecipe(a.recipeID)
+	right_r = Skillet:GetRecipe(b.recipeID)
+	left  = Skillet:GetLevelRequiredToUse(left_r.itemID)
+	right = Skillet:GetLevelRequiredToUse(right_r.itemID)
 	if not left  then  left = 0 end
 	if not right then right = 0 end
 	if left == right then
 --
 -- Same level, try iLevel next
 --
-		local left = select(4,GetItemInfo(left_r.itemID)) or 0
-		local right = select(4,GetItemInfo(right_r.itemID)) or 0
+		if left_r.itemID then
+			left = select(4,GetItemInfo(left_r.itemID)) or 0
+		end
+		if right_r.itemID then
+			right = select(4,GetItemInfo(right_r.itemID)) or 0
+		end
 		if left == right then
 --
 -- Same level, sort by difficulty
@@ -106,18 +111,21 @@ local function sort_recipe_by_item_level(tradeskill, a, b)
 end
 
 local function sort_recipe_by_item_quality(tradeskill, a, b)
+	local left_r, left, right_r, right
 	while a.subGroup and #a.subGroup.entries>0 do
 		a = a.subGroup.entries[1]
 	end
 	while b.subGroup and #b.subGroup.entries>0 do
 		b = b.subGroup.entries[1]
 	end
-	local left_r = Skillet:GetRecipe(a.recipeID)
-	local right_r = Skillet:GetRecipe(b.recipeID)
-	local _,_, left = GetItemInfo(left_r.itemID)
-	local _,_, right = GetItemInfo(right_r.itemID)
-	if not left  then  left = 0 end
-	if not right then right = 0 end
+	left_r = Skillet:GetRecipe(a.recipeID)
+	right_r = Skillet:GetRecipe(b.recipeID)
+	if left_r.itemID then
+		left = select(3,GetItemInfo(left_r.itemID)) or 0
+	end
+	if right_r.itemID then
+		right = select(3,GetItemInfo(right_r.itemID)) or 0
+	end
 	if left == right then
 --
 -- Same level, sort by level required to use

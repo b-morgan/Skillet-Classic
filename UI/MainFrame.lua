@@ -675,16 +675,14 @@ function Skillet:TradeButton_OnEnter(button)
 		local rank, maxRank = data.rank, data.maxRank
 		GameTooltip:AddLine("["..tostring(rank).."/"..tostring(maxRank).."]",0,1,0)
 		if tradeID == self.currentTrade then
+			local link
 			if GetTradeSkillListLink then
-				local link = GetTradeSkillListLink()
-				if link then
-					GameTooltip:AddLine(L["shift-click to link"])
-				elseif C_TradeSkillUI then
-					link = C_TradeSkillUI.GetTradeSkillListLink()
-					if link then
-						GameTooltip:AddLine(L["shift-click to link"])
-					end
-				end
+				link = GetTradeSkillListLink()
+			elseif C_TradeSkillUI.GetTradeSkillListLink then
+				link = C_TradeSkillUI.GetTradeSkillListLink()
+			end
+			if link then
+				GameTooltip:AddLine(L["shift-click to link"])
 			end
 		end
 		local buttonIcon = _G[button:GetName().."Icon"]
@@ -722,16 +720,14 @@ function Skillet:TradeButton_OnClick(this,button)
 	if button == "LeftButton" then
 		if player == self.currentPlayer and self.currentTrade then
 			if self.currentTrade == tradeID and IsShiftKeyDown() then
+				local link
 				if GetTradeSkillListLink then
-					local link = GetTradeSkillListLink()
-					if link then
-						ChatEdit_InsertLink(link)
-					elseif C_TradeSkillUI then
-						link = C_TradeSkillUI.GetTradeSkillListLink()
-						if link then
-							ChatEdit_InsertLink(link)
-						end
-					end
+					link = GetTradeSkillListLink()
+				elseif C_TradeSkillUI.GetTradeSkillListLink then
+					link = C_TradeSkillUI.GetTradeSkillListLink()
+				end
+				if link then
+					ChatEdit_InsertLink(link)
 				end
 			elseif self.currentTrade ~= tradeID then
 				if self.skillIsCraft[self.currentTrade] ~= self.skillIsCraft[tradeID] then
