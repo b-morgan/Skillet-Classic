@@ -367,9 +367,6 @@ function Skillet:OnInitialize()
 	if not self.db.global.SkillLineAbility_cata then
 		self:InitializeSkillLevels()
 	end
-	if not self.db.global.SkillLineAbility_retail then
-		self:InitializeSkillLevels()
-	end
 
 --
 -- Hook default tooltips
