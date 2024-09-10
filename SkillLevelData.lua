@@ -91,7 +91,7 @@ end
 --   Old MainFrame.lua call: GetTradeSkillLevels((recipe.itemID>0 and recipe.itemID) or -recipe.spellID)
 --
 function Skillet:GetTradeSkillLevels(itemID, spellID)
-	DA.DEBUG(0,"GetTradeSkillLevels("..tostring(itemID)..", "..tostring(spellID)..")")
+	--DA.DEBUG(0,"GetTradeSkillLevels("..tostring(itemID)..", "..tostring(spellID)..")")
 	local a,b,c,d,e,f,g,h
 	local rb = getRacialBonus()
 	local skillLevels = Skillet.db.global.SkillLevels
@@ -106,7 +106,7 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 	if itemID then 
 		if tonumber(itemID) ~= nil and itemID ~= 0 then
 			if self.isCraft or self.currentTrade == 7411 then  -- isCraft for Classic and BCC, Enchanting TradeID for Wrath
-				DA.DEBUG(1,"GetTradeSkillLevels: itemID= "..tostring(itemID)..", spellID= "..tostring(spellID)..")")
+				--DA.DEBUG(1,"GetTradeSkillLevels: itemID= "..tostring(itemID)..", spellID= "..tostring(spellID)..")")
 				itemID = -itemID
 			end
 			self.indexTradeSkillLevel = itemID
@@ -146,7 +146,7 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 							else
 								for spell, strng in pairs(levels) do
 									name = GetSpellInfo(spell)
-									DA.DEBUG(1,"GetTradeSkillLevels: name= "..tostring(name))
+									--DA.DEBUG(1,"GetTradeSkillLevels: name= "..tostring(name))
 									if name == spellID then
 										levels = strng
 										break
@@ -159,8 +159,8 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 --
 -- Compare the sources
 --				
-				DA.DEBUG(1,"GetTradeSkillLevels: levelsWowhead= "..tostring(levels))
-				DA.DEBUG(1,"GetTradeSkillLevels: levelsByRecipe= "..tostring(levelsByRecipe))
+				--DA.DEBUG(1,"GetTradeSkillLevels: levelsWowhead= "..tostring(levels))
+				--DA.DEBUG(1,"GetTradeSkillLevels: levelsByRecipe= "..tostring(levelsByRecipe))
 				if levels and type(levels) == 'string' then
 					a,b,c,d = string.split("/", levels)
 					a = (tonumber(a) or 0) + rb
@@ -189,14 +189,15 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 					b = f
 					c = g
 					d = h
-					DA.DEBUG(1,"GetTradeSkillLevels: levelsReturned= "..tostring(a).."/"..tostring(b).."/"..tostring(c).."/"..tostring(d))
+					--DA.DEBUG(1,"GetTradeSkillLevels: levelsReturned= "..tostring(a).."/"..tostring(b).."/"..tostring(c).."/"..tostring(d))
 					self.sourceTradeSkillLevel = 2
 					return a, b, c, d
 				elseif levels then
-					DA.DEBUG(1,"GetTradeSkillLevels: levelsReturned= "..tostring(a).."/"..tostring(b).."/"..tostring(c).."/"..tostring(d))
+					--DA.DEBUG(1,"GetTradeSkillLevels: levelsReturned= "..tostring(a).."/"..tostring(b).."/"..tostring(c).."/"..tostring(d))
+					self.sourceTradeSkillLevel = 2
 					return a, b, c, d
 				elseif levelsByRecipe then
-					DA.DEBUG(1,"GetTradeSkillLevels: levelsReturned= "..tostring(e).."/"..tostring(f).."/"..tostring(g).."/"..tostring(h))
+					--DA.DEBUG(1,"GetTradeSkillLevels: levelsReturned= "..tostring(e).."/"..tostring(f).."/"..tostring(g).."/"..tostring(h))
 					self.sourceTradeSkillLevel = 2
 					return e, f, g, h
 				end
@@ -221,7 +222,7 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 							b = (tonumber(TSILevels[2]) or 0) + rb
 							c = (tonumber(TSILevels[3]) or 0) + rb
 							d = (tonumber(TSILevels[4]) or 0) + rb
-							self.sourceTradeSkillLevel = 2
+							self.sourceTradeSkillLevel = 3
 							return a, b, c, d
 						end
 					end
@@ -248,19 +249,19 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 					b = (tonumber(b) or 0) + rb
 					c = (tonumber(c) or 0) + rb
 					d = (tonumber(d) or 0) + rb
-					self.sourceTradeSkillLevel = 3
+					self.sourceTradeSkillLevel = 4
 					return a, b, c, d
 				end
 			end
 		elseif tonumber(itemID) == nil then
 			DA.DEBUG(0,"GetTradeSkillLevels: "..tostring(itemID).." is not a number")
-			self.sourceTradeSkillLevel = 4
+			self.sourceTradeSkillLevel = 5
 			self.indexTradeSkillLevel = nil
 			return 0, 0, 0, 0 
 		end
 	else
 		DA.DEBUG(0,"GetTradeSkillLevels: itemID is missing")
-		self.sourceTradeSkillLevel = 5
+		self.sourceTradeSkillLevel = 6
 		self.indexTradeSkillLevel = nil
 		return 0, 0, 0, 0 
 	end
@@ -268,7 +269,7 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 		self.db.global.MissingSkillLevels = {}
 	end
 	self.db.global.MissingSkillLevels[itemID] = "0/0/0/0"
-	self.sourceTradeSkillLevel = 6
+	self.sourceTradeSkillLevel = 7
 	return 0, 0, 0, 0 
 end
 
@@ -3958,7 +3959,7 @@ Skillet.db.global.SkillLevels = {
 [34722] = "400/400/430/470",
 }
 Skillet.db.global.SkillLineAbility_era = {
---@version-classic@
+--[====[@version-classic@
 [2149] = '1/40/55/70',
 [2153] = '30/45/60/75',
 [2152] = '1/30/45/60',
@@ -5332,7 +5333,7 @@ Skillet.db.global.SkillLineAbility_era = {
 [448085] = '1/250/255/260',
 [448624] = '1/120/125/130',
 [451706] = '1/250/255/260',
---@end-version-classic@
+--@end-version-classic@]====]
 }
 Skillet.db.global.SkillLineAbility_cata = {
 --@version-cata@
@@ -9635,7 +9636,7 @@ Skillet.db.global.SkillLineAbility_cata = {
 --@end-version-cata@
 }
 Skillet.db.global.SkillLineAbility_retail = {
---@version-retail@
+--[====[@version-retail@
 [2018] = '1/1/1/1',
 [2108] = '1/1/1/1',
 [2149] = '1/40/55/70',
@@ -19182,6 +19183,6 @@ Skillet.db.global.SkillLineAbility_retail = {
 [422337] = '1/100/100/100',
 [422338] = '1/100/100/100',
 [422330] = '1/100/100/100',
---@end-version-retail@
+--@end-version-retail@]====]
 }
 end
