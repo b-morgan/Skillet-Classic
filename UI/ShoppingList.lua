@@ -31,8 +31,6 @@ local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
 local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
 local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
 
-SKILLET_SHOPPING_LIST_HEIGHT = 16
-
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
 -- Stolen from the Waterfall Ace2 addon.
@@ -1157,6 +1155,7 @@ function Skillet:ShoppingListToggleIncludeGuild()
 	Skillet.db.profile.include_guild = not Skillet.db.profile.include_guild
 end
 
+local num_buttons = 0
 local function get_button(i)
 	local button = _G["SkilletShoppingListButton"..i]
 	if not button then
@@ -1179,7 +1178,6 @@ end
 --
 function Skillet:UpdateShoppingListWindow(use_cached_recipes)
 	--DA.DEBUG(0,"UpdateShoppingListWindow("..tostring(use_cached_recipes)..")")
-	local num_buttons = 0
 	if not self.shoppingList or not self.shoppingList:IsVisible() then
 		return
 	end
@@ -1237,15 +1235,21 @@ function Skillet:UpdateShoppingListWindow(use_cached_recipes)
 			return (b.player > a.player)
 		end)
 	end
-	local button_count = SkilletShoppingListList:GetHeight() / SKILLET_SHOPPING_LIST_HEIGHT
-	button_count = math.floor(button_count)
+	local height = SkilletShoppingListParent:GetHeight()
+	local buttonH = SkilletShoppingListButton1:GetHeight()
+	local width = SkilletShoppingListParent:GetWidth() - 30 -- Allow for scrollbars
+	--DA.DEBUG(1,"UpdateShoppingListWindow: height= "..tostring(height)..", buttonH= "..tostring(buttonH))
+	--DA.DEBUG(1,"UpdateShoppingListWindow: SkilletShoppingListParent width= "..tostring(width))
+	local button_count = height / buttonH
+	button_count = math.floor(button_count) - 1
+	--DA.DEBUG(1,"UpdateShoppingListWindow: numItems= "..tostring(numItems)..", button_count= "..tostring(button_count)..", num_buttons= "..tostring(num_buttons))
 --
 -- Update the scroll frame
 --
-	FauxScrollFrame_Update(SkilletShoppingListList,          -- frame
-							numItems,                        -- num items
-							button_count,                    -- num to display
-							SKILLET_SHOPPING_LIST_HEIGHT)    -- value step (item height)
+	FauxScrollFrame_Update(SkilletShoppingListList,	 -- frame
+							numItems,                -- num items
+							button_count,            -- num to display
+							buttonH)                 -- value step (item height)
 --
 -- Where in the list of items to start counting.
 --
@@ -1284,8 +1288,11 @@ function Skillet:UpdateShoppingListWindow(use_cached_recipes)
 		else
 			button.id = nil
 			button:Hide()
+			name:SetText("")
 			name:Hide()
+			count:SetText("")
 			count:Hide()
+			player:SetText("")
 			player:Hide()
 		end
 	end

@@ -33,6 +33,11 @@ Skillet.NewsData = {
 					{ header = "Skill Levels", body = "Separate skill level data into two files" },
 				},
 			},
+			{	name = "Fixes",
+				data = {
+					{ header = "Shopping List", body = "Fix for items displaying outside of frame" },
+				},
+			},
 		},
 	},
 	{	version = "1.98",
