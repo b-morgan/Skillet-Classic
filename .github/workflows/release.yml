@@ -40,13 +40,6 @@ jobs:
 
       # once cloned, we just run the GitHub Action for the packager project
 
-      - name: Package and release for Classic Era
+      - name: Package and release for Classic Era and Cataclysm Classic
         uses: BigWigsMods/packager@master
-        with:
-          args: -g classic
-
-      - name: Package and release for Cataclysm Classic
-        uses: BigWigsMods/packager@master
-        with:
-          args: -g cata
 
