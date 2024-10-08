@@ -2289,6 +2289,60 @@ function Skillet:SkillButton_LinkRecipe()
 	end
 end
 
+--
+-- Inspired by Kaliel's Tracker
+--
+StaticPopupDialogs["SKILLET_WowheadURL"] = {
+    text = "Skillet - Wowhead URL",
+    button2 = CLOSE,
+    hasEditBox = 1,
+    editBoxWidth = 300,
+    EditBoxOnTextChanged = function(self)
+        self:SetText(self.text)
+        self:HighlightText()
+    end,
+    EditBoxOnEnterPressed = function(self)
+        self:GetParent():Hide()
+    end,
+    EditBoxOnEscapePressed = function(self)
+        self:GetParent():Hide()
+    end,
+    OnShow = function(self)
+        local url = "https://www.wowhead.com/"
+		if WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
+			url = url.."classic/"
+		elseif WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC then
+			url = url.."cata/"
+		end
+        local param = "item="..self.text.text_arg1
+        self.text:SetText(self.text:GetText().."\n\n"..self.text.text_arg2)
+        self.editBox.text = url..param
+        self.editBox:SetText(self.editBox.text)
+        self.editBox:SetFocus()
+    end,
+    timeout = 0,
+    whileDead = 1,
+    hideOnEscape = 1
+}
+
+--
+-- Pop up a dialog with a Wowhead URL
+--
+function Skillet:SkillButton_WowheadURL()
+	DA.DEBUG(0,"SkillButton_WowheadURL()")
+	local skill = Skillet.menuButton.skill
+	--DA.DEBUG(1,"SkillButton_WowheadURL: skill= "..DA.DUMP1(skill,1))
+	if skill and skill.recipeID then
+		--DA.DEBUG(1,"SkillButton_WowheadURL: recipeID= "..tostring(skill.recipeID)..", name= "..tostring(skill.name))
+		local recipe = self:GetRecipe(skill.recipeID)
+		--DA.DEBUG(2,"SkillButton_WowheadURL: recipe= "..DA.DUMP1(recipe,1))
+		if recipe and recipe.itemID then
+			--DA.DEBUG(2,"SkillButton_WowheadURL: itemID= "..tostring(recipe.itemID)..", name= "..tostring(recipe.name))
+			StaticPopup_Show("SKILLET_WowheadURL", recipe.itemID, recipe.name)
+		end
+	end
+end
+
 function Skillet:SkillButton_CopySelected()
 	DA.DEBUG(0,"SkillButton_CopySelected()")
 	local skillListKey = self.currentPlayer..":"..self.currentTrade..":"..self.currentGroupLabel
@@ -3180,6 +3234,10 @@ local skillMenuList = {
 		func = function() Skillet:SkillButton_LinkRecipe() end,
 	},
 	{
+		text = L["Wowhead URL"],
+		func = function() Skillet:SkillButton_WowheadURL() end,
+	},
+	{
 		text = L["New Group"],
 		hasArrow = true,
 		menuList = skillMenuGroup,
@@ -3233,6 +3291,10 @@ local skillMenuListLocked = {
 	{
 		text = L["Link Recipe"],
 		func = function() Skillet:SkillButton_LinkRecipe() end,
+	},
+	{
+		text = L["Wowhead URL"],
+		func = function() Skillet:SkillButton_WowheadURL() end,
 	},
 	{
 		text = L["Selection"],
