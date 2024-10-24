@@ -495,6 +495,20 @@ Skillet.options =
 					width = "full",
 					order = 2
 				},
+				select_top_recipe = {
+					type = "toggle",
+					name = L["SELECTTOPRECIPENAME"],
+					desc = L["SELECTTOPRECIPEDESC"],
+					get = function()
+						return Skillet.db.profile.select_top_recipe
+					end,
+					set = function(self,value)
+						Skillet.db.profile.select_top_recipe = value
+						Skillet:UpdateTradeSkillWindow()
+					end,
+					width = "full",
+					order = 3,
+				},
 				enhanced_recipe_display = {
 					type = "toggle",
 					name = L["ENHANCHEDRECIPEDISPLAYNAME"],
@@ -507,7 +521,7 @@ Skillet.options =
 						Skillet:UpdateTradeSkillWindow()
 					end,
 					width = "full",
-					order = 3,
+					order = 4,
 				},
 				interrupt_clears_queue = {
 					type = "toggle",
@@ -520,7 +534,7 @@ Skillet.options =
 						Skillet.db.profile.interrupt_clears_queue = value
 					end,
 					width = "full",
-					order = 4,
+					order = 5,
 				},
 				sound_on_empty_queue = {
 					type = "toggle",
@@ -533,7 +547,7 @@ Skillet.options =
 						Skillet.db.profile.sound_on_empty_queue = value
 					end,
 					width = "full",
-					order = 5,
+					order = 6,
 				},
 				clamp_to_screen = {
 					type = "toggle",

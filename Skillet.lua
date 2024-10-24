@@ -70,6 +70,7 @@ local defaults = {
 		queue_glyph_reagents = false,					-- not in Classic
 		display_required_level = false,
 		display_item_level = false,
+		select_top_recipe = false,
 		display_shopping_list_at_bank = true,
 		display_shopping_list_at_auction = true,
 		display_shopping_list_at_merchant = true,
@@ -1546,6 +1547,13 @@ function Skillet:ShowTradeSkillWindow()
 		self:UpdateTradeSkillWindow()
 	else
 		self:UpdateTradeSkillWindow()
+	end
+	if self.db.profile.select_top_recipe then
+		if SkilletScrollButton1.skill.skillIndex then
+			self:SetSelectedSkill(SkilletScrollButton1.skill.skillIndex)
+		else
+			self:SetSelectedSkill(SkilletScrollButton2.skill.skillIndex)
+		end
 	end
 	DA.DEBUG(0,"ShowTradeSkillWindow complete")
 end
