@@ -31,6 +31,7 @@ Skillet.NewsData = {
 			{	name = "Changes",
 				data = {
 					{ header = "Recipes", body = "Add option to select top recipe" },
+					{ header = "TOC", body = "Update TOC" },
 				},
 			},
 		},
