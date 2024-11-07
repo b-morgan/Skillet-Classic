@@ -2257,11 +2257,11 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						self:RegisterForClicks("LeftButtonUp")
+						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						Skillet:QueueAllItems()
+						Skillet:QueueAllItems(button)
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -2299,11 +2299,11 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						self:RegisterForClicks("LeftButtonUp")
+						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						Skillet:CreateAllItems()
+						Skillet:CreateAllItems(button)
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -2325,11 +2325,11 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						self:RegisterForClicks("LeftButtonUp")
+						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						Skillet:QueueItems(SkilletItemCountInputBox:GetNumber())
+						Skillet:QueueItems(button, SkilletItemCountInputBox:GetNumber())
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -2355,7 +2355,7 @@
 					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						Skillet:CreateItems(SkilletItemCountInputBox:GetNumber())
+						Skillet:CreateItems(button, SkilletItemCountInputBox:GetNumber())
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -2653,7 +2653,7 @@
 					</OnLoad>
 					<OnClick>
 						Skillet:InventoryFilterButtons_Hide()
-						Skillet:StartQueue_OnClick(self,button)
+						Skillet:StartQueue_OnClick(self, button)
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -2678,7 +2678,7 @@
 						self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 					</OnLoad>
 					<PreClick>
-						Skillet:PauseQueue_PreClick(self,button)
+						Skillet:PauseQueue_PreClick(self, button)
 					</PreClick>
 				</Scripts>
 			</Button>

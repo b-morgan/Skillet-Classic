@@ -204,7 +204,7 @@ end
 --
 -- Queue up the command and reserve reagents
 --
-function Skillet:QueueAppendCommand(command, queueCraftables)
+function Skillet:QueueAppendCommand(command, queueCraftables, first)
 	DA.DEBUG(0,"QueueAppendCommand("..DA.DUMP1(command)..", "..tostring(queueCraftables).."), level= "..tostring(command.level))
 	local recipe = self:GetRecipe(command.recipeID)
 	local reagentsInQueue = self.db.realm.reagentsInQueue[Skillet.currentPlayer]
@@ -230,7 +230,7 @@ function Skillet:QueueAppendCommand(command, queueCraftables)
 --
 -- Enchants get queued at the front of the queue
 --
-		self:AddToQueue(command, command.tradeID == 7411)
+		self:AddToQueue(command, first or command.tradeID == 7411)
 	end
 	DA.DEBUG(0,"QueueAppendCommand: level= "..tostring(command.level))
 	if not command.level then
@@ -473,8 +473,8 @@ end
 --
 -- Adds the currently selected number of items to the queue
 --
-function Skillet:QueueItems(count)
-	DA.DEBUG(0,"QueueItems("..tostring(count)..")")
+function Skillet:QueueItems(button, count)
+	DA.DEBUG(0,"QueueItems("..tostring(button)..", "..tostring(count)..")")
 	--DA.DEBUG(1,"currentPlayer= "..tostring(self.currentPlayer)..", currentTrade= "..tostring(self.currentTrade)..", selectedSkill= "..tostring(self.selectedSkill))
 	if not self.selectedSkill then return 0 end
 	local skill = self:GetSkill(self.currentPlayer, self.currentTrade, self.selectedSkill)
@@ -499,8 +499,12 @@ function Skillet:QueueItems(count)
 	if count > 0 then
 		if self.currentTrade and self.selectedSkill then
 			if recipe then
+				local first = false
+				if button == "RightButton" then
+					first = true
+				end
 				local queueCommand = self:QueueCommandIterate(recipeID, count)
-				self:QueueAppendCommand(queueCommand, Skillet.db.profile.queue_craftable_reagents)
+				self:QueueAppendCommand(queueCommand, Skillet.db.profile.queue_craftable_reagents, first)
 			end
 		end
 	end
@@ -510,31 +514,29 @@ end
 --
 -- Queue the max number of craftable items for the currently selected skill
 --
-function Skillet:QueueAllItems()
-	DA.DEBUG(0,"QueueAllItems()");
-	local count = self:QueueItems()						-- no argument means queue em all
+function Skillet:QueueAllItems(button)
+	DA.DEBUG(0,"QueueAllItems("..tostring(button)..")");
+	local count = self:QueueItems(button)						-- no argument means queue em all
 	return count
 end
 
 --
 -- Adds the currently selected number of items to the queue and then starts the queue
 --
-function Skillet:CreateItems(count)
-	local mouse = GetMouseButtonClicked()
-	DA.DEBUG(0,"CreateItems("..tostring(count).."), "..tostring(mouse))
-	if self:QueueItems(count) > 0 then
-		self:ProcessQueue(mouse == "RightButton" or IsAltKeyDown())
+function Skillet:CreateItems(button, count)
+	DA.DEBUG(0,"CreateItems("..tostring(button)..", "..tostring(count)..")")
+	if self:QueueItems(button, count) > 0 then
+		self:ProcessQueue(button == "RightButton" or IsAltKeyDown())
 	end
 end
 
 --
 -- Queue and create the max number of craftable items for the currently selected skill
 --
-function Skillet:CreateAllItems()
-	local mouse = GetMouseButtonClicked()
-	DA.DEBUG(0,"CreateAllItems(), "..tostring(mouse))
-	if self:QueueAllItems() > 0 then
-		self:ProcessQueue(mouse == "RightButton" or IsAltKeyDown())
+function Skillet:CreateAllItems(button)
+	DA.DEBUG(0,"CreateAllItems("..tostring(button)..")")
+	if self:QueueAllItems(button) > 0 then
+		self:ProcessQueue(button == "RightButton" or IsAltKeyDown())
 	end
 end
 
@@ -564,7 +566,7 @@ function Skillet:EnchantItem()
 			end
 		end
 	end
-	self:CreateItems(1)
+	self:CreateItems(nil, 1)
 end
 
 function Skillet:UNIT_SPELLCAST_SENT(event, unit, target, castGUID)

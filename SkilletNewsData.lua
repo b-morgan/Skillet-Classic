@@ -33,6 +33,11 @@ Skillet.NewsData = {
 					{ header = "EasyMenu", body = "Replace EasyMenu calls" },
 				},
 			},
+			{	name = "Changes",
+				data = {
+					{ header = "Queuing", body = "Add more right-click queue to top" },
+				},
+			},
 		},
 	},
 	{	version = "2.02",
