@@ -2823,7 +2823,7 @@ function Skillet:ReagentButtonOnClick(button, skillIndex, reagentIndex)
 		else
 			local x, y = GetCursorPosition()
 			local uiScale = UIParent:GetEffectiveScale()
-			EasyMenu(self.data.recipeMenuTable, self.recipeMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+			EasySkillet(self.data.recipeMenuTable, self.recipeMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
 		end
 	end
 end
@@ -3521,46 +3521,143 @@ local headerMenuListMainGroupLocked = {
 	},
 }
 
+local function SkillMenuList(SkilletSkillMenu, rootDescription)
+	if Skillet.isTest then 
+		local title = "skillMenuList"
+		if Skillet.isLocked then
+			title = title .. "(locked)"
+		end
+		rootDescription:CreateTitle(title);
+	end
+	rootDescription:CreateButton(L["Link Recipe"], function() Skillet:SkillButton_LinkRecipe() end);
+	rootDescription:CreateButton(L["Wowhead URL"], function() Skillet:SkillButton_WowheadURL() end);
+	if Skillet.isLocked then
+		rootDescription:CreateButton(L["Add to Ignore Materials"], function()
+			local skill = Skillet.menuButton.skill
+			if skill and skill.recipeID then
+				local recipeID = skill.recipeID
+				local spellLink = C_TradeSkillUI.GetRecipeLink(skill.recipeID)
+				Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeID] = spellLink
+				if Skillet.ignoreList and Skillet.ignoreList:IsVisible() then
+					Skillet:UpdateIgnoreListWindow()
+				end
+			end
+		end);
+	end
+	rootDescription:CreateButton(Skillet.favoriteMenuText, function()
+		local recipeID = Skillet.menuButton.skill.recipeID
+		local favoriteButton = _G[Skillet.menuButton:GetName() .. "Favorite"]
+		Skillet:ToggleFavorite(recipeID)
+		favoriteButton:SetFavorite(Skillet:IsFavorite(recipeID))
+	end);
+	if not Skillet.isLocked then
+		local submenu1 = rootDescription:CreateButton(L["Ignore"]);
+			submenu1:CreateButton(L["Add Recipe to Ignored List"], function()
+				local index = Skillet.menuButton:GetID()
+				local skillDB = Skillet.db.realm.skillDB[Skillet.currentPlayer][Skillet.currentTrade][index]
+				local recipeID = string.sub(skillDB,2)
+				local print=(tostring(index)..", "..tostring(skillDB)..", "..tostring(recipeID))
+				Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeID] = Skillet.currentTrade
+				if Skillet.ignoreList and Skillet.ignoreList:IsVisible() then
+					Skillet:UpdateIgnoreListWindow()
+				end
+			end);
+			submenu1:CreateButton(L["Remove Recipe from Ignored List"], function()
+				local index = Skillet.menuButton:GetID()
+				local skillDB = Skillet.db.realm.skillDB[Skillet.currentPlayer][Skillet.currentTrade][index]
+				local recipeID = string.sub(skillDB,2)
+				local print=(tostring(index)..", "..tostring(skillDB)..", "..tostring(recipeID))
+				Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeID] = nil
+				if Skillet.ignoreList and Skillet.ignoreList:IsVisible() then
+					Skillet:UpdateIgnoreListWindow()
+				end
+			end);
+		local submenu2 = rootDescription:CreateButton(L["New Group"]);
+			submenu2:CreateButton(L["Empty Group"], function() Skillet:SkillButton_NewGroup() end);
+			submenu2:CreateButton(L["From Selection"], function() Skillet:SkillButton_MakeGroup() end);
+	end
+	rootDescription:CreateDivider(); -- CreateSpacer, CreateDivider
+	rootDescription:CreateButton(L["Copy"], function() Skillet:SkillButton_CopySelected() end);
+	if not Skillet.isLocked then
+		rootDescription:CreateButton(L["Cut"], function() Skillet:SkillButton_CutSelected() end);
+		rootDescription:CreateButton(L["Paste"], function() Skillet:SkillButton_PasteSelected(Skillet.menuButton) end);
+	end
+end;
+
+local function HeaderMenuList(SkilletSkillMenu, rootDescription)
+	if Skillet.isTest then 
+		local title = "headerMenuList"
+		if Skillet.isLocked then
+			title = title .. "(locked)"
+		end
+		rootDescription:CreateTitle(title);
+	end
+	if not Skillet.isLocked then
+		rootDescription:CreateButton(L["Rename Group"], function() Skillet:SkillButton_NameEditEnable(Skillet.menuButton) end);
+		local submenu1 = rootDescription:CreateButton(L["New Group"]);
+			submenu1:CreateButton(L["Empty Group"], function() Skillet:SkillButton_NewGroup() end);
+			submenu1:CreateButton(L["From Selection"], function() Skillet:SkillButton_MakeGroup() end);
+		rootDescription:CreateDivider(); -- CreateSpacer, CreateDivider
+	end
+	local submenu2 = rootDescription:CreateButton(L["Selection"]);
+		submenu2:CreateButton(L["Select All"], function() Skillet:SkillButton_SetAllSelections(true) Skillet:UpdateTradeSkillWindow() end);
+		submenu2:CreateButton(L["Select None"], function() Skillet:SkillButton_SetAllSelections(false) Skillet:UpdateTradeSkillWindow() end);
+	rootDescription:CreateDivider(); -- CreateSpacer, CreateDivider
+	rootDescription:CreateButton(L["Copy"], function() Skillet:SkillButton_CopySelected() end);
+	if not Skillet.isLocked then
+		rootDescription:CreateButton(L["Cut"], function() Skillet:SkillButton_CutSelected() end);
+		rootDescription:CreateButton(L["Paste"], function() Skillet:SkillButton_PasteSelected(Skillet.menuButton) end);
+	end
+end;
+
+local function HeaderMenuListMainGroup(SkilletSkillMenu, rootDescription)
+	if Skillet.isTest then 
+		local title = "headerMenuListMainGroup"
+		if Skillet.isLocked then
+			title = title .. "(locked)"
+		end
+		rootDescription:CreateTitle(title);
+	end
+	if not Skillet.isLocked then
+		local submenu1 = rootDescription:CreateButton(L["New Group"]);
+			submenu1:CreateButton(L["Empty Group"], function() Skillet:SkillButton_NewGroup() end);
+			submenu1:CreateButton(L["From Selection"], function() Skillet:SkillButton_MakeGroup() end);
+		rootDescription:CreateDivider(); -- CreateSpacer, CreateDivider
+		local submenu2 = rootDescription:CreateButton(L["Selection"]);
+			submenu2:CreateButton(L["Select All"], function() Skillet:SkillButton_SetAllSelections(true) Skillet:UpdateTradeSkillWindow() end);
+			submenu2:CreateButton(L["Select None"], function() Skillet:SkillButton_SetAllSelections(false) Skillet:UpdateTradeSkillWindow() end);
+		rootDescription:CreateDivider(); -- CreateSpacer, CreateDivider
+	end
+	rootDescription:CreateButton(L["Copy"], function() Skillet:SkillButton_CopySelected() end);
+	if not Skillet.isLocked then
+		rootDescription:CreateButton(L["Cut"], function() Skillet:SkillButton_CutSelected() end);
+		rootDescription:CreateButton(L["Paste"], function() Skillet:SkillButton_PasteSelected(Skillet.menuButton) end);
+	end
+end;
+
 --
 -- Called when the skill operators drop down is displayed
 --
 function Skillet:SkilletSkillMenu_Show(button)
-	if not SkilletSkillMenu then
-		SkilletSkillMenu = CreateFrame("Frame", "SkilletSkillMenu", _G["UIParent"], "UIDropDownMenuTemplate")
-	end
+	--DA.DEBUG(0,"SkilletSkillMenu_Show("..tostring(button)..")")
 	local x, y = GetCursorPosition()
 	local uiScale = UIParent:GetEffectiveScale()
 	local locked = self:RecipeGroupIsLocked()
+	self.isLocked = locked
+	if not SkilletSkillMenu then
+		SkilletSkillMenu = CreateFrame("Frame", "SkilletSkillMenu", _G["UIParent"], "UIDropDownMenuTemplate")
+		SkilletSkillMenu:SetScale(uiScale)
+	end
 	self.menuButton = button
 	if button.skill.subGroup then
 		if button.skill.mainGroup then
-			if locked then
-				EasyMenu(headerMenuListMainGroupLocked, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
-			else
-				EasyMenu(headerMenuListMainGroup, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
-			end
+			MenuUtil.CreateContextMenu(SkilletSkillMenu, HeaderMenuListMainGroup);
 		else
-			if locked then
-				EasyMenu(headerMenuListLocked, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
-			else
-				EasyMenu(headerMenuList, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
-			end
+			MenuUtil.CreateContextMenu(SkilletSkillMenu, HeaderMenuList);
 		end
 	else
 		GameTooltip:Hide() --hide tooltip, because it may be over the menu, sometimes it still fails
-		if isClassic then
-			if locked then
-				EasyMenu(skillMenuListClassicLocked, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
-			else
-				EasyMenu(skillMenuListClassic, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
-			end
-		else
-			if locked then
-				EasyMenu(skillMenuListLocked, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
-			else
-				EasyMenu(skillMenuList, SkilletSkillMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
-			end
-		end
+		MenuUtil.CreateContextMenu(SkilletSkillMenu, SkillMenuList);
 	end
 end
 
@@ -3647,13 +3744,21 @@ function Skillet:PauseQueue_PostClick(button)
 end
 
 function Skillet:SkilletQueueMenu_Show(button)
-	if not SkilletQueueMenu then
-		SkilletQueueMenu = CreateFrame("Frame", "SkilletQueueMenu", _G["UIParent"], "UIDropDownMenuTemplate")
-	end
+	--DA.DEBUG(0,"SkilletQueueMenu_Show("..tostring(button)..")")
 	local x, y = GetCursorPosition()
 	local uiScale = UIParent:GetEffectiveScale()
+	if not SkilletQueueMenu then
+		SkilletQueueMenu = CreateFrame("Frame", "SkilletQueueMenu", _G["UIParent"], "UIDropDownMenuTemplate")
+		--DA.DEBUG(0,"SkilletQueueMenu_Show: uiScale= "..tostring(uiScale))
+		SkilletQueueMenu:SetScale(uiScale)
+	end
 	self.queueMenuButton = button
-	EasyMenu(queueMenuList, SkilletQueueMenu, _G["UIParent"], x/uiScale,y/uiScale, "MENU", 5)
+	MenuUtil.CreateButtonContextMenu(SkilletQueueMenu,
+    {L["Move to Top"], function() Skillet:QueueMoveToTop(Skillet.queueMenuButton:GetID()) end},
+    {L["Move Up"], function() Skillet:QueueMoveUp(Skillet.queueMenuButton:GetID()) end},
+    {L["Move Down"], function() Skillet:QueueMoveDown(Skillet.queueMenuButton:GetID()) end},
+    {L["Move to Bottom"], function() Skillet:QueueMoveToBottom(Skillet.queueMenuButton:GetID()) end}
+	);
 end
 
 function Skillet:QueueManagementToggle(showDetails)
