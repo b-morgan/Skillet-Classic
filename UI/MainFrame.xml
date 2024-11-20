@@ -779,18 +779,7 @@
 	# Tool tip to be used when hovering over recipe lines in the skill list
 	#
 	-->
-	<GameTooltip name="SkilletTradeskillTooltip" frameStrata="TOOLTIP" hidden="true" parent="UIParent" inherits="GameTooltipTemplate">
-		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
-			<EdgeSize>
-				<AbsValue val="16"/>
-			</EdgeSize>
-			<TileSize>
-				<AbsValue val="16"/>
-			</TileSize>
-			<BackgroundInsets>
-				<AbsInset left="5" right="5" top="5" bottom="5"/>
-			</BackgroundInsets>
-		</Backdrop>
+	<GameTooltip name="SkilletTradeskillTooltip" frameStrata="TOOLTIP" hidden="true" inherits="GameTooltipTemplate">
 		<Layers>
 			<Layer level="ARTWORK">
 				<FontString name="$parentTextLeft1" inherits="GameTooltipTextSmall" hidden="true">
