@@ -530,7 +530,7 @@ local function GetReagentData(reagent)
 		else
 			id = reagent.id
 		end
-		name = GetItemInfo(id) or id
+		name = C_Item.GetItemInfo(id) or id
 		if Atr_GetAuctionBuyout then
 			value = (Atr_GetAuctionBuyout(id) or 0)
 		elseif Auctionator and Auctionator.API.v1.GetAuctionPriceByItemID then
@@ -559,7 +559,7 @@ local function GetReagentData(reagent)
 			if Skillet.db.profile.plugins.ATR.buyablePrices then
 				if Skillet.db.profile.plugins.ATR.useVendorCalc then
 					local buyFactor = Skillet.db.profile.plugins.ATR.buyFactor or buyFactorDef
-					value = ( select(11,GetItemInfo(id)) or 0 ) * needed * buyFactor
+					value = ( select(11,C_Item.GetItemInfo(id)) or 0 ) * needed * buyFactor
 				end
 			else
 				value = 0
@@ -583,7 +583,7 @@ local function AddExtraText(value, needed, id, name, custom)
 -- If this reagent is sold by a vendor, then use that (calculated) price instead
 --
 			local buyFactor = Skillet.db.profile.plugins.ATR.buyFactor or buyFactorDef
-			value = ( select(11,GetItemInfo(id)) or 0 ) * needed * buyFactor
+			value = ( select(11,C_Item.GetItemInfo(id)) or 0 ) * needed * buyFactor
 			toConcatExtra[#toConcatExtra+1] = Skillet:FormatMoneyFull(value, true)
 		else
 --
@@ -628,10 +628,10 @@ local function GetRecipeData(recipe)
 		profit = buyout * ah_tax - cost
 		percentage = profit * 100 / cost
 		--DA.DEBUG(0,"GetRecipeData: buyout= "..tostring(buyout)..", profit= "..tostring(profit)..", percentage= "..tostring(percentage))
-		recipe.buyout = buyout
-		recipe.cost = cost
-		recipe.profit = profit
-		recipe.percentage = percentage
+		recipe.buyout = buyout or 0
+		recipe.cost = cost or 0
+		recipe.profit = profit or 0
+		recipe.percentage = percentage or 0
 --		recipe.mostsold = successCount
 --		recipe.salesrate = salesRate
 		recipe.suffix = SetATRsuffix(recipe)
@@ -642,8 +642,13 @@ end
 -- Sort by Auctionator Buyout price
 --
 function plugin.SortByBuyout(skill,a,b)
-	if a.subGroup or b.subGroup then
-		return NOSORT(skill, a, b)
+	--DA.DEBUG(0,"SortByBuyout: skill= "..tostring(skill)..", a="..tostring(a)..", b="..tostring(b))
+	if a and b then
+		if a.subGroup or b.subGroup then
+			return NOSORT(skill, a, b)
+		end
+	else
+		return false
 	end
 	local recipeA, recipeB, idA, idB, buyoutA, buyoutB
 	recipeA = Skillet:GetRecipe(a.recipeID)
@@ -666,8 +671,13 @@ end
 -- Sort by Auctionator Cost
 --
 function plugin.SortByCost(skill,a,b)
-	if a.subGroup or b.subGroup then
-		return NOSORT(skill, a, b)
+	--DA.DEBUG(0,"SortByCost: skill= "..tostring(skill)..", a="..tostring(a)..", b="..tostring(b))
+	if a and b then
+		if a.subGroup or b.subGroup then
+			return NOSORT(skill, a, b)
+		end
+	else
+		return false
 	end
 	local recipeA, recipeB, idA, idB, costA, costB
 	recipeA = Skillet:GetRecipe(a.recipeID)
@@ -690,8 +700,13 @@ end
 -- Sort by calculated profit value
 --
 function plugin.SortByProfit(skill,a,b)
-	if a.subGroup or b.subGroup then
-		return NOSORT(skill, a, b)
+	--DA.DEBUG(0,"SortByProfit: skill= "..tostring(skill)..", a="..tostring(a)..", b="..tostring(b))
+	if a and b then
+		if a.subGroup or b.subGroup then
+			return NOSORT(skill, a, b)
+		end
+	else
+		return false
 	end
 	local recipeA, recipeB, idA, idB, profitA, profitB
 	recipeA = Skillet:GetRecipe(a.recipeID)
@@ -714,14 +729,22 @@ end
 -- Sort by calculated profit percentage
 --
 function plugin.SortByPercent(skill,a,b)
-	if a.subGroup or b.subGroup then
-		return NOSORT(skill, a, b)
+	--DA.DEBUG(0,"SortByPercent: skill= "..tostring(skill)..", a="..tostring(a)..", b="..tostring(b))
+	if a and b then
+		--DA.DEBUG(1,"SortByPercent: a= "..DA.DUMP1(a,1))
+		--DA.DEBUG(1,"SortByPercent: b= "..DA.DUMP1(b,1))
+		if a.subGroup or b.subGroup then
+--			return NOSORT(skill, a, b)
+			return false
+		end
+	else
+		return false
 	end
 	local recipeA, recipeB, idA, idB, percentA, percentB
 	recipeA = Skillet:GetRecipe(a.recipeID)
-	--DA.DEBUG(0,"SortByPercent: recipeA= "..DA.DUMP1(recipeA))
+	--DA.DEBUG(1,"SortByPercent: recipeA= "..DA.DUMP1(recipeA))
 	recipeB = Skillet:GetRecipe(b.recipeID)
-	--DA.DEBUG(0,"SortByPercent: recipeB= "..DA.DUMP1(recipeB))
+	--DA.DEBUG(1,"SortByPercent: recipeB= "..DA.DUMP1(recipeB))
 	if not recipeA.percentage then
 		GetRecipeData(recipeA)
 	end
@@ -730,7 +753,7 @@ function plugin.SortByPercent(skill,a,b)
 		GetRecipeData(recipeB)
 	end
 	percentB = recipeB.percentage or 0
-	--DA.DEBUG(0,"SortByPercent: percentA= "..tostring(percentA)..", percentB= "..tostring(percentB))
+	--DA.DEBUG(1,"SortByPercent: percentA= "..tostring(percentA)..", percentB= "..tostring(percentB))
 	return (percentA > percentB)
 end
 
@@ -740,8 +763,12 @@ end
 -- For enchanting, use the scrollID instead of the itemID
 --
 function plugin.SortMostSold(skill,a,b)
-	if a.subGroup or b.subGroup then
-		return NOSORT(skill, a, b)
+	if a and b then
+		if a.subGroup or b.subGroup then
+			return NOSORT(skill, a, b)
+		end
+	else
+		return
 	end
 	local recipeA, recipeB, itemNameA, itemNameB, successCountA, successCountB
 	recipeA = Skillet:GetRecipe(a.recipeID)
@@ -749,14 +776,14 @@ function plugin.SortMostSold(skill,a,b)
 	recipeB = Skillet:GetRecipe(b.recipeID)
 	--DA.DEBUG(0,"SortMostSold: recipeB= "..DA.DUMP1(recipeB))
 	if recipeA.scrollID then
-		itemNameA = GetItemInfo(recipeA.scrollID)
+		itemNameA = C_Item.GetItemInfo(recipeA.scrollID)
 	elseif recipeA.itemID then
-		itemNameA = GetItemInfo(recipeA.itemID)
+		itemNameA = C_Item.GetItemInfo(recipeA.itemID)
 	end
 	if recipeB.scrollID then
-		itemNameB = GetItemInfo(recipeB.scrollID)
+		itemNameB = C_Item.GetItemInfo(recipeB.scrollID)
 	elseif recipeB.itemID then
-		itemNameB = GetItemInfo(recipeB.itemID)
+		itemNameB = C_Item.GetItemInfo(recipeB.itemID)
 	end
 	--DA.DEBUG(0,"SortMostSold: itemNameA= "..tostring(itemNameA)..", itemNameB= "..tostring(itemNameB))
 	successCountA = 0
@@ -778,8 +805,12 @@ end
 -- For enchanting, use the scrollID instead of the itemID
 --
 function plugin.SortSalesRate(skill,a,b)
-	if a.subGroup or b.subGroup then
-		return NOSORT(skill, a, b)
+	if a and b then
+		if a.subGroup or b.subGroup then
+			return NOSORT(skill, a, b)
+		end
+	else
+		return
 	end
 	local recipeA, recipeB, itemNameA, itemNameB, successCountA, successCountB
 	local failedCountA, failedCountB, salesRateA, salesRateB
@@ -788,14 +819,14 @@ function plugin.SortSalesRate(skill,a,b)
 	recipeB = Skillet:GetRecipe(b.recipeID)
 	--DA.DEBUG(0,"SortSalesRate: recipeB= "..DA.DUMP1(recipeB))
 	if recipeA.scrollID then
-		itemNameA = GetItemInfo(recipeA.scrollID)
+		itemNameA = C_Item.GetItemInfo(recipeA.scrollID)
 	elseif recipeA.itemID then
-		itemNameA = GetItemInfo(recipeA.itemID)
+		itemNameA = C_Item.GetItemInfo(recipeA.itemID)
 	end
 	if recipeB.scrollID then
-		itemNameB = GetItemInfo(recipeB.scrollID)
+		itemNameB = C_Item.GetItemInfo(recipeB.scrollID)
 	elseif recipeB.itemID then
-		itemNameB = GetItemInfo(recipeB.itemID)
+		itemNameB = C_Item.GetItemInfo(recipeB.itemID)
 	end
 	--DA.DEBUG(0,"SortSalesRate: itemNameA= "..tostring(itemNameA)..", itemNameB= "..tostring(itemNameB))
 	salesRateA = 0
@@ -864,6 +895,7 @@ function plugin.GetExtraText(skill, recipe)
 	local label = ""
 	local extra_text = ""
 	if not recipe then return end
+	if not Auctionator then return end
 	local itemID = recipe.itemID
 --
 -- Check for Enchanting. 
@@ -912,7 +944,7 @@ function plugin.GetExtraText(skill, recipe)
 				for _, quality in pairs(recipe.qualityIDs) do
 					outputItemInfo = C_TradeSkillUI.GetRecipeOutputItemData(recipe.spellID, {}, nil, quality)
 					if outputItemInfo and outputItemInfo.hyperlink then
-						age = Auctionator.API.v1.GetAuctionAgeByItemLink and Auctionator.API.v1.GetAuctionAgeByItemLink(addonName, outputItemInfo.hyperlink)
+						age = Auctionator.API.v1.GetAuctionAgeByItemLink(addonName, outputItemInfo.hyperlink)
 						if age and age < 2 then
 							price = Auctionator.API.v1.GetAuctionPriceByItemLink(addonName, outputItemInfo.hyperlink)
 							buyout = (price or 0) * recipe.numMade
@@ -1001,7 +1033,7 @@ function plugin.GetExtraText(skill, recipe)
 		if addonName and Journalator and Skillet.db.profile.plugins.ATR.journalatorE then
 			label = label.."\n"
 			extra_text = extra_text.."\n"
-			local itemName = GetItemInfo(itemID)
+			local itemName = C_Item.GetItemInfo(itemID)
 			local salesRate, successCount, failedCount, lastSold, lastBought
 			if Journalator.API and itemName then
 				successCount = Journalator.API.v1.GetRealmSuccessCountByItemName(addonName, itemName)
@@ -1022,7 +1054,7 @@ function plugin.GetExtraText(skill, recipe)
 				label = label.."   salesRate:\n"
 				extra_text = extra_text..tostring(salesRate).."\n"
 			end
-			if successCount and (successCount > 0  or DA.DebugShow) then
+			if successCount and (successCount > 0 or DA.DebugShow) then
 				label = label.."   successCount:\n"
 				extra_text = extra_text..tostring(successCount).."\n"
 			end
@@ -1071,7 +1103,7 @@ function plugin.RecipeNameSuffix(skill, recipe)
 		--DA.DEBUG(0,"RecipeNameSuffix: Change to scrollID, itemID= "..tostring(itemID))
 	end
 	local itemName
-	if itemID then itemName = GetItemInfo(itemID) end
+	if itemID then itemName = C_Item.GetItemInfo(itemID) end
 	--DA.DEBUG(0,"RecipeNameSuffix: itemName= "..tostring(itemName)..", type= "..type(itemName))
 	if Skillet.db.profile.plugins.ATR.enabled and itemID then
 		buyout = GetBuyout(recipe)
@@ -1210,7 +1242,7 @@ function Skillet:AuctionatorSearch(whichOne)
 		end
 		for i=1,#list,1 do
 			local id  = list[i].id
-			local name = GetItemInfo(id)
+			local name = C_Item.GetItemInfo(id)
 			if name and not Skillet:VendorSellsReagent(id) then
 				table.insert (items, name)
 				DA.DEBUG(1, "AuctionatorSearch: Item["..tostring(i).."] "..name.." ("..tostring(id)..") added")
@@ -1228,14 +1260,14 @@ function Skillet:AuctionatorSearch(whichOne)
 			itemID = Skillet.EnchantSpellToItem[itemID] or 0
 		end
 		if itemID ~= 0 then
-			shoppingListName = GetItemInfo(itemID)
+			shoppingListName = C_Item.GetItemInfo(itemID)
 		else
 			shoppingListName = recipe.name
 		end
 		if (shoppingListName) then
 			if recipe.tradeID == 7411 and not Skillet.isCraft then
 				if recipe.scrollID then
-					local scrollName = GetItemInfo(recipe.scrollID)
+					local scrollName = C_Item.GetItemInfo(recipe.scrollID)
 					table.insert(items, scrollName)
 				end
 			elseif not recipe.salvage then
@@ -1259,7 +1291,7 @@ function Skillet:AuctionatorSearch(whichOne)
 				id = reagent.id
 			end
 			if id then
-				local reagentName = GetItemInfo(id)
+				local reagentName = C_Item.GetItemInfo(id)
 				if (reagentName) then
 					if not Skillet:VendorSellsReagent(id) then
 						table.insert (items, reagentName)
