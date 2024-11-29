@@ -35,7 +35,7 @@ Skillet.NewsData = {
 			},
 			{	name = "Changes",
 				data = {
-					{ header = "TOC", body = "Update TOC" },
+					{ header = "Recipes", body = "Remove 'Link Recipe' from Classic Era" },
 				},
 			},
 		},
