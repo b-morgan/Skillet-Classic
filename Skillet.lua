@@ -900,6 +900,7 @@ end
 
 function Skillet:PLAYER_REGEN_DISABLED()
 	DA.TRACE("PLAYER_REGEN_DISABLED()")
+	self.inCombat = true
 	if self:HideAllWindows() then
 		DA.MARK3("|cf0f00000Skillet-Classic|r: Combat lockdown restriction. Leave combat and try again.")
 	end
@@ -907,6 +908,7 @@ end
 
 function Skillet:PLAYER_REGEN_ENABLED()
 	DA.TRACE("PLAYER_REGEN_ENABLED()")
+	self.inCombat = false
 end
 
 function Skillet:PLAYER_LOGOUT()
@@ -1316,6 +1318,10 @@ end
 --
 function Skillet:SkilletShowWindow()
 	DA.DEBUG(0,"SkilletShowWindow(), currentTrade= "..tostring(self.currentTrade)..", scanInProgress= "..tostring(scanInProgress))
+	if UnitAffectingCombat("player") then
+		DA.MARK3(0,"|cff8888ffSkillet|r: Combat lockdown restriction.".." Leave combat and try again.")
+		return
+	end
 	if self:IsModKey2Down() then
 		self.db.realm.skillDB[self.currentPlayer][self.currentTrade] = {}
 	end

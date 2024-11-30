@@ -31,6 +31,7 @@ Skillet.NewsData = {
 			{	name = "Fixes",
 				data = {
 					{ header = "Plugins", body = "Fix Auctionator sorting errors" },
+					{ header = "Combat", body = "Add another check for in combat" },
 				},
 			},
 			{	name = "Changes",
