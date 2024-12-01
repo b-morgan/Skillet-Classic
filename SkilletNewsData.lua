@@ -36,7 +36,8 @@ Skillet.NewsData = {
 			},
 			{	name = "Changes",
 				data = {
-					{ header = "Recipes", body = "Remove 'Link Recipe' from Classic Era" },
+					{ header = "Recipes", body = "Remove 'Link Recipe' from Classic Era right-click menu" },
+					{ header = "Recipes", body = "Add 'List Reagents' to Classic Era right-click menu" },
 				},
 			},
 		},

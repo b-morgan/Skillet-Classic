@@ -2275,6 +2275,17 @@ function Skillet:SkillButton_OnReceiveDrag(button)
 	end
 end
 
+function Skillet:SkillButton_ListReagents()
+	DA.DEBUG(0,"SkillButton_ListReagents()")
+	local skill = Skillet.menuButton.skill
+	if skill and skill.skillIndex then
+		Skillet:ReagentsLinkOnClick(menuButton, skill.skillIndex, false)
+	else
+		DA.DEBUG(0,"SkillButton_ListReagents: skill= "..DA.DUMP1(skill))
+		return
+	end
+end
+
 function Skillet:SkillButton_LinkRecipe()
 	DA.DEBUG(0,"SkillButton_LinkRecipe()")
 	local skill = Skillet.menuButton.skill
@@ -3153,7 +3164,9 @@ local function SkillMenuList(SkilletSkillMenu, rootDescription)
 		end
 		rootDescription:CreateTitle(title);
 	end
-	if not isClassic then
+	if isClassic then
+		rootDescription:CreateButton(L["List Reagents"], function() Skillet:SkillButton_ListReagents() end);
+	else
 		rootDescription:CreateButton(L["Link Recipe"], function() Skillet:SkillButton_LinkRecipe() end);
 	end
 	rootDescription:CreateButton(L["Wowhead URL"], function() Skillet:SkillButton_WowheadURL() end);
