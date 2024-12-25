@@ -34,7 +34,6 @@ function Skillet:InventoryReagentCraftability(reagentID, playerOverride)
 	local recipeSource = self.db.global.itemRecipeSource[reagentID]
 	local numReagentsCrafted = 0
 	local skillIndexLookup = self.data.skillIndexLookup[player]
-	local cachedInventory = self.db.realm.inventoryData[player]
 	if recipeSource then
 		for childRecipeID in pairs(recipeSource) do
 			local childRecipe = self:GetRecipe(childRecipeID)
@@ -61,14 +60,10 @@ function Skillet:InventoryReagentCraftability(reagentID, playerOverride)
 	if self.db.realm.reagentsInQueue[player] then
 		queued = self.db.realm.reagentsInQueue[player][reagentID] or 0
 	end
-	local numCanUse = self:GetInventory(player, reagentID)
+	local numCanUse, numCanMake, numPlusBank = self:GetInventory(player, reagentID)
 	local numCrafted = numReagentsCrafted + queued
-	if numCrafted == 0 then
-		Skillet.db.realm.inventoryData[player][reagentID] = numCanUse
-	else
-		--DA.DEBUG(2,"player="..player..", numCrafted="..tostring(numCrafted)..", reagentID="..tostring(reagentID).."("..tostring((GetItemInfo(reagentID)))..")")
-		Skillet.db.realm.inventoryData[player][reagentID] = numCanUse.." "..numCrafted
-	end
+	--DA.DEBUG(2,"player="..player..", numCrafted="..tostring(numCrafted)..", reagentID="..tostring(reagentID).."("..tostring((GetItemInfo(reagentID)))..")")
+	Skillet.db.realm.inventoryData[player][reagentID] = numCanUse.." "..numCrafted.." "..numPlusBank
 	self.visited[reagentID] = false -- okay to calculate this reagent again
 	return numCrafted
 end
@@ -154,7 +149,7 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex)
 end
 
 function Skillet:InventoryScan()
-	--DA.DEBUG(0,"InventoryScan()")
+	DA.DEBUG(0,"InventoryScan()")
 	if self.linkedSkill or self.isGuild then
 		return
 	end
@@ -167,21 +162,25 @@ function Skillet:InventoryScan()
 		for reagentID in pairs(self.db.global.itemRecipeUsedIn) do
 			local a = GetItemInfo(reagentID)
 			local b = inventoryData[reagentID]
-			--DA.DEBUG(2,"reagent "..tostring(a).." "..tostring(b))
+			--DA.DEBUG(2,"InventoryScan: reagent "..tostring(a).." "..tostring(b))
 			if reagentID and not inventoryData[reagentID] then				-- have we calculated this one yet?
 				if self.currentPlayer == (UnitName("player")) then			-- if this is the current player, use the API
-					--DA.DEBUG(2,"Using API")
-					numCanUse = GetItemCount(reagentID,false)		-- In Classic just bags
+					--DA.DEBUG(2,"InventoryScan: Using API")
+					if self.db.profile.use_bank_as_alt then 		-- use_bank_as_alt, use_alt_banks
+						numCanUse = GetItemCount(reagentID,true)
+					else
+						numCanUse = GetItemCount(reagentID,false)	-- In Classic just bags
+					end
 				elseif cachedInventory and cachedInventory[reagentID] then	-- otherwise, use what cached data is available
-					--DA.DEBUG(2,"Using cachedInventory")
+					--DA.DEBUG(2,"InventoryScan: Using cachedInventory")
 					local a,b,c,d = string.split(" ", cachedInventory[reagentID])
 					numCanUse = a
 				else
-					--DA.DEBUG(2,"Using Zero")
+					--DA.DEBUG(2,"InventoryScan: Using Zero")
 					numCanUse = 0
 				end
 				inventoryData[reagentID] = tostring(numCanUse)	-- only what we have for now (no craftability info)
-				--DA.DEBUG(2,"inventoryData["..reagentID.."]="..inventoryData[reagentID])
+				--DA.DEBUG(2,"InventoryScan: inventoryData["..reagentID.."]="..inventoryData[reagentID])
 			end
 		end
 	end
@@ -206,18 +205,24 @@ function Skillet:InventoryScan()
 	--DA.DEBUG(0,"InventoryScan complete for "..tostring(player))
 end
 
+--
+-- The currentPlayer obeys the Classic crafting from the bags only but
+-- everyone else can contribute from their bags or their bank.
+--
 function Skillet:GetInventory(player, reagentID)
-	--DA.DEBUG(0,"GetInventory("..tostring(player)..", "..tostring(reagentID)..")")
+	DA.DEBUG(0,"GetInventory("..tostring(player)..", "..tostring(reagentID)..")")
+	local have, make, plusbank
 	if player and reagentID then
-		if self.db.realm.inventoryData[player] and self.db.realm.inventoryData[player][reagentID] then
-			--DA.DEBUG(1,"inventoryData= "..tostring(self.db.realm.inventoryData[player][reagentID]))
-			local have, make = string.split(" ", self.db.realm.inventoryData[player][reagentID])
-			return tonumber(have) or 0, tonumber(make) or 0
-		elseif player == self.currentPlayer then	-- UnitName("player")
-			return GetItemCount(reagentID,false) or 0, 0
+		if player == self.currentPlayer then
+			have = GetItemCount(reagentID,false)	-- bags only
+			plusbank = GetItemCount(reagentID,true)	-- bags + bank
+			make = 0
+		elseif self.db.realm.inventoryData[player] and self.db.realm.inventoryData[player][reagentID] then
+			DA.DEBUG(1,"inventoryData= "..tostring(self.db.realm.inventoryData[player][reagentID]))
+			have, make, plusbank = string.split(" ", self.db.realm.inventoryData[player][reagentID])
 		end
 	end
-	return 0, 0		-- have, make
+	return tonumber(have) or 0, tonumber(make) or 0, tonumber(plusbank) or 0
 end
 
 --

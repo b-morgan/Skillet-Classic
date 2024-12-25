@@ -444,7 +444,6 @@ Skillet.options =
 					order = 39
 				},
 				use_bank_as_alt = {
-					hidden = isClassic,
 					type = "toggle",
 					name = L["USEBANKASALTNAME"],
 					desc = L["USEBANKASALTDESC"],
@@ -457,6 +456,20 @@ Skillet.options =
 					end,
 					width = 1.5,
 					order = 40
+				},
+				use_alt_banks = {
+					type = "toggle",
+					name = L["USEALTBANKSNAME"],
+					desc = L["USEALTBANKSDESC"],
+					get = function()
+						return Skillet.db.profile.use_alt_banks
+					end,
+					set = function(self,value)
+						Skillet.db.profile.use_alt_banks = value
+						Skillet:UpdateTradeSkillWindow()
+					end,
+					width = 1.5,
+					order = 41
 				},
 			}
 		},

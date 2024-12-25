@@ -31,6 +31,7 @@ Skillet.NewsData = {
 			{	name = "Changes",
 				data = {
 					{ header = "Plugins", body = "Add sell to vendor price and profit sorts to Auctionator" },
+					{ header = "Options", body = "Add 'use bank as alt' and 'use alt banks' options to Classic Era" },
 				},
 			},
 		},
