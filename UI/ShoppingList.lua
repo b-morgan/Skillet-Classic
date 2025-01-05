@@ -211,8 +211,8 @@ function Skillet:ClearShoppingList(player)
 	self:UpdateTradeSkillWindow()
 end
 
-function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
-	--DA.DEBUG(0,"GetShoppingList("..tostring(player)..", "..tostring(sameFaction)..", "..tostring(includeGuildbank)..")")
+function Skillet:GetShoppingList(player, sameFaction, includeGuildbank, includeTools)
+	--DA.DEBUG(0,"GetShoppingList("..tostring(player)..", "..tostring(sameFaction)..", "..tostring(includeGuildbank)..", "..tostring(includeTools)..")")
 	self:InventoryScan()
 	local curPlayer = self.currentPlayer
 	if not self.db.realm.faction then
@@ -312,13 +312,13 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
 		end
 	end
 
-	if Skillet.db.profile.queue_tools then
+	if Skillet.db.profile.queue_tools and includeTools then
 		for id,entry in pairs(Skillet.db.realm.toolData[curPlayer]) do
 			local have = GetItemCount(id,false)	-- bags only
 			local bank = GetItemCount(id,true)	-- bags + bank
 			--DA.DEBUG(2,"toolData: id= "..tostring(id)..", name= "..tostring(entry.name)..", value= "..tostring(entry.value))
 			if have == 0 and bank > 0 then
-				local entry = { ["id"] = id, ["count"] = 1, ["player"] = curPlayer, ["value"] = 0, ["source"] = "?" }
+				local entry = { ["id"] = id, ["count"] = 1, ["player"] = curPlayer, ["value"] = 0, ["source"] = "bank" }
 				table.insert(list, entry)
 			end
 		end
@@ -327,12 +327,12 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
 	return list
 end
 
-local function cache_list(self)
+local function cache_list(self, includeTools)
 	local name = nil
 	if not Skillet.db.profile.include_alts then
 		name = Skillet.currentPlayer
 	end
-	self.cachedShoppingList = self:GetShoppingList(name, Skillet.db.profile.same_faction, Skillet.db.profile.include_guild)
+	self.cachedShoppingList = self:GetShoppingList(name, Skillet.db.profile.same_faction, Skillet.db.profile.include_guild, includeTools)
 end
 
 local function indexBags()
@@ -649,11 +649,11 @@ function Skillet:BANKFRAME_OPENED()
 	end
 	Skillet.bankBusy = false
 	Skillet.bankQueue = {}
-	cache_list(self)
+	cache_list(self, Skillet.db.profile.queue_tools)
 	if #self.cachedShoppingList == 0 then
 		return
 	end
-	self:DisplayShoppingList(true) -- true -> at a bank
+	self:DisplayShoppingList(true, Skillet.db.profile.queue_tools) -- true -> at a bank
 end
 
 --
@@ -1255,11 +1255,11 @@ function Skillet:UpdateShoppingListWindow(use_cached_recipes)
 	end
 	local height = SkilletShoppingListParent:GetHeight()
 	local width = SkilletShoppingListParent:GetWidth() - 30 -- Allow for scrollbars
-	DA.DEBUG(1,"UpdateShoppingListWindow: height= "..tostring(height)..", SKILLET_SHOPPING_LIST_HEIGHT= "..tostring(SKILLET_SHOPPING_LIST_HEIGHT))
-	DA.DEBUG(1,"UpdateShoppingListWindow: SkilletShoppingListParent width= "..tostring(width))
+	--DA.DEBUG(1,"UpdateShoppingListWindow: height= "..tostring(height)..", SKILLET_SHOPPING_LIST_HEIGHT= "..tostring(SKILLET_SHOPPING_LIST_HEIGHT))
+	--DA.DEBUG(1,"UpdateShoppingListWindow: SkilletShoppingListParent width= "..tostring(width))
 	local button_count = height / SKILLET_SHOPPING_LIST_HEIGHT
 	button_count = math.floor(button_count) - 1
-	DA.DEBUG(1,"UpdateShoppingListWindow: numItems= "..tostring(numItems)..", button_count= "..tostring(button_count)..", num_buttons= "..tostring(num_buttons))
+	--DA.DEBUG(1,"UpdateShoppingListWindow: numItems= "..tostring(numItems)..", button_count= "..tostring(button_count)..", num_buttons= "..tostring(num_buttons))
 --
 -- Update the scroll frame
 --
@@ -1333,8 +1333,8 @@ end
 --
 -- Fills out and displays the shopping list frame
 --
-function Skillet:DisplayShoppingList(atBank)
-	--DA.DEBUG(0,"DisplayShoppingList")
+function Skillet:DisplayShoppingList(atBank, includeTools)
+	--DA.DEBUG(0,"DisplayShoppingList("..tostring(atBank)..", "..tostring(includeTools)..")")
 	if not self.shoppingList then
 		self.shoppingList = createShoppingListFrame(self)
 	end
@@ -1348,7 +1348,7 @@ function Skillet:DisplayShoppingList(atBank)
 	else
 		SkilletShoppingListRetrieveButton:Hide()
 	end
-	cache_list(self)
+	cache_list(self, includeTools)
 	local frame = self.shoppingList
 	if Bagnon then
 		frame:SetFrameStrata("HIGH")

@@ -2739,7 +2739,7 @@
 						if Skillet:IsShoppingListVisible() then
 							Skillet:HideShoppingList()
 						else
-							Skillet:DisplayShoppingList(false)
+							Skillet:DisplayShoppingList(false, Skillet.db.profile.queue_tools)
 						end
 					</OnClick>
 				</Scripts>
