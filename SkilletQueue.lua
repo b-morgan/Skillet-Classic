@@ -130,30 +130,6 @@ local function queueAppendReagent(command, reagentID, need, queueCraftables)
 	DA.DEBUG(0,"queueAppendReagent: level= "..tostring(command.level))
 end
 
-local function queueAppendTools(command, queue)
-	DA.DEBUG(0,"queueAppendTools("..DA.DUMP1(command)..", "..tostring(queue)..")")
-	local tools
-	if Skillet.isCraft then
-		tools = { GetCraftSpellFocus(command.recipeIndex) }
-	else
-		tools = { GetTradeSkillTools(command.recipeIndex) }
-	end
-	if tools then
-		DA.DEBUG(1,"queueAppendTools: #tools= "..tostring(#tools)..", tools= "..DA.DUMP1(tools))
-		local nt = #tools+1
-		if nt > 1 then
-			for t=2,nt,2 do
-				if not tools[t] then
-					local id = GetItemInfoInstant(tools[t-1])
-					DA.DEBUG(1,"queueAppendTools: t= "..tostring(t)..", tool= "..tostring(tools[t-1])..", id= "..tostring(id))
-					if id then
-						queue[id] = -1
-					end
-				end
-			end
-		end
-	end
-end
 --
 -- command.complex means the queue entry requires additional crafting to take place prior to entering the queue.
 -- we can't just increase the # of the first command if it happens to be the same recipe without making sure
@@ -222,9 +198,6 @@ function Skillet:QueueAppendCommand(command, queueCraftables, first)
 			DA.DEBUG(3,"reagent= "..DA.DUMP1(reagent))
 			queueAppendReagent(command, reagent.id, command.count * reagent.numNeeded, queueCraftables)
 		end -- for
-		if Skillet.db.profile.queue_tools then
-			queueAppendTools(command, reagentsInQueue)
-		end
 		--DA.DEBUG(2,"newInQueue["..tostring(level).."]["..tostring(recipe.itemID).."]= "..tostring(self.newInQueue[level][recipe.itemID]).." ("..tostring(recipe.name)..")")
 		self.newInQueue[level][recipe.itemID] = (self.newInQueue[level][recipe.itemID] or 0) + command.count * (recipe.numMade or 0)
 --
@@ -799,9 +772,6 @@ function Skillet:ScanQueuedReagents()
 			for i=1,#recipe.reagentData,1 do
 				local reagent = recipe.reagentData[i]
 				reagentsInQueue[reagent.id] = (reagentsInQueue[reagent.id] or 0) - reagent.numNeeded * command.count
-			end
-			if Skillet.db.profile.queue_tools then
-				queueAppendTools(command,reagentsInQueue)
 			end
 		end
 	end
