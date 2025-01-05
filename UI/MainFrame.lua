@@ -562,7 +562,7 @@ end
 -- that are only applicable to trade skills, as needed
 --
 function Skillet:ConfigureRecipeControls()
-	DA.DEBUG(0,"ConfigureRecipeControls()")
+	--DA.DEBUG(0,"ConfigureRecipeControls()")
 	--DA.DEBUG(1,"ConfigureRecipeControls: build= "..tostring(Skillet.build)..", currentTrade= "..tostring(Skillet.currentTrade))
 	if self.queueCasting then
 		return
