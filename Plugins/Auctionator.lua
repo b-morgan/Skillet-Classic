@@ -1247,7 +1247,7 @@ Skillet:RegisterDisplayDetailPlugin("ATRPlugin")	-- we have a GetExtraText funct
 --    false (or nil) will search for the item and reagents in the MainFrame
 --
 function Skillet:AuctionatorSearch(whichOne)
-	DA.DEBUG(0, "AuctionatorSearch("..tostring(whichOne)..")")
+	--DA.DEBUG(0, "AuctionatorSearch("..tostring(whichOne)..")")
 	local shoppingListName
 	local items = {}
 	local recipe = Skillet:GetRecipeDataByTradeIndex(Skillet.currentTrade, Skillet.selectedSkill)
@@ -1261,7 +1261,7 @@ function Skillet:AuctionatorSearch(whichOne)
 		end
 		local list = Skillet:GetShoppingList(name, Skillet.db.profile.same_faction, Skillet.db.profile.include_guild)
 		if not list or #list == 0 then
-			DA.DEBUG(0,"AuctionatorSearch: Shopping List is empty")
+			--DA.DEBUG(0,"AuctionatorSearch: Shopping List is empty")
 			return
 		end
 		for i=1,#list,1 do
@@ -1269,7 +1269,7 @@ function Skillet:AuctionatorSearch(whichOne)
 			local name = C_Item.GetItemInfo(id)
 			if name and not Skillet:VendorSellsReagent(id) then
 				table.insert (items, name)
-				DA.DEBUG(1, "AuctionatorSearch: Item["..tostring(i).."] "..name.." ("..tostring(id)..") added")
+				--DA.DEBUG(1, "AuctionatorSearch: Item["..tostring(i).."] "..name.." ("..tostring(id)..") added")
 			end
 		end
 	else
@@ -1338,9 +1338,9 @@ function Skillet:AuctionatorSearch(whichOne)
 					if (bname) then
 						if not Skillet:VendorSellsReagent(id) then
 							table.insert (items, bname)
-							DA.DEBUG(1, "AuctionatorSearch:  Added  ["..i.."] ("..id..") "..bname)
+							--DA.DEBUG(1, "AuctionatorSearch:  Added  ["..i.."] ("..id..") "..bname)
 						else
-							DA.DEBUG(1, "AuctionatorSearch: Skipped ["..i.."] ("..id..") "..bname)
+							--DA.DEBUG(1, "AuctionatorSearch: Skipped ["..i.."] ("..id..") "..bname)
 						end
 					end
 				end
@@ -1353,24 +1353,24 @@ function Skillet:AuctionatorSearch(whichOne)
 				if (bname) then
 					if not Skillet:VendorSellsReagent(id) then
 						table.insert (items, bname)
-						DA.DEBUG(1, "AuctionatorSearch:  Added  ["..i.."] ("..id..") "..bname)
+						--DA.DEBUG(1, "AuctionatorSearch:  Added  ["..i.."] ("..id..") "..bname)
 					else
-						DA.DEBUG(1, "AuctionatorSearch: Skipped ["..i.."] ("..id..") "..bname)
+						--DA.DEBUG(1, "AuctionatorSearch: Skipped ["..i.."] ("..id..") "..bname)
 					end
 				end
 			end
 		end
 	end
 	if Atr_SelectPane and Atr_SearchAH then
-		DA.DEBUG(0, "AuctionatorSearch: shoppingListName= "..tostring(shoppingListName)..", items= "..DA.DUMP1(items))
+		--DA.DEBUG(0, "AuctionatorSearch: shoppingListName= "..tostring(shoppingListName)..", items= "..DA.DUMP1(items))
 		local BUY_TAB = 3;
 		Atr_SelectPane(BUY_TAB)
 		Atr_SearchAH(shoppingListName, items)
 	elseif useSearchExact and Auctionator.API.v1.MultiSearchExact then
-		DA.DEBUG(0, "AuctionatorSearch: (exact) addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
+		--DA.DEBUG(0, "AuctionatorSearch: (exact) addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
 		Auctionator.API.v1.MultiSearchExact(addonName, items)
 	elseif Auctionator.API.v1.MultiSearch then
-		DA.DEBUG(0, "AuctionatorSearch: addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
+		--DA.DEBUG(0, "AuctionatorSearch: addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
 		Auctionator.API.v1.MultiSearch(addonName, items)
 	end
 end
