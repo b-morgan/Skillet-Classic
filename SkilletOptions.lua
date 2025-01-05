@@ -666,7 +666,7 @@ Skillet.options =
 					if Skillet:IsShoppingListVisible() then
 						Skillet:HideShoppingList()
 					else
-						Skillet:DisplayShoppingList(false)
+						Skillet:DisplayShoppingList(false, Skillet.db.profile.queue_tools)
 					end
 				else
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
