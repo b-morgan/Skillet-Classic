@@ -311,6 +311,19 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank)
 			end
 		end
 	end
+
+	if Skillet.db.profile.queue_tools then
+		for id,entry in pairs(Skillet.db.realm.toolData[curPlayer]) do
+			local have = GetItemCount(id,false)	-- bags only
+			local bank = GetItemCount(id,true)	-- bags + bank
+			--DA.DEBUG(2,"toolData: id= "..tostring(id)..", name= "..tostring(entry.name)..", value= "..tostring(entry.value))
+			if have == 0 and bank > 0 then
+				local entry = { ["id"] = id, ["count"] = 1, ["player"] = curPlayer, ["value"] = 0, ["source"] = "?" }
+				table.insert(list, entry)
+			end
+		end
+	end
+	
 	return list
 end
 

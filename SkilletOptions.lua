@@ -1562,6 +1562,91 @@ Skillet.options =
 		},
 
 --
+-- commands to manage the manual toolData list
+--
+		tooladd = {
+			type = 'input',
+			name = "tooladd",
+			desc = "Add a tool (tooladd id|link,data)",
+			get = function()
+				return value
+			end,
+			set = function(self,value)
+				if not (UnitAffectingCombat("player")) then
+					if value then
+						local item, id, data, name, link
+						local player = Skillet.currentPlayer
+						DA.DEBUG(0,"value= "..value)
+						item, data = string.split(",",value)
+						if string.find(item,"|H") then
+							id = Skillet:GetItemIDFromLink(item)
+						else
+							id = tonumber(item)
+						end
+						name, link = GetItemInfo(id)
+						data = tonumber(data)
+						DA.DEBUG(0,"id= "..tostring(id)..", name= "..tostring(name)..", data= "..tostring(data)..", link= "..tostring(link))
+						Skillet.db.realm.toolData[player][id] = { ["name"] = name, ["value"] = data }
+						end
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
+				end
+			end,
+			order = 110
+		},
+		tooldel = {
+			type = 'input',
+			name = "tooldel",
+			desc = "Delete a tool (tooldel id|link)",
+			get = function()
+				return value
+			end,
+			set = function(self,value)
+				if not (UnitAffectingCombat("player")) then
+					if value then
+						local id
+						local player = Skillet.currentPlayer
+						DA.DEBUG(0,"value= "..value)
+						if string.find(value,"|H") then
+							id = Skillet:GetItemIDFromLink(value)
+						else
+							id = tonumber(value)
+						end
+						Skillet.db.realm.toolData[player][id] = nil
+						end
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
+				end
+			end,
+			order = 111
+		},
+		tooldump = {
+			type = 'execute',
+			name = "tooldump",
+			desc = "Print the toolData table",
+			func = function()
+				local player = Skillet.currentPlayer
+				if next(Skillet.db.realm.toolData[player]) == nil then
+					print("toolData is empty")
+				end
+				for id,entry in pairs(Skillet.db.realm.toolData[player]) do
+					print("id= "..tostring(id)..", name= "..tostring(entry.name)..", value= "..tostring(entry.value))
+				end
+			end,
+			order = 112
+		},
+		toolclear = {
+			type = 'execute',
+			name = "toolclear",
+			desc = "Clear the custom reagent data table",
+			func = function()
+				local player = Skillet.currentPlayer
+				Skillet.db.realm.toolData[player] = {}
+			end,
+			order = 113
+		},
+
+--
 -- command to reset the position of the major Skillet frames
 --
 		reset = {
@@ -1593,7 +1678,7 @@ Skillet.options =
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
 			end,
-			order = 110
+			order = 130
 		},
 	}
 }

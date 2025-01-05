@@ -596,6 +596,12 @@ function Skillet:InitializeDatabase(player, clean)
 		if not self.db.realm.queueData[player] or clean then
 			self.db.realm.queueData[player] = {}
 		end
+		if not self.db.realm.toolData then
+			self.db.realm.toolData = {}
+		end
+		if not self.db.realm.toolData[player] or clean then
+			self.db.realm.toolData[player] = {}
+		end
 		if not self.db.realm.auctionData then
 			self.db.realm.auctionData = {}
 		end
