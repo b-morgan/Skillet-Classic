@@ -149,7 +149,7 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex)
 end
 
 function Skillet:InventoryScan()
-	DA.DEBUG(0,"InventoryScan()")
+	--DA.DEBUG(0,"InventoryScan()")
 	if self.linkedSkill or self.isGuild then
 		return
 	end
@@ -210,7 +210,7 @@ end
 -- everyone else can contribute from their bags or their bank.
 --
 function Skillet:GetInventory(player, reagentID)
-	DA.DEBUG(0,"GetInventory("..tostring(player)..", "..tostring(reagentID)..")")
+	--DA.DEBUG(0,"GetInventory("..tostring(player)..", "..tostring(reagentID)..")")
 	local have, make, plusbank
 	if player and reagentID then
 		if player == self.currentPlayer then
@@ -218,7 +218,7 @@ function Skillet:GetInventory(player, reagentID)
 			plusbank = GetItemCount(reagentID,true)	-- bags + bank
 			make = 0
 		elseif self.db.realm.inventoryData[player] and self.db.realm.inventoryData[player][reagentID] then
-			DA.DEBUG(1,"inventoryData= "..tostring(self.db.realm.inventoryData[player][reagentID]))
+			--DA.DEBUG(1,"inventoryData= "..tostring(self.db.realm.inventoryData[player][reagentID]))
 			have, make, plusbank = string.split(" ", self.db.realm.inventoryData[player][reagentID])
 		end
 	end
