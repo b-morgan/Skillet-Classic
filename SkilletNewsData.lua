@@ -26,6 +26,15 @@ local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
 
 Skillet.NewsName = "Skillet-Classic News"
 Skillet.NewsData = {
+	{	version = "2.07",
+		data = {
+			{	name = "Changes",
+				data = {
+					{ header = "Options", body = "Fix 'use bank as alt' and 'use alt banks' options" },
+				},
+			},
+		},
+	},
 	{	version = "2.06",
 		data = {
 			{	name = "Changes",

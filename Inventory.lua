@@ -98,8 +98,12 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex)
 				end
 				for alt in pairs(self.db.realm.inventoryData) do
 					if alt ~= player then
-						local altBoth = self:GetInventory(alt, reagentID)
-						reagentAvailableAlts = reagentAvailableAlts + altBoth
+						local altHave, altCraft, altBoth = self:GetInventory(alt, reagentID)
+						if self.db.profile.use_alt_banks then
+							reagentAvailableAlts = reagentAvailableAlts + altBoth
+						else
+							reagentAvailableAlts = reagentAvailableAlts + altHave
+						end
 					end
 				end
 				if self.db.profile.use_guildbank_as_alt then
