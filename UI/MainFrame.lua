@@ -1809,6 +1809,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 	lastUpdateSpellID = skill.id
 	local recipe = Skillet.unknownRecipe
 	if skill then
+		--DA.DEBUG(1,"UpdateDetailsWindow: skill= "..DA.DUMP1(skill))
 		recipe = self:GetRecipe(skill.id) or Skillet.unknownRecipe
 --
 -- Name of the skill
@@ -1818,7 +1819,6 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 --
 -- Fill the skill level bar
 --
-		DA.DEBUG(1,"UpdateDetailsWindow: itemID= "..tostring(recipe.itemID)..", spellID= "..tostring(recipe.spellID))
 		if recipe.itemID and recipe.spellID then
 			--DA.DEBUG(1,"UpdateDetailsWindow: recipe= "..DA.DUMP1(recipe))
 			--DA.DEBUG(1,"UpdateDetailsWindow: itemID= "..tostring(recipe.itemID)..", spellID= "..tostring(recipe.spellID))

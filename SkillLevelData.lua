@@ -203,12 +203,16 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 --
 -- If there is an entry in our own table(s), use it
 --
-		if skillLevels and skillLevels[itemID] or levelsByRecipe then
+		if skillLevels then
 --
 -- The data from Wowhead is not specific to the game version
 --
-			if skillLevels and skillLevels[itemID] then
-				levels = skillLevels[itemID]
+			if skillLevels[itemID] or skillLevels[-itemID] then
+				if skillLevels[itemID] then
+					levels = skillLevels[itemID]
+				else
+					levels = skillLevels[-itemID]
+				end
 				if type(levels) == 'table' then
 					if spellID then
 						if isRetail then
@@ -226,12 +230,12 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 					end
 				end
 			end
-			local r = compareLevels(levels,levelsByRecipe)
-			if r == 1 then
-				return a,b,c,d
-			elseif r == 2 then
-				return e,f,g,h
-			end
+		end
+		local r = compareLevels(levels,levelsByRecipe)
+		if r == 1 then
+			return a,b,c,d
+		elseif r == 2 then
+			return e,f,g,h
 		end
 --
 -- The TradeskillInfo addon seems to be more accurate than LibPeriodicTable-3.1
@@ -284,6 +288,10 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 			end
 		end
 	elseif spellID then
+--
+-- On Classic Era, spellID is the name of the spell.
+-- Until we can convert that to a number, this code doesn't work.
+--
 		if is_Retail then
 			levelsByRecipe = skillLevelsRetail[spellID]
 		elseif is_Classic then
