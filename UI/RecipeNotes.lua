@@ -164,29 +164,27 @@ function Skillet:UpdateNotesWindow()
 			end
 			local key
 			if index == 1 then
-				local texture
 --
 -- notes for the recipe itself
 --
-				text:SetText(recipeID)
-				if recipe.numMade > 0 then
-					local a
-					a,a,a,a,a,a,a,a,a,texture = GetItemInfo(recipe.itemID)		-- get the item texture
-					if recipe.itemID then
-						key = "item:"..recipe.itemID
-					else
-						key = "name:"..recipeID
-					end
+				local name, _, texture = GetSpellInfo(recipeID)
+				--DA.DEBUG(0,"UpdateNotesWindow: name= "..tostring(name)..", texture= "..tostring(texture))
+				text:SetText(name)
+				if itemID then
+					texture = select(10,GetItemInfo(itemID))
+					key = "item:"..itemID
 				else
-					texture = "Interface\\Icons\\Spell_Holy_GreaterHeal"		-- standard enchant icon
-					key = "enchant:"..recipeID
+					key = "name:"..recipeID
 				end
-				icon:SetNormalTexture(texture)
+				--DA.DEBUG(0,"UpdateNotesWindow: key= "..tostring(key)..", texture= "..tostring(texture))
+				if texture then
+					icon:SetNormalTexture(texture)
+				end
 			else
-				local name, link, _,_,_,_,_,_,_,texture = GetItemInfo(recipe.reagentData[index-1].id)
 --
 -- notes for a reagent
 --
+				local name, link, _,_,_,_,_,_,_,texture = GetItemInfo(recipe.reagentData[index-1].id)
 				text:SetText(name)
 				icon:SetNormalTexture(texture)
 				key = "reagent:"..recipe.reagentData[index-1].id
