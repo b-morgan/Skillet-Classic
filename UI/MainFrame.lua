@@ -1818,6 +1818,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 --
 -- Fill the skill level bar
 --
+		DA.DEBUG(1,"UpdateDetailsWindow: itemID= "..tostring(recipe.itemID)..", spellID= "..tostring(recipe.spellID))
 		if recipe.itemID and recipe.spellID then
 			--DA.DEBUG(1,"UpdateDetailsWindow: recipe= "..DA.DUMP1(recipe))
 			--DA.DEBUG(1,"UpdateDetailsWindow: itemID= "..tostring(recipe.itemID)..", spellID= "..tostring(recipe.spellID))

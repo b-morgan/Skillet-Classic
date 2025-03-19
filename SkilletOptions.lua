@@ -1043,7 +1043,10 @@ Skillet.options =
 			end,
 			set = function(self,value)
 				if not (UnitAffectingCombat("player")) then
-					Skillet:PrintTradeSkillLevels(value)
+					--DA.DEBUG(0,"value= "..value)
+					itemID, spellID = string.split(" ",value)
+					--DA.DEBUG(0,"itemID= "..tostring(itemID)..", spellID= "..tostring(spellID))
+					Skillet:PrintTradeSkillLevels(itemID, spellID)
 				else
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
