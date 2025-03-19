@@ -170,6 +170,7 @@ end
 --
 function Skillet:GetTradeSkillLevels(itemID, spellID)
 	DA.DEBUG(0,"GetTradeSkillLevels("..tostring(itemID)..", "..tostring(spellID)..")")
+	local rb = getRacialBonus()
 	local skillLevels = Skillet.db.global.SkillLevels
 	local levels
 	local skillLevelsEra = Skillet.db.global.SkillLineAbility_era
