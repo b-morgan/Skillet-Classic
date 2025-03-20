@@ -421,7 +421,7 @@ end
 --
 function Skillet:PrintTradeSkillLevels(itemID, spellID)
 	--DA.DEBUG(0,"PrintTradeSkillLevels("..tostring(itemID)..", "..tostring(spellID)..")")
-	DA.MARK3(Skillet.version..", "..Skillet.wowVersion..", "..Skillet.Skillet.SkillLevelVersion..", "..GetLocale())
+	DA.MARK3(Skillet.version..", "..Skillet.wowVersion..", "..Skillet.SkillLevelVersion..", "..GetLocale())
 	DA.MARK3("PrintTradeSkillLevels: altskilllevels= "..tostring(self.db.profile.altskilllevels))
 	DA.MARK3("PrintTradeSkillLevels: baseskilllevel= "..tostring(self.db.profile.baseskilllevel))
 	DA.MARK3("PrintTradeSkillLevels: #SkillLevels= "..tostring(tablelength(self.db.global.SkillLevels)))
