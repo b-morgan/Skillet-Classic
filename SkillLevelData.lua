@@ -192,9 +192,9 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 --
 -- Use the appropriate table to find the data
 --
-			if is_Retail then
+			if isRetail then
 				levelsByRecipe = skillLevelsRetail[recipeID]
-			elseif is_Classic then
+			elseif isClassic then
 				levelsByRecipe = skillLevelsEra[recipeID]
 			else
 				levelsByRecipe = skillLevelsClassic[recipeID]
@@ -294,15 +294,17 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 -- On Classic Era, spellID is the name of the spell.
 -- Until we can convert that to a number, this code doesn't work.
 --
-		if is_Retail then
+		local spellName
+		if isRetail then
 			levelsByRecipe = skillLevelsRetail[spellID]
-		elseif is_Classic then
-			spellNum = Skillet.db.global.NameToSpellID[spellID]
-			levelsByRecipe = skillLevelsEra[spellNum]
-			DA.DEBUG(1,"GetTradeSkillLevels: spellID= "..tostring(spellID)..", spellNum= "..tostring(spellNum)..", levelsByRecipe= "..tostring(levelsByRecipe))
+		elseif isClassic then
+			spellName = spellID
+			spellID = Skillet.db.global.NameToSpellID[spellName] or 0
+			levelsByRecipe = skillLevelsEra[spellID]
 		else
 			levelsByRecipe = skillLevelsClassic[spellID]
 		end
+		DA.DEBUG(1,"GetTradeSkillLevels: spellName= "..tostring(spellName)..", spellID= "..tostring(spellID)..", levelsByRecipe= "..tostring(levelsByRecipe))
 		if skillLevels and (skillLevels[spellID] or skillLevels[-spellID]) then
 --
 -- The data from Wowhead is not specific to the game version
@@ -326,12 +328,12 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 					end
 				end
 			end
-			local r = compareLevels(levels,levelsByRecipe)
-			if r == 1 then
-				return a,b,c,d
-			elseif r == 2 then
-				return e,f,g,h
-			end
+		end
+		local r = compareLevels(levels,levelsByRecipe)
+		if r == 1 then
+			return a,b,c,d
+		elseif r == 2 then
+			return e,f,g,h
 		end
 	end
 --
