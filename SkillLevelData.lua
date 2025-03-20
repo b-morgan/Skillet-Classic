@@ -287,15 +287,19 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 				return a, b, c, d
 			end
 		end
-	elseif spellID then
+	end
+	if spellID and spellID ~= 0 then
 --
+-- Since itemID didn't find anything, try the spellID.
 -- On Classic Era, spellID is the name of the spell.
 -- Until we can convert that to a number, this code doesn't work.
 --
 		if is_Retail then
 			levelsByRecipe = skillLevelsRetail[spellID]
 		elseif is_Classic then
-			levelsByRecipe = skillLevelsEra[spellID]
+			spellNum = Skillet.db.global.NameToSpellID[spellID]
+			levelsByRecipe = skillLevelsEra[spellNum]
+			DA.DEBUG(1,"GetTradeSkillLevels: spellID= "..tostring(spellID)..", spellNum= "..tostring(spellNum)..", levelsByRecipe= "..tostring(levelsByRecipe))
 		else
 			levelsByRecipe = skillLevelsClassic[spellID]
 		end
@@ -329,18 +333,31 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 				return e,f,g,h
 			end
 		end
-	else
-		DA.DEBUG(0,"GetTradeSkillLevels: itemID is missing")
-		self.sourceTradeSkillLevel = 6
-		self.indexTradeSkillLevel = nil
-		return 0, 0, 0, 0 
 	end
+--
+-- Searching for itemID and SpellID both failed.
+-- Check the MissingSkillLevels table and add an entry if it isn't there.
+-- This allows for manual editing of that table in the saved variables.
+--
 	if not self.db.global.MissingSkillLevels then
 		self.db.global.MissingSkillLevels = {}
 	end
-	self.db.global.MissingSkillLevels[itemID] = "0/0/0/0"
+	local index = 0
+	if itemID and itemID ~= 0 then
+		index = itemID
+	elseif spellID and spellID ~= 0 then
+		index = spellID
+	end
+	if not self.db.global.MissingSkillLevels[index] then
+		self.db.global.MissingSkillLevels[index] = "0/0/0/0"
+	end
 	self.sourceTradeSkillLevel = 7
-	return 0, 0, 0, 0 
+	a,b,c,d = string.split("/", self.db.global.MissingSkillLevels[index])
+	a = (tonumber(a) or 0)
+	b = (tonumber(b) or 0)
+	c = (tonumber(c) or 0)
+	d = (tonumber(d) or 0)
+	return a, b, c, d
 end
 
 function Skillet:GetTradeSkillLevelColor(itemID, rank)
@@ -404,6 +421,7 @@ end
 --
 function Skillet:PrintTradeSkillLevels(itemID, spellID)
 	--DA.DEBUG(0,"PrintTradeSkillLevels("..tostring(itemID)..", "..tostring(spellID)..")")
+	DA.MARK3(Skillet.version.." ("..Skillet.wowVersion..") "..GetLocale())
 	DA.MARK3("PrintTradeSkillLevels: altskilllevels= "..tostring(self.db.profile.altskilllevels))
 	DA.MARK3("PrintTradeSkillLevels: baseskilllevel= "..tostring(self.db.profile.baseskilllevel))
 	DA.MARK3("PrintTradeSkillLevels: #SkillLevels= "..tostring(tablelength(self.db.global.SkillLevels)))
@@ -416,7 +434,7 @@ function Skillet:PrintTradeSkillLevels(itemID, spellID)
 	if itemID then
 		local orange, yellow, green, gray = self:GetTradeSkillLevels(itemID, spellID)
 		DA.MARK3("PrintTradeSkillLevels: itemID= "..tostring(itemID)..", spellID= "..tostring(spellID))
-		DA.MARK3("PrintTradeSkillLevels: index= "..tostring(self.indexTradeSkillLevel)..", source= "..tostring(self.sourceTradeSkillLevel))
+		DA.MARK3("PrintTradeSkillLevels: source= "..tostring(self.sourceTradeSkillLevel))
 		DA.MARK3("PrintTradeSkillLevels: levels= "..tostring(orange).."/"..tostring(yellow).."/"..tostring(green).."/"..tostring(gray))
 	end
 end
