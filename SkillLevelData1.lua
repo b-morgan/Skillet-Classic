@@ -63,6 +63,8 @@ local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
 function Skillet:InitializeSkillLevels()
 Skillet.SkillLevelVersion = 1
 Skillet.db.global.MissingSkillLevels = {}
+Skillet.db.global.SkillLineAbility_cata = {}
+Skillet.db.global.SkillLineAbility_retail = {}
 Skillet.db.global.SkillLevels = {
 -- https://wotlk.wowhead.com/alchemy#recipes
 -- skipping spellID: 2336 - Elixir of Tongues

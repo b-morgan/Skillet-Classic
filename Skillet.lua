@@ -364,6 +364,10 @@ function Skillet:OnInitialize()
 		self.db.global.MissingSkillLevels = {}
 		initSkillLevels = true
 	end
+	if not self.db.global.SkillLevels then
+		self.db.global.SkillLevels = {}
+		initSkillLevels = true
+	end
 	if not self.db.global.SkillLineAbility_era then
 		self.db.global.SkillLineAbility_era = {}
 		initSkillLevels = true
@@ -507,7 +511,6 @@ function Skillet:FlushRecipeData()
 	Skillet.db.global.recipeDB = {}
 	Skillet.db.global.itemRecipeUsedIn = {}
 	Skillet.db.global.itemRecipeSource = {}
-	Skillet.db.global.SkillLevels = nil
 	Skillet.db.realm.skillDB = {}
 	Skillet.db.realm.subClass = {}
 	Skillet.db.realm.invSlot = {}
