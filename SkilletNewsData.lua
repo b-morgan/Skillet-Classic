@@ -32,6 +32,7 @@ Skillet.NewsData = {
 				data = {
 					{ header = "Skill Levels", body = "Update Skill Level data and code" },
 					{ header = "Recipe Notes", body = "Update Notes frame" },
+					{ header = "TOC", body = "Update TOC" },
 				},
 			},
 		},
