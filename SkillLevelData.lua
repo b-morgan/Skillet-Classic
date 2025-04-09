@@ -177,7 +177,7 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 	local skillLevelsClassic = Skillet.db.global.SkillLineAbility_cata
 	local skillLevelsRetail = Skillet.db.global.SkillLineAbility_retail
 	local possibleRecipes, recipeID, levelsByRecipe
-	if itemID and itemID ~= 0 then 
+	if itemID and type(itemID) == 'number' and itemID ~= 0 then 
 --
 -- The CraftInfoAnywhere (https://www.curseforge.com/wow/addons/craft-info-anywhere) API
 -- is used to get the recipeID that produces this itemID
@@ -292,7 +292,6 @@ function Skillet:GetTradeSkillLevels(itemID, spellID)
 --
 -- Since itemID didn't find anything, try the spellID.
 -- On Classic Era, spellID is the name of the spell.
--- Until we can convert that to a number, this code doesn't work.
 --
 		local spellName
 		if isRetail then
