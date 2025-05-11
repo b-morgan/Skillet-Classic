@@ -716,8 +716,17 @@ function Skillet:StopCast(spell, success)
 					self.processingPosition = nil
 					self.processingCommand = nil
 					local qsize = self:RemoveFromQueue(qpos)
+--
+-- Sound IDs can be found at https://www.wowhead.com/sounds 
+--
 					if self.db.profile.sound_on_empty_queue and qsize == 0 then
-						PlaySoundFile("Sound/Creature/Peon/PeonBuildingComplete1.ogg", "Master")
+						PlaySoundFile(558132, "Master") -- PeonBuildingComplete
+						if self.db.profile.flash_on_empty_queue then FlashClientIcon() end
+					end
+					if self.db.profile.sound_on_remove_queue and qsize ~= 0 then
+						PlaySoundFile(558147, "Master") -- PeonYes3
+--						PlaySoundFile(567473, "Master") -- UnsheathMetal
+						if self.db.profile.flash_on_remove_queue then FlashClientIcon() end
 					end
 					DA.DEBUG(0,"removed successful queue command at "..tostring(qpos)..", qsize= "..tostring(qsize))
 				end

@@ -559,8 +559,51 @@ Skillet.options =
 					set = function(self,value)
 						Skillet.db.profile.sound_on_empty_queue = value
 					end,
-					width = "full",
+--					width = "full",
+					width = 1.5,
 					order = 6,
+				},
+				flash_on_empty_queue = {
+					type = "toggle",
+					name = L["FLASHONEMPTYQUEUENAME"],
+					desc = L["FLASHONEMPTYQUEUEDESC"],
+					get = function()
+						return Skillet.db.profile.flash_on_empty_queue
+					end,
+					set = function(self,value)
+						Skillet.db.profile.flash_on_empty_queue = value
+					end,
+--					width = "full",
+					width = 1.5,
+					order = 7,
+				},
+				sound_on_remove_queue = {
+					type = "toggle",
+					name = L["SOUNDONREMOVEQUEUENAME"],
+					desc = L["SOUNDONREMOVEQUEUEDESC"],
+					get = function()
+						return Skillet.db.profile.sound_on_remove_queue
+					end,
+					set = function(self,value)
+						Skillet.db.profile.sound_on_remove_queue = value
+					end,
+--					width = "full",
+					width = 1.5,
+					order = 8,
+				},
+				flash_on_remove_queue = {
+					type = "toggle",
+					name = L["FLASHONREMOVEQUEUENAME"],
+					desc = L["FLASHONREMOVEQUEUEDESC"],
+					get = function()
+						return Skillet.db.profile.flash_on_remove_queue
+					end,
+					set = function(self,value)
+						Skillet.db.profile.flash_on_remove_queue = value
+					end,
+--					width = "full",
+					width = 1.5,
+					order = 9,
 				},
 				clamp_to_screen = {
 					type = "toggle",
@@ -575,7 +618,7 @@ Skillet.options =
 						if SkilletStandaloneQueue then SkilletStandaloneQueue:SetClampedToScreen(value) end
 					end,
 					width = "full",
-					order = 9,
+					order = 10,
 				},
 				scale_tooltip = {
 					type = "toggle",
@@ -588,7 +631,7 @@ Skillet.options =
 						Skillet.db.profile.scale_tooltip = value
 					end,
 					width = "full",
-					order = 10,
+					order = 11,
 				},
 				transparency = {
 					type = "range",
@@ -605,7 +648,7 @@ Skillet.options =
 						Skillet:UpdateStandaloneQueueWindow()
 					end,
 					width = "full",
-					order = 11,
+					order = 20,
 				},
 				scale = {
 					type = "range",
@@ -622,7 +665,7 @@ Skillet.options =
 						Skillet:UpdateStandaloneQueueWindow()
 					end,
 					width = "full",
-					order = 12,
+					order = 21,
 				},
 				ttscale = {
 					type = "range",
@@ -639,7 +682,7 @@ Skillet.options =
 						Skillet:UpdateStandaloneQueueWindow()
 					end,
 					width = "full",
-					order = 13,
+					order = 22,
 				},
 			},
 		},

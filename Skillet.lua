@@ -89,6 +89,9 @@ local defaults = {
 		search_includes_reagents = true,
 		interrupt_clears_queue = false,
 		sound_on_empty_queue = false,
+		sound_on_remove_queue = false,
+		flash_on_empty_queue = false,
+		flash_on_remove_queue = false,
 		clamp_to_screen = true,
 		scale_tooltip = false,
 		transparency = 1.0,
@@ -460,14 +463,33 @@ function Skillet:FlushAllData()
 	Skillet.db.realm.tradeSkills = {}
 	Skillet.db.realm.auctionData = {}
 	Skillet.db.realm.inventoryData = {}
-	Skillet.db.realm.bagData = {}
-	Skillet.db.realm.bagDetails = {}
-	Skillet.db.realm.bankData = {}
-	Skillet.db.realm.bankDetails = {}
 	Skillet.db.realm.userIgnoredMats = {}
 	Skillet:FlushCustomData()
 	Skillet:FlushQueueData()
 	Skillet:FlushRecipeData()
+	Skillet:FlushDetailData()
+	Skillet:InitializeMissingVendorItems()
+end
+
+--
+-- Flush all data for the current player
+--
+function Skillet:FlushPlayerData()
+	DA.DEBUG(0,"FlushPlayerData()");
+	local player = UnitName("player")
+	Skillet.db.realm.tradeSkills[player] = {}
+	Skillet.db.realm.auctionData[player] = {}
+	Skillet.db.realm.inventoryData[player] = {}
+	Skillet.db.realm.userIgnoredMats[player] = {}
+	Skillet.db.realm.bagData[player] = {}
+	Skillet.db.realm.bagDetails[player] = {}
+	Skillet.db.realm.bankData[player] = {}
+	Skillet.db.realm.bankDetails[player] = {}
+	Skillet.db.realm.queueData[player] = {}
+	Skillet.db.realm.reagentsInQueue[player] = {}
+	Skillet.db.realm.modifiedInQueue[player] = {}
+	Skillet.db.realm.groupDB[player] = {}
+	Skillet.db.realm.options[player] = {}
 end
 
 --
@@ -507,6 +529,17 @@ function Skillet:FlushRecipeData()
 	Skillet.db.realm.subClass = {}
 	Skillet.db.realm.invSlot = {}
 	Skillet:InitializeSkillLevels()
+end
+
+function Skillet:FlushDetailData()
+	DA.DEBUG(0,"FlushDetailData()");
+	Skillet.db.realm.bagData = {}
+	Skillet.db.realm.bagDetails = {}
+	Skillet.db.realm.bankData = {}
+	Skillet.db.realm.bankDetails = {}
+--	Skillet.db.global.warbandData = {}
+--	Skillet.db.global.warbandDetails = {}
+	Skillet.db.global.detailedGuildbank = {}
 end
 
 --

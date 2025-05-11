@@ -72,7 +72,8 @@ def spells_list_write(file_name):
 	for item_id in spell_to_skill_line:
 		o.write(spells_list_str(item_id))
 		if item_id in spell_to_name:
-			result = '["' + str(spell_to_name[item_id]) + '"] = '
+			name = spell_to_name[item_id].replace('"','\\"')
+			result = '["' + name + '"] = '
 			result = result + str(item_id)
 			result = result + ",\n"
 			n.write(result)
