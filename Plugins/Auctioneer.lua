@@ -22,6 +22,11 @@ Skillet.AUCPlugin = {}
 local plugin = Skillet.AUCPlugin
 local L = Skillet.L
 
+local IsAddOnLoaded = C_AddOns and C_AddOns.IsAddOnLoaded or IsAddOnLoaded
+local GetAddOnMetadata = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
+local LoadAddOn = C_AddOns and C_AddOns.LoadAddOn or LoadAddOn
+local GetItemInfo = C_Item and C_Item.GetItemInfo or GetItemInfo
+
 plugin.options =
 {
 	type = 'group',

@@ -19,6 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 local L = Skillet.L
 
+local GetItemInfo = C_Item and C_Item.GetItemInfo or GetItemInfo
+local GetItemCount = C_Item and C_Item.GetItemCount or GetItemCount
+
+
 StaticPopupDialogs["SKILLET_QUEUE_LARGE"] = {
 	text = "Skillet-Classic\n"..L["Request to queue %s items.\n Are you sure?"],
 	button1 = ACCEPT,

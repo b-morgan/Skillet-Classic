@@ -22,6 +22,8 @@ Skillet.BCPlugin = {}
 local plugin = Skillet.BCPlugin
 local L = Skillet.L
 
+local GetItemInfo = C_Item and C_Item.GetItemInfo or GetItemInfo
+
 plugin.options =
 {
 	type = 'group',

@@ -1,8 +1,4 @@
 local addonName,addonTable = ...
-local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
-local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
-local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
-local DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
 
@@ -22,8 +18,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Skillet.APSPlugin = {}
 
+local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
+local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
+local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
+local DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
+
 local plugin = Skillet.APSPlugin
 local L = Skillet.L
+
+local GetItemInfo = C_Item and C_Item.GetItemInfo or GetItemInfo
 
 plugin.options =
 {

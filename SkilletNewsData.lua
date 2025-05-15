@@ -31,6 +31,12 @@ Skillet.NewsData = {
 			{	name = "Changes",
 				data = {
 					{ header = "Options", body = "Additional sound and flash options to craft queue" },
+					{ header = "TOC", body = "Update TOC (MOP Beta)" },
+				},
+			},
+			{	name = "Fixes",
+				data = {
+					{ header = "All", body = "Add C_AddOns. and C_Item." },
 				},
 			},
 		},

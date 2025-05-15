@@ -22,6 +22,8 @@ Skillet.ATLPlugin = {}
 local plugin = Skillet.ATLPlugin
 local L = Skillet.L
 
+local GetItemInfo = C_Item and C_Item.GetItemInfo or GetItemInfo
+
 plugin.options =
 {
 	type = 'group',

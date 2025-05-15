@@ -29,6 +29,8 @@ local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
 local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
 local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
 
+local GetItemInfo = C_Item and C_Item.GetItemInfo or GetItemInfo
+
 local merchant_inventory = {}
 
 --

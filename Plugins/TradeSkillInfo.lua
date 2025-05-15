@@ -24,6 +24,8 @@ Skillet.TSIPlugin = {}
 local plugin = Skillet.TSIPlugin
 local L = Skillet.L
 
+local GetItemInfo = C_Item and C_Item.GetItemInfo or GetItemInfo
+
 plugin.options =
 {
 	type = 'group',
