@@ -664,8 +664,7 @@ function Skillet:UI_INFO_MESSAGE(event, errorType, message)
 end
 
 function Skillet:ContinueCast(spell)
-	DA.DEBUG(0,"ContinueCast("..tostring(spell).."): changingTrade= "..tostring(self.changingTrade)..
-	  ", processingSpell= "..tostring(self.processingSpell)..", queueCasting= "..tostring(self.queueCasting))
+	DA.DEBUG(0,"ContinueCast("..tostring(spell).."): changingTrade= "..tostring(self.changingTrade)..", processingSpell= "..tostring(self.processingSpell)..", queueCasting= "..tostring(self.queueCasting))
 	if self.changingTrade then			-- contains the tradeID we are changing to
 		self.currentTrade = self.changingTrade
 		Skillet:SkilletShow()			-- seems to let DoTradeSkill know we have changed
@@ -677,8 +676,7 @@ function Skillet:ContinueCast(spell)
 end
 
 function Skillet:StopCast(spell, success)
-	DA.DEBUG(0,"StopCast("..tostring(spell)..", "..tostring(success).."): changingTrade= "..tostring(self.changingTrade)..
-	  ", processingSpell= "..tostring(self.processingSpell)..", queueCasting= "..tostring(self.queueCasting)..", pauseQueue= "..tostring(self.pauseQueue))
+	DA.DEBUG(0,"StopCast("..tostring(spell)..", "..tostring(success).."): changingTrade= "..tostring(self.changingTrade)..", processingSpell= "..tostring(self.processingSpell)..", queueCasting= "..tostring(self.queueCasting)..", pauseQueue= "..tostring(self.pauseQueue))
 	if not self.db.realm.queueData then
 		self.db.realm.queueData = {}
 	end

@@ -1513,8 +1513,7 @@ end
 function Skillet:ContinueChange()
 	DA.DEBUG(0,"ContinueChange()")
 	self.isCraft = self.skillIsCraft[self.changingTrade]
-	DA.DEBUG(1,"ContinueChange: changingTrade= "..tostring(self.changingTrade)..", changingName= "..tostring(self.changingName)..
-	  ", isCraft= "..tostring(self.isCraft))
+	DA.DEBUG(1,"ContinueChange: changingTrade= "..tostring(self.changingTrade)..", changingName= "..tostring(self.changingName)..", isCraft= "..tostring(self.isCraft))
 	self.currentTrade = self.changingTrade
 	self:ChangeTradeSkill(self.changingTrade, self.changingName)
 end
