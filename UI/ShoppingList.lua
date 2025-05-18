@@ -391,8 +391,12 @@ local function indexBags()
 					end
 				end
 			end
-		Skillet.db.realm.bagData[player] = data
-		Skillet.db.realm.bagDetails[player] = details
+			Skillet.db.realm.bagData[player] = data
+			if Skillet.db.profile.collect_details then
+				Skillet.db.realm.bagDetails[player] = details
+			else
+				--DA.DEBUG(2,"indexBags: Not collecting details")		
+			end
 		end
 	end
 end
@@ -457,7 +461,11 @@ local function indexBank()
 			end
 		end
 	end
-	Skillet.db.realm.bankDetails[player] = bank
+	if Skillet.db.profile.collect_details then
+		Skillet.db.realm.bankDetails[player] = bank
+	else
+		--DA.DEBUG(2,"indexBank: Not collecting details")		
+	end
 end
 
 local function indexGuildBank(tab)
