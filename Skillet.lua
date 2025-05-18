@@ -476,6 +476,27 @@ function Skillet:FlushAllData()
 end
 
 --
+-- Flush all data for the current player
+--
+function Skillet:FlushPlayerData()
+	DA.DEBUG(0,"FlushPlayerData()");
+	local player = UnitName("player")
+	Skillet.db.realm.tradeSkills[player] = {}
+	Skillet.db.realm.auctionData[player] = {}
+	Skillet.db.realm.inventoryData[player] = {}
+	Skillet.db.realm.userIgnoredMats[player] = {}
+	Skillet.db.realm.bagData[player] = {}
+	Skillet.db.realm.bagDetails[player] = {}
+	Skillet.db.realm.bankData[player] = {}
+	Skillet.db.realm.bankDetails[player] = {}
+	Skillet.db.realm.queueData[player] = {}
+	Skillet.db.realm.reagentsInQueue[player] = {}
+	Skillet.db.realm.modifiedInQueue[player] = {}
+	Skillet.db.realm.groupDB[player] = {}
+	Skillet.db.realm.options[player] = {}
+end
+
+--
 -- Custom Groups data could represent significant
 -- effort by the player so don't clear it without
 -- good cause.
@@ -512,6 +533,20 @@ function Skillet:FlushRecipeData()
 	Skillet.db.realm.subClass = {}
 	Skillet.db.realm.invSlot = {}
 	Skillet:InitializeSkillLevels()
+end
+
+--
+-- Detailed contents of the bags, bank, and guildbank
+-- can take a lot of space so clearing these tables
+-- can free that up.
+--
+function Skillet:FlushDetailData()
+	DA.DEBUG(0,"FlushDetailData()");
+	Skillet.db.realm.bagData = {}
+	Skillet.db.realm.bagDetails = {}
+	Skillet.db.realm.bankData = {}
+	Skillet.db.realm.bankDetails = {}
+	Skillet.db.global.detailedGuildbank = {}
 end
 
 --
