@@ -38,13 +38,15 @@ local GetItemCount = C_Item and C_Item.GetItemCount or GetItemCount
 Skillet.version = GetAddOnMetadata("Skillet-Classic", "Version")
 Skillet.interface = select(4, GetBuildInfo())
 Skillet.build = (Skillet.interface < 20000 and "Classic") or (Skillet.interface < 30000 and "BCC") or
-  (Skillet.interface < 40000 and "Wrath") or (Skillet.interface < 50000 and "Cata") or "Retail"
+  (Skillet.interface < 40000 and "Wrath") or (Skillet.interface < 50000 and "Cata") or
+  (Skillet.interface < 60000 and "Mists") or "Retail"
 Skillet.project = WOW_PROJECT_ID
 local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE -- 1
 local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC -- 2
 local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC -- 5
 local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC -- 11
 local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC -- 14
+local isMists = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC -- 15
 
 Skillet.isCraft = false			-- true for the Blizzard Craft UI, false for the Blizzard TradeSkill UI
 Skillet.lastCraft = false		-- help events know when to call ConfigureRecipeControls()
