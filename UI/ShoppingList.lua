@@ -534,6 +534,27 @@ function Skillet:BAG_CONTAINER_UPDATE(event, bagID)
 	DA.TRACE("BAG_CONTAINER_UPDATE( "..tostring(bagID).." )")
 end
 
+--[[
+  local frame = CreateFrame("Frame")
+  frame:RegisterEvent("BAG_UPDATE")
+  frame:RegisterEvent("BAG_UPDATE_DELAYED")
+  frame:RegisterEvent("UNIT_INVENTORY_CHANGED")
+  local bags = {}
+  frame:SetScript("OnEvent", function(_, event, data)
+    if data then
+      bags[data] = true
+    end
+    frame:SetScript("OnUpdate", function()
+      frame:SetScript("OnUpdate", nil)
+      for bagID in pairs(bags) do
+        self:BAG_UPDATE(event, bagID)
+      end
+      bags = {}
+      self:BAG_UPDATE_DELAYED()
+    end)
+  end)
+--]]
+
 --
 -- So we can track when the players inventory changes and update craftable counts
 --
@@ -550,8 +571,9 @@ function Skillet:BAG_UPDATE(event, bagID)
 		showing = true
 	end
 	if MerchantFrame and MerchantFrame:IsVisible() then
+		showing = true
 		-- may need to update the button on the merchant frame window ...
-		self:UpdateMerchantFrame()
+--		self:UpdateMerchantFrame()
 	end
 	if self.shoppingList and self.shoppingList:IsVisible() then
 		showing = true
@@ -602,6 +624,37 @@ function Skillet:BAG_UPDATE_DELAYED(event)
 		if Skillet.gotGuildbankEvent and Skillet.gotBagUpdateEvent then
 			Skillet:UpdateGuildQueue("bag update")
 		end
+	end
+	local scanned = false
+	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
+		Skillet:InventoryScan()
+		scanned = true
+		Skillet:UpdateTradeSkillWindow()
+	end
+	if Skillet.shoppingList and Skillet.shoppingList:IsVisible() then
+		if not scanned then
+			Skillet:InventoryScan()
+			scanned = true
+		end
+		Skillet:UpdateShoppingListWindow(false)
+	end
+	if MerchantFrame and MerchantFrame:IsVisible() then
+		if not scanned then
+			Skillet:InventoryScan()
+			scanned = true
+		end
+		self:UpdateMerchantFrame()
+	end
+end
+
+--
+-- Event is fired when the inventory (bags) changes
+--
+function Skillet:UNIT_INVENTORY_CHANGED(event, unit)
+	DA.TRACE("UNIT_INVENTORY_CHANGED( "..tostring(unit).." )")
+	if Skillet.bagsChanged and not UnitAffectingCombat("player") then
+		indexBags()
+		Skillet.bagsChanged = false
 	end
 	local scanned = false
 	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
@@ -997,37 +1050,6 @@ end
 
 function Skillet:UpdateGuildQueue(where)
 	processGuildQueue(where)
-end
-
---
--- Event is fired when the inventory (bags) changes
---
-function Skillet:UNIT_INVENTORY_CHANGED(event, unit)
-	DA.TRACE("UNIT_INVENTORY_CHANGED( "..tostring(unit).." )")
-	if Skillet.bagsChanged and not UnitAffectingCombat("player") then
-		indexBags()
-		Skillet.bagsChanged = false
-	end
-	local scanned = false
-	if Skillet.tradeSkillFrame and Skillet.tradeSkillFrame:IsVisible() then
-		Skillet:InventoryScan()
-		scanned = true
-		Skillet:UpdateTradeSkillWindow()
-	end
-	if Skillet.shoppingList and Skillet.shoppingList:IsVisible() then
-		if not scanned then
-			Skillet:InventoryScan()
-			scanned = true
-		end
-		Skillet:UpdateShoppingListWindow(false)
-	end
-	if MerchantFrame and MerchantFrame:IsVisible() then
-		if not scanned then
-			Skillet:InventoryScan()
-			scanned = true
-		end
-		self:UpdateMerchantFrame()
-	end
 end
 
 --
