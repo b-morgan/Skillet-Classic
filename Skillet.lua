@@ -230,6 +230,7 @@ function Skillet:ConfigureProfile()
 	Skillet.TraceShow = Skillet.db.profile.TraceShow
 	Skillet.TraceLog = Skillet.db.profile.TraceLog
 	Skillet.TraceLog2 = Skillet.db.profile.TraceLog2
+	Skillet.TraceLog3 = Skillet.db.profile.TraceLog3
 	Skillet.ProfileShow = Skillet.db.profile.ProfileShow
 --
 -- Profile variable to control Skillet fixes for Blizzard bugs.
