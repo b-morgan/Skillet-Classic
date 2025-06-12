@@ -825,6 +825,7 @@ Skillet.options =
 			end,
 			set = function(self,value)
 				Skillet.db.profile.collect_details = value
+				Skillet:Print("collect_details= "..tostring(value))
 			end,
 			order = 60
 		},

@@ -342,6 +342,7 @@ local function indexBags()
 	DA.TRACE("indexBags()")
 	local player = Skillet.currentPlayer
 	if player then
+		local collect = Skillet.db.profile.collect_details
 		local details = {}
 		local data = {}
 		local bags = {0,1,2,3,4}
@@ -376,7 +377,7 @@ local function indexBags()
 					else
 						name = item						-- when all else fails, use the link
 					end
-					if id then
+					if collect and id then
 						table.insert(details, {
 							["bag"] = container,
 							["slot"] = i,
@@ -392,7 +393,7 @@ local function indexBags()
 				end
 			end
 			Skillet.db.realm.bagData[player] = data
-			if Skillet.db.profile.collect_details then
+			if collect then
 				Skillet.db.realm.bagDetails[player] = details
 			else
 				--DA.DEBUG(2,"indexBags: Not collecting details")		
@@ -409,6 +410,7 @@ local function indexBank()
 --
 -- bankData is a count by item.
 --
+	local collect = Skillet.db.profile.collect_details
 	bank = {}
 	local player = Skillet.currentPlayer
 	local bankData = Skillet.db.realm.bankData[player]
@@ -445,7 +447,7 @@ local function indexBank()
 				else
 					name = item						-- when all else fails, use the link
 				end
-				if id then
+				if collect and id then
 					table.insert(bank, {
 						["bag"] = container,
 						["slot"] = i,
@@ -461,7 +463,7 @@ local function indexBank()
 			end
 		end
 	end
-	if Skillet.db.profile.collect_details then
+	if collect then
 		Skillet.db.realm.bankDetails[player] = bank
 	else
 		--DA.DEBUG(2,"indexBank: Not collecting details")		
@@ -572,8 +574,6 @@ function Skillet:BAG_UPDATE(event, bagID)
 	end
 	if MerchantFrame and MerchantFrame:IsVisible() then
 		showing = true
-		-- may need to update the button on the merchant frame window ...
---		self:UpdateMerchantFrame()
 	end
 	if self.shoppingList and self.shoppingList:IsVisible() then
 		showing = true
@@ -591,10 +591,6 @@ function Skillet:BAG_UPDATE(event, bagID)
 			Skillet:BANK_UPDATE(event,bagID) -- Looks like an event but its not.
 		end
 	end
---
--- Schedule a fake BAG_UPDATE_DELAYED "event" just in case Blizzard forgets
---
-	self:ScheduleTimer("BAG_UPDATE_DELAYED",1.0)
 end
 
 --
@@ -603,10 +599,6 @@ end
 --
 function Skillet:BAG_UPDATE_DELAYED(event)
 	DA.TRACE("BAG_UPDATE_DELAYED")
---
--- Only need one event so cancel the fake if it exists.
---
-	self:CancelTimer("BAG_UPDATE_DELAYED")
 	if Skillet.bagsChanged and not UnitAffectingCombat("player") then
 		indexBags()
 		Skillet.bagsChanged = false
