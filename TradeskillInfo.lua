@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
 local GetItemInfo = C_Item and C_Item.GetItemInfo or GetItemInfo
+local GetItemIcon = C_Item and C_Item.GetItemIconByID or GetItemIcon
 
 -- This file contains code used to access recipe/tradeskill information
 

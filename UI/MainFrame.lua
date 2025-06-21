@@ -28,6 +28,8 @@ local GetAddOnMetadata = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetad
 local LoadAddOn = C_AddOns and C_AddOns.LoadAddOn or LoadAddOn
 local GetItemInfo = C_Item and C_Item.GetItemInfo or GetItemInfo
 local GetItemCount = C_Item and C_Item.GetItemCount or GetItemCount
+local GetItemIcon = C_Item and C_Item.GetItemIconByID or GetItemIcon
+local GetItemQualityColor = C_Item and C_Item.GetItemQualityColor or GetItemQualityColor
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
@@ -1892,16 +1894,16 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 -- Get the icon
 --
 	if Skillet.isCraft then
-		--DA.DEBUG(1,"UpdateDetailsWindow: texture from GetCraftIcon("..tostring(GetCraftIcon)..")")
+		DA.DEBUG(1,"UpdateDetailsWindow: texture from GetCraftIcon("..tostring(GetCraftIcon)..")")
 		texture = GetCraftIcon(skillIndex)
 	elseif recipe.itemID ~= 0 then
-		--DA.DEBUG(1,"UpdateDetailsWindow: texture from GetItemIcon("..tostring(recipe.itemID)..")")
+		DA.DEBUG(1,"UpdateDetailsWindow: texture from GetItemIcon("..tostring(recipe.itemID)..")")
 		texture = GetItemIcon(recipe.itemID)
 	elseif Skillet.db.profile.enchant_scrolls and recipe.scrollID ~= 0 and recipe.scrollID ~= nil then --for ring enchants recipe.scrollID is nil.
-		--DA.DEBUG(1,"UpdateDetailsWindow: texture from GetItemIcon("..tostring(recipe.scrollID)..")")
+		DA.DEBUG(1,"UpdateDetailsWindow: texture from GetItemIcon("..tostring(recipe.scrollID)..")")
 		texture = GetItemIcon(recipe.scrollID)
 	else
-		--DA.DEBUG(1,"UpdateDetailsWindow: texture from GetTradeSkillIcon("..tostring(GetTradeSkillIcon)..")")
+		DA.DEBUG(1,"UpdateDetailsWindow: texture from GetTradeSkillIcon("..tostring(GetTradeSkillIcon)..")")
 		texture = GetTradeSkillIcon(skillIndex)
 	end
 	if texture then

@@ -26,6 +26,15 @@ local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
 
 Skillet.NewsName = "Skillet-Classic News"
 Skillet.NewsData = {
+	{	version = "2.14",
+		data = {
+			{	name = "Fixes",
+				data = {
+					{ header = "All", body = "Add more C_Item." },
+				},
+			},
+		},
+	},
 	{	version = "2.13",
 		data = {
 			{	name = "Changes",
