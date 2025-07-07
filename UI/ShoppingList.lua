@@ -377,7 +377,7 @@ local function indexBags()
 					else
 						name = item						-- when all else fails, use the link
 					end
-					if collect and id then
+					if id then
 						table.insert(details, {
 							["bag"] = container,
 							["slot"] = i,
@@ -447,7 +447,7 @@ local function indexBank()
 				else
 					name = item						-- when all else fails, use the link
 				end
-				if collect and id then
+				if id then
 					table.insert(bank, {
 						["bag"] = container,
 						["slot"] = i,
