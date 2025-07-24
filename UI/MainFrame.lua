@@ -1150,6 +1150,7 @@ function Skillet:UpdateTradeSkillWindow()
 			end
 			--DA.DEBUG( if self.currentGroupLabel ~= "Blizzard" then DA.DEBUG(0,"skill.subGroup = "..tostring(skill.subGroup)) end
 			if skill.subGroup then
+				--DA.DEBUG(2,"skill.subGroup= "..DA.DUMP(skill.subGroup,1))
 				if SkillButtonNameEdit.originalButton ~= buttonText then
 					buttonText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, textAlpha)
 					countText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, textAlpha)
@@ -1167,6 +1168,8 @@ function Skillet:UpdateTradeSkillWindow()
 					else
 						name = skill.name.." (0)"
 					end
+					local groupIndex = skill.subGroup.groupIndex
+					DA.DEBUG(2,"name= "..tostring(name)..", groupIndex= "..tostring(groupIndex))
 					buttonText:SetText(name)      -- THIS IS A HEADER SO DON'T TRY TO USE THE RECIPE ID!
 					button:SetID(skillIndex or 0)
 					buttonExpand.group = skill.subGroup
@@ -1174,18 +1177,18 @@ function Skillet:UpdateTradeSkillWindow()
 					button:UnlockHighlight() -- headers never get highlighted
 					buttonExpand:Show()
 					local rankBarWidth = 0
---[[
-					local _, _, _, _, _, _,_,showProgressBar, currentRank, maxRank, startingRank  = GetTradeSkillInfo(skillIndex)
-					if ( showProgressBar ) then
-						skillRankBar:Show();
-						skillRankBar:SetMinMaxValues(startingRank,maxRank);
-						skillRankBar:SetValue(currentRank);
-						skillRankBar.currentRank = currentRank;
-						skillRankBar.maxRank = maxRank;
-						skillRankBar.Rank:SetText(currentRank.."/"..maxRank);
-						rankBarWidth = 60;
+					if groupIndex then
+						local _, _, _, _, _, _,_,showProgressBar, currentRank, maxRank, startingRank  = GetTradeSkillInfo(groupIndex)
+						if ( showProgressBar ) then
+							skillRankBar:Show();
+							skillRankBar:SetMinMaxValues(startingRank,maxRank);
+							skillRankBar:SetValue(currentRank);
+							skillRankBar.currentRank = currentRank;
+							skillRankBar.maxRank = maxRank;
+							skillRankBar.Rank:SetText(currentRank.."/"..maxRank);
+							rankBarWidth = 60;
+						end
 					end
-]]--
 					local button_width = button:GetTextWidth()
 					show_button(button, self.currentTrade, skillIndex, i)
 				end

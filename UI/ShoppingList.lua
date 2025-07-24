@@ -342,7 +342,6 @@ local function indexBags()
 	DA.TRACE("indexBags()")
 	local player = Skillet.currentPlayer
 	if player then
-		local collect = Skillet.db.profile.collect_details
 		local details = {}
 		local data = {}
 		local bags = {0,1,2,3,4}
@@ -393,7 +392,7 @@ local function indexBags()
 				end
 			end
 			Skillet.db.realm.bagData[player] = data
-			if collect then
+			if Skillet.db.profile.collect_details then
 				Skillet.db.realm.bagDetails[player] = details
 			else
 				--DA.DEBUG(2,"indexBags: Not collecting details")		
@@ -410,7 +409,6 @@ local function indexBank()
 --
 -- bankData is a count by item.
 --
-	local collect = Skillet.db.profile.collect_details
 	bank = {}
 	local player = Skillet.currentPlayer
 	local bankData = Skillet.db.realm.bankData[player]
@@ -463,7 +461,7 @@ local function indexBank()
 			end
 		end
 	end
-	if collect then
+	if Skillet.db.profile.collect_details then
 		Skillet.db.realm.bankDetails[player] = bank
 	else
 		--DA.DEBUG(2,"indexBank: Not collecting details")		
