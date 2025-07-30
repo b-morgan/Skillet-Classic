@@ -3639,7 +3639,7 @@ Skillet.db.global.SkillLevels = {
 [34721] = "350/375/392/410",
 [34722] = "400/400/430/470",
 }
--- .\SkillLineAbility.5.5.0.60802.lua
+-- .\SkillLineAbility.5.5.0.62258.lua
 Skillet.db.global.SkillLineAbility = {
 [2149] = '1/40/55/70',    -- Handstitched Leather Boots
 [2153] = '30/45/60/75',    -- Handstitched Leather Pants
@@ -9111,8 +9111,9 @@ Skillet.db.global.SkillLineAbility = {
 [1224167] = '1/525/530/535',    -- Vicious Fireweave Pants
 [1224168] = '1/525/530/535',    -- Vicious Fireweave Robe
 [1224169] = '1/515/520/525',    -- Vicious Fireweave Shoulders
+[1245411] = '1/540/552/565',    -- Venerable Potion of Invisibility
 }
--- .\SpellName.5.5.0.60802.lua
+-- .\SpellName.5.5.0.62258.lua
 Skillet.db.global.NameToSpellID = {
 ["Handstitched Leather Boots"] = 2149,
 ["Handstitched Leather Pants"] = 2153,
@@ -14580,5 +14581,6 @@ Skillet.db.global.NameToSpellID = {
 ["Vicious Fireweave Pants"] = 1224167,
 ["Vicious Fireweave Robe"] = 1224168,
 ["Vicious Fireweave Shoulders"] = 1224169,
+["Venerable Potion of Invisibility"] = 1245411,
 }
 end

@@ -1,8 +1,10 @@
 local addonName,addonTable = ...
-local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
-local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
-local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
-local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
+local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE -- 1
+local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC -- 2
+local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC -- 5
+local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC -- 11
+local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC -- 14
+local isMists = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC -- 19
 local DA
 if isRetail then
 	DA = _G[addonName] -- for DebugAids.lua
@@ -201,20 +203,6 @@ plugin.options =
 --			width = "full",
 			order = 20
 		},
---[[
-		alwaysEnchanting = {
-			type = "toggle",
-			name = "alwaysEnchanting",
-			desc = "Always show Enchanting profit (loss)",
-			get = function()
-				return Skillet.db.profile.plugins.ATR.alwaysEnchanting
-			end,
-			set = function(self,value)
-				Skillet.db.profile.plugins.ATR.alwaysEnchanting = value
-			end,
-			order = 21
-		},
---]]
 		calcProfitAhTax = {
 			type = "toggle",
 			name = "calcProfitAhTax",
@@ -459,6 +447,7 @@ local function GetBuyout(recipe)
 end
 
 local function GetReagentData(reagent)
+	--DA.DEBUG(0,"GetReagentData: reagent= "..DA.DUMP1(reagent))
 	local value = 0
 	local needed = 0
 	local custom = ""
@@ -510,6 +499,7 @@ local function GetReagentData(reagent)
 end
 
 local function AddExtraText(value, needed, id, name, custom)
+	DA.DEBUG(0,"AddExtraText("..tostring(value)..", "..tostring(needed)..", "..tostring(id)..", "..tostring(name)..", "..tostring(custom)..")")
 	if not Skillet:VendorSellsReagent(id) then
 --
 -- Not sold by a vendor so use the default
