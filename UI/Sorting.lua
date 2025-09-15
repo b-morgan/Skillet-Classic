@@ -185,6 +185,7 @@ local function SkillIsFilteredOut(skillIndex)
 	local recipe = Skillet:GetRecipe(skill.id)
 	--DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe,1))
 	local recipeID = recipe.spellID or 0
+	local searchResult = false
 	if recipeID == 0 then
 --
 -- It's a header, don't filter here
@@ -238,10 +239,15 @@ local function SkillIsFilteredOut(skillIndex)
 		DA.DEBUG(1,"Searching for '"..tostring(searchtext).."'")
 		local filter = string.lower(searchtext)
 		local nameOnly = false
+		local useAnd = false
+		local wordList
 		if string.sub(filter,1,1) == "!" then
 			filter = string.sub(filter,2)
 			--DA.DEBUG(1,"Searching nameOnly")
 			nameOnly = true
+		end
+		if string.find(filter,"+",1,true) then
+			useAnd = true
 		end
 		local word
 		local name = ""
@@ -332,18 +338,31 @@ local function SkillIsFilteredOut(skillIndex)
 		if searchText then 
 			DA.DEBUG(1,"Searching searchText= "..tostring(searchText))
 			searchText = string.lower(searchText)
-			local wordList = { string.split(" ",filter) }
+			if useAnd then
+				wordList = { string.split("+",filter) }
+			else
+				wordList = { string.split(" ",filter) }
+			end
+			DA.DEBUG(1,"useAnd= "..tostring(useAnd)..", wordList= "..DA.DUMP1(wordList))
+			local found = 0
 			for v,word in pairs(wordList) do
 				--DA.DEBUG(2,"word= '"..tostring(word).."'")
-				if string.find(searchText, word, 1, true) == nil then
-					--DA.DEBUG(2,"not found")
-					return true
+				if string.find(searchText, word, 1, true) then
+					found = found + 1
 				end
-				--DA.DEBUG(2,"found")
+			end
+			DA.DEBUG(2,"found= "..tostring(found))
+			if useAnd then
+				if found ~= #wordList then
+					searchResult = true
+				end
+			elseif found == 0 then
+				searchResult = true
 			end
 		end
 	end
-	return false
+	DA.DEBUG(1,"searchResult= "..tostring(searchResult))
+	return searchResult
 end
 
 local function set_sort_desc(toggle)
