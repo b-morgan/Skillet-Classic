@@ -569,11 +569,14 @@ end
 -- hide UI components that cannot be used for crafts and show that
 -- that are only applicable to trade skills, as needed
 --
-function Skillet:ConfigureRecipeControls()
-	--DA.DEBUG(0,"ConfigureRecipeControls()")
+function Skillet:ConfigureRecipeControls(enchant)
+	--DA.DEBUG(0,"ConfigureRecipeControls("..tostring(enchant)..")")
 	--DA.DEBUG(1,"ConfigureRecipeControls: build= "..tostring(Skillet.build)..", currentTrade= "..tostring(Skillet.currentTrade))
 	if self.queueCasting then
 		return
+	end
+	if enchant == nil then
+		enchant = Skillet.currentTrade == 7411
 	end
 	if Skillet.isCraft then
 		if Skillet.db.profile.queue_crafts then
@@ -603,7 +606,7 @@ function Skillet:ConfigureRecipeControls()
 			SkilletEnchantButton:Disable()		-- because DoCraft is restricted
 			SkilletEnchantButton:Show()
 		end
-	elseif Skillet.currentTrade == 7411 then
+	elseif enchant then
 		if Skillet.db.profile.queue_crafts then
 			SkilletQueueButton:Show()
 			SkilletEmptyQueueButton:Show()
@@ -1902,9 +1905,11 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 	elseif recipe.itemID ~= 0 then
 		DA.DEBUG(1,"UpdateDetailsWindow: texture from GetItemIcon("..tostring(recipe.itemID)..")")
 		texture = GetItemIcon(recipe.itemID)
+		self:ConfigureRecipeControls(false)
 	elseif Skillet.db.profile.enchant_scrolls and recipe.scrollID ~= 0 and recipe.scrollID ~= nil then --for ring enchants recipe.scrollID is nil.
 		DA.DEBUG(1,"UpdateDetailsWindow: texture from GetItemIcon("..tostring(recipe.scrollID)..")")
 		texture = GetItemIcon(recipe.scrollID)
+		self:ConfigureRecipeControls(true)
 	else
 		DA.DEBUG(1,"UpdateDetailsWindow: texture from GetTradeSkillIcon("..tostring(GetTradeSkillIcon)..")")
 		texture = GetTradeSkillIcon(skillIndex)
@@ -3182,30 +3187,28 @@ local function SkillMenuList(SkilletSkillMenu, rootDescription)
 		rootDescription:CreateButton(L["Link Recipe"], function() Skillet:SkillButton_LinkRecipe() end);
 	end
 	rootDescription:CreateButton(L["Wowhead URL"], function() Skillet:SkillButton_WowheadURL() end);
-	if not Skillet.isLocked then
-		local submenu1 = rootDescription:CreateButton(L["Ignore"]);
-			submenu1:CreateButton(L["Add Recipe to Ignored List"], function()
-				local index = Skillet.menuButton:GetID()
-				local skillDB = Skillet.db.realm.skillDB[Skillet.currentPlayer][Skillet.currentTrade][index]
-				local recipeID = string.sub(skillDB,2)
-				Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeID] = Skillet.currentTrade
-				if Skillet.ignoreList and Skillet.ignoreList:IsVisible() then
-					Skillet:UpdateIgnoreListWindow()
-				end
-			end);
-			submenu1:CreateButton(L["Remove Recipe from Ignored List"], function()
-				local index = Skillet.menuButton:GetID()
-				local skillDB = Skillet.db.realm.skillDB[Skillet.currentPlayer][Skillet.currentTrade][index]
-				local recipeID = string.sub(skillDB,2)
-				Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeID] = nil
-				if Skillet.ignoreList and Skillet.ignoreList:IsVisible() then
-					Skillet:UpdateIgnoreListWindow()
-				end
-			end);
-		local submenu2 = rootDescription:CreateButton(L["New Group"]);
-			submenu2:CreateButton(L["Empty Group"], function() Skillet:SkillButton_NewGroup() end);
-			submenu2:CreateButton(L["From Selection"], function() Skillet:SkillButton_MakeGroup() end);
-	end
+	local submenu1 = rootDescription:CreateButton(L["Ignore"]);
+		submenu1:CreateButton(L["Add Recipe to Ignored List"], function()
+			local index = Skillet.menuButton:GetID()
+			local skillDB = Skillet.db.realm.skillDB[Skillet.currentPlayer][Skillet.currentTrade][index]
+			local recipeID = string.sub(skillDB,2)
+			Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeID] = Skillet.currentTrade
+			if Skillet.ignoreList and Skillet.ignoreList:IsVisible() then
+				Skillet:UpdateIgnoreListWindow()
+			end
+		end);
+		submenu1:CreateButton(L["Remove Recipe from Ignored List"], function()
+			local index = Skillet.menuButton:GetID()
+			local skillDB = Skillet.db.realm.skillDB[Skillet.currentPlayer][Skillet.currentTrade][index]
+			local recipeID = string.sub(skillDB,2)
+			Skillet.db.realm.userIgnoredMats[Skillet.currentPlayer][recipeID] = nil
+			if Skillet.ignoreList and Skillet.ignoreList:IsVisible() then
+				Skillet:UpdateIgnoreListWindow()
+			end
+		end);
+	local submenu2 = rootDescription:CreateButton(L["New Group"]);
+		submenu2:CreateButton(L["Empty Group"], function() Skillet:SkillButton_NewGroup() end);
+		submenu2:CreateButton(L["From Selection"], function() Skillet:SkillButton_MakeGroup() end);
 	rootDescription:CreateDivider(); -- CreateSpacer, CreateDivider
 	rootDescription:CreateButton(L["Copy"], function() Skillet:SkillButton_CopySelected() end);
 	if not Skillet.isLocked then
