@@ -236,6 +236,21 @@ local function SkillIsFilteredOut(skillIndex)
 --
 	local searchtext = Skillet:GetTradeSkillOption("searchtext")
 	if searchtext and searchtext ~= "" then
+		if not Skillet.db.global.tooltipCache then
+			Skillet.db.global.tooltipCache = {}
+		end
+		if not Skillet.db.global.tooltipCache[Skillet.currentTrade] then
+			Skillet.db.global.tooltipCache[Skillet.currentTrade] = {}
+		end
+		local tooltipCache = Skillet.db.global.tooltipCache[Skillet.currentTrade]
+		if not Skillet.db.global.tooltipCount then
+			Skillet.db.global.tooltipCount = {}
+		end
+		if not Skillet.db.global.tooltipCount[Skillet.currentTrade] then
+			Skillet.db.global.tooltipCount[Skillet.currentTrade] = {}
+		end
+		local tooltipCount = Skillet.db.global.tooltipCount[Skillet.currentTrade]
+
 		DA.DEBUG(1,"Searching for '"..tostring(searchtext).."'")
 		local filter = string.lower(searchtext)
 		local nameOnly = false
@@ -262,12 +277,7 @@ local function SkillIsFilteredOut(skillIndex)
 		DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe))
 		if not nameOnly then
 			DA.DEBUG(1,"Searching name and tooltip")
-			if not Skillet.data.tooltipCache or Skillet.data.tooltipCachedTrade ~= Skillet.currentTrade then
-				DA.DEBUG(1,"Reset tooltipCache")
-				Skillet.data.tooltipCachedTrade = Skillet.currentTrade
-				Skillet.data.tooltipCache = {}
-			end
-			if not Skillet.data.tooltipCache[recipeID] then
+			if not tooltipCache[recipeID] then
 				DA.DEBUG(1,"Setup tooltipCache["..tostring(recipeID).."]")
 				if skillIndex then
 					if Skillet.isCraft then
@@ -281,6 +291,7 @@ local function SkillIsFilteredOut(skillIndex)
 						if about then
 							searchText = searchText.." "..string.lower(tostring(about))
 						end
+						tiplines = -1
 					elseif Skillet.currentTrade == 7411 then
 						DA.DEBUG(1,"skillIndex= "..tostring(skillIndex).." ("..tostring(recipe.name)..")")
 						local desc = GetTradeSkillDescription(skillIndex)
@@ -288,6 +299,7 @@ local function SkillIsFilteredOut(skillIndex)
 							DA.DEBUG(1,"desc= "..tostring(desc))
 							searchText = searchText.." "..string.lower(desc)
 						end
+						tiplines = -1
 					else
 						DA.DEBUG(1,"skillIndex= "..tostring(skillIndex).." ("..tostring(recipe.name)..")")
 						local link = GetTradeSkillItemLink(skillIndex)
@@ -300,15 +312,6 @@ local function SkillIsFilteredOut(skillIndex)
 						tooltip:ClearAllPoints()
 						tooltip:SetTradeSkillItem(skillIndex)
  						tiplines = tooltip:NumLines()
-						if tiplines == 0 then
-							if link then
-								DA.DEBUG(1,"link= "..DA.PLINK(link))
-								tooltip:SetHyperlink(link)
-							else
-								DA.DEBUG(1,"no link found")
-							end
-							tiplines = tooltip:NumLines()
-						end
  						DA.DEBUG(1,"Found "..tostring(tiplines).." tiplines")
 						for i=1, tiplines, 1 do
 							searchText = searchText.." "..string.lower(_G["SkilletParsingTooltipTextLeft"..i]:GetText() or " ")
@@ -327,12 +330,16 @@ local function SkillIsFilteredOut(skillIndex)
 					end
 				end
 				if tiplines ~= 0 then
-					DA.DEBUG(1,"Setting searchText".."tiplines= "..tostring(tiplines))
-					Skillet.data.tooltipCache[recipeID] = searchText
+					DA.DEBUG(1,"Setting tooltipCache".."tiplines= "..tostring(tiplines))
+					tooltipCache[recipeID] = searchText
+				end
+				if tiplines > 0 then
+					DA.DEBUG(1,"Setting tooltipCount".."tiplines= "..tostring(tiplines))
+					tooltipCount[recipeID] = tiplines
 				end
 			else
 				DA.DEBUG(1,"Using tooltipCache["..tostring(recipeID).."]")
-				searchText = Skillet.data.tooltipCache[recipeID]
+				searchText = tooltipCache[recipeID]
 			end
 		end
 		if searchText then 
