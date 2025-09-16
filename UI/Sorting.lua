@@ -274,10 +274,13 @@ local function SkillIsFilteredOut(skillIndex)
 			tooltip = CreateFrame("GameTooltip", "SkilletParsingTooltip", _G["ANCHOR_NONE"], "GameTooltipTemplate")
 			tooltip:SetOwner(WorldFrame, "ANCHOR_NONE");
 		end
-		DA.DEBUG(1,"recipe= "..DA.DUMP1(recipe))
 		if not nameOnly then
-			DA.DEBUG(1,"Searching name and tooltip")
-			if not tooltipCache[recipeID] then
+			--DA.DEBUG(1,"Searching name and tooltip")
+--
+-- If no entry exists or if the entry doesn't have any tooltip data then
+-- create (or update) an entry for this recipeID
+--
+			if not tooltipCache[recipeID] or tooltipCount[recipeID] == 0 then
 				DA.DEBUG(1,"Setup tooltipCache["..tostring(recipeID).."]")
 				if skillIndex then
 					if Skillet.isCraft then
@@ -302,17 +305,18 @@ local function SkillIsFilteredOut(skillIndex)
 						tiplines = -1
 					else
 						DA.DEBUG(1,"skillIndex= "..tostring(skillIndex).." ("..tostring(recipe.name)..")")
-						local link = GetTradeSkillItemLink(skillIndex)
-						local itemName
-						if link then
-							itemName = GetItemInfo(link)
-						elseif recipe.itemID then
-							itemName = GetItemInfo(recipe.itemID)
-						end
 						tooltip:ClearAllPoints()
 						tooltip:SetTradeSkillItem(skillIndex)
  						tiplines = tooltip:NumLines()
  						DA.DEBUG(1,"Found "..tostring(tiplines).." tiplines")
+--
+-- If at first you don't succeed, try again!
+--
+						if tiplines == 0 then
+							tooltip:SetTradeSkillItem(skillIndex)
+							tiplines = tooltip:NumLines()
+							DA.DEBUG(1,"Found(2) "..tostring(tiplines).." tiplines")
+						end
 						for i=1, tiplines, 1 do
 							searchText = searchText.." "..string.lower(_G["SkilletParsingTooltipTextLeft"..i]:GetText() or " ")
 							searchText = searchText.." "..string.lower(_G["SkilletParsingTooltipTextRight"..i]:GetText() or " ")
@@ -324,7 +328,7 @@ local function SkillIsFilteredOut(skillIndex)
 						local reagent = recipe.reagentData[i]
 						if reagent then
 							local itemName = GetItemInfo(reagent.id) or reagent.id
-							DA.DEBUG(1,"Adding '"..tostring(itemName).."'")
+							--DA.DEBUG(2,"Adding '"..tostring(itemName).."'")
 							searchText = searchText.." "..string.lower(itemName)
 						end
 					end
@@ -339,6 +343,9 @@ local function SkillIsFilteredOut(skillIndex)
 				end
 			else
 				DA.DEBUG(1,"Using tooltipCache["..tostring(recipeID).."]")
+--
+-- tooltipCache already includes the recipe.name
+--
 				searchText = tooltipCache[recipeID]
 			end
 		end
@@ -351,6 +358,9 @@ local function SkillIsFilteredOut(skillIndex)
 				wordList = { string.split(" ",filter) }
 			end
 			DA.DEBUG(1,"useAnd= "..tostring(useAnd)..", wordList= "..DA.DUMP1(wordList))
+--
+-- Count the number of words found
+--
 			local found = 0
 			for v,word in pairs(wordList) do
 				--DA.DEBUG(2,"word= '"..tostring(word).."'")
@@ -358,7 +368,13 @@ local function SkillIsFilteredOut(skillIndex)
 					found = found + 1
 				end
 			end
-			DA.DEBUG(2,"found= "..tostring(found))
+			--DA.DEBUG(2,"found= "..tostring(found))
+--
+-- If the separator was "+" then all the words must be found
+-- If the separator was " " then any word must be found
+-- Note: searchResult is true if this skillIndex should be removed and
+--   false if this skillIndex should be kept
+--
 			if useAnd then
 				if found ~= #wordList then
 					searchResult = true
