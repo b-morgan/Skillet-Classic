@@ -547,7 +547,7 @@ end
 -- can be caused by incomplete data in our cache.
 --
 function Skillet:FlushTooltipData()
-	DA.DEBUG(0,"FlushDetailData()");
+	DA.DEBUG(0,"FlushTooltipData()");
 	Skillet.db.global.tooltipCache = {}
 	Skillet.db.global.tooltipCount = {}
 end
