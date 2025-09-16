@@ -473,9 +473,11 @@ function Skillet:FlushAllData()
 	Skillet.db.realm.bankData = {}
 	Skillet.db.realm.bankDetails = {}
 	Skillet.db.realm.userIgnoredMats = {}
+	Skillet:FlushPlayerData()
 	Skillet:FlushCustomData()
 	Skillet:FlushQueueData()
 	Skillet:FlushRecipeData()
+	Skillet:FlushDetailData()
 end
 
 --
@@ -532,6 +534,8 @@ function Skillet:FlushRecipeData()
 	Skillet.db.global.recipeDB = {}
 	Skillet.db.global.itemRecipeUsedIn = {}
 	Skillet.db.global.itemRecipeSource = {}
+	Skillet.db.global.tooltipCache = {}
+	Skillet.db.global.tooltipCount = {}
 	Skillet.db.realm.skillDB = {}
 	Skillet.db.realm.subClass = {}
 	Skillet.db.realm.invSlot = {}
