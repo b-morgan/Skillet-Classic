@@ -543,6 +543,16 @@ function Skillet:FlushRecipeData()
 end
 
 --
+-- Failures when searching for words in the tooltip
+-- can be caused by incomplete data in our cache.
+--
+function Skillet:FlushTooltipData()
+	DA.DEBUG(0,"FlushDetailData()");
+	Skillet.db.global.tooltipCache = {}
+	Skillet.db.global.tooltipCount = {}
+end
+
+--
 -- Detailed contents of the bags, bank, and guildbank
 -- can take a lot of space so clearing these tables
 -- can free that up.

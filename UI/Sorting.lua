@@ -676,3 +676,15 @@ function Skillet:SortDropdown_OnClick()
 	Skillet:SortAndFilterRecipes()
 	Skillet:UpdateTradeSkillWindow()
 end
+
+--
+-- Called when shift-clicking the SkilletSearchClear button
+-- to clear the tooltipCache for this profession
+--
+function Skillet:ClearTooltipCache()
+	DA.DEBUG(0,"ClearTooltipCache()"..", currentTrade= "..tostring(Skillet.currentTrade))
+	if Skillet.currentTrade and Skillet.db.global.tooltipCache then
+		Skillet.db.global.tooltipCache[Skillet.currentTrade] = {}
+		Skillet.db.global.tooltipCount[Skillet.currentTrade] = {}
+	end
+end	

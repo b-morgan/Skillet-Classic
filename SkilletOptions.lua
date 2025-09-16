@@ -802,6 +802,19 @@ Skillet.options =
 			end,
 			order = 58
 		},
+		flushtooltipdata = {
+			type = 'execute',
+			name = "Flush Tooltip Data",
+			desc = "Clear the Tooltip Cache",
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:FlushTooltipData()
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
+				end
+			end,
+			order = 59
+		},
 		flushdetaildata = {
 			type = 'execute',
 			name = "Flush Detail Data",

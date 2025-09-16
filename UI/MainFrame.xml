@@ -1150,7 +1150,9 @@
 						Skillet:InventoryFilterButtons_Hide()
 						SkilletSearchBox:SetText("")
 						SkilletSearchBox:ClearFocus()
-						Skillet.data.tooltipCache = {}
+						if IsShiftKeyDown() then
+							Skillet:ClearTooltipCache()
+						end
 					</OnClick>
 				</Scripts>
 			</Button>
