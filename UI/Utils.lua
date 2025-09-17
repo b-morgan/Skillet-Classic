@@ -24,7 +24,7 @@ local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
 -- Handy utilities for Skillet UI methods.
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
-local Dialog = LibStub("LibDialog-1.0")
+-- local Dialog = LibStub("LibDialog-1.0")
 
 local infoBox
 -- Stolen from the AceAddon about frame code. Just too useful
@@ -291,6 +291,7 @@ function Skillet:Tooltip_ShowCompareItem(tip, link, sideOverride)
 ]]--
 end
 
+--[[
 Dialog:Register("SKILLETMSG", {
 	text = "",
 	on_show = function(self, data)
@@ -310,7 +311,26 @@ function Skillet:MessageBox(msg)
 		msg = msg,
 	})
 end
+]]--
 
+StaticPopupDialogs["SKILLETMSG"] = {
+	text = "",
+	button1 = OKAY,
+	OnAccept = function( self )
+		return
+	end,
+	timeout = 0,
+	exclusive = 1,
+	whileDead = 1,
+	hideOnEscape = 1
+};
+
+function Skillet:MessageBox(msg)
+	StaticPopupDialogs.SKILLETMSG.text = msg
+	StaticPopup_Show("SKILLETMSG")
+end
+
+--[[
 Dialog:Register("SKILLETASKFOR", {
 	text = "",
 	on_show = function(self, data)
@@ -336,4 +356,23 @@ function Skillet:AskFor(msg, handler)
 		msg = msg,
 		handler = handler,
 	})
+end
+]]--
+
+StaticPopupDialogs["SKILLETASKFOR"] = {
+	text = "",
+	button1 = OKAY,
+	OnAccept = function( self )
+		return
+	end,
+	timeout = 0,
+	exclusive = 1,
+	whileDead = 1,
+	hideOnEscape = 1
+};
+
+function Skillet:AskFor(msg, handler)
+	StaticPopupDialogs.SKILLETASKFOR.text = msg
+	StaticPopupDialogs.SKILLETASKFOR.OnAccept = handler
+	StaticPopup_Show("SKILLETASKFOR")
 end

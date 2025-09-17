@@ -23,8 +23,8 @@
 ## X-Website: https://www.curseforge.com/wow/addons/skillet-classic
 ## SavedVariables: SkilletDB
 ## SavedVariablesPerCharacter: SkilletWho, SkilletDBPC, SkilletMemory, SkilletProfile
-## OptionalDeps: Ace3, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1, TradeSkillMaster, Auctionator, MissingTradeSkillsList, BeanCounter, DataStore, Journalator, CraftInfoAnywhere
-## X-Embeds: Ace3, LibStub, CallbackHandler-1.0, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1
+## OptionalDeps: Ace3, LibWindow-1.1, LibPeriodicTable-3.1, TradeSkillMaster, Auctionator, MissingTradeSkillsList, BeanCounter, DataStore, Journalator, CraftInfoAnywhere
+## X-Embeds: Ace3, LibStub, CallbackHandler-1.0, LibWindow-1.1, LibPeriodicTable-3.1
 
 ## LoadManagers: AddonLoader
 ## X-LoadOn-Always: delayed
