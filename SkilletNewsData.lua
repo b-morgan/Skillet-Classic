@@ -32,6 +32,7 @@ Skillet.NewsData = {
 				data = {
 					{ header = "Searching", body = "Update Tooltip data collection\nUse '+' in Search for 'and'" },
 					{ header = "Enchanting", body = "Update Detail Buttons on a per recipe basis" },
+					{ header = "Packaging", body = "Remove LibDialog" },
 				},
 			},
 		},
