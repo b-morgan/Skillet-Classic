@@ -1,10 +1,10 @@
-## Interface: 11507, 50500, 50501
+## Interface: 11507
 ## Title: Skillet-Classic |cff7fff7f -Ace3-|r
 ## Notes: A replacement tradeskill window
 ## Notes-esES: Una sustitucion de la ventana de Habilidades de Comercio
 ## Notes-ruRU: Заменяет окно профессий на более функциональное.
 ## Author: bsmorgan
-## Version: @project-version@
+## Version: 2.18-alpha8
 ## Category-enUS: Professions
 ## Category-deDE: Berufe
 ## Category-esES: Profesiones
@@ -75,10 +75,7 @@ TradeskillInfo.lua
 SkilletQueue.lua
 Upgrades.lua
 SkillLevelData.lua
-SkillLevelData1.lua [AllowLoadGameType vanilla]
-## SkillLevelData2.lua
-SkillLevelData4.lua	[AllowLoadGameType cata]
-SkillLevelData5.lua [AllowLoadGameType classic]
+SkillLevelData1.lua
 RecipeGroups.lua
 Inventory.lua
 SkilletPlugin.lua
