@@ -17,11 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
-local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
-local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
-local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
-local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
-local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
+local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE -- 1
+local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC -- 2
+local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC -- 5
+local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC -- 11
+local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC -- 14
+local isMists = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC -- 19
 
 local IsAddOnLoaded = C_AddOns and C_AddOns.IsAddOnLoaded or IsAddOnLoaded
 local GetAddOnMetadata = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
@@ -2329,36 +2330,36 @@ end
 -- Inspired by Kaliel's Tracker
 --
 StaticPopupDialogs["SKILLET_WowheadURL"] = {
-    text = "Skillet - Wowhead URL",
-    button2 = CLOSE,
-    hasEditBox = 1,
-    editBoxWidth = 300,
-    EditBoxOnTextChanged = function(self)
-        self:SetText(self.text)
-        self:HighlightText()
-    end,
-    EditBoxOnEnterPressed = function(self)
-        self:GetParent():Hide()
-    end,
-    EditBoxOnEscapePressed = function(self)
-        self:GetParent():Hide()
-    end,
-    OnShow = function(self)
-        local url = "https://www.wowhead.com/"
-		if WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
+	text = "Skillet - Wowhead URL",
+	button2 = CLOSE,
+	hasEditBox = 1,
+	editBoxWidth = 300,
+	EditBoxOnTextChanged = function(self)
+		self:HighlightText()
+	end,
+	EditBoxOnEnterPressed = function(self)
+		self:GetParent():Hide()
+	end,
+	EditBoxOnEscapePressed = function(self)
+		self:GetParent():Hide()
+	end,
+	OnShow = function(self)
+		local textFrame = self.Text or self.text
+		local editBox = self.EditBox or self.editBox
+		local url = "https://www.wowhead.com/"
+		if isClassic then
 			url = url.."classic/"
-		elseif WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC then
-			url = url.."cata/"
+		elseif isMists then
+			url = url.."mop-classic/"
 		end
-        local param = "item="..self.text.text_arg1
-        self.text:SetText(self.text:GetText().."\n\n"..self.text.text_arg2)
-        self.editBox.text = url..param
-        self.editBox:SetText(self.editBox.text)
-        self.editBox:SetFocus()
-    end,
-    timeout = 0,
-    whileDead = 1,
-    hideOnEscape = 1
+		local param = "item="..textFrame.text_arg1
+		textFrame:SetText(textFrame:GetText().."\n\n"..textFrame.text_arg2)
+		editBox:SetText(url..param)
+		editBox:SetFocus()
+	end,
+	timeout = 0,
+	whileDead = 1,
+	hideOnEscape = 1
 }
 
 --
