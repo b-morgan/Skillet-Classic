@@ -953,6 +953,19 @@ Skillet.options =
 			end,
 			order = 68
 		},
+		printallqueues = {
+			type = 'execute',
+			name = "PrintAllQueues",
+			desc = "Print All Player Queues",
+			func = function()
+				if not (UnitAffectingCombat("player")) then
+					Skillet:PrintAllQueues()
+				else
+					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
+				end
+			end,
+			order = 68
+		},
 		printsavedqueue = {
 			type = 'input',
 			name = "PrintSavedQueue",

@@ -238,8 +238,8 @@ function Skillet:RemoveFromQueue(index)
 			reagentsInQueue[reagent.id] = (reagentsInQueue[reagent.id] or 0) + (reagent.numNeeded or 0) * command.count
 		end
 	end
-	if self.skippedQueue[index] then
-		self.skippedQueue[index] = nil
+	if command.skipped then
+		command.skipped = nil
 	end
 	table.remove(queue, index)
 	self:AdjustInventory()
@@ -250,7 +250,6 @@ function Skillet:ClearQueue()
 	DA.DEBUG(0,"ClearQueue()")
 	if #self.db.realm.queueData[self.currentPlayer] > 0 then
 		self.db.realm.queueData[self.currentPlayer] = {}
-		self.skippedQueue = {}
 		self.db.realm.reagentsInQueue[self.currentPlayer] = {}
 		self:UpdateTradeSkillWindow()
 	end
@@ -278,18 +277,30 @@ end
 --
 -- Prints the contents of the queue name or the current queue
 --
-function Skillet:PrintQueue(name)
-	DA.DEBUG(0,"PrintQueue("..tostring(name)..")");
+function Skillet:PrintQueue(name, player)
+	DA.DEBUG(0,"PrintQueue("..tostring(name)..", "..tostring(player)..")")
 	local queue
 	if name then
 		DA.MARK2("name= "..tostring(name))
 		queue = self.db.profile.SavedQueues[name].queue
+	elseif player then
+		queue = self.db.realm.queueData[player]
 	else
 		queue = self.db.realm.queueData[self.currentPlayer]
 	end
 	if queue then
 		for qpos,command in pairs(queue) do
-			DA.MARK2("qpos= "..tostring(qpos)..", skipped= "..tostring(self.skippedQueue[qpos])..", command= "..DA.DUMP1(command))
+			DA.MARK2("qpos= "..tostring(qpos)..", command= "..DA.DUMP1(command))
+		end
+	end
+end
+
+function Skillet:PrintAllQueues()
+	DA.DEBUG(0,"PrintAllQueues()")
+	for player,queue in pairs(self.db.realm.queueData) do
+		if #queue > 0 then
+			DA.MARK2("player= "..tostring(player))
+			self:PrintQueue(nil,player)
 		end
 	end
 end
@@ -301,7 +312,6 @@ function Skillet:ProcessQueue(altMode)
 	local skillIndexLookup = self.data.skillIndexLookup[self.currentPlayer]
 	self.processingPosition = nil
 	self.processingCommand = nil
-	self.skippedQueue = {}
 	local command
 --
 -- If any plugins have registered a ProcessQueue function, call it now
@@ -327,7 +337,7 @@ function Skillet:ProcessQueue(altMode)
 				end
 				if cooldown then
 					Skillet:Print(L["Skipping"],recipe.name,"-",L["has cooldown of"],SecondsToTime(cooldown))
-					self.skippedQueue[qpos] = true
+					command.skipped = true
 					craftable = false
 				else
 					for i=1,#recipe.reagentData,1 do
@@ -340,7 +350,7 @@ function Skillet:ProcessQueue(altMode)
 						--DA.DEBUG(1,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
 						if numInBags < reagent.numNeeded then
 							Skillet:Print(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded,"x",reagentName,"("..L["have"],numInBags..")")
-							self.skippedQueue[qpos] = true
+							command.skipped = true
 							craftable = false
 							break
 						end
@@ -371,13 +381,13 @@ function Skillet:ProcessQueue(altMode)
 			local tradeID = command.tradeID
 			local tradeName = command.tradeName
 			local recipeIndex = command.recipeIndex
-			local verifyIndex = self.data.skillIndexLookup[self.currentPlayer][recipeID]
-			if recipeIndex ~= verifyIndex then
-				DA.WARN("recipeIndex= "..tostring(recipeIndex).." and verifyIndex= "..tostring(verifyIndex).." do not match")
-				self.queueCasting = false
-				self:RemoveFromQueue(qpos)
-				return
-			end
+--			local verifyIndex = self.data.skillIndexLookup[self.currentPlayer][recipeID]
+--			if recipeIndex ~= verifyIndex then
+--				DA.WARN("recipeIndex= "..tostring(recipeIndex).." and verifyIndex= "..tostring(verifyIndex).." do not match")
+--				self.queueCasting = false
+--				self:RemoveFromQueue(qpos)
+--				return
+--			end
 			local count = command.count
 			local itemID, missN
 			if self.currentTrade ~= tradeID and tradeName then
@@ -701,7 +711,7 @@ function Skillet:StopCast(spell, success)
 -- empty queue or command not found (removed?)
 --
 			if not queue[1] or not command then
-				DA.DEBUG(0,"StopCast empty queue[1]= "..tostring(queue[1])..", command= "..tostring(command))
+				DA.DEBUG(0,"StopCast empty queue[1]= "..tostring(queue[1])..", command= "..DA.DUMP1(command))
 				self.queueCasting = false
 				self.processingSpell = nil
 				self.processingPosition = nil
@@ -740,7 +750,7 @@ function Skillet:StopCast(spell, success)
 			self.processingSpell = nil
 			self.processingPosition = nil
 			self.processingCommand = nil
-			if self.db.profile.interrupt_clears_queue and qpos and not self.skippedQueue[qpos] then -- if qpos and not self.pauseQueue then
+			if self.db.profile.interrupt_clears_queue and qpos and command and not command.skipped then -- if qpos and not self.pauseQueue then
 				self:RemoveFromQueue(qpos)
 				DA.DEBUG(0,"removed failed queue command at "..tostring(qpos))
 			end
