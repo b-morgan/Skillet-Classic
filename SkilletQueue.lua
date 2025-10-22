@@ -290,7 +290,7 @@ function Skillet:PrintQueue(name, player)
 	end
 	if queue then
 		for qpos,command in pairs(queue) do
-			DA.MARK2("qpos= "..tostring(qpos)..", command= "..DA.DUMP1(command))
+			DA.MARK2("qpos= "..tostring(qpos)..", command= "..DA.DUMP(command))
 		end
 	end
 end
@@ -381,13 +381,6 @@ function Skillet:ProcessQueue(altMode)
 			local tradeID = command.tradeID
 			local tradeName = command.tradeName
 			local recipeIndex = command.recipeIndex
---			local verifyIndex = self.data.skillIndexLookup[self.currentPlayer][recipeID]
---			if recipeIndex ~= verifyIndex then
---				DA.WARN("recipeIndex= "..tostring(recipeIndex).." and verifyIndex= "..tostring(verifyIndex).." do not match")
---				self.queueCasting = false
---				self:RemoveFromQueue(qpos)
---				return
---			end
 			local count = command.count
 			local itemID, missN
 			if self.currentTrade ~= tradeID and tradeName then
