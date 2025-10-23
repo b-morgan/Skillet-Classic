@@ -1525,6 +1525,7 @@ function Skillet:ChangeTradeSkill(tradeID, tradeName)
 				self.closingTrade = true
 				self:SkilletClose()
 				StaticPopup_Show("SKILLET_IGNORE_CHANGE")
+				Skillet:SkilletFrameForceClose()
 				return
 			end
 		end
