@@ -869,6 +869,10 @@ function Skillet:UpdateTradeButtons(player)
 	if not Skillet.AdditionalButtonsList then
 		self:CreateAdditionalButtonsList()
 	end
+	if not Skillet.AdditionalButton then
+		Skillet.AdditionalButton = {}
+		Skillet.AdditionalMacrotext = {}
+	end
 --
 -- Iterate thru the list of additional skills and add buttons for each one
 --
@@ -888,12 +892,22 @@ function Skillet:UpdateTradeButtons(player)
 			button = CreateFrame("Button", buttonName, frame, "SkilletTradeButtonAdditionalTemplate")
 			button:SetID(additionalSpellId)
 --
+-- For now, Thermal Anvil gets special treatment
+--
+			if additionalSpellId == 126462 then
+				button:SetAttribute("type", "macro");
+				local macrotext = Skillet:GetAutoTargetMacro(additionalSpellId)
+				button:SetAttribute("macrotext", macrotext)
+				Skillet.AdditionalMacrotext[i] = macrotext
+			else
+--
 -- no modifier - pure spell
 --
-			button:SetAttribute("type1", "spell");
-			button:SetAttribute("type2", "macro");
-			button:SetAttribute("alt-type*", "macro");
-			button:SetAttribute("spell", additionalSpellId);
+				button:SetAttribute("type1", "spell");
+				button:SetAttribute("type2", "macro");
+				button:SetAttribute("alt-type*", "macro");
+				button:SetAttribute("spell", additionalSpellId);
+			end
 		end
 		button:ClearAllPoints()
 		button:SetPoint("BOTTOMLEFT", SkilletRankFrame, "TOPLEFT", position, 3)
@@ -901,6 +915,7 @@ function Skillet:UpdateTradeButtons(player)
 		buttonIcon:SetTexture(spellIcon)
 		position = position + button:GetWidth()
 		button:Show()
+		Skillet.AdditionalButton[i] = button
 	end
 	--DA.DEBUG(3,"UpdateTradeButtons complete")
 end

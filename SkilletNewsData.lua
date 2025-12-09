@@ -27,6 +27,15 @@ local isMists = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC -- 19
 
 Skillet.NewsName = "Skillet-Classic News"
 Skillet.NewsData = {
+	{	version = "2.24",
+		data = {
+			{	name = "Changes",
+				data = {
+					{ header = "UI", body = "Fix Thermal Anvil" },
+				},
+			},
+		},
+	},
 	{	version = "2.23",
 		data = {
 			{	name = "Changes",
