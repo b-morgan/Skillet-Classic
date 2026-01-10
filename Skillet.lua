@@ -384,6 +384,9 @@ function Skillet:OnInitialize()
 		self.db.global.NameToSpellID = {}
 		initSkillLevels = true
 	end
+	if not Skillet.SkillLevelVersion then
+		initSkillLevels = true
+	end
 	if initSkillLevels then
 		self:InitializeSkillLevels()
 	end
@@ -855,7 +858,7 @@ function Skillet:OnEnable()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("NEW_RECIPE_LEARNED") -- arg1 = recipeID
 	self:RegisterEvent("SKILL_LINES_CHANGED") -- replacement for CHAT_MSG_SKILL?
-	self:RegisterEvent("LEARNED_SPELL_IN_TAB") -- arg1 = professionID
+--	self:RegisterEvent("LEARNED_SPELL_IN_TAB") -- arg1 = professionID
 
 	self:RegisterEvent("ADDON_ACTION_BLOCKED")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
