@@ -22,6 +22,7 @@ local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
 local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
 local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
 local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
+local isMists = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC
 
 --
 -- Our own tables of skill levels:
@@ -60,6 +61,7 @@ local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
 -- or '/run Skillet:InitializeSkillLevels()'
 -- or '/run Skillet.db.global.SkillLevels = nil'
 --
+
 function Skillet:InitializeSkillLevels()
 Skillet.SkillLevelVersion = 4
 Skillet.db.global.SkillLineAbility_era = nil	-- obsolete
@@ -3637,6 +3639,7 @@ Skillet.db.global.SkillLevels = {
 [34721] = "350/375/392/410",
 [34722] = "400/400/430/470",
 }
+-- SkillLineAbility.4.4.2.60192.lua
 Skillet.db.global.SkillLineAbility = {
 [2149] = '1/40/55/70',    -- Handstitched Leather Boots
 [2153] = '30/45/60/75',    -- Handstitched Leather Pants
@@ -8075,6 +8078,7 @@ Skillet.db.global.SkillLineAbility = {
 [1224219] = '1/525/530/535',    -- Fireweave Robe
 [1224212] = '1/515/520/525',    -- Fireweave Shoulders
 }
+-- SpellName.4.4.2.60192.lua
 Skillet.db.global.NameToSpellID = {
 ["Handstitched Leather Boots"] = 2149,
 ["Handstitched Leather Pants"] = 2153,
@@ -10420,7 +10424,7 @@ Skillet.db.global.NameToSpellID = {
 ["Elixir of Protection"] = 54220,
 ["Potion of Speed"] = 54221,
 ["Potion of Wild Magic"] = 54222,
-['Mark "S" Boomstick'] = 54353,
+["Mark \"S\" Boomstick"] = 54353,
 ["Rune of Spellbreaking"] = 54447,
 ["Rune of Swordbreaking"] = 54446,
 ["Cobalt Triangle Shield"] = 54550,

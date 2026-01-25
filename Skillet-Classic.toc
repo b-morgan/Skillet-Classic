@@ -76,9 +76,9 @@ SkilletQueue.lua
 Upgrades.lua
 SkillLevelData.lua
 SkillLevelData1.lua [AllowLoadGameType vanilla]
-## SkillLevelData2.lua
+SkillLevelData2.lua [AllowLoadGameType tbc]
 SkillLevelData4.lua	[AllowLoadGameType cata]
-SkillLevelData5.lua [AllowLoadGameType classic]
+SkillLevelData5.lua [AllowLoadGameType mists]
 RecipeGroups.lua
 Inventory.lua
 SkilletPlugin.lua

@@ -2,13 +2,13 @@
 #
 # SkillLevelsConverter2.py
 #
-# This program takes up to three SkillLineAbility file name arguments on the command line which are
+# This program takes up to four SkillLineAbility file name arguments on the command line which are
 # .csv tables from https://wago.tools/db2/SkillLineAbility and https://wago.tools/db2/SpellName
 #
 # The output will be .lua tables containing the data for inclusion in 
-# Skillet-Classic's SkillLevelData1.lua, SkillLevelData4.lua, or SkillLevelData5.lua
+# Skillet-Classic's SkillLevelData1.lua, SkillLevelData2.lua, or SkillLevelData5.lua
 #
-# Skillet (retail) will use SkillLevelData2.lua (which is empty in the Skillet-Classic release)
+# Skillet (retail) will use SkillLevelData12.lua
 #
 # There may be some post-processing needed for names that include the double quote character.
 #
@@ -65,11 +65,12 @@ def spells_list_write(file_name):
 	dirname, basename = os.path.split(output_file)
 	filename, ext = basename.split('.', 1)
 	o = open(output_file, "w")
-	o.write("-- " + output_file + "\n")
-	o.write("Skillet.db.global.SkillLineAbility = {\n")
 	spell_name_output = output_file.replace("SkillLineAbility", "SpellName")
+	dirname2, basename2 = os.path.split(spell_name_output)
 	n = open(spell_name_output, "w")
-	n.write("-- " + spell_name_output + "\n")
+	o.write("-- " + basename + "\n")
+	o.write("Skillet.db.global." + filename + " = {\n")
+	n.write("-- " + basename2 + "\n")
 	n.write("Skillet.db.global.NameToSpellID = {\n")
 	for item_id in spell_to_skill_line:
 		o.write(spells_list_str(item_id))
@@ -116,7 +117,6 @@ if len(sys.argv) >= 3:
 	trivial_skill_line_rank_low = {}
 	trivial_skill_line_rank_high = {}
 	spell_to_name = {}
-
 	spells_list_read(sys.argv[2])
 	print(str(len(spell_to_skill_line))+" records processed in "+sys.argv[2])
 	spells_list_write(sys.argv[2])
@@ -127,8 +127,17 @@ if len(sys.argv) >= 4:
 	trivial_skill_line_rank_low = {}
 	trivial_skill_line_rank_high = {}
 	spell_to_name = {}
-
 	spells_list_read(sys.argv[3])
 	print(str(len(spell_to_skill_line))+" records processed in "+sys.argv[3])
 	spells_list_write(sys.argv[3])
-	
+
+if len(sys.argv) >= 5:
+	spell_to_skill_line = {}
+	min_skill_line_rank = {}
+	trivial_skill_line_rank_low = {}
+	trivial_skill_line_rank_high = {}
+	spell_to_name = {}
+	spells_list_read(sys.argv[4])
+	print(str(len(spell_to_skill_line))+" records processed in "+sys.argv[4])
+	spells_list_write(sys.argv[4])
+

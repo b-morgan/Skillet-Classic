@@ -59,13 +59,17 @@ local function sort_recipe_by_skill_level(tradeskill, a, b)
 		rightDifficulty = skill_style_type[b.skillData.difficulty].level
 	end
 	if leftDifficulty == rightDifficulty then
-		local left = Skillet:GetTradeSkillLevels(nil, a.spellID)
-		local right = Skillet:GetTradeSkillLevels(nil, b.spellID)
+		local lefto, left = Skillet:GetTradeSkillLevels(nil, a.spellID)
+		local righto, right = Skillet:GetTradeSkillLevels(nil, b.spellID)
 		if left == right then
-			if a.subGroup and b.subGroup then
-				return #a.subGroup.entries < #b.subGroup.entries
+			if lefto == righto then
+				if a.subGroup and b.subGroup then
+					return #a.subGroup.entries > #b.subGroup.entries
+				else
+					return (a.skillIndex or 0) > (b.skillIndex or 0)
+				end
 			else
-				return (a.skillIndex or 0) < (b.skillIndex or 0)
+				return lefto > righto
 			end
 		else
 			return left > right
