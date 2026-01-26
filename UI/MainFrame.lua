@@ -962,12 +962,20 @@ function Skillet:PluginButton_OnClick(button)
 	end
 end
 
+function Skillet:DelayUpdate()
+	Skillet.delayUpdate = false
+end
 --
 -- Updates the trade skill window whenever anything has changed,
 -- number of skills, skill type, skill level, etc
 --
 function Skillet:UpdateTradeSkillWindow()
 	DA.DEBUG(0,"UpdateTradeSkillWindow()")
+	if Skillet.db.profile.delayupdate and self.delayUpdate then
+		return
+	elseif Skillet.db.profile.delayupdate then
+		self:ScheduleTimer("DelayUpdate", 0.5)
+	end
 	self:NameEditSave()
 	if not self.currentPlayer or not self.currentTrade then 
 		DA.DEBUG(3,"leaving early, no player or no trade")

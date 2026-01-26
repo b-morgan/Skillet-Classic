@@ -1230,6 +1230,18 @@ Skillet.options =
 			end,
 			order = 85
 		},
+		delayupdate = {
+			type = "toggle",
+			name = "DelayUpdate",
+			desc = "Delay UpdateTradeSkillWindow calls",
+			get = function()
+				return Skillet.db.profile.delayupdate
+			end,
+			set = function(self,value)
+				Skillet.db.profile.delayupdate = value
+			end,
+			order = 86
+		},
 
 --
 -- Commands to manipulate the state of debugging code flags
@@ -1250,7 +1262,7 @@ Skillet.options =
 					Skillet.WarnLog = value
 				end
 			end,
-			order = 81
+			order = 91
 		},
 		WarnLog = {
 			type = "toggle",
@@ -1263,7 +1275,7 @@ Skillet.options =
 				Skillet.db.profile.WarnLog = value
 				Skillet.WarnLog = value
 			end,
-			order = 82
+			order = 92
 		},
 		DebugShow = {
 			type = "toggle",
@@ -1280,7 +1292,7 @@ Skillet.options =
 					Skillet.DebugLogging = value
 				end
 			end,
-			order = 83
+			order = 93
 		},
 		DebugLogging = {
 			type = "toggle",
@@ -1293,7 +1305,7 @@ Skillet.options =
 				Skillet.db.profile.DebugLogging = value
 				Skillet.DebugLogging = value
 			end,
-			order = 84
+			order = 94
 		},
 		DebugLevel = {
 			type = "input",
@@ -1310,7 +1322,7 @@ Skillet.options =
 				Skillet.db.profile.DebugLevel = value
 				Skillet.DebugLevel = value
 			end,
-			order = 85
+			order = 95
 		},
 		TableDump = {
 			type = "toggle",
@@ -1323,7 +1335,7 @@ Skillet.options =
 				Skillet.db.profile.TableDump = value
 				Skillet.TableDump = value
 			end,
-			order = 86
+			order = 96
 		},
 		TraceShow = {
 			type = "toggle",
@@ -1340,7 +1352,7 @@ Skillet.options =
 					Skillet.TraceLog = value
 				end
 			end,
-			order = 87
+			order = 97
 		},
 		TraceLog = {
 			type = "toggle",
@@ -1353,7 +1365,7 @@ Skillet.options =
 				Skillet.db.profile.TraceLog = value
 				Skillet.TraceLog = value
 			end,
-			order = 88
+			order = 98
 		},
 		TraceLog2 = {
 			type = "toggle",
@@ -1366,7 +1378,7 @@ Skillet.options =
 				Skillet.db.profile.TraceLog2 = value
 				Skillet.TraceLog2 = value
 			end,
-			order = 88
+			order = 98
 		},
 		TraceLog3 = {
 			type = "toggle",
@@ -1379,7 +1391,7 @@ Skillet.options =
 				Skillet.db.profile.TraceLog3 = value
 				Skillet.TraceLog3 = value
 			end,
-			order = 88
+			order = 98
 		},
 		ProfileShow = {
 			type = "toggle",
@@ -1392,7 +1404,7 @@ Skillet.options =
 				Skillet.db.profile.ProfileShow = value
 				Skillet.ProfileShow = value
 			end,
-			order = 89
+			order = 99
 		},
 		ClearDebugLog = {
 			type = "execute",
@@ -1402,7 +1414,7 @@ Skillet.options =
 				SkilletDBPC = {}
 				DA.DebugLog = SkilletDBPC
 			end,
-			order = 90
+			order = 100
 		},
 		ClearProfileLog = {
 			type = "execute",
@@ -1412,7 +1424,7 @@ Skillet.options =
 				SkilletProfile = {}
 				DA.DebugProfile = SkilletProfile
 			end,
-			order = 91
+			order = 101
 		},
 		DebugStatus = {
 			type = 'execute',
@@ -1421,7 +1433,7 @@ Skillet.options =
 			func = function()
 				DA.DebugAidsStatus()
 			end,
-			order = 92
+			order = 102
 		},
 		DebugOff = {
 			type = 'execute',
@@ -1474,7 +1486,7 @@ Skillet.options =
 					Skillet.ProfileShow = false
 				end
 			end,
-			order = 93
+			order = 103
 		},
 		LogLevel = {
 			type = "toggle",
@@ -1487,7 +1499,7 @@ Skillet.options =
 				Skillet.db.profile.LogLevel = value
 				Skillet.LogLevel = value
 			end,
-			order = 94
+			order = 104
 		},
 		MaxDebug = {
 			type = "input",
@@ -1502,7 +1514,7 @@ Skillet.options =
 				Skillet.db.profile.MAXDEBUG = value
 				Skillet.MAXDEBUG = value
 			end,
-			order = 95
+			order = 105
 		},
 		MaxProfile = {
 			type = "input",
@@ -1517,7 +1529,7 @@ Skillet.options =
 				Skillet.db.profile.MAXPROFILE = value
 				Skillet.MAXPROFILE = value
 			end,
-			order = 96
+			order = 106
 		},
 		FixBugs = {
 			type = "toggle",
@@ -1534,7 +1546,7 @@ Skillet.options =
 					Skillet.TraceLog = value
 				end
 			end,
-			order = 97
+			order = 107
 		},
 		DebugMark = {
 			type = 'input',
@@ -1545,7 +1557,7 @@ Skillet.options =
 			set = function(self,value)
 				DA.MARK(value)
 			end,
-			order = 98
+			order = 108
 		},
 --
 -- Commands to set/show how many TRADE_SKILL_UPDATE / CRAFT_UPDATE events to ignore
@@ -1564,7 +1576,7 @@ Skillet.options =
 				elseif value > 9 then value = 10 end
 				Skillet.db.realm.trade_wait = value
 			end,
-			order = 100
+			order = 110
 		},
 		CraftWait = {
 			type = "input",
@@ -1580,7 +1592,7 @@ Skillet.options =
 				elseif value > 9 then value = 10 end
 				Skillet.db.realm.craft_wait = value
 			end,
-			order = 101
+			order = 111
 		},
 		ShowWait = {
 			type = 'execute',
@@ -1590,7 +1602,7 @@ Skillet.options =
 				print("TradeWait= "..tostring(Skillet.db.realm.trade_wait))
 				print("CraftWait= "..tostring(Skillet.db.realm.craft_wait))
 			end,
-			order = 103
+			order = 113
 		},
 --
 -- commands to manage the custom reagent price table
@@ -1623,7 +1635,7 @@ Skillet.options =
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
 			end,
-			order = 105
+			order = 115
 		},
 		customdel = {
 			type = 'input',
@@ -1649,7 +1661,7 @@ Skillet.options =
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
 			end,
-			order = 106
+			order = 116
 		},
 		customshow = {
 			type = 'execute',
@@ -1661,7 +1673,7 @@ Skillet.options =
 					print(tostring(entry.name)..", "..Skillet:FormatMoneyFull(entry.value,true))
 				end
 			end,
-			order = 107
+			order = 117
 		},
 		customdump = {
 			type = 'execute',
@@ -1673,7 +1685,7 @@ Skillet.options =
 					print("id= "..tostring(id)..", name= "..tostring(entry.name)..", value= "..tostring(entry.value))
 				end
 			end,
-			order = 108
+			order = 118
 		},
 		customclear = {
 			type = 'execute',
@@ -1683,7 +1695,7 @@ Skillet.options =
 				local server = Skillet.data.server or 0
 				Skillet.db.global.customPrice[server] = {}
 			end,
-			order = 109
+			order = 119
 		},
 
 --
@@ -1717,7 +1729,7 @@ Skillet.options =
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
 			end,
-			order = 110
+			order = 120
 		},
 		tooldel = {
 			type = 'input',
@@ -1743,7 +1755,7 @@ Skillet.options =
 					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
 				end
 			end,
-			order = 111
+			order = 121
 		},
 		tooldump = {
 			type = 'execute',
@@ -1758,7 +1770,7 @@ Skillet.options =
 					print("id= "..tostring(id)..", name= "..tostring(entry.name)..", value= "..tostring(entry.value))
 				end
 			end,
-			order = 112
+			order = 122
 		},
 		toolclear = {
 			type = 'execute',
@@ -1768,7 +1780,7 @@ Skillet.options =
 				local player = Skillet.currentPlayer
 				Skillet.db.realm.toolData[player] = {}
 			end,
-			order = 113
+			order = 123
 		},
 
 --

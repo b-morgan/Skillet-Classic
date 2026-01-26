@@ -33,6 +33,7 @@ Skillet.NewsData = {
 				data = {
 					{ header = "SkillLevels", body = "Update SkillLevels code and data" },
 					{ header = "Sorting", body = "Fix By Difficulty sort" },
+					{ header = "UI", body = "Add delayupdate to reduce FPS loss when crafting" },
 				},
 			},
 		},
