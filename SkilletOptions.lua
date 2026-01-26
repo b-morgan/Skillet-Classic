@@ -1239,6 +1239,7 @@ Skillet.options =
 			end,
 			set = function(self,value)
 				Skillet.db.profile.delayupdate = value
+				print("delayupdate= "..tostring(value))
 			end,
 			order = 86
 		},

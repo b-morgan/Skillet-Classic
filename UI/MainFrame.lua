@@ -974,6 +974,7 @@ function Skillet:UpdateTradeSkillWindow()
 	if Skillet.db.profile.delayupdate and self.delayUpdate then
 		return
 	elseif Skillet.db.profile.delayupdate then
+		Skillet.delayUpdate = true
 		self:ScheduleTimer("DelayUpdate", 0.5)
 	end
 	self:NameEditSave()
