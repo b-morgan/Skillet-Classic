@@ -607,8 +607,13 @@ function Skillet:GetRecipe(id)
 				DA.DEBUG(0,"id= "..tostring(id)..", recipeString= "..tostring(recipeString))
 			end
 			Skillet.data.recipeList[id] = {}
-			Skillet.data.recipeList[id].spellID = tonumber(id)
-			Skillet.data.recipeList[id].name = GetSpellInfo(tonumber(id))
+			if tonumber(id) then
+				Skillet.data.recipeList[id].spellID = tonumber(id)
+				Skillet.data.recipeList[id].name = GetSpellInfo(tonumber(id))
+			else
+				Skillet.data.recipeList[id].spellID = id
+				Skillet.data.recipeList[id].name = id
+			end
 			Skillet.data.recipeList[id].tradeID = tonumber(tradeID)
 			Skillet.data.recipeList[id].itemID = tonumber(itemID)
 			Skillet.data.recipeList[id].numMade = tonumber(numMade)
@@ -1046,7 +1051,7 @@ local function ScanTrade()
 				local recipeString
 				local toolString = "-"
 				recipe.tradeID = tradeID
-				if isClassic then
+				if isClassic or isBCC then
 					recipe.spellID = recipeID
 				else
 					recipe.spellID = Skillet:GetItemIDFromLink(GetTradeSkillRecipeLink(i))
