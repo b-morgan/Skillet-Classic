@@ -499,8 +499,6 @@ function Skillet:FlushPlayerData()
 	Skillet.db.realm.bankDetails[player] = {}
 	Skillet.db.realm.queueData[player] = {}
 	Skillet.db.realm.reagentsInQueue[player] = {}
-	Skillet.db.realm.modifiedInQueue[player] = {}
-	Skillet.db.realm.groupDB[player] = {}
 	Skillet.db.realm.options[player] = {}
 end
 
@@ -630,6 +628,12 @@ function Skillet:InitializeDatabase(player, clean)
 		end
 		if not self.db.realm.skillDB[player] or clean then
 			self.db.realm.skillDB[player] = {}
+		end
+		if not self.db.realm.options then
+			self.db.realm.options = {}
+		end
+		if not self.db.realm.options[player] or clean then
+			self.db.realm.options[player] = {}
 		end
 		if not self.db.realm.subClass then
 			self.db.realm.subClass = {}
