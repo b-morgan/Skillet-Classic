@@ -340,6 +340,7 @@ end
 
 local function indexBags()
 	DA.TRACE("indexBags()")
+	--DA.DEBUG(0,"indexBags()")
 	local player = Skillet.currentPlayer
 	if player then
 		local details = {}
@@ -366,9 +367,10 @@ local function indexBags()
 					id = Skillet:GetItemIDFromLink(item)
 				else
 					info = C_Container.GetContainerItemInfo(container, i)
-					--DA.DEBUG(2,"info="..DA.DUMP1(info))
+					DA.TRACE2("indexBags: container= "..tostring(container)..", i= "..tostring(i)..", info= "..DA.DUMP1(info))
+					--DA.DEBUG(2,"indexBags: container= "..tostring(container)..", i= "..tostring(i)..", info= "..DA.DUMP1(info))
 					id = info.itemID
-					count = info.stackCount
+					count = info.stackCount or 0
 				end
 					local name = string.match(item,"%[.+%]")
 					if name then 
@@ -402,6 +404,7 @@ local function indexBags()
 end
 
 local function indexBank()
+	DA.TRACE("indexBank()")
 	--DA.DEBUG(0,"indexBank()")
 --
 -- bank contains detailed contents of each tab,slot which 
@@ -435,9 +438,10 @@ local function indexBank()
 					id = Skillet:GetItemIDFromLink(item)
 				else
 					info = C_Container.GetContainerItemInfo(container, i)
-					--DA.DEBUG(2,"info="..DA.DUMP1(info))
+					DA.TRACE2("indexBank: container= "..tostring(container)..", i= "..tostring(i)..", info= "..DA.DUMP1(info))
+					--DA.DEBUG(2,"indexBank: container= "..tostring(container)..", i= "..tostring(i)..", info= "..DA.DUMP1(info))
 					id = info.itemID
-					count = info.stackCount
+					count = info.stackCount or 0
 				end
 				local name = string.match(item,"%[.+%]")
 				if name then 
