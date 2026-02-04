@@ -1185,7 +1185,6 @@ end
 function Skillet:PLAYER_INTERACTION_MANAGER_FRAME_SHOW(event,interactionType)
 	DA.TRACE("PLAYER_INTERACTION_MANAGER_FRAME_SHOW("..tostring(interactionType)..")")
 	if interactionType == Enum.PlayerInteractionType.Merchant then -- 5
---		Skillet:Skillet:MERCHANT_SHOW()
 		Skillet:MerchantShow()
 	end
 	if interactionType == Enum.PlayerInteractionType.Banker then -- 8

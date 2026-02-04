@@ -84,7 +84,10 @@
 		</Layers>
 		<Scripts>
 			<OnLoad>
+	<!--
 				self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+	-->
+				self:RegisterForClicks("AnyUp", "AnyDown")
 			</OnLoad>
 			<OnEnter>
 				Skillet:TradeButtonAdditional_OnEnter(self)
