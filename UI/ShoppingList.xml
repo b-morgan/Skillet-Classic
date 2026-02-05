@@ -117,7 +117,7 @@
 			<!-- shift clicking will insert a link to the recipe in the chat window. -->
 			if button == "LeftButton" and IsShiftKeyDown() then
 				local name,link = C_Item.GetItemInfo(self.id)
-				ChatEdit_InsertLink(self.count .. "x" .. link)
+				Skillet:ChatEdit_InsertLink(self.count .. "x" .. link)
 			end
 
 			<!-- alt clicking will insert the item name into the Auction House. -->

@@ -1861,6 +1861,15 @@ function Skillet:SetTradeSkillOption(option, value, playerOverride, tradeOverrid
 		self.db.realm.options[player][trade][option] = value
 	end
 end
+local ChatEdit_InsertLink  = ChatFrameUtil and ChatFrameUtil.InsertLink or ChatEdit_InsertLink
+
+function Skillet:ChatEdit_InsertLink(link)
+	if ChatFrameUtil and ChatFrameUtil.InsertLink then
+		ChatFrameUtil.InsertLink(link)
+	else
+		ChatEdit_InsertLink(link)
+	end
+end
 
 function Skillet:IsActive()
 	return Skillet:IsEnabled()

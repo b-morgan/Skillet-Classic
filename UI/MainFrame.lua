@@ -31,6 +31,7 @@ local GetItemInfo = C_Item and C_Item.GetItemInfo or GetItemInfo
 local GetItemCount = C_Item and C_Item.GetItemCount or GetItemCount
 local GetItemIcon = C_Item and C_Item.GetItemIconByID or GetItemIcon
 local GetItemQualityColor = C_Item and C_Item.GetItemQualityColor or GetItemQualityColor
+local ChatEdit_InsertLink  = ChatFrameUtil and ChatFrameUtil.InsertLink or ChatEdit_InsertLink
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 

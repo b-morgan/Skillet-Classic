@@ -2133,7 +2133,7 @@
 						elseif ( IsShiftKeyDown() ) then
 							<!-- This will put a link to the *item* that can be created with this trade skill
 								 into the current chat  box -->
-							ChatEdit_InsertLink(link)
+							Skillet:ChatEdit_InsertLink(link)
 						elseif ( IsAltKeyDown() ) then
 						<!-- This will put a link to the *reagents* required by this *item*
 							 into the current chat edit box -->
