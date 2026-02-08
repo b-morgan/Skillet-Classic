@@ -23,7 +23,7 @@
 ## X-Website: https://www.curseforge.com/wow/addons/skillet-classic
 ## SavedVariables: SkilletDB
 ## SavedVariablesPerCharacter: SkilletWho, SkilletDBPC, SkilletMemory, SkilletProfile
-## OptionalDeps: Ace3, LibWindow-1.1, LibPeriodicTable-3.1, TradeSkillMaster, Auctionator, MissingTradeSkillsList, BeanCounter, DataStore, Journalator, CraftInfoAnywhere
+## OptionalDeps: Ace3, LibWindow-1.1, LibPeriodicTable-3.1, TradeSkillMaster, DataStore, Auctionator, Journalator, CraftInfoAnywhere
 ## X-Embeds: Ace3, LibStub, CallbackHandler-1.0, LibWindow-1.1, LibPeriodicTable-3.1
 
 ## LoadManagers: AddonLoader
@@ -45,7 +45,6 @@ Libs\AceTimer-3.0\AceTimer-3.0.xml
 Libs\LibWindow-1.1\LibWindow-1.1.lua
 Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1.lua
 Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1-Tradeskill\LibPeriodicTable-3.1-Tradeskill.lua
-Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1-TradeskillResultMats\LibPeriodicTable-3.1-TradeskillResultMats.lua
 Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1-TradeskillLevels\LibPeriodicTable-3.1-TradeskillLevels.lua
 Libs\EasySkillet\EasySkillet.lua
 Libs\EasySkillet\UIDropDownSkillet.xml
@@ -94,14 +93,6 @@ Plugins\AuctionDB.lua
 Plugins\Auctioneer.lua
 Plugins\AuctionLite.lua
 Plugins\DataStoreAuctions.lua
-#### Obsolete or Unused Addons
-## Plugins\CancelForm.lua
-## Plugins\BootyBayGazette.lua
-## Plugins\MissingTradeSkillsList.lua
-#### Addons not ported to Classic
-## Plugins\AckisRecipeList.lua
-## Plugins\TradeSkillInfo.lua
-## Plugins\TheUndermineJournal.lua
 
 #### UI files
 UI\Utils.lua
