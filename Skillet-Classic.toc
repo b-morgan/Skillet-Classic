@@ -93,6 +93,7 @@ Plugins\AuctionDB.lua
 Plugins\Auctioneer.lua
 Plugins\AuctionLite.lua
 Plugins\DataStoreAuctions.lua
+Plugins\AckisRecipeList.lua
 
 #### UI files
 UI\Utils.lua
