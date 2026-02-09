@@ -32,6 +32,7 @@ Skillet.NewsData = {
 			{	name = "Changes",
 				data = {
 					{ header = "TOC", body = "Remove unused library and plugins" },
+					{ header = "Shopping", body = "Better fix for arithmetic on nil" },
 				},
 			},
 		},

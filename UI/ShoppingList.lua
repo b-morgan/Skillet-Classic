@@ -339,7 +339,6 @@ local function cache_list(self, includeTools)
 end
 
 local function indexBags()
-	DA.TRACE("indexBags()")
 	--DA.DEBUG(0,"indexBags()")
 	local player = Skillet.currentPlayer
 	if player then
@@ -347,31 +346,31 @@ local function indexBags()
 		local data = {}
 		local bags = {0,1,2,3,4}
 		for _, container in pairs(bags) do
-		local slots
+			local slots
 			if GetContainerNumSlots then
 				slots = GetContainerNumSlots(container)
 			else
 				slots = C_Container.GetContainerNumSlots(container)
 			end
-		for i = 1, slots, 1 do
-			local item
-			if GetContainerItemLink then
-				item = GetContainerItemLink(container, i)
-			else
-				item = C_Container.GetContainerItemLink(container, i)
-			end
-			if item then
-				local info, id, count
-				if GetContainerItemInfo then
-					info, count = GetContainerItemInfo(container, i)
-					id = Skillet:GetItemIDFromLink(item)
+			for i = 1, slots, 1 do
+				local item
+				if GetContainerItemLink then
+					item = GetContainerItemLink(container, i)
 				else
-					info = C_Container.GetContainerItemInfo(container, i)
-					DA.TRACE2("indexBags: container= "..tostring(container)..", i= "..tostring(i)..", info= "..DA.DUMP1(info))
-					--DA.DEBUG(2,"indexBags: container= "..tostring(container)..", i= "..tostring(i)..", info= "..DA.DUMP1(info))
-					id = info.itemID
-					count = info.stackCount or 0
+					item = C_Container.GetContainerItemLink(container, i)
 				end
+				if item then
+					local info, id, count
+					if GetContainerItemInfo then
+						info, count = GetContainerItemInfo(container, i) -- info is icon
+						id = Skillet:GetItemIDFromLink(item)
+					else
+						info = C_Container.GetContainerItemInfo(container, i)
+						--DA.DEBUG(2,"indexBags: container= "..tostring(container)..", i= "..tostring(i)..", info= "..DA.DUMP1(info))
+						id = info.itemID
+						count = info.stackCount
+					end
+					count = count or 0
 					local name = string.match(item,"%[.+%]")
 					if name then 
 						name = string.sub(name,2,-2)	-- remove the brackets
@@ -390,21 +389,20 @@ local function indexBags()
 							data[id] = 0
 						end
 						data[id] = data[id] + count
-					end
-				end
-			end
-			Skillet.db.realm.bagData[player] = data
-			if Skillet.db.profile.collect_details then
-				Skillet.db.realm.bagDetails[player] = details
-			else
-				--DA.DEBUG(2,"indexBags: Not collecting details")		
-			end
+					end -- id
+				end -- item
+			end -- for slots
+		end -- for container
+		Skillet.db.realm.bagData[player] = data
+		if Skillet.db.profile.collect_details then
+			Skillet.db.realm.bagDetails[player] = details
+		else
+			--DA.DEBUG(2,"indexBags: Not collecting details")		
 		end
-	end
+	end -- player
 end
 
 local function indexBank()
-	DA.TRACE("indexBank()")
 	--DA.DEBUG(0,"indexBank()")
 --
 -- bank contains detailed contents of each tab,slot which 
@@ -415,8 +413,7 @@ local function indexBank()
 	bank = {}
 	local player = Skillet.currentPlayer
 	local bankData = Skillet.db.realm.bankData[player]
---	local bankBags = {-1,5,6,7,8,9,10,11,-3}
-	local bankBags = {-1,5,6,7,8,9,10,11}		-- In Classic, there is no reagent bank
+	local bankBags = {-1,5,6,7,8,9,10,11}
 	for _, container in pairs(bankBags) do
 		local slots
 		if GetContainerNumSlots then
@@ -434,15 +431,15 @@ local function indexBank()
 			if item then
 				local info, id, count
 				if GetContainerItemInfo then
-					info, count = GetContainerItemInfo(container, i)
+					info, count = GetContainerItemInfo(container, i) -- info is icon
 					id = Skillet:GetItemIDFromLink(item)
 				else
 					info = C_Container.GetContainerItemInfo(container, i)
-					DA.TRACE2("indexBank: container= "..tostring(container)..", i= "..tostring(i)..", info= "..DA.DUMP1(info))
 					--DA.DEBUG(2,"indexBank: container= "..tostring(container)..", i= "..tostring(i)..", info= "..DA.DUMP1(info))
 					id = info.itemID
-					count = info.stackCount or 0
+					count = info.stackCount
 				end
+				count = count or 0
 				local name = string.match(item,"%[.+%]")
 				if name then 
 					name = string.sub(name,2,-2)	-- remove the brackets
@@ -461,10 +458,10 @@ local function indexBank()
 						bankData[id] = 0
 					end
 					bankData[id] = bankData[id] + count
-				end
-			end
-		end
-	end
+				end -- id
+			end -- item
+		end -- for slots
+	end -- for container
 	if Skillet.db.profile.collect_details then
 		Skillet.db.realm.bankDetails[player] = bank
 	else
