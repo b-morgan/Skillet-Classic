@@ -4,7 +4,6 @@ local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC -- 2
 local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC -- 5
 local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC -- 11
 local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC -- 14
-local isMists = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC -- 19
 local DA
 if isRetail then
 	DA = _G[addonName] -- for DebugAids.lua
@@ -239,28 +238,32 @@ function DA.TRACE(...)
 			comma = ", "
 		end
 		local value = select(i,...)
-		local vtype = type(value)
-		if (vtype == "nil") then 
-			text = text..comma.."(nil)"
-		elseif (vtype == "number") then 
-			text = text..comma..tostring(value)
-		elseif (vtype == "string") then
-			local t = string.sub(value,1,2)
-			if t == ", " then
-				text = text..value
-			else
-				text = text..comma..value
+		if issecretvalue and issecretvalue(value) then
+			text = text..comma.."(secret)"
+		else
+			local vtype = type(value)
+			if (vtype == "nil") then 
+				text = text..comma.."(nil)"
+			elseif (vtype == "number") then 
+				text = text..comma..tostring(value)
+			elseif (vtype == "string") then
+				local t = string.sub(value,1,2)
+				if t == ", " then
+					text = text..value
+				else
+					text = text..comma..value
+				end
+			elseif (vtype == "boolean") then 
+				if (value) then
+					text = text..comma.."true" 
+				else 
+					text = text..comma.."false" 
+				end
+			elseif (vtype == "table" or vtype == "function" or vtype == "thread" or vtype == "userdata") then 
+				text = text..comma.."("..vtype..")"
+			else                               
+				text = text..comma.."(unknown)"
 			end
-		elseif (vtype == "boolean") then 
-			if (value) then
-				text = text..comma.."true" 
-			else 
-				text = text..comma.."false" 
-			end
-		elseif (vtype == "table" or vtype == "function" or vtype == "thread" or vtype == "userdata") then 
-			text = text..comma.."("..vtype..")"
-		else                               
-			text = text..comma.."(unknown)"
 		end
 	end
 	if (DA.TraceShow) then
