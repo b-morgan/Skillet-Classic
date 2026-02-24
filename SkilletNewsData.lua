@@ -27,6 +27,15 @@ local isMists = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC -- 19
 
 Skillet.NewsName = "Skillet-Classic News"
 Skillet.NewsData = {
+	{	version = "2.31",
+		data = {
+			{	name = "Changes",
+				data = {
+					{ header = "Addons", body = "Update TradeSkillMaster Compatibility" },
+				},
+			},
+		},
+	},
 	{	version = "2.30",
 		data = {
 			{	name = "Changes",

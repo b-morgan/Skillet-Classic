@@ -64,7 +64,6 @@ local TradeSkillList = {
 --
 -- a table of crafts by id
 -- Enchanting is a Craft in Classic Era, Season of Mastery, Burning Crusade Classic
--- and a TradeSkill in Wrath of the Lich King Classic
 -- This will be fixed in CollectTradeSkillData()
 --
 local CraftList = {
@@ -124,18 +123,14 @@ function Skillet:CollectTradeSkillData()
 			self.tradeSkillNamesByID[id] = name
 		end
 	end
-	if isWrath or (self.db.profile.support_crafting and not TSM_API) then
+	if self.db.profile.support_crafting and not TSM_API then
 		for i=1,#CraftList,1 do
 			local id = CraftList[i]
 			local name = GetSpellInfo(id)
-			--DA.DEBUG(2,"id= "..tostring(id)..", name= "..tostring(name))
+			DA.DEBUG(2,"id= "..tostring(id)..", name= "..tostring(name))
 			if name then
 				table.insert(self.tradeSkillList,id)
-				if self.build == "Wrath" and id == 7411 then
-					self.skillIsCraft[id] = false
-				else
-					self.skillIsCraft[id] = true
-				end
+				self.skillIsCraft[id] = true
 				self.tradeSkillIDsByName[name] = id
 				self.tradeSkillNamesByID[id] = name
 			end
