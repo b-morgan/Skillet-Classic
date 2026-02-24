@@ -569,7 +569,7 @@ end
 
 --
 -- hide UI components that cannot be used for crafts and show that
--- that are only applicable to trade skills, as needed
+-- they are only applicable to trade skills, as needed
 --
 function Skillet:ConfigureRecipeControls(enchant)
 	--DA.DEBUG(0,"ConfigureRecipeControls("..tostring(enchant)..")")
@@ -1198,7 +1198,7 @@ function Skillet:UpdateTradeSkillWindow()
 						name = skill.name.." (0)"
 					end
 					local groupIndex = skill.subGroup.groupIndex
-					DA.DEBUG(2,"name= "..tostring(name)..", groupIndex= "..tostring(groupIndex))
+					--DA.DEBUG(2,"name= "..tostring(name)..", groupIndex= "..tostring(groupIndex))
 					buttonText:SetText(name)      -- THIS IS A HEADER SO DON'T TRY TO USE THE RECIPE ID!
 					button:SetID(skillIndex or 0)
 					buttonExpand.group = skill.subGroup
