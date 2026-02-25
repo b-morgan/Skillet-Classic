@@ -569,7 +569,7 @@ end
 
 --
 -- hide UI components that cannot be used for crafts and show that
--- they are only applicable to trade skills, as needed
+-- that are only applicable to trade skills, as needed
 --
 function Skillet:ConfigureRecipeControls(enchant)
 	--DA.DEBUG(0,"ConfigureRecipeControls("..tostring(enchant)..")")
@@ -985,8 +985,9 @@ function Skillet:UpdateTradeSkillWindow()
 	end
 	local skillListKey = self.currentPlayer..":"..self.currentTrade..":"..self.currentGroupLabel
 	local numTradeSkills = 0
-	if not self.dataScanned then
+	if not self.dataScanned or self.dataSourceChanged then
 		self.dataScanned = self:RescanTrade()
+		self.dataSourceChanged = false
 		self:SortAndFilterRecipes()
 	end
 	if not self.data.sortedSkillList or not self.data.sortedSkillList[skillListKey] then
@@ -1198,7 +1199,7 @@ function Skillet:UpdateTradeSkillWindow()
 						name = skill.name.." (0)"
 					end
 					local groupIndex = skill.subGroup.groupIndex
-					--DA.DEBUG(2,"name= "..tostring(name)..", groupIndex= "..tostring(groupIndex))
+					DA.DEBUG(2,"name= "..tostring(name)..", groupIndex= "..tostring(groupIndex))
 					buttonText:SetText(name)      -- THIS IS A HEADER SO DON'T TRY TO USE THE RECIPE ID!
 					button:SetID(skillIndex or 0)
 					buttonExpand.group = skill.subGroup
@@ -1510,7 +1511,7 @@ function Skillet:SkillButton_OnEnter(button)
 			end
 		elseif self.currentTrade == 7411 and recipe.itemID == 0 then
 --
--- Wrath Enchanting tooltip is built with special API calls
+-- Enchanting tooltip is built with special API calls
 --
 			tip:AddLine(skill.name, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, false);
 			if skillIndex then

@@ -1040,8 +1040,8 @@ function Skillet:TRADE_SKILL_UPDATE()
 	end
 	DA.TRACE("TRADE_SKILL_UPDATE: dataSourceChanged= "..tostring(Skillet.dataSourceChanged)..", dataScanned= "..tostring(Skillet.dataScanned))
 	if Skillet.dataSourceChanged or not Skillet.dataScanned then
-		Skillet.dataSourceChanged = false
 		Skillet:SkilletShowWindow()
+		Skillet.dataSourceChanged = false
 	end
 end
 
@@ -1057,8 +1057,8 @@ function Skillet:CRAFT_UPDATE()
 	end
 	DA.TRACE("CRAFT_UPDATE: dataSourceChanged= "..tostring(Skillet.dataSourceChanged)..", dataScanned= "..tostring(Skillet.dataScanned))
 	if Skillet.dataSourceChanged or not Skillet.dataScanned then
-		Skillet.dataSourceChanged = false
 		Skillet:SkilletShowWindow()
+		Skillet.dataSourceChanged = false
 	end
 end
 

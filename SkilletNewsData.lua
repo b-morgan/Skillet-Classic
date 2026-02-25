@@ -32,6 +32,7 @@ Skillet.NewsData = {
 			{	name = "Changes",
 				data = {
 					{ header = "Addons", body = "Update TradeSkillMaster Compatibility" },
+					{ header = "Recipes", body = "Adjust triggering a recipe rescan" },
 				},
 			},
 		},
