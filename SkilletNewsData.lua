@@ -33,6 +33,7 @@ Skillet.NewsData = {
 				data = {
 					{ header = "Addons", body = "Update TradeSkillMaster Compatibility" },
 					{ header = "Recipes", body = "Adjust triggering a recipe rescan" },
+					{ header = "Crafts", body = "Implement Enchanting invSlot filter" },
 				},
 			},
 		},
