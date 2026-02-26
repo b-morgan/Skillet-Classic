@@ -59,15 +59,17 @@ with open('SpellEquippedItems.'+build+'.csv') as f:
         spell_to_item_invtypes[int(row['SpellID'])] = int(row['EquippedItemInvTypes'])
 
 data_format = """\
-    [{}] = {{{}, {}, {}, "{}"}} -- {}\
+    [{}] = {{{}, {}, {}, "{}"}}, -- {}\
 """
 unique_format = """\
-	[{}] = "{}"\
+	[{}] = "{}",\
 	"""
 
 o = open('enchantSlot.'+build+'.lua', "w")
+o.write("-- \n")
 o.write("-- " + build + "\n")
 o.write("-- [spell] = {EquippedItemClass, EquippedItemSubclass, EquippedItemInvTypes, Slot}\n")
+o.write("-- \n")
 o.write("Skillet.enchantSlot = {\n")
 unique_invtypes = {}
 for spell_id in enchants_only:
