@@ -438,3 +438,8 @@ Skillet.scrollData = {
     [113047] = 87585, -- Secret Tiger Fang Inscription
 }
 
+Skillet.enchantSlot = {
+}
+
+Skillet.uniqueSlot = {
+}

@@ -25,6 +25,19 @@ def get_slot(s):
 		res = s[idx1 + len(start):idx2]
 	return(res)
 
+translateSlot = {
+	"Bracer": "WRISTSLOT",	
+	"Chest": "CHESTSLOT",	
+	"Cloak": "BACKSLOT",
+	"Boots": "FEETSLOT",	
+	"Gloves": "HANDSSLOT",	
+	"Shield": "Shield",	
+	"2H Weapon": "2H Weapon",	
+	"Weapon": "Weapon",
+	"Ring": "Ring",
+	"Off-Hand": "?",	
+}
+
 #
 # Initialize the data storage
 #
@@ -84,12 +97,14 @@ for spell_id in enchants_only:
 				unique_invtypes[spell_invtypes] = spell_slot
 			else:
 				unique_invtypes[spell_subclass] = spell_slot
+			if spell_slot in translateSlot:
+				spell_slot = translateSlot[spell_slot]
 			o.write(data_format.format(spell_id, spell_class, spell_subclass, spell_invtypes, spell_slot, spell_name) + "\n")
 o.write("}\n")
 
 o.write("\nSkillet.uniqueSlot = {\n")
 for invtype in unique_invtypes:
-	print(unique_format.format(invtype,unique_invtypes[invtype]))
+#	print(unique_format.format(invtype,unique_invtypes[invtype]))
 	o.write(unique_format.format(invtype,unique_invtypes[invtype]) + "\n")
 o.write("}\n")
 o.close()

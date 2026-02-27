@@ -179,6 +179,15 @@ function Skillet:StealEnchantButton()
 			CraftCreateButton:SetPoint("TOPLEFT", SkilletEnchantButton, "TOPLEFT",0, 0)
 		end
 	end
+--
+-- Temporary
+--
+	if GetCraftSlots then
+		Skillet.db.global.getCraftSlots = {}
+		for n, s in ipairs({GetCraftSlots()}) do
+			Skillet.db.global.getCraftSlots[n] = {s, (getglobal(s) or "")}
+		end
+	end
 end
 
 --
@@ -1255,6 +1264,8 @@ function Skillet:UpdateTradeSkillWindow()
 					if level and level > 1 then
 						levelText:SetText(level)
 					end
+				elseif self.db.profile.display_skill_index then
+					levelText:SetText(tostring(skillIndex))
 				end
 				text = (self:RecipeNamePrefix(skill, recipe) or "") .. (skill.name or "")
 				if recipe.reagentData and #recipe.reagentData > 0 then

@@ -1054,7 +1054,9 @@ local function ScanTrade()
 				else
 					recipe.spellID = Skillet:GetItemIDFromLink(GetTradeSkillRecipeLink(i))
 				end
-				recipe.scrollID = Skillet.scrollData[recipe.spellID]
+				if Skillet.scrollData then
+					recipe.scrollID = Skillet.scrollData[recipe.spellID]
+				end
 				recipe.name = skillName
 				if #tools >= 1 then
 					recipe.tools = { tools[1] }

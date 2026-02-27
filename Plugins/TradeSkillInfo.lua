@@ -168,7 +168,7 @@ function plugin.GetExtraText(skill, recipe)
 			end
 			if TradeskillInfo:ShowingSkillAuctioneerProfit() then -- insert item value and reagent costs from Auctioneer
 				local value, cost, profit = TradeskillInfo:GetCombineAuctioneerCost(tsiRecipeID)
-				if GetAuctionBuyout and Skillet.scrollData[tsiRecipeID] then
+				if GetAuctionBuyout and Skillet.scrollData and Skillet.scrollData[tsiRecipeID] then
 					value = GetAuctionBuyout(Skillet.scrollData[tsiRecipeID]) or 0
 					profit = value - cost
 				end
@@ -177,7 +177,7 @@ function plugin.GetExtraText(skill, recipe)
 			end
 			if TradeskillInfo:ShowingSkillProfit() then -- insert item value and reagent costs
 				local value, cost, profit = TradeskillInfo:GetCombineCost(tsiRecipeID)
-				if Skillet.scrollData[tsiRecipeID] then
+				if Skillet.scrollData and Skillet.scrollData[tsiRecipeID] then
 					value = select(11, GetItemInfo(Skillet.scrollData[tsiRecipeID]))
 					profit = (value or 0) - (cost or 0) 
 				end

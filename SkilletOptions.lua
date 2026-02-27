@@ -1023,6 +1023,20 @@ Skillet.options =
 			end,
 			order = 72
 		},
+		skillindex = {
+			type = "toggle",
+			name = "skillIndex",
+			desc = "Enable/Disable printing skillIndex",
+			get = function()
+				return Skillet.db.profile.display_skill_index
+			end,
+			set = function(self,value)
+				Skillet.db.profile.display_skill_index = value
+				Skillet:ConfigureRecipeControls()
+				Skillet:UpdateTradeSkillWindow()
+			end,
+			order = 72
+		},
 --
 -- commands to toggle Blizzard's frames (beats using "/run")
 --

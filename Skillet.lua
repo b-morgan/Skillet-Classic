@@ -87,6 +87,7 @@ local defaults = {
 		use_blizzard_for_followers = false,				-- not in Classic
 		hide_blizzard_frame = true,						-- primarily for debugging
 		support_crafting = true,
+		display_skill_index = false,					-- primarily for debugging
 		ignore_change = false,							-- not in Classic
 		queue_crafts = false,
 		include_craftbuttons = true,
