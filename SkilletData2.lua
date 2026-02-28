@@ -35,6 +35,10 @@ function Skillet:CountEnchants(clear)
 	local wrong_scrollData2 = {}
 --	local missing_vellumData2 = {}
 --	local vellum_by_enchant = {}
+	if not Skillet.scrollData then 
+		DA.MARK2("No scrollData found")
+		return
+	end
 	for rid,eid in pairs(Skillet.scrollData) do
 		i = i + 1
 		if not Skillet.scrollData2[rid] then

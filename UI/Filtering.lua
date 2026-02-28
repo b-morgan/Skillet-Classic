@@ -165,7 +165,7 @@ function Skillet.FilterDropDown_Initialize(menuFrame,level)
 	if not Skillet.isCraft then
 		info.text = L["InvSlot"]
 	else
-		info.text = L["InvSlot"].." (not implemented yet)"
+		info.text = L["InvSlot"]
 	end
 	info.func = Skillet.FilterDropDown_OnClick
 	info.value = index

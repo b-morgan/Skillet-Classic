@@ -31,10 +31,10 @@ translateSlot = {
 	"Cloak": "BACKSLOT",
 	"Boots": "FEETSLOT",	
 	"Gloves": "HANDSSLOT",	
+	"2H Weapon": "ENCHSLOT_2HWEAPON",	
+	"Weapon": "ENCHSLOT_WEAPON",
 	"Shield": "Shield",	
-	"2H Weapon": "2H Weapon",	
-	"Weapon": "Weapon",
-	"Ring": "Ring",
+	"Ring": "Finger",
 	"Off-Hand": "?",	
 }
 
@@ -101,10 +101,14 @@ for spell_id in enchants_only:
 				spell_slot = translateSlot[spell_slot]
 			o.write(data_format.format(spell_id, spell_class, spell_subclass, spell_invtypes, spell_slot, spell_name) + "\n")
 o.write("}\n")
+o.close()
 
+o = open('uniqueSlot.'+build+'.lua', "w")
+o.write("-- \n")
+o.write("-- " + build + "\n")
+o.write("-- \n")
 o.write("\nSkillet.uniqueSlot = {\n")
 for invtype in unique_invtypes:
-#	print(unique_format.format(invtype,unique_invtypes[invtype]))
 	o.write(unique_format.format(invtype,unique_invtypes[invtype]) + "\n")
 o.write("}\n")
 o.close()

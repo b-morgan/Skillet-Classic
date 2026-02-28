@@ -829,7 +829,7 @@ local function ScanTrade()
 		--DA.DEBUG(2,"ScanTrade: Expanding Craft Groups")
 		for i = 1, numCrafts do
 			local skillName, craftSubSpellName, skillType, numAvailable, isExpanded = GetCraftInfo(i)
-			DA.DEBUG(2,"ScanCraft: i= "..tostring(i)..", skillName= "..tostring(skillName)..", craftSubSpellName="..tostring(craftSubSpellName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
+			--DA.DEBUG(2,"ScanCraft: i= "..tostring(i)..", skillName= "..tostring(skillName)..", craftSubSpellName="..tostring(craftSubSpellName)..", skillType="..tostring(skillType)..", isExpanded= "..tostring(isExpanded))
 			if skillType == "header" or skillType == "subheader" then
 				if not isExpanded then
 					ExpandCraftSubClass(i)
@@ -1049,11 +1049,7 @@ local function ScanTrade()
 				local recipeString
 				local toolString = "-"
 				recipe.tradeID = tradeID
-				if isClassic or isBCC then
-					recipe.spellID = recipeID
-				else
-					recipe.spellID = Skillet:GetItemIDFromLink(GetTradeSkillRecipeLink(i))
-				end
+				recipe.spellID = Skillet:GetItemIDFromLink(GetTradeSkillRecipeLink(i))
 				if Skillet.scrollData then
 					recipe.scrollID = Skillet.scrollData[recipe.spellID]
 				end
@@ -1106,10 +1102,13 @@ local function ScanTrade()
 					--DA.DEBUG(2,"ScanTrade: itemType= "..tostring(itemType)..", itemSubType= "..tostring(itemSubType))
 					--DA.DEBUG(2,"ScanTrade: itemClassID= "..tostring(itemClassID)..", itemSubClassID= "..tostring(itemSubClassID))
 					--DA.DEBUG(2,"ScanTrade: bindType= "..tostring(bindType)..", itemSetID= "..tostring(itemSetID))
-					itemName = craftName or "e"..tostring(Skillet:GetItemIDFromLink(itemLink))
---
--- Need some way to determine "itemEquipLoc" for this enchant
---
+					recipe.spellID = Skillet:GetItemIDFromLink(itemLink)
+					itemName = craftName or "e"..tostring(recipe.spellID)
+					--DA.DEBUG(2,"ScanTrade: spellID= "..tostring(recipe.spellID)..", enchantSlot= "..DA.DUMP1(Skillet.enchantSlot[recipe.spellID]))
+					if Skillet.enchantSlot[recipe.spellID] and Skillet.enchantSlot[recipe.spellID][4] then
+						itemEquipLoc = Skillet.enchantSlot[recipe.spellID][4]
+					end
+					--DA.DEBUG(2,"ScanTrade: spellID= "..tostring(recipe.spellID)..", itemEquipLoc= "..tostring(itemEquipLoc))
 				end
 
 				if itemName then
