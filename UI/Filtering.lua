@@ -46,23 +46,23 @@ function Skillet:RecipeFilter(skillIndex)
 	local invSlot = Skillet.db.realm.invSlot[Skillet.currentPlayer][Skillet.currentTrade]
 	local itemID = recipe.itemID
 	--DA.DEBUG(1,"RecipeFilter: itemID= "..tostring(itemID)..", subClass= "..tostring(subClass[itemID])..", invSlot= "..tostring(invSlot[itemID]))
-	--DA.DEBUG(1,"RecipeFilter: subClass.selected= "..tostring(subClass.selected)..", invSlot.selected= "..tostring(invSlot.selected))
+	DA.DEBUG(1,"RecipeFilter: subClass.selected= "..tostring(subClass.selected)..", invSlot.selected= "..tostring(invSlot.selected))
 	if not ItemID and not subClass.selected and not invSlot.selected then
 --
 -- not initialized yet
 --
-		--DA.DEBUG(1,"RecipeFilter: not initialized yet")
+		DA.DEBUG(1,"RecipeFilter: not initialized yet")
 		return false
 	end
-	if subClass.selected == "None" and invSlot.selected == "None" then
+	if (subClass.selected == "None" and invSlot.selected == "None") or (not subClass.selected and invSlot.selected == "None") then
 --
 -- not filtering anything
 --
-		--DA.DEBUG(1,"RecipeFilter: not filtering anything")
+		DA.DEBUG(1,"RecipeFilter: not filtering anything")
 		return false
 	end
-	--DA.DEBUG(1,"RecipeFilter: itemID= "..tostring(itemID)..", subClass= "..tostring(subClass[itemID])..", invSlot= "..tostring(invSlot[itemID]))
-	--DA.DEBUG(1,"RecipeFilter: subClass.selected= "..tostring(subClass.selected)..", invSlot.selected= "..tostring(invSlot.selected))
+	DA.DEBUG(1,"RecipeFilter: itemID= "..tostring(itemID)..", subClass= "..tostring(subClass[itemID])..", invSlot= "..tostring(invSlot[itemID]))
+	DA.DEBUG(1,"RecipeFilter: subClass.selected= "..tostring(subClass.selected)..", invSlot.selected= "..tostring(invSlot.selected))
 	if not Skillet.isCraft then
 		if subClass[itemID] == subClass.selected or invSlot[itemID] == invSlot.selected then
 --

@@ -1096,7 +1096,7 @@ local function ScanTrade()
 					--DA.DEBUG(2,"ScanTrade: itemLink.itemName= "..tostring(itemName)..", itemEquipLoc= "..tostring(itemEquipLoc))
 				else
 					craftName, craftSubSpellName, craftType, numAvailable, isExpanded = GetCraftInfo(i)
-					--DA.DEBUG(2,"ScanTrade: craftName= "..tostring(craftName)..", craftSubSpellName= "..tostring(craftSubSpellName))
+					DA.DEBUG(2,"ScanTrade: craftName= "..tostring(craftName)..", craftSubSpellName= "..tostring(craftSubSpellName))
 					--DA.DEBUG(2,"ScanTrade: craftType= "..tostring(craftType)..", numAvailable= "..tostring(numAvailable))
 					--DA.DEBUG(2,"ScanTrade: isExpanded= "..tostring(isExpanded))
 					--DA.DEBUG(2,"ScanTrade: itemType= "..tostring(itemType)..", itemSubType= "..tostring(itemSubType))
@@ -1108,7 +1108,7 @@ local function ScanTrade()
 					if Skillet.enchantSlot[recipe.spellID] and Skillet.enchantSlot[recipe.spellID][4] then
 						itemEquipLoc = Skillet.enchantSlot[recipe.spellID][4]
 					end
-					--DA.DEBUG(2,"ScanTrade: spellID= "..tostring(recipe.spellID)..", itemEquipLoc= "..tostring(itemEquipLoc))
+					DA.DEBUG(2,"ScanTrade: spellID= "..tostring(recipe.spellID)..", itemEquipLoc= "..tostring(itemEquipLoc))
 				end
 
 				if itemName then
