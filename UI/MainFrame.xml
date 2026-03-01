@@ -1192,6 +1192,15 @@
 								</Anchor>
 							</Anchors>
 						</FontString>
+						<FontString name="$parentSkillChance" inherits="GameFontHighlightSmall" justifyH="CENTER">
+							<Anchors>
+								<Anchor point="TOP" relativeTo="SkilletRankFrame">
+									<Offset>
+										<AbsDimension x="0" y="-24"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
 					</Layer>
 					<Layer level="BACKGROUND">
 						<Texture name="$parentBackground">

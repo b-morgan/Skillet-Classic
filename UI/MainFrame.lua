@@ -126,6 +126,43 @@ local pre_show_callbacks = {}
 --
 local pre_hide_callbacks = {}
 
+local function getLvlUpChance()
+--
+-- % to level up with this recipe is calculated by: (greySkill - yourSkill) / (greySkill - yellowSkill)
+--
+	local currentLevel, maxLevel = 0, 0
+	local skillRanks = Skillet:GetSkillRanks(Skillet.currentPlayer, Skillet.currentTrade)
+	if skillRanks then
+		currentLevel, maxLevel = skillRanks.rank, skillRanks.maxRank
+	end
+	local gray = SkilletRankFrame.gray
+	local yellow = SkilletRankFrame.yellow
+	if not gray then gray = SkilletRankFrame.subRanks.green:GetValue() end
+	if not yellow then yellow = SkilletRankFrame.subRanks.orange:GetValue() end
+	DA.DEBUG(0,"currentLevel= "..tostring(currentLevel)..", gray= "..tostring(gray)..", yellow= "..tostring(yellow))
+	if (currentLevel > gray) then
+		return 0
+	elseif (gray - yellow) == 0 then
+		return 100
+	else
+		local percent = ((gray - currentLevel) / ( gray - yellow )) * 100
+		if percent > 100 then
+			percent = 100
+		end
+		return percent
+	end
+end
+
+local function RankFrameMenuList(SkilletRankFrameMenu, rootDescription)
+	if Skillet.isTest then 
+		local title = "RankFrameMenuList"
+		rootDescription:CreateTitle(title);
+	end
+	rootDescription:CreateButton(L["Button 1"], function() Skillet:RankFrame_Button1() end);
+	rootDescription:CreateDivider(); -- CreateSpacer, CreateDivider
+	rootDescription:CreateButton(L["Button 2"], function() Skillet:RankFrame_Button2() end);
+end
+
 function Skillet:AddPreButtonShowCallback(method)
 	assert(method and type(method) == "function",
 		   "Usage: Skillet:AddPreButtonShowCallback(method). method must be a non-nil function")
@@ -1084,6 +1121,7 @@ function Skillet:UpdateTradeSkillWindow()
 	SkilletRankFrame:SetMinMaxValues(0, maxRank)
 	SkilletRankFrame:SetValue(rank)
 	SkilletRankFrameSkillRank:SetText(tradeName.."    "..rank.."/"..maxRank)
+	SkilletRankFrameSkillChance:Hide()
 	SkilletRankFrame.subRanks.gray:SetValue(maxRank)
 	for c,s in pairs(SkilletRankFrame.subRanks) do
 		s:SetMinMaxValues(0, maxRank)
@@ -1898,6 +1936,14 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 				for c,s in pairs(SkilletRankFrame.subRanks) do
 					s:Show()
 				end
+				if self.db.profile.enhanced_chance_display then
+					local chance = getLvlUpChance()
+					chance = math.floor(chance*10)/10		-- one decimal is enough
+					SkilletRankFrameSkillChance:SetText(chance.."%")
+					SkilletRankFrameSkillChance:Show()
+				else
+					SkilletRankFrameSkillChance:Hide()
+				end
 			end
 		end
 --
@@ -2682,43 +2728,6 @@ end
 function Skillet:PushSkill(player, tradeID, skillIndex)
 	local entry = { ["player"] = player, ["tradeID"] = tradeID, ["skillIndex"] = skillIndex }
 	table.insert(skillStack, entry)
-end
-
-local function getLvlUpChance()
---
--- % to level up with this recipe is calculated by: (greySkill - yourSkill) / (greySkill - yellowSkill)
---
-	local currentLevel, maxLevel = 0, 0
-	local skillRanks = Skillet:GetSkillRanks(Skillet.currentPlayer, Skillet.currentTrade)
-	if skillRanks then
-		currentLevel, maxLevel = skillRanks.rank, skillRanks.maxRank
-	end
-	local gray = SkilletRankFrame.gray
-	local yellow = SkilletRankFrame.yellow
-	if not gray then gray = SkilletRankFrame.subRanks.green:GetValue() end
-	if not yellow then yellow = SkilletRankFrame.subRanks.orange:GetValue() end
-	--DA.DEBUG(0,"currentLevel= "..tostring(currentLevel)..", gray= "..tostring(gray)..", yellow= "..tostring(yellow))
-	if (currentLevel > gray) then
-		return 0
-	elseif (gray - yellow) == 0 then
-		return 100
-	else
-		local percent = ((gray - currentLevel) / ( gray - yellow )) * 100
-		if percent > 100 then
-			percent = 100
-		end
-		return percent
-	end
-end
-
-local function RankFrameMenuList(SkilletRankFrameMenu, rootDescription)
-	if Skillet.isTest then 
-		local title = "RankFrameMenuList"
-		rootDescription:CreateTitle(title);
-	end
-	rootDescription:CreateButton(L["Button 1"], function() Skillet:RankFrame_Button1() end);
-	rootDescription:CreateDivider(); -- CreateSpacer, CreateDivider
-	rootDescription:CreateButton(L["Button 2"], function() Skillet:RankFrame_Button2() end);
 end
 
 --

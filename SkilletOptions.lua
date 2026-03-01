@@ -537,8 +537,24 @@ Skillet.options =
 						Skillet.db.profile.enhanced_recipe_display = value
 						Skillet:UpdateTradeSkillWindow()
 					end,
-					width = "full",
+--					width = "full",
+					width = 1.5,
 					order = 4,
+				},
+				enhanced_chance_display = {
+					type = "toggle",
+					name = L["ENHANCHEDCHANCEDISPLAYNAME"],
+					desc = L["ENHANCHEDCHANCEDISPLAYDESC"],
+					get = function()
+						return Skillet.db.profile.enhanced_chance_display
+					end,
+					set = function(self,value)
+						Skillet.db.profile.enhanced_chance_display = value
+						Skillet:UpdateTradeSkillWindow()
+					end,
+--					width = "full",
+					width = 1.5,
+					order = 5,
 				},
 				interrupt_clears_queue = {
 					type = "toggle",
@@ -551,7 +567,7 @@ Skillet.options =
 						Skillet.db.profile.interrupt_clears_queue = value
 					end,
 					width = "full",
-					order = 5,
+					order = 6,
 				},
 				sound_on_empty_queue = {
 					type = "toggle",
@@ -565,7 +581,7 @@ Skillet.options =
 					end,
 --					width = "full",
 					width = 1.5,
-					order = 6,
+					order = 7,
 				},
 				flash_on_empty_queue = {
 					type = "toggle",
@@ -579,7 +595,7 @@ Skillet.options =
 					end,
 --					width = "full",
 					width = 1.5,
-					order = 7,
+					order = 8,
 				},
 				sound_on_remove_queue = {
 					type = "toggle",
@@ -593,7 +609,7 @@ Skillet.options =
 					end,
 --					width = "full",
 					width = 1.5,
-					order = 8,
+					order = 9,
 				},
 				flash_on_remove_queue = {
 					type = "toggle",
@@ -607,7 +623,7 @@ Skillet.options =
 					end,
 --					width = "full",
 					width = 1.5,
-					order = 9,
+					order = 10,
 				},
 				clamp_to_screen = {
 					type = "toggle",
@@ -622,7 +638,7 @@ Skillet.options =
 						if SkilletStandaloneQueue then SkilletStandaloneQueue:SetClampedToScreen(value) end
 					end,
 					width = "full",
-					order = 10,
+					order = 11,
 				},
 				scale_tooltip = {
 					type = "toggle",
@@ -635,7 +651,7 @@ Skillet.options =
 						Skillet.db.profile.scale_tooltip = value
 					end,
 					width = "full",
-					order = 11,
+					order = 12,
 				},
 				transparency = {
 					type = "range",

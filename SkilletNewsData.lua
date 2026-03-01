@@ -34,6 +34,7 @@ Skillet.NewsData = {
 					{ header = "Addons", body = "Update TradeSkillMaster Compatibility" },
 					{ header = "Recipes", body = "Adjust triggering a recipe rescan" },
 					{ header = "Crafts", body = "Implement Enchanting invSlot filter" },
+					{ header = "Recipes", body = "Add option to always display skill up chance" },
 				},
 			},
 		},
