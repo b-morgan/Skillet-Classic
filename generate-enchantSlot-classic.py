@@ -33,8 +33,8 @@ translateSlot = {
 	"Gloves": "HANDSSLOT",	
 	"2H Weapon": "ENCHSLOT_2HWEAPON",	
 	"Weapon": "ENCHSLOT_WEAPON",
-	"Shield": "Shield",	
-	"Ring": "Finger",
+	"Shield": "SHIELDSLOT",	
+	"Ring": "FINGER0SLOT",
 	"Off-Hand": "?",	
 }
 
