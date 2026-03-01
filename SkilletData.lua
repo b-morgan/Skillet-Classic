@@ -1049,7 +1049,7 @@ local function ScanTrade()
 				local recipeString
 				local toolString = "-"
 				recipe.tradeID = tradeID
-				if isClassic then
+				if isClassic or isBCC then
 					recipe.spellID = recipeID
 				else
 					recipe.spellID = Skillet:GetItemIDFromLink(GetTradeSkillRecipeLink(i))
