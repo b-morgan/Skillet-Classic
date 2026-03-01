@@ -1049,7 +1049,11 @@ local function ScanTrade()
 				local recipeString
 				local toolString = "-"
 				recipe.tradeID = tradeID
-				recipe.spellID = Skillet:GetItemIDFromLink(GetTradeSkillRecipeLink(i))
+				if isClassic then
+					recipe.spellID = recipeID
+				else
+					recipe.spellID = Skillet:GetItemIDFromLink(GetTradeSkillRecipeLink(i))
+				end
 				if Skillet.scrollData then
 					recipe.scrollID = Skillet.scrollData[recipe.spellID]
 				end
@@ -1075,7 +1079,7 @@ local function ScanTrade()
 --
 					DA.WARN("ScanTrade: malformed itemLink, tradeID= "..tostring(tradeID)..", i= "..tostring(i)..", name= "..tostring(skillName)..", link= "..DA.PLINK(itemLink))
 					itemLink = nil
-					break
+					break			--** This is a quick fix that will ignore this recipe
 				end
 				if itemLinkCraft then
 					--DA.DEBUG(2,"ScanTrade: using itemLinkCraft")
@@ -1103,13 +1107,13 @@ local function ScanTrade()
 					--DA.DEBUG(2,"ScanTrade: itemType= "..tostring(itemType)..", itemSubType= "..tostring(itemSubType))
 					--DA.DEBUG(2,"ScanTrade: itemClassID= "..tostring(itemClassID)..", itemSubClassID= "..tostring(itemSubClassID))
 					--DA.DEBUG(2,"ScanTrade: bindType= "..tostring(bindType)..", itemSetID= "..tostring(itemSetID))
-					recipe.spellID = Skillet:GetItemIDFromLink(itemLink)
-					itemName = craftName or "e"..tostring(recipe.spellID)
-					--DA.DEBUG(2,"ScanTrade: spellID= "..tostring(recipe.spellID)..", enchantSlot= "..DA.DUMP1(Skillet.enchantSlot[recipe.spellID]))
-					if Skillet.enchantSlot[recipe.spellID] and Skillet.enchantSlot[recipe.spellID][4] then
-						itemEquipLoc = Skillet.enchantSlot[recipe.spellID][4]
+					recipe.craftID = Skillet:GetItemIDFromLink(itemLink)
+					itemName = craftName or "e"..tostring(recipe.craftID)
+					--DA.DEBUG(2,"ScanTrade: craftID= "..tostring(recipe.craftID)..", enchantSlot= "..DA.DUMP1(Skillet.enchantSlot[recipe.craftID]))
+					if Skillet.enchantSlot[recipe.craftID] and Skillet.enchantSlot[recipe.craftID][4] then
+						itemEquipLoc = Skillet.enchantSlot[recipe.craftID][4]
 					end
-					DA.DEBUG(2,"ScanTrade: spellID= "..tostring(recipe.spellID)..", itemEquipLoc= "..tostring(itemEquipLoc))
+					DA.DEBUG(2,"ScanTrade: craftID= "..tostring(recipe.craftID)..", itemEquipLoc= "..tostring(itemEquipLoc))
 				end
 
 				if itemName then
