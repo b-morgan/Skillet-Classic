@@ -1075,6 +1075,7 @@ local function ScanTrade()
 --
 					DA.WARN("ScanTrade: malformed itemLink, tradeID= "..tostring(tradeID)..", i= "..tostring(i)..", name= "..tostring(skillName)..", link= "..DA.PLINK(itemLink))
 					itemLink = nil
+					break
 				end
 				if itemLinkCraft then
 					--DA.DEBUG(2,"ScanTrade: using itemLinkCraft")
