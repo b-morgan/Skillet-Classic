@@ -1303,6 +1303,7 @@ function Skillet:UpdateTradeSkillWindow()
 						levelText:SetText(level)
 					end
 				elseif self.db.profile.display_skill_index then
+					levelText:SetWidth(28)
 					levelText:SetText(tostring(skillIndex))
 				end
 				text = (self:RecipeNamePrefix(skill, recipe) or "") .. (skill.name or "")
