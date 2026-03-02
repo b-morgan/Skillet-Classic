@@ -1048,11 +1048,14 @@ local function ScanTrade()
 				local recipe = Skillet.data.recipeList[recipeID]
 				local recipeString
 				local toolString = "-"
+				local itemLinkTrade = GetTradeSkillItemLink(i)
+				local itemLinkCraft = GetCraftItemLink(i)
+				local recipeLink = GetTradeSkillRecipeLink(i)
 				recipe.tradeID = tradeID
 				if isClassic or isBCC then
 					recipe.spellID = recipeID
 				else
-					recipe.spellID = Skillet:GetItemIDFromLink(GetTradeSkillRecipeLink(i))
+					recipe.spellID = Skillet:GetItemIDFromLink(recipeLink)
 				end
 				if Skillet.scrollData then
 					recipe.scrollID = Skillet.scrollData[recipe.spellID]
@@ -1070,35 +1073,46 @@ local function ScanTrade()
 				local itemStackCount, itemEquipLoc, itemIcon, itemSellPrice, itemClassID, itemSubClassID
 				local bindType, expacID, itemSetID, isCraftingReagent
 				local itemString = "0"
-				local itemLinkTrade = GetTradeSkillItemLink(i)
-				local itemLinkCraft = GetCraftItemLink(i)
-				itemLink = itemLinkTrade or itemLinkCraft
+				if itemLinkCraft then
+					DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", itemLinkCraft= "..tostring(DA.PLINK(itemLinkCraft)))
+					itemLink = itemLinkCraft
+				elseif itemLinkTrade then
+					DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", itemLinkTrade= "..tostring(DA.PLINK(itemLinkTrade)))
+					itemLink = itemLinkTrade
+				else
+					DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", recipeID= "..tostring(recipeID)..", recipeLink= "..tostring(DA.PLINK(recipeLink)))
+					itemLink = recipeLink
+					recipe.itemID = 0
+					recipe.numMade = 1
+				end
 				if itemLink and strfind(itemLink,"item::") then
 --
--- itemLink is malformed, attempt to fix it
+-- itemLink is malformed, attempt to fix it.
 --
 					DA.WARN("ScanTrade: malformed itemLink, tradeID= "..tostring(tradeID)..", i= "..tostring(i)..", name= "..tostring(skillName)..", link= "..tostring(itemLink))
 					itemLink = string.gsub(itemLink, "item::", "item:")
 				end
-				if itemLinkCraft then
-					--DA.DEBUG(2,"ScanTrade: using itemLinkCraft")
-					--DA.DEBUG(2,"ScanTrade: itemLinkCraft= "..tostring(DA.PLINK(itemLinkCraft)))
-				elseif itemLinkTrade then
-					--DA.DEBUG(2,"ScanTrade: using itemLinkTrade")
-					--DA.DEBUG(2,"ScanTrade: itemLinkTrade= "..tostring(DA.PLINK(itemLinkTrade)))
-				else
-					DA.DEBUG(2,"ScanTrade: using recipeID")
-					itemLink = recipeID
-					recipe.itemID = 0
-					recipe.numMade = 1
-				end
 
-				itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
+				itemName, infoLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
 				  itemStackCount, itemEquipLoc, itemIcon, itemSellPrice, itemClassID, itemSubClassID,
 				  bindType, expacID, itemSetID, isCraftingReagent = GetItemInfo(itemLink)
 
+				if not itemName and recipeLink then
+					itemName, infoLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
+					  itemStackCount, itemEquipLoc, itemIcon, itemSellPrice, itemClassID, itemSubClassID,
+					  bindType, expacID, itemSetID, isCraftingReagent = GetItemInfo(recipeLink)
+				end
+				
 				if not Skillet.isCraft then
-					--DA.DEBUG(2,"ScanTrade: itemLink.itemName= "..tostring(itemName)..", itemEquipLoc= "..tostring(itemEquipLoc))
+					DA.DEBUG(2,"ScanTrade: itemName= "..tostring(itemName)..", itemEquipLoc= "..tostring(itemEquipLoc))
+					DA.DEBUG(2,"ScanTrade: itemType= "..tostring(itemType)..", itemSubType= "..tostring(itemSubType))
+					--DA.DEBUG(2,"ScanTrade: itemClassID= "..tostring(itemClassID)..", itemSubClassID= "..tostring(itemSubClassID))
+					DA.DEBUG(2,"ScanTrade: spellID= "..tostring(recipe.spellID)..", scrollID= "..tostring(recipe.scrollID))
+					--DA.DEBUG(2,"ScanTrade: bindType= "..tostring(bindType)..", itemSetID= "..tostring(itemSetID))
+					if not itemName and not itemEquipLoc and tradeID == 7411 then
+						itemName = recipe.name
+						itemEquipLoc = Skillet.enchantSlot[recipe.spellID][4]
+					end					
 				else
 					craftName, craftSubSpellName, craftType, numAvailable, isExpanded = GetCraftInfo(i)
 					DA.DEBUG(2,"ScanTrade: craftName= "..tostring(craftName)..", craftSubSpellName= "..tostring(craftSubSpellName))
@@ -1146,9 +1160,9 @@ local function ScanTrade()
 						Skillet.db.realm.subClass[player][tradeID][itemID] = itemSubType
 					end
 					if itemEquipLoc then
-						if Skillet.isCraft then
+--						if Skillet.isCraft then
 							DA.DEBUG(2,"ScanTrade: itemEquipLoc= "..tostring(itemEquipLoc))
-						end
+--						end
 						if itemEquipLoc == "INVTYPE_ROBE" then
 							DA.DEBUG(2,"ScanTrade: Changing itemEquipLoc from INVTYPE_ROBE to INVTYPE_CHEST")
 							itemEquipLoc = "INVTYPE_CHEST"

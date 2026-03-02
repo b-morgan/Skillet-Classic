@@ -45,51 +45,35 @@ function Skillet:RecipeFilter(skillIndex)
 	local subClass = Skillet.db.realm.subClass[Skillet.currentPlayer][Skillet.currentTrade]
 	local invSlot = Skillet.db.realm.invSlot[Skillet.currentPlayer][Skillet.currentTrade]
 	local itemID = recipe.itemID
-	--DA.DEBUG(1,"RecipeFilter: itemID= "..tostring(itemID)..", subClass= "..tostring(subClass[itemID])..", invSlot= "..tostring(invSlot[itemID]))
-	DA.DEBUG(1,"RecipeFilter: subClass.selected= "..tostring(subClass.selected)..", invSlot.selected= "..tostring(invSlot.selected))
 	if not ItemID and not subClass.selected and not invSlot.selected then
---
--- not initialized yet
---
 		DA.DEBUG(1,"RecipeFilter: not initialized yet")
 		return false
 	end
-	if (subClass.selected == "None" and invSlot.selected == "None") or (not subClass.selected and invSlot.selected == "None") then
---
--- not filtering anything
---
-		DA.DEBUG(1,"RecipeFilter: not filtering anything")
-		return false
-	end
-	DA.DEBUG(1,"RecipeFilter: itemID= "..tostring(itemID)..", subClass= "..tostring(subClass[itemID])..", invSlot= "..tostring(invSlot[itemID]))
-	DA.DEBUG(1,"RecipeFilter: subClass.selected= "..tostring(subClass.selected)..", invSlot.selected= "..tostring(invSlot.selected))
 	if not Skillet.isCraft then
-		if subClass[itemID] == subClass.selected or invSlot[itemID] == invSlot.selected then
---
--- filtering active, return only items that meet the criteria
---
-			--DA.DEBUG(1,"RecipeFilter: filtering active, "..tostring(recipe.name).." met the criteria")
+		if subClass.selected == "None" and invSlot.selected == "None" then
+			--DA.DEBUG(1,"RecipeFilter(T): not filtering anything")
 			return false
 		end
---
--- filtering active, item did not meet the criteria
---
-		--DA.DEBUG(1,"RecipeFilter: filtering active, "..tostring(recipe.name).." did not meet the criteria")
+		DA.DEBUG(1,"RecipeFilter(T): itemID= "..tostring(itemID)..", subClass= "..tostring(subClass[itemID])..", invSlot= "..tostring(invSlot[itemID]))
+		DA.DEBUG(1,"RecipeFilter(T): subClass.selected= "..tostring(subClass.selected)..", invSlot.selected= "..tostring(invSlot.selected))
+		if subClass[itemID] == subClass.selected or invSlot[itemID] == invSlot.selected then
+			DA.DEBUG(1,"RecipeFilter(T): filtering active, "..tostring(recipe.name).." met the criteria")
+			return false
+		end
+		DA.DEBUG(1,"RecipeFilter(T): filtering active, "..tostring(recipe.name).." did not meet the criteria")
 		return true
 	else
-		DA.DEBUG(1,"RecipeFilter: itemID= "..tostring(itemID)..", invSlot= "..tostring(invSlot[itemID]))
-		DA.DEBUG(1,"RecipeFilter: invSlot.selected= "..tostring(invSlot.selected))
-		if invSlot[itemID] == invSlot.selected then
---
--- filtering active, return only items that meet the criteria
---
-			DA.DEBUG(1,"RecipeFilter: filtering active, "..tostring(recipe.name).." met the criteria")
+		if invSlot.selected == "None" then
+			--DA.DEBUG(1,"RecipeFilter(C): not filtering anything")
 			return false
 		end
---
--- filtering active, item did not meet the criteria
---
-		DA.DEBUG(1,"RecipeFilter: filtering active, "..tostring(recipe.name).." did not meet the criteria")
+		DA.DEBUG(1,"RecipeFilter(C): itemID= "..tostring(itemID)..", invSlot= "..tostring(invSlot[itemID]))
+		DA.DEBUG(1,"RecipeFilter(C): invSlot.selected= "..tostring(invSlot.selected))
+		if invSlot[itemID] == invSlot.selected then
+			DA.DEBUG(1,"RecipeFilter(C): filtering active, "..tostring(recipe.name).." met the criteria")
+			return false
+		end
+		DA.DEBUG(1,"RecipeFilter(C): filtering active, "..tostring(recipe.name).." did not meet the criteria")
 		return true
 	end
 end
