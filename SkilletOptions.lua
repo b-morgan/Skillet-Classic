@@ -929,21 +929,16 @@ Skillet.options =
 			end,
 			order = 65
 		},
---[[
-		resetrecipefilter = {
+		version = {
 			type = 'execute',
-			name = L["Reset Recipe Filter"],
-			desc = L["RESETRECIPEFILTERDESC"],
+			name = "Version",
+			desc = "Print version information",
 			func = function()
-				if not (UnitAffectingCombat("player")) then
-					Skillet:ResetTradeSkillFilter()
-				else
-					DA.DEBUG(0,"|cff8888ffSkillet|r: Combat lockdown restriction. Leave combat and try again.")
-				end
+				local wowVersion,wowBuild = GetBuildInfo();
+				print("Skillet-Classic "..tostring(Skillet.version).." on "..tostring(wowVersion).."."..tostring(wowBuild)..", "..tostring(GetLocale()))
 			end,
 			order = 66
 		},
-]]--
 		printsaved = {
 			type = 'execute',
 			name = "PrintSaved",
