@@ -1075,11 +1075,10 @@ local function ScanTrade()
 				itemLink = itemLinkTrade or itemLinkCraft
 				if itemLink and strfind(itemLink,"item::") then
 --
--- itemLink is malformed, ignore it
+-- itemLink is malformed, attempt to fix it
 --
-					DA.WARN("ScanTrade: malformed itemLink, tradeID= "..tostring(tradeID)..", i= "..tostring(i)..", name= "..tostring(skillName)..", link= "..DA.PLINK(itemLink))
-					itemLink = nil
-					break			--** This is a quick fix that will ignore this recipe
+					DA.WARN("ScanTrade: malformed itemLink, tradeID= "..tostring(tradeID)..", i= "..tostring(i)..", name= "..tostring(skillName)..", link= "..tostring(itemLink))
+					itemLink = string.gsub(itemLink, "item::", "item:")
 				end
 				if itemLinkCraft then
 					--DA.DEBUG(2,"ScanTrade: using itemLinkCraft")
@@ -1093,6 +1092,7 @@ local function ScanTrade()
 					recipe.itemID = 0
 					recipe.numMade = 1
 				end
+
 				itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
 				  itemStackCount, itemEquipLoc, itemIcon, itemSellPrice, itemClassID, itemSubClassID,
 				  bindType, expacID, itemSetID, isCraftingReagent = GetItemInfo(itemLink)
