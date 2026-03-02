@@ -445,6 +445,18 @@ Skillet.scrollData = {
 -- to get a mapping of the enchant spell id to the invslot. 
 --
 
+Skillet.translateSlot = {
+	["WRISTSLOT"] = WRISTSLOT,	
+	["CHESTSLOT"] = CHESTSLOT,	
+	["BACKSLOT"] = BACKSLOT,
+	["FEETSLOT"] = FEETSLOT,	
+	["HANDSSLOT"] = HANDSSLOT,	
+	["ENCHSLOT_2HWEAPON"] = ENCHSLOT_2HWEAPON,	
+	["ENCHSLOT_WEAPON"] = ENCHSLOT_WEAPON,
+	["SHIELDSLOT"] = SHIELDSLOT,	
+	["FINGER0SLOT"] = FINGER0SLOT,
+}
+
 -- 
 -- 5.5.3.65988
 -- [spell] = {EquippedItemClass, EquippedItemSubclass, EquippedItemInvTypes, Slot}
