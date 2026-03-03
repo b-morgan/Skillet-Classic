@@ -1089,7 +1089,7 @@ local function ScanTrade()
 --
 -- itemLink is malformed, attempt to fix it.
 --
-					DA.WARN("ScanTrade: malformed itemLink, tradeID= "..tostring(tradeID)..", i= "..tostring(i)..", name= "..tostring(skillName)..", link= "..tostring(itemLink))
+					DA.DEBUG(0,"ScanTrade: malformed itemLink, tradeID= "..tostring(tradeID)..", i= "..tostring(i)..", name= "..tostring(skillName)..", link= "..DA.PLINK(itemLink))
 					itemLink = string.gsub(itemLink, "item::", "item:")
 				end
 
