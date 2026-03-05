@@ -250,9 +250,6 @@ function Skillet:GetTradeSkillTools(skillIndex)
 	end
 end
 
-function Skillet:ExpandTradeSkillSubClass(skillIndex)
-end
-
 --
 -- Gets the trade skill line, and knows how to do the right
 -- thing depending on whether or not this is a craft.
