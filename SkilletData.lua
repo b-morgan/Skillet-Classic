@@ -1066,6 +1066,8 @@ local function ScanTrade()
 				local itemStackCount, itemEquipLoc, itemIcon, itemSellPrice, itemClassID, itemSubClassID
 				local bindType, expacID, itemSetID, isCraftingReagent
 				local itemString = "0"
+				recipe.itemID = 0
+				recipe.numMade = 0
 				if itemLinkCraft then
 					DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", itemLinkCraft= "..tostring(DA.PLINK(itemLinkCraft)))
 					itemLink = itemLinkCraft
@@ -1075,8 +1077,6 @@ local function ScanTrade()
 				else
 					DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", recipeID= "..tostring(recipeID)..", recipeLink= "..tostring(DA.PLINK(recipeLink)))
 					itemLink = recipeLink
-					recipe.itemID = 0
-					recipe.numMade = 1
 				end
 				if itemLink and strfind(itemLink,"item::") then
 --
@@ -1246,7 +1246,7 @@ local function ScanTrade()
 --
 -- TradeID and something else is different
 --
-						DA.WARN("ScanTrade:  recipeID="..tostring(recipeID)..", oldTradeID="..tostring(oldTradeID)..", tradeID="..tostring(tradeID).." (no match)")
+						DA.WARN("ScanTrade: recipeID="..tostring(recipeID)..", oldTradeID="..tostring(oldTradeID)..", tradeID="..tostring(tradeID).." (no match)")
 					end
 --
 -- TradeID is good but something else is different. 
