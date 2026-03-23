@@ -27,6 +27,15 @@ local isMists = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC -- 19
 
 Skillet.NewsName = "Skillet-Classic News"
 Skillet.NewsData = {
+	{	version = "2.32",
+		data = {
+			{	name = "Changes",
+				data = {
+					{ header = "Recipes", body = "Update option to always display skill up chance\nAdd options to recipe right-click menu" },
+				},
+			},
+		},
+	},
 	{	version = "2.31",
 		data = {
 			{	name = "Changes",

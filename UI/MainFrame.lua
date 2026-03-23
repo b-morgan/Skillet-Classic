@@ -1940,7 +1940,7 @@ function Skillet:UpdateDetailsWindow(skillIndex)
 				if self.db.profile.enhanced_chance_display then
 					local chance = getLvlUpChance()
 					chance = math.floor(chance*10)/10		-- one decimal is enough
-					SkilletRankFrameSkillChance:SetText(chance.."%")
+					SkilletRankFrameSkillChance:SetText(COLORORANGE..orange.."|r/"..COLORYELLOW..yellow.."|r/"..COLORGREEN..green.."|r/"..COLORGRAY..gray.."|r/ "..L["Chance"]..": "..chance.."|r%")
 					SkilletRankFrameSkillChance:Show()
 				else
 					SkilletRankFrameSkillChance:Hide()
@@ -2377,17 +2377,6 @@ function Skillet:SkillButton_OnReceiveDrag(button)
 	end
 end
 
-function Skillet:SkillButton_ListReagents()
-	DA.DEBUG(0,"SkillButton_ListReagents()")
-	local skill = Skillet.menuButton.skill
-	if skill and skill.skillIndex then
-		Skillet:ReagentsLinkOnClick(menuButton, skill.skillIndex, false)
-	else
-		DA.DEBUG(0,"SkillButton_ListReagents: skill= "..DA.DUMP1(skill))
-		return
-	end
-end
-
 function Skillet:SkillButton_LinkRecipe()
 	DA.DEBUG(0,"SkillButton_LinkRecipe()")
 	local skill = Skillet.menuButton.skill
@@ -2399,14 +2388,49 @@ function Skillet:SkillButton_LinkRecipe()
 			spellLink = GetTradeSkillRecipeLink(skill.skillIndex)
 		end
 	else
-		DA.DEBUG(0,"SkillButton_LinkRecipe: skill= "..DA.DUMP1(skill))
+		DA.DEBUG(1,"SkillButton_LinkRecipe: skill= "..DA.DUMP1(skill,1))
 		return
 	end
-	DA.DEBUG(0,"SkillButton_LinkRecipe: recipeID= "..tostring(skill.recipeID)..", skillIndex= "..tostring(skill.skillIndex))
+	DA.DEBUG(1,"SkillButton_LinkRecipe: recipeID= "..tostring(skill.recipeID)..", skillIndex= "..tostring(skill.skillIndex))
 	if spellLink then
 		if not ChatEdit_InsertLink(spellLink) then
-			DA.DEBUG(0,"SkillButton_LinkRecipe: spellLink= "..DA.PLINK(spellLink))
+			DA.DEBUG(1,"SkillButton_LinkRecipe: spellLink= "..DA.PLINK(spellLink))
 		end
+	else
+		ChatEdit_InsertLink("["..L["No Data"].."]")
+	end
+end
+
+function Skillet:SkillButton_LinkItem()
+	DA.DEBUG(0,"SkillButton_LinkItem()")
+	local skill = Skillet.menuButton.skill
+	local itemLink
+	if skill and skill.skillIndex then
+		if Skillet.isCraft and GetCraftItemLink then
+			itemLink = GetCraftItemLink(skill.skillIndex)
+		elseif (not Skillet.isCraft) and GetTradeSkillItemLink then 
+			itemLink = GetTradeSkillItemLink(skill.skillIndex)
+		end
+	else
+		DA.DEBUG(1,"SkillButton_LinkItem: skill= "..DA.DUMP1(skill,1))
+		return
+	end
+	DA.DEBUG(1,"SkillButton_LinkItem: recipeID= "..tostring(skill.recipeID)..", skillIndex= "..tostring(skill.skillIndex))
+	if itemLink then
+		if not ChatEdit_InsertLink(itemLink) then
+			DA.DEBUG(1,"SkillButton_LinkItem: itemLink= "..DA.PLINK(itemLink))
+		end
+	end
+end
+
+function Skillet:SkillButton_ListReagents()
+	DA.DEBUG(0,"SkillButton_ListReagents()")
+	local skill = Skillet.menuButton.skill
+	if skill and skill.skillIndex then
+		Skillet:ReagentsLinkOnClick(menuButton, skill.skillIndex, false)
+	else
+		DA.DEBUG(1,"SkillButton_ListReagents: skill= "..DA.DUMP1(skill))
+		return
 	end
 end
 
@@ -2735,6 +2759,9 @@ end
 -- Called when then mouse enters the rank status bar
 --
 function Skillet:RankFrame_OnEnter(button)
+	if self.db.profile.enhanced_chance_display then
+		return
+	end
 	GameTooltip:SetOwner(button, "ANCHOR_BOTTOMLEFT")
 	local r,g,b = SkilletSkillName:GetTextColor()
 	GameTooltip:AddLine(SkilletSkillName:GetText(),r,g,b)
@@ -2751,7 +2778,7 @@ function Skillet:RankFrame_OnEnter(button)
 	if not orange then orange = SkilletRankFrame.subRanks.red:GetValue() end
 	local chance = getLvlUpChance()
 	chance = math.floor(chance*10)/10		-- one decimal is enough
-	GameTooltip:AddLine(COLORORANGE..orange.."|r/"..COLORYELLOW..yellow.."|r/"..COLORGREEN..green.."|r/"..COLORGRAY..gray.."|r/ Chance:"..chance.."|r%")
+	GameTooltip:AddLine(COLORORANGE..orange.."|r/"..COLORYELLOW..yellow.."|r/"..COLORGREEN..green.."|r/"..COLORGRAY..gray.."|r/ "..L["Chance"]..": "..chance.."|r%")
 	GameTooltip:Show()
 end
 
@@ -3281,11 +3308,9 @@ local function SkillMenuList(SkilletSkillMenu, rootDescription)
 		end
 		rootDescription:CreateTitle(title);
 	end
-	if isClassic then
-		rootDescription:CreateButton(L["List Reagents"], function() Skillet:SkillButton_ListReagents() end);
-	else
-		rootDescription:CreateButton(L["Link Recipe"], function() Skillet:SkillButton_LinkRecipe() end);
-	end
+	rootDescription:CreateButton(L["Link Recipe"], function() Skillet:SkillButton_LinkRecipe() end);
+	rootDescription:CreateButton(L["Link Item"], function() Skillet:SkillButton_LinkItem() end);
+	rootDescription:CreateButton(L["List Reagents"], function() Skillet:SkillButton_ListReagents() end);
 	rootDescription:CreateButton(L["Wowhead URL"], function() Skillet:SkillButton_WowheadURL() end);
 	local submenu1 = rootDescription:CreateButton(L["Ignore"]);
 		submenu1:CreateButton(L["Add Recipe to Ignored List"], function()
