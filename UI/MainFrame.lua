@@ -2793,6 +2793,7 @@ end
 function Skillet:RankFrame_OnMouseDown(button)
 	local mouse = GetMouseButtonClicked()
 	DA.DEBUG(3,"RankFrame_OnMouseDown("..tostring(button).."), "..tostring(mouse))
+	if not DA.DebugShow then return end
 	if (mouse == "LeftButton") then
 		if not Skillet.RankFrameExtra then
 			GameTooltip:AddLine("RankFrame_OnMouseDown")
@@ -2807,6 +2808,7 @@ end
 function Skillet:RankFrame_OnMouseUp(button)
 	local mouse = GetMouseButtonClicked()
 	DA.DEBUG(3,"RankFrame_OnMouseUp("..tostring(button).."), "..tostring(mouse))
+	if not DA.DebugShow then return end
 	if (mouse == "LeftButton") then
 		GameTooltip:AddLine("RankFrame_OnMouseUp")
 		GameTooltip:Show()
