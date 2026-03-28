@@ -963,7 +963,7 @@ end
 function Skillet:ADDON_ACTION_BLOCKED()
 	DA.TRACE("ADDON_ACTION_BLOCKED()")
 	if self:HideAllWindows() then
-		DA.MARK3("|cf0f00000Skillet-Classic|r: Combat lockdown restriction. Leave combat and try again.")
+		DA.MARK3("|cf0f00000Skillet-Classic|r: ADDON_ACTION_BLOCKED")
 	end
 end
 
@@ -971,7 +971,7 @@ function Skillet:PLAYER_REGEN_DISABLED()
 	DA.TRACE("PLAYER_REGEN_DISABLED()")
 	self.inCombat = true
 	if self:HideAllWindows() then
-		DA.MARK3("|cf0f00000Skillet-Classic|r: Combat lockdown restriction. Leave combat and try again.")
+		DA.MARK3("|cf0f00000Skillet-Classic|r: PLAYER_REGEN_DISABLED")
 	end
 end
 
@@ -1100,7 +1100,7 @@ end
 function Skillet:TRADE_SKILL_SHOW()
 	DA.TRACE("TRADE_SKILL_SHOW")
 	if UnitAffectingCombat("player") then
-		DA.MARK3(0,"|cff8888ffSkillet|r: Combat lockdown restriction.".." Leave combat and try again.")
+		DA.MARK3(0,"|cff8888ffSkillet|r: TRADE_SKILL_SHOW combat lockdown restriction.".." Leave combat and try again.")
 		return
 	end
 	Skillet.tradeUpdate = 0
@@ -1127,7 +1127,7 @@ function Skillet:CRAFT_SHOW()
 	DA.TRACE("CRAFT_SHOW")
 	if TSM_API then return end
 	if UnitAffectingCombat("player") then
-		DA.MARK3(0,"|cff8888ffSkillet|r: Combat lockdown restriction.".." Leave combat and try again.")
+		DA.MARK3(0,"|cff8888ffSkillet|r: CRAFT_SHOW combat lockdown restriction.".." Leave combat and try again.")
 		return
 	end
 	if Skillet.castSpellID == 5149 then
@@ -1399,7 +1399,7 @@ end
 function Skillet:SkilletShowWindow()
 	DA.DEBUG(0,"SkilletShowWindow(), currentTrade= "..tostring(self.currentTrade)..", scanInProgress= "..tostring(scanInProgress))
 	if UnitAffectingCombat("player") then
-		DA.MARK3(0,"|cff8888ffSkillet|r: Combat lockdown restriction.".." Leave combat and try again.")
+		DA.MARK3(0,"|cff8888ffSkillet|r: SkilletShowWindow() combat lockdown restriction.".." Leave combat and try again.")
 		return
 	end
 	if self:IsModKey2Down() then
