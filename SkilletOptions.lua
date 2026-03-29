@@ -1258,26 +1258,29 @@ Skillet.options =
 		delayupdate = {
 			type = "toggle",
 			name = "DelayUpdate",
-			desc = "Delay UpdateTradeSkillWindow calls",
+			desc = "Delay UpdateTradeSkillWindow",
 			get = function()
 				return Skillet.db.profile.delayupdate
 			end,
 			set = function(self,value)
 				Skillet.db.profile.delayupdate = value
 				print("delayupdate= "..tostring(value))
+				if not Skillet.db.profile.updatedelay then
+					Skillet.db.profile.updatedelay = 0.5
+				end
 			end,
 			order = 86
 		},
 		updatedelay = {
 			type = "input",
 			name = "UpdateDelay",
-			desc = "When DelayUpdate is true, tenths of a second to delay",
+			desc = "Tenths of a second to delay UpdateTradeSkillWindow",
 			get = function()
 				return Skillet.db.profile.updatedelay
 			end,
 			set = function(self,value)
 				local value = tonumber(value)
-				value = math.max(0,math.min(value,10))/10
+				value = math.max(1,math.min(value,10))/10
 				print("updatedelay= "..tostring(value))
 				Skillet.db.profile.updatedelay = value
 			end,
