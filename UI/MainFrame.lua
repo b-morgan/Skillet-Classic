@@ -1011,6 +1011,10 @@ end
 
 function Skillet:DelayUpdate()
 	Skillet.delayUpdate = false
+	if Skillet.needsUpdate then
+        Skillet.needsUpdate = false
+        Skillet:UpdateTradeSkillWindow()
+	end
 end
 --
 -- Updates the trade skill window whenever anything has changed,
@@ -1019,10 +1023,11 @@ end
 function Skillet:UpdateTradeSkillWindow()
 	DA.DEBUG(0,"UpdateTradeSkillWindow()")
 	if Skillet.db.profile.delayupdate and self.delayUpdate then
+		Skillet.needsUpdate = true
 		return
 	elseif Skillet.db.profile.delayupdate then
 		Skillet.delayUpdate = true
-		self:ScheduleTimer("DelayUpdate", 0.5)
+		self:ScheduleTimer("DelayUpdate", Skillet.db.profile.updatedelay)
 	end
 	self:NameEditSave()
 	if not self.currentPlayer or not self.currentTrade then 

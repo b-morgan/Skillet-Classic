@@ -104,6 +104,7 @@ local defaults = {
 		transparency = 1.0,
 		scale = 1.0,
 		ttscale = 1.0,
+		updatedelay = 0.5,
 		plugins = {},
 		SavedQueues = {},
 		include_alts = true,	-- Display alt's items in shopping list

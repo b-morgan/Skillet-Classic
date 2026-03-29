@@ -34,6 +34,7 @@ Skillet.NewsData = {
 					{ header = "Recipes", body = "Update option to always display skill up chance\nAdd options to recipe right-click menu" },
 					{ header = "SkillLevels", body = "Hide unimplemented mouse actions when not debugging" },
 					{ header = "Errors", body = "Add specific text to some combat restriction messages" },
+					{ header = "UI", body = "More fixes to delayupdate" },
 				},
 			},
 		},

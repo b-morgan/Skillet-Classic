@@ -1268,6 +1268,21 @@ Skillet.options =
 			end,
 			order = 86
 		},
+		updatedelay = {
+			type = "input",
+			name = "UpdateDelay",
+			desc = "When DelayUpdate is true, tenths of a second to delay",
+			get = function()
+				return Skillet.db.profile.updatedelay
+			end,
+			set = function(self,value)
+				local value = tonumber(value)
+				value = math.max(0,math.min(value,10))/10
+				print("updatedelay= "..tostring(value))
+				Skillet.db.profile.updatedelay = value
+			end,
+			order = 87
+		},
 
 --
 -- Commands to manipulate the state of debugging code flags
