@@ -126,6 +126,14 @@ local pre_show_callbacks = {}
 --
 local pre_hide_callbacks = {}
 
+local function getTradeSkillListLink()
+	if GetTradeSkillListLink then
+		return GetTradeSkillListLink()
+	elseif C_TradeSkillUI.GetTradeSkillListLink then
+		return C_TradeSkillUI.GetTradeSkillListLink()
+	end
+end
+
 local function getLvlUpChance()
 --
 -- % to level up with this recipe is calculated by: (greySkill - yourSkill) / (greySkill - yellowSkill)
@@ -734,12 +742,7 @@ function Skillet:TradeButton_OnEnter(button)
 		local rank, maxRank = data.rank, data.maxRank
 		GameTooltip:AddLine("["..tostring(rank).."/"..tostring(maxRank).."]",0,1,0)
 		if tradeID == self.currentTrade then
-			local link
-			if GetTradeSkillListLink then
-				link = GetTradeSkillListLink()
-			elseif C_TradeSkillUI.GetTradeSkillListLink then
-				link = C_TradeSkillUI.GetTradeSkillListLink()
-			end
+			local link = getTradeSkillListLink()
 			if link then
 				GameTooltip:AddLine(L["shift-click to link"])
 			end
@@ -778,15 +781,14 @@ function Skillet:TradeButton_OnClick(this,button)
 	DA.DEBUG(0,"TradeButton_OnClick: "..tostring(name).." "..tostring(player).." "..tostring(tradeID)..", button= "..tostring(button))
 	if button == "LeftButton" then
 		if player == self.currentPlayer and self.currentTrade then
-			if self.currentTrade == tradeID and IsShiftKeyDown() then
-				local link
-				if GetTradeSkillListLink then
-					link = GetTradeSkillListLink()
-				elseif C_TradeSkillUI.GetTradeSkillListLink then
-					link = C_TradeSkillUI.GetTradeSkillListLink()
-				end
-				if link then
-					ChatEdit_InsertLink(link)
+			if self.currentTrade == tradeID then
+				if IsShiftKeyDown() then
+					local link = getTradeSkillListLink()
+					if link then
+						ChatEdit_InsertLink(link)
+					end
+				else
+					self:UpdateTradeSkillWindow()
 				end
 			elseif self.currentTrade ~= tradeID then
 				if self.skillIsCraft[self.currentTrade] ~= self.skillIsCraft[tradeID] then
