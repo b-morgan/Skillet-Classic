@@ -1123,11 +1123,13 @@ Skillet.options =
 				Skillet.data.customgroups = value
 				if value then
 					SkilletRecipeGroupOperations:Enable()
+					print("Custom Groups enabled")
 				else
 					SkilletRecipeGroupOperations:Disable()
+					print("Custom Groups disabled")
 				end
 			end,
-			order = 78
+			order = 77
 		},
 		nomodkeys = {
 			type = "toggle",
@@ -1603,6 +1605,28 @@ Skillet.options =
 			end,
 			order = 108
 		},
+--
+-- DA.DUMP (and DA.DUMP1) command recursion level
+--   default value is 1
+--	 limited to a max of 5 but that will probably
+--   cause stack overflow
+--
+		DumpLevel = {
+			type = "input",
+			name = "DumpLevel",
+			desc = "Recursion level in DA.DUMP commands",
+			get = function()
+				return Skillet.db.profile.dumplevel
+			end,
+			set = function(self,value)
+				local value = tonumber(value)
+				value = math.max(1,math.min(value,5))
+				Skillet.db.profile.dumplevel = value
+				print("dumplevel= "..tostring(value))
+			end,
+			order = 109
+		},
+
 --
 -- Commands to set/show how many TRADE_SKILL_UPDATE / CRAFT_UPDATE events to ignore
 --

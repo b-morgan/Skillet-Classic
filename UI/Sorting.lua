@@ -599,22 +599,24 @@ function Skillet:SortAndFilterRecipes() -- SAFR:
 --
 		local group = Skillet:RecipeGroupFind(Skillet.currentPlayer, Skillet.currentTrade, Skillet.currentGroupLabel, Skillet.currentGroup)
 		--DA.DEBUG(1,"SAFR: current grouping "..tostring(Skillet.currentGroupLabel).." "..tostring(Skillet.currentGroup))
-		if recipe_sort_method ~= NOSORT then
-			Skillet:RecipeGroupSort(group, recipe_sort_method, is_sort_desc())
-		end
-		local depth, index = 1, 1
-		if Skillet.currentGroup then
-			Skillet:RecipeGroupInitFlatten(group, sortedSkillList)
-			depth, index = 1, 1
-		else
-			depth, index = 0, 0
-		end
+		if group then
+			if recipe_sort_method ~= NOSORT then
+				Skillet:RecipeGroupSort(group, recipe_sort_method, is_sort_desc())
+			end
+			local depth, index = 1, 1
+			if Skillet.currentGroup then
+				Skillet:RecipeGroupInitFlatten(group, sortedSkillList)
+				depth, index = 1, 1
+			else
+				depth, index = 0, 0
+			end
 --
 -- RecipeGroupFlatten does filtering (only if the skillIndex is correct)
 -- and sorting but not searching
 --
-		button_index = Skillet:RecipeGroupFlatten(group, depth, sortedSkillList, index)
-		--DA.DEBUG(1,"SAFR: sorted "..tostring(button_index).." skills in "..tostring(Skillet.currentGroupLabel))
+			button_index = Skillet:RecipeGroupFlatten(group, depth, sortedSkillList, index)
+			--DA.DEBUG(1,"SAFR: sorted "..tostring(button_index).." skills in "..tostring(Skillet.currentGroupLabel))
+		end
 	end
 	sortedSkillList.count = button_index
 --

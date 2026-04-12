@@ -105,6 +105,7 @@ local defaults = {
 		scale = 1.0,
 		ttscale = 1.0,
 		updatedelay = 0.5,
+		dumplevel = 1,
 		plugins = {},
 		SavedQueues = {},
 		include_alts = true,	-- Display alt's items in shopping list
@@ -515,6 +516,8 @@ function Skillet:FlushCustomData()
 	DA.DEBUG(0,"FlushCustomData()");
 	Skillet.db.profile.groupDB = {}
 	Skillet.db.profile.groupSN = {}
+	Skillet.currentGroupLabel = "Blizzard"
+	Skillet.currentGroup = nil
 end
 
 --
