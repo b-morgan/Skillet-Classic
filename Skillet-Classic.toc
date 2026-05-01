@@ -96,6 +96,7 @@ Plugins\Auctionator.lua
 Plugins\AuctionDB.lua
 Plugins\Auctioneer.lua
 Plugins\AuctionLite.lua
+Plugins\CanIMogIt.lua
 Plugins\DataStoreAuctions.lua
 Plugins\AckisRecipeList.lua
 
