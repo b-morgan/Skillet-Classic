@@ -426,33 +426,33 @@ function Skillet:OnInitialize()
 --
 -- Create a static popup for changing professions
 --
-StaticPopupDialogs["SKILLET_CONTINUE_CHANGE"] = {
-	text = "Skillet-Classic\n"..L["Press Okay to continue changing professions"],
-	button1 = OKAY,
-	OnAccept = function( self )
-		Skillet:ContinueChange()
-		return
-	end,
-	timeout = 0,
-	exclusive = 1,
-	whileDead = 1,
-	hideOnEscape = 1
-};
+	StaticPopupDialogs["SKILLET_CONTINUE_CHANGE"] = {
+		text = "Skillet-Classic\n"..L["Press Okay to continue changing professions"],
+		button1 = OKAY,
+		OnAccept = function( self )
+			Skillet:ContinueChange()
+			return
+		end,
+		timeout = 0,
+		exclusive = 1,
+		whileDead = 1,
+		hideOnEscape = 1
+	};
 
 --
 -- Create a static popup for changing professions
 --
-StaticPopupDialogs["SKILLET_IGNORE_CHANGE"] = {
-	text = "Skillet-Classic\n"..L["Use Action Bar button to change professions"],
-	button1 = OKAY,
-	OnAccept = function( self )
-		return
-	end,
-	timeout = 0,
-	exclusive = 1,
-	whileDead = 1,
-	hideOnEscape = 1
-};
+	StaticPopupDialogs["SKILLET_IGNORE_CHANGE"] = {
+		text = "Skillet-Classic\n"..L["Use Action Bar button to change professions"],
+		button1 = OKAY,
+		OnAccept = function( self )
+			return
+		end,
+		timeout = 0,
+		exclusive = 1,
+		whileDead = 1,
+		hideOnEscape = 1
+	};
 
 --
 -- Now do the character initialization
@@ -471,7 +471,7 @@ end
 -- increment to trigger a call.
 --
 function Skillet:FlushAllData()
-	DA.DEBUG(0,"FlushAllData()");
+	DA.DEBUG(0,"FlushAllData()")
 	Skillet.data = {}
 	Skillet.db.realm.tradeSkills = {}
 	Skillet.db.realm.auctionData = {}
@@ -492,7 +492,7 @@ end
 -- Flush all data for the current player
 --
 function Skillet:FlushPlayerData()
-	DA.DEBUG(0,"FlushPlayerData()");
+	DA.DEBUG(0,"FlushPlayerData()")
 	local player = UnitName("player")
 	Skillet.db.realm.tradeSkills[player] = {}
 	Skillet.db.realm.auctionData[player] = {}
@@ -513,11 +513,12 @@ end
 -- good cause.
 --
 function Skillet:FlushCustomData()
-	DA.DEBUG(0,"FlushCustomData()");
+	DA.DEBUG(0,"FlushCustomData()")
 	Skillet.db.profile.groupDB = {}
 	Skillet.db.profile.groupSN = {}
 	Skillet.currentGroupLabel = "Blizzard"
 	Skillet.currentGroup = nil
+	Skillet:SetTradeSkillOption("grouping", "Blizzard")
 end
 
 --
