@@ -1068,14 +1068,14 @@ local function ScanTrade()
 				local itemString = "0"
 				recipe.itemID = 0
 				recipe.numMade = 0
+				--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", itemLinkCraft= "..tostring(DA.PLINK(itemLinkCraft)))
+				--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", itemLinkTrade= "..tostring(DA.PLINK(itemLinkTrade)))
+				--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", recipeID= "..tostring(recipeID)..", recipeLink= "..tostring(DA.PLINK(recipeLink)))
 				if itemLinkCraft then
-					DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", itemLinkCraft= "..tostring(DA.PLINK(itemLinkCraft)))
 					itemLink = itemLinkCraft
 				elseif itemLinkTrade then
-					DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", itemLinkTrade= "..tostring(DA.PLINK(itemLinkTrade)))
 					itemLink = itemLinkTrade
 				else
-					DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", recipeID= "..tostring(recipeID)..", recipeLink= "..tostring(DA.PLINK(recipeLink)))
 					itemLink = recipeLink
 				end
 				if itemLink and strfind(itemLink,"item::") then
@@ -1086,9 +1086,11 @@ local function ScanTrade()
 					itemLink = string.gsub(itemLink, "item::", "item:")
 				end
 
-				itemName, infoLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
-				  itemStackCount, itemEquipLoc, itemIcon, itemSellPrice, itemClassID, itemSubClassID,
-				  bindType, expacID, itemSetID, isCraftingReagent = GetItemInfo(itemLink)
+				if itemLink then
+					itemName, infoLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
+					  itemStackCount, itemEquipLoc, itemIcon, itemSellPrice, itemClassID, itemSubClassID,
+					  bindType, expacID, itemSetID, isCraftingReagent = GetItemInfo(itemLink)
+				end
 
 				if not itemName and recipeLink then
 					itemName, infoLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
@@ -1096,34 +1098,34 @@ local function ScanTrade()
 					  bindType, expacID, itemSetID, isCraftingReagent = GetItemInfo(recipeLink)
 				end
 				
-				if not Skillet.isCraft then
-					DA.DEBUG(2,"ScanTrade: itemName= "..tostring(itemName)..", itemEquipLoc= "..tostring(itemEquipLoc))
-					DA.DEBUG(2,"ScanTrade: itemType= "..tostring(itemType)..", itemSubType= "..tostring(itemSubType))
-					--DA.DEBUG(2,"ScanTrade: itemClassID= "..tostring(itemClassID)..", itemSubClassID= "..tostring(itemSubClassID))
-					DA.DEBUG(2,"ScanTrade: spellID= "..tostring(recipe.spellID)..", scrollID= "..tostring(recipe.scrollID))
-					--DA.DEBUG(2,"ScanTrade: bindType= "..tostring(bindType)..", itemSetID= "..tostring(itemSetID))
-					if not itemName and not itemEquipLoc and tradeID == 7411 then
-						itemName = recipe.name
-						itemEquipLoc = Skillet.enchantSlot[recipe.spellID][4]
-					end					
-				else
-					craftName, craftSubSpellName, craftType, numAvailable, isExpanded = GetCraftInfo(i)
-					DA.DEBUG(2,"ScanTrade: craftName= "..tostring(craftName)..", craftSubSpellName= "..tostring(craftSubSpellName))
-					--DA.DEBUG(2,"ScanTrade: craftType= "..tostring(craftType)..", numAvailable= "..tostring(numAvailable))
-					--DA.DEBUG(2,"ScanTrade: isExpanded= "..tostring(isExpanded))
-					--DA.DEBUG(2,"ScanTrade: itemType= "..tostring(itemType)..", itemSubType= "..tostring(itemSubType))
-					--DA.DEBUG(2,"ScanTrade: itemClassID= "..tostring(itemClassID)..", itemSubClassID= "..tostring(itemSubClassID))
-					--DA.DEBUG(2,"ScanTrade: bindType= "..tostring(bindType)..", itemSetID= "..tostring(itemSetID))
-					recipe.craftID = Skillet:GetItemIDFromLink(itemLink)
-					itemName = craftName or "e"..tostring(recipe.craftID)
-					--DA.DEBUG(2,"ScanTrade: craftID= "..tostring(recipe.craftID)..", enchantSlot= "..DA.DUMP1(Skillet.enchantSlot[recipe.craftID]))
-					if Skillet.enchantSlot[recipe.craftID] and Skillet.enchantSlot[recipe.craftID][4] then
-						itemEquipLoc = Skillet.enchantSlot[recipe.craftID][4]
-					end
-					DA.DEBUG(2,"ScanTrade: craftID= "..tostring(recipe.craftID)..", itemEquipLoc= "..tostring(itemEquipLoc))
-				end
-
 				if itemName then
+					if not Skillet.isCraft then
+						--DA.DEBUG(2,"ScanTrade: itemName= "..tostring(itemName)..", itemEquipLoc= "..tostring(itemEquipLoc))
+						--DA.DEBUG(2,"ScanTrade: itemType= "..tostring(itemType)..", itemSubType= "..tostring(itemSubType))
+						--DA.DEBUG(2,"ScanTrade: itemClassID= "..tostring(itemClassID)..", itemSubClassID= "..tostring(itemSubClassID))
+						--DA.DEBUG(2,"ScanTrade: spellID= "..tostring(recipe.spellID)..", scrollID= "..tostring(recipe.scrollID))
+						--DA.DEBUG(2,"ScanTrade: bindType= "..tostring(bindType)..", itemSetID= "..tostring(itemSetID))
+						if not itemName and not itemEquipLoc and tradeID == 7411 then
+							itemName = recipe.name
+							itemEquipLoc = Skillet.enchantSlot[recipe.spellID][4]
+						end					
+					else
+						craftName, craftSubSpellName, craftType, numAvailable, isExpanded = GetCraftInfo(i)
+						--DA.DEBUG(2,"ScanTrade: craftName= "..tostring(craftName)..", craftSubSpellName= "..tostring(craftSubSpellName))
+						--DA.DEBUG(2,"ScanTrade: craftType= "..tostring(craftType)..", numAvailable= "..tostring(numAvailable))
+						--DA.DEBUG(2,"ScanTrade: isExpanded= "..tostring(isExpanded))
+						--DA.DEBUG(2,"ScanTrade: itemType= "..tostring(itemType)..", itemSubType= "..tostring(itemSubType))
+						--DA.DEBUG(2,"ScanTrade: itemClassID= "..tostring(itemClassID)..", itemSubClassID= "..tostring(itemSubClassID))
+						--DA.DEBUG(2,"ScanTrade: bindType= "..tostring(bindType)..", itemSetID= "..tostring(itemSetID))
+						recipe.craftID = Skillet:GetItemIDFromLink(itemLink)
+						itemName = craftName or "e"..tostring(recipe.craftID)
+						--DA.DEBUG(2,"ScanTrade: craftID= "..tostring(recipe.craftID)..", enchantSlot= "..DA.DUMP1(Skillet.enchantSlot[recipe.craftID]))
+						if Skillet.enchantSlot[recipe.craftID] and Skillet.enchantSlot[recipe.craftID][4] then
+							itemEquipLoc = Skillet.enchantSlot[recipe.craftID][4]
+						end
+						--DA.DEBUG(2,"ScanTrade: craftID= "..tostring(recipe.craftID)..", itemEquipLoc= "..tostring(itemEquipLoc))
+					end
+
 					local itemID, linkType = Skillet:GetItemIDFromLink(itemLink)
 					itemID = itemID or 0
 					--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", itemID= "..tostring(itemID)..", linkType= "..tostring(linkType))
@@ -1153,9 +1155,7 @@ local function ScanTrade()
 						Skillet.db.realm.subClass[player][tradeID][itemID] = itemSubType
 					end
 					if itemEquipLoc then
---						if Skillet.isCraft then
-							DA.DEBUG(2,"ScanTrade: itemEquipLoc= "..tostring(itemEquipLoc))
---						end
+						--DA.DEBUG(2,"ScanTrade: itemEquipLoc= "..tostring(itemEquipLoc))
 						if itemEquipLoc == "INVTYPE_ROBE" then
 							DA.DEBUG(2,"ScanTrade: Changing itemEquipLoc from INVTYPE_ROBE to INVTYPE_CHEST")
 							itemEquipLoc = "INVTYPE_CHEST"
@@ -1168,96 +1168,96 @@ local function ScanTrade()
 						Skillet.db.realm.invSlot[player][tradeID].name[itemEquipLoc] = numInvSlot[itemEquipLoc]
 						Skillet.db.realm.invSlot[player][tradeID][itemID] = itemEquipLoc
 					end
-				end
 
-				local reagentString = "-"
-				local reagentData = {}
-				local numReagents
-				if Skillet.isCraft then
-					numReagents = GetCraftNumReagents(i)
-				else
-					numReagents = GetTradeSkillNumReagents(i)
-				end
-				--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", numReagents= "..tostring(numReagents))
-				for j=1, numReagents, 1 do
-					local reagentName, _, numNeeded
+					local reagentString = "-"
+					local reagentData = {}
+					local numReagents
 					if Skillet.isCraft then
-						reagentName, _, numNeeded = GetCraftReagentInfo(i,j)	-- reagentName, reagentTexture, reagentCount, playerReagentCount
+						numReagents = GetCraftNumReagents(i)
 					else
-						reagentName, _, numNeeded = GetTradeSkillReagentInfo(i,j)
+						numReagents = GetTradeSkillNumReagents(i)
 					end
-					--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", j= "..tostring(j)..", reagentName= "..tostring(reagentName)..", numNeeded= "..tostring(numNeeded))
-					local reagentID = 0
-					if reagentName then
-						local reagentLink
+					--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", numReagents= "..tostring(numReagents))
+					for j=1, numReagents, 1 do
+						local reagentName, _, numNeeded
 						if Skillet.isCraft then
-							reagentLink = GetCraftReagentItemLink(i,j)
+							reagentName, _, numNeeded = GetCraftReagentInfo(i,j)	-- reagentName, reagentTexture, reagentCount, playerReagentCount
 						else
-							reagentLink = GetTradeSkillReagentItemLink(i,j)
+							reagentName, _, numNeeded = GetTradeSkillReagentInfo(i,j)
 						end
-						--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", reagentLink= "..DA.PLINK(reagentLink))
+						--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", j= "..tostring(j)..", reagentName= "..tostring(reagentName)..", numNeeded= "..tostring(numNeeded))
+						local reagentID = 0
+						if reagentName then
+							local reagentLink
+							if Skillet.isCraft then
+								reagentLink = GetCraftReagentItemLink(i,j)
+							else
+								reagentLink = GetTradeSkillReagentItemLink(i,j)
+							end
+							--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", reagentLink= "..DA.PLINK(reagentLink))
 --
 -- If the reagent is not in the client's cache, the link will be nil. 
 -- This failure could be recovered with some fancy coding.
 --
-						if reagentLink then
-							reagentID = Skillet:GetItemIDFromLink(reagentLink)
+							if reagentLink then
+								reagentID = Skillet:GetItemIDFromLink(reagentLink)
+							else
+								missingReagentLink[reagentName] = {}
+								missingReagentLink[reagentName].skillId = i
+								missingReagentLink[reagentName].reagentId = j
+							end
 						else
-							missingReagentLink[reagentName] = {}
-							missingReagentLink[reagentName].skillId = i
-							missingReagentLink[reagentName].reagentId = j
-						end
-					else
 --
 -- The ...ReagentInfo call failed. Not sure if this can be recovered.
 --
-						missingReagentName[recipeID] = {}
-						missingReagentName[recipeID].skillId = i
-						missingReagentName[recipeID].reagentId = j
+							missingReagentName[recipeID] = {}
+							missingReagentName[recipeID].skillId = i
+							missingReagentName[recipeID].reagentId = j
+						end
+						reagentData[j] = {}
+						reagentData[j].id = reagentID
+						reagentData[j].numNeeded = numNeeded
+						if reagentString ~= "-" then
+							reagentString = reagentString..":"..reagentID..":"..numNeeded
+						else
+							reagentString = reagentID..":"..numNeeded
+						end
+						Skillet:ItemDataAddUsedInRecipe(reagentID, recipeID)	-- add a cross reference for where a particular item is used
 					end
-					reagentData[j] = {}
-					reagentData[j].id = reagentID
-					reagentData[j].numNeeded = numNeeded
-					if reagentString ~= "-" then
-						reagentString = reagentString..":"..reagentID..":"..numNeeded
-					else
-						reagentString = reagentID..":"..numNeeded
+					recipe.reagentData = reagentData
+					recipeString = tradeID.." "..itemString.." "..reagentString
+					if #tools then
+						recipeString = recipeString.." "..toolString
 					end
-					Skillet:ItemDataAddUsedInRecipe(reagentID, recipeID)	-- add a cross reference for where a particular item is used
-				end
-				recipe.reagentData = reagentData
-				recipeString = tradeID.." "..itemString.." "..reagentString
-				if #tools then
-					recipeString = recipeString.." "..toolString
-				end
-				if not recipeDB[recipeID] then
-					recipeDB[recipeID] = recipeString
-				elseif recipeDB[recipeID] ~= recipeString then
+					if not recipeDB[recipeID] then
+						recipeDB[recipeID] = recipeString
+					elseif recipeDB[recipeID] ~= recipeString then
 --
 -- This entry doesn't match an existing entry. Check to see what is different
 --
-					local oldTradeID, oldItemString, oldReagentString, oldToolString = string.split(" ",recipeDB[recipeID])
-					if oldItemString == itemString and oldReagentString == reagentString and oldToolString == toolString then
+						local oldTradeID, oldItemString, oldReagentString, oldToolString = string.split(" ",recipeDB[recipeID])
+						if oldItemString == itemString and oldReagentString == reagentString and oldToolString == toolString then
 --
 -- TradeID is different but everything else is the same
 --					
-						DA.WARN("ScanTrade: recipeID="..tostring(recipeID)..", oldTradeID="..tostring(oldTradeID)..", tradeID="..tostring(tradeID).." (match)")
-					elseif oldTradeID ~= tostring(tradeID) then
+							DA.WARN("ScanTrade: recipeID="..tostring(recipeID)..", oldTradeID="..tostring(oldTradeID)..", tradeID="..tostring(tradeID).." (match)")
+						elseif oldTradeID ~= tostring(tradeID) then
 --
 -- TradeID and something else is different
 --
-						DA.WARN("ScanTrade: recipeID="..tostring(recipeID)..", oldTradeID="..tostring(oldTradeID)..", tradeID="..tostring(tradeID).." (no match)")
-					end
+							DA.WARN("ScanTrade: recipeID="..tostring(recipeID)..", oldTradeID="..tostring(oldTradeID)..", tradeID="..tostring(tradeID).." (no match)")
+						end
 --
 -- TradeID is good but something else is different. 
 -- This happens most often when a previous scan encountered a reagent item not cached yet
 --
-					DA.WARN("ScanTrade: replacing recipeID="..tostring(recipeID)..", '"..tostring(recipeDB[recipeID]).."' with '"..tostring(recipeString).."'")
-					recipeDB[recipeID] = recipeString
-				end
-			end
-		end
-	end
+						DA.WARN("ScanTrade: replacing recipeID="..tostring(recipeID)..", '"..tostring(recipeDB[recipeID]).."' with '"..tostring(recipeString).."'")
+						recipeDB[recipeID] = recipeString
+					end
+				end -- if itemName
+			end -- if header
+		end -- if skillName
+	end -- for numskills
 --
 -- SkilletMemory is a saved variable snapshot of data tables
 --
