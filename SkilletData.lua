@@ -919,11 +919,13 @@ local function ScanTrade()
 -- GetCraftInfo() returns are: craftName, craftSubSpellName, craftType, numAvailable, isExpanded, trainingPointCost, requiredLevel
 --
 				craftName, craftSubSpellName, craftType, numAvailable, isExpanded = GetCraftInfo(i)
+				local itemLinkCraft = GetCraftItemLink(i)
 				skillName = craftName
 				skillType = craftType
 			end
 		else
 			skillName, skillType, numAvailable, isExpanded = GetTradeSkillInfo(i)
+			local itemLinkTrade = GetTradeSkillItemLink(i)
 		end
 		--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", skillName= "..tostring(skillName)..", craftSubSpellName= "..tostring(craftSubSpellName)..", skillType="..tostring(skillType)..", numAvailable= "..tostring(numAvailable)..", isExpanded= "..tostring(isExpanded))
 		if skillName then
@@ -1168,7 +1170,10 @@ local function ScanTrade()
 						Skillet.db.realm.invSlot[player][tradeID].name[itemEquipLoc] = numInvSlot[itemEquipLoc]
 						Skillet.db.realm.invSlot[player][tradeID][itemID] = itemEquipLoc
 					end
-
+				end -- if itemName
+--
+--** Not sure why we are here without an itemName
+--
 					local reagentString = "-"
 					local reagentData = {}
 					local numReagents
@@ -1254,7 +1259,7 @@ local function ScanTrade()
 						DA.WARN("ScanTrade: replacing recipeID="..tostring(recipeID)..", '"..tostring(recipeDB[recipeID]).."' with '"..tostring(recipeString).."'")
 						recipeDB[recipeID] = recipeString
 					end
-				end -- if itemName
+--**			end -- if itemName
 			end -- if header
 		end -- if skillName
 	end -- for numskills
