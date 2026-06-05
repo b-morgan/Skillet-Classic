@@ -31,9 +31,6 @@ local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
 local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
 local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
 
-local GetItemInfo = C_Item and C_Item.GetItemInfo or GetItemInfo
-local GetItemCount = C_Item and C_Item.GetItemCount or GetItemCount
-
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
 -- Stolen from the Waterfall Ace2 addon.
@@ -182,7 +179,7 @@ local function createShoppingListFrame(self)
 end
 
 function Skillet:ShoppingListButton_OnEnter(button)
-	local name, link, quality = GetItemInfo(button.id)
+	local name, link, quality = C_Item.GetItemInfo(button.id)
 	if link then
 		GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 		GameTooltip:SetHyperlink(link)
@@ -261,7 +258,7 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank, includeT
 		--DA.DEBUG(1,"player: "..player)
 		if reagentsInQueue then
 			for id,count in pairs(reagentsInQueue) do
-				local name = GetItemInfo(id)
+				local name = C_Item.GetItemInfo(id)
 				--DA.DEBUG(2,"reagent: "..id.." ("..tostring(name)..") x "..count)
 				local deficit = count -- deficit is usually negative
 				local numInBoth, numInBothCurrent, numGuildbank = 0,0,0
@@ -317,8 +314,8 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank, includeT
 
 	if Skillet.db.profile.queue_tools and includeTools then
 		for id,entry in pairs(Skillet.db.realm.toolData[curPlayer]) do
-			local have = GetItemCount(id,false)	-- bags only
-			local bank = GetItemCount(id,true)	-- bags + bank
+			local have = C_Item.GetItemCount(id,false)	-- bags only
+			local bank = C_Item.GetItemCount(id,true)	-- bags + bank
 			--DA.DEBUG(2,"toolData: id= "..tostring(id)..", name= "..tostring(entry.name)..", value= "..tostring(entry.value))
 			if have == 0 and bank > 0 then
 				local entry = { ["id"] = id, ["count"] = 1, ["player"] = curPlayer, ["value"] = 0, ["source"] = "bank" }
@@ -347,29 +344,16 @@ local function indexBags()
 		local bags = {0,1,2,3,4}
 		for _, container in pairs(bags) do
 			local slots
-			if GetContainerNumSlots then
-				slots = GetContainerNumSlots(container)
-			else
-				slots = C_Container.GetContainerNumSlots(container)
-			end
+			slots = C_Container.GetContainerNumSlots(container)
 			for i = 1, slots, 1 do
 				local item
-				if GetContainerItemLink then
-					item = GetContainerItemLink(container, i)
-				else
-					item = C_Container.GetContainerItemLink(container, i)
-				end
+				item = C_Container.GetContainerItemLink(container, i)
 				if item then
 					local info, id, count
-					if GetContainerItemInfo then
-						info, count = GetContainerItemInfo(container, i) -- info is icon
-						id = Skillet:GetItemIDFromLink(item)
-					else
-						info = C_Container.GetContainerItemInfo(container, i)
-						--DA.DEBUG(2,"indexBags: container= "..tostring(container)..", i= "..tostring(i)..", info= "..DA.DUMP1(info))
-						id = info.itemID
-						count = info.stackCount
-					end
+					info = C_Container.GetContainerItemInfo(container, i)
+					--DA.DEBUG(2,"indexBags: container= "..tostring(container)..", i= "..tostring(i)..", info= "..DA.DUMP1(info))
+					id = info.itemID
+					count = info.stackCount
 					count = count or 0
 					local name = string.match(item,"%[.+%]")
 					if name then 
@@ -416,29 +400,16 @@ local function indexBank()
 	local bankBags = {-1,5,6,7,8,9,10,11}
 	for _, container in pairs(bankBags) do
 		local slots
-		if GetContainerNumSlots then
-			slots = GetContainerNumSlots(container)
-		else
-			slots = C_Container.GetContainerNumSlots(container)
-		end
+		slots = C_Container.GetContainerNumSlots(container)
 		for i = 1, slots, 1 do
 			local item
-			if GetContainerItemLink then
-				item = GetContainerItemLink(container, i)
-			else
-				item = C_Container.GetContainerItemLink(container, i)
-			end
+			item = C_Container.GetContainerItemLink(container, i)
 			if item then
 				local info, id, count
-				if GetContainerItemInfo then
-					info, count = GetContainerItemInfo(container, i) -- info is icon
-					id = Skillet:GetItemIDFromLink(item)
-				else
-					info = C_Container.GetContainerItemInfo(container, i)
-					--DA.DEBUG(2,"indexBank: container= "..tostring(container)..", i= "..tostring(i)..", info= "..DA.DUMP1(info))
-					id = info.itemID
-					count = info.stackCount
-				end
+				info = C_Container.GetContainerItemInfo(container, i)
+				--DA.DEBUG(2,"indexBank: container= "..tostring(container)..", i= "..tostring(i)..", info= "..DA.DUMP1(info))
+				id = info.itemID
+				count = info.stackCount
 				count = count or 0
 				local name = string.match(item,"%[.+%]")
 				if name then 
@@ -816,7 +787,7 @@ function Skillet:PrintAuctionData()
 	local auctionData = self.db.realm.auctionData[player]
 	if auctionData then
 		for itemID,count in pairs(auctionData) do
-			local itemName = GetItemInfo(itemID)
+			local itemName = C_Item.GetItemInfo(itemID)
 			DA.MARK2("itemID= "..tostring(itemID).." ("..tostring(itemName).."), count= "..tostring(count))
 		end
 	end
@@ -828,31 +799,21 @@ end
 local function findBagForItem(itemID, count)
 	--DA.DEBUG(0, "findBagForItem("..tostring(itemID)..", "..tostring(count)..")")
 	if not itemID then return nil end
-	local _, _, _, _, _, _, _, itemStackCount = GetItemInfo(itemID)
+	local _, _, _, _, _, _, _, itemStackCount = C_Item.GetItemInfo(itemID)
 	for container = 0, 4, 1 do
 		local bagSize, freeSlots, bagType
-		if GetContainerNumSlots then
-			bagSize = GetContainerNumSlots(container)
-			freeSlots, bagType = GetContainerNumFreeSlots(container)
-		else
-			bagSize = C_Container.GetContainerNumSlots(container)
-			freeSlots, bagType = C_Container.GetContainerNumFreeSlots(container)
-		end
+		bagSize = C_Container.GetContainerNumSlots(container)
+		freeSlots, bagType = C_Container.GetContainerNumFreeSlots(container)
 		--DA.DEBUG(1, "findBagForItem: container= "..tostring(container)..", bagSize= "..tostring(bagSize)..", freeSlots= "..tostring(freeSlots)..", bagType= "..tostring(bagType))
 		if bagType == 0 then
 			for slot = 1, bagSize, 1 do
 				local info, bagItem, num_in_bag, locked
-				if GetContainerItemID then
-					bagItem = GetContainerItemID(container, slot)
-					info, num_in_bag, locked  = GetContainerItemInfo(container, slot)
-				else
-					info = C_Container.GetContainerItemInfo(container, slot)
-					--DA.DEBUG(1, "findBagForItem: container= "..tostring(container)..", slot= "..tostring(slot)..", info= "..DA.DUMP1(info))
-					if info then
-						bagItem = info.itemID
-						num_in_bag = info.stackCount
-						locked = info.isLocked
-					end
+				info = C_Container.GetContainerItemInfo(container, slot)
+				--DA.DEBUG(1, "findBagForItem: container= "..tostring(container)..", slot= "..tostring(slot)..", info= "..DA.DUMP1(info))
+				if info then
+					bagItem = info.itemID
+					num_in_bag = info.stackCount
+					locked = info.isLocked
 				end
 				if bagItem then
 					if itemID == bagItem then
@@ -881,40 +842,24 @@ local function getItemFromBank(itemID, bag, slot, count)
 	--DA.DEBUG(0,"getItemFromBank(", itemID, bag, slot, count,")")
 	ClearCursor()
 	local info, available
-	if GetContainerItemInfo then
-		info, available = GetContainerItemInfo(bag, slot)
-	else
-		info = C_Container.GetContainerItemInfo(bag, slot)
-		--DA.DEBUG(2,"info="..DA.DUMP1(info))
-		available = info.stackCount
-	end
+	info = C_Container.GetContainerItemInfo(bag, slot)
+	--DA.DEBUG(2,"info="..DA.DUMP1(info))
+	available = info.stackCount
 	local num_moved = 0
 	if available then
 		if available == 1 or count >= available then
 			--DA.DEBUG(1,"PickupContainerItem(",bag,", ", slot,")")
-			if PickupContainerItem then
-				PickupContainerItem(bag, slot)
-			else
-				C_Container.PickupContainerItem(bag, slot)
-			end
+			C_Container.PickupContainerItem(bag, slot)
 			num_moved = available
 		else
 			--DA.DEBUG(1,"SplitContainerItem(",bag, slot, count,")")
-			if SplitContainerItem then
-				SplitContainerItem(bag, slot, count)
-			else
-				C_Container.SplitContainerItem(bag, slot, count)
-			end
+			C_Container.SplitContainerItem(bag, slot, count)
 			num_moved = count
 		end
 		local tobag, toslot = findBagForItem(itemID, num_moved)
 		--DA.DEBUG(1,"tobag=", tobag, " toslot=", toslot, " findBagForItem(", itemID, num_moved,")")
 		if not tobag then
-			if GetContainerItemLink then
-				Skillet:Print(L["Could not find bag space for"]..": "..GetContainerItemLink(bag, slot))
-			else
-				Skillet:Print(L["Could not find bag space for"]..": "..C_Container.GetContainerItemLink(bag, slot))
-			end
+			Skillet:Print(L["Could not find bag space for"]..": "..C_Container.GetContainerItemLink(bag, slot))
 			ClearCursor()
 			return 0
 		end
@@ -923,11 +868,7 @@ local function getItemFromBank(itemID, bag, slot, count)
 			PutItemInBackpack()
 		else
 			--DA.DEBUG(1,"PutItemInBag(",ContainerIDToInventoryID(tobag),")")
-			if ContainerIDToInventoryID then
-				PutItemInBag(ContainerIDToInventoryID(tobag))
-			else
-				PutItemInBag(C_Container.ContainerIDToInventoryID(tobag))
-			end
+			PutItemInBag(C_Container.ContainerIDToInventoryID(tobag))
 		end
 	else
 		--DA.DEBUG(1,"getItemFromBank: none available")
@@ -959,11 +900,7 @@ local function getItemFromGuildBank(itemID, bag, slot, count)
 			return 0
 		else
 			--DA.DEBUG(1,"getItemFromGuildBank: PickupContainerItem("..tostring(tobag)..", "..tostring(toslot)..")")
-			if PickupContainerItem then
-				PickupContainerItem(tobag, toslot) -- actually puts the item in the bag
-			else
-				C_Container.PickupContainerItem(tobag, toslot)
-			end
+			C_Container.PickupContainerItem(tobag, toslot) -- actually puts the item in the bag
 		end
 	end
 	ClearCursor()
@@ -1240,8 +1177,8 @@ function Skillet:UpdateShoppingListWindow(use_cached_recipes)
 --
 		table.sort(self.cachedShoppingList, function(a,b)
 			local na, nb
-			na = GetItemInfo(a.id) or ""
-			nb = GetItemInfo(b.id) or ""
+			na = C_Item.GetItemInfo(a.id) or ""
+			nb = C_Item.GetItemInfo(b.id) or ""
 			return nb > na
 		end)
 		if Skillet.db.profile.merge_items then
@@ -1317,7 +1254,7 @@ function Skillet:UpdateShoppingListWindow(use_cached_recipes)
 		player:SetPoint("LEFT", name:GetName(), "RIGHT", 4)
 		if itemIndex <= numItems then
 			count:SetText(self.cachedShoppingList[itemIndex].count)
-			name:SetText(GetItemInfo(self.cachedShoppingList[itemIndex].id))
+			name:SetText(C_Item.GetItemInfo(self.cachedShoppingList[itemIndex].id))
 			player:SetText(self.cachedShoppingList[itemIndex].player)
 			button.valueText:Hide()
 			button.id  = self.cachedShoppingList[itemIndex].id
