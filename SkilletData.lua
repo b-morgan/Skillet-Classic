@@ -1105,7 +1105,12 @@ local function ScanTrade()
 					--DA.DEBUG(2,"ScanTrade: bindType= "..tostring(bindType)..", itemSetID= "..tostring(itemSetID))
 					if not itemName and not itemEquipLoc and tradeID == 7411 then
 						itemName = recipe.name
-						itemEquipLoc = Skillet.enchantSlot[recipe.spellID][4]
+						local enchantSlot = Skillet.enchantSlot[recipe.spellID]
+						if enchantSlot then
+							itemEquipLoc = enchantSlot[4]
+						else
+							DA.DEBUG(2,"ScanTrade: missing enchantSlot, spellID= "..tostring(recipe.spellID))
+						end
 					end					
 				else
 					craftName, craftSubSpellName, craftType, numAvailable, isExpanded = GetCraftInfo(i)
