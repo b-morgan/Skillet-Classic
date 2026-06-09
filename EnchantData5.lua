@@ -8,6 +8,7 @@
 -- https://github.com/Auctionator/Auctionator/blob/master/DB2_Scripts/convert-enchant-spell-to-enchant-classic.py
 --
 
+-- 5.5.4.68042
 Skillet.scrollData = {
     [2831] = 2304, -- Armor +8
     [2832] = 2313, -- Armor +16
@@ -47,6 +48,7 @@ Skillet.scrollData = {
     [50913] = 38378, -- Wyrmscale Leg Armor
     [54736] = 40776, -- EMP Generator
     [54998] = 41091, -- Hand-Mounted Pyro Rocket
+    [54758] = 41093, -- Hyperspeed Acceleration
     [55002] = 41111, -- Flexweave Underlay
     [55016] = 41118, -- Nitro Boosts
     [55630] = 41601, -- Shining Spellthread
@@ -91,6 +93,7 @@ Skillet.scrollData = {
     [113048] = 87581, -- Secret Ox Horn Inscription
     [136213] = 93403, -- Wrathion - OCL - Add Prismatic Socket Effect
     [136213] = 94904, -- Wrathion - OCL - Add Prismatic Socket Effect
+    [1277115] = 265774, -- Going Platinum!
     [96286] = 68796, -- Reinforced Fishing Line
     [35495] = 29536, -- Nethercleft Leg Armor
     [7418] = 38679, -- Enchant Bracer - Minor Health
@@ -416,6 +419,7 @@ Skillet.scrollData = {
     [139631] = 95349, -- Enchant Weapon - Glorious Tyranny
     [142468] = 98163, -- Enchant Weapon - Bloody Dancing Steel
     [142469] = 98164, -- Enchant Weapon - Spirit of Conquest
+    [1257682] = 254314, -- Enchant Weapon - Tyranny
     [60653] = 44455, -- Enchant Shield - Greater Intellect
     [54793] = 40800, -- Frag Belt
     [55632] = 41603, -- Azure Spellthread
@@ -458,7 +462,7 @@ Skillet.translateSlot = {
 }
 
 -- 
--- 5.5.3.65988
+-- 5.5.4.68042
 -- [spell] = {EquippedItemClass, EquippedItemSubclass, EquippedItemInvTypes, Slot}
 -- 
 Skillet.enchantSlot = {

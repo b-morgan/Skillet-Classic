@@ -24,6 +24,7 @@ import os
 #
 if len(sys.argv) < 2:
 	print("Usage:")
+	print("    One command line argument of the form '5.5.0.62258'") 
 	exit()
 else:
 	build = sys.argv[1]
