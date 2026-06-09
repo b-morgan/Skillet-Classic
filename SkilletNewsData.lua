@@ -32,6 +32,7 @@ Skillet.NewsData = {
 			{	name = "Changes",
 				data = {
 					{ header = "Recipes", body = "More fixes to recipe scanning" },
+					{ header = "Enchanting", body = "Update scroll data" },
 				},
 			},
 		},
