@@ -33,6 +33,8 @@ Skillet.NewsData = {
 				data = {
 					{ header = "Recipes", body = "More fixes to recipe scanning" },
 					{ header = "Enchanting", body = "Update scroll data" },
+					{ header = "Options", body = "Fix TooltipCache option" },
+					{ header = "Plugins", body = "Adjust calculations in Auctionator plugin" },
 				},
 			},
 		},

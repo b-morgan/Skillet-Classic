@@ -427,7 +427,8 @@ Skillet.options =
 					end,
 					set = function(self,value)
 						Skillet.db.profile.search_includes_reagents = value
-						Skillet.data.tooltipCache = {}
+						Skillet.db.global.tooltipCache = {}
+						Skillet.db.global.tooltipCount = {}
 					end,
 					width = "full",
 					order = 38
