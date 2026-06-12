@@ -302,7 +302,7 @@ plugin.options =
 			type = "range",
 			name = "buyFactor",
 			desc = "Multiply vendor sell price by this to get calculated buy price",
-			min = 1, max = 10, step = 1, isPercent = false,
+			min = 1, max = 10, step = .1, isPercent = false,
 			get = function()
 				return Skillet.db.profile.plugins.ATR.buyFactor
 			end,
@@ -467,6 +467,16 @@ local function GetReagentData(reagent)
 		else
 			value = 0
 		end
+		if Skillet:VendorSellsReagent(id) then
+			if Skillet.db.profile.plugins.ATR.buyablePrices then
+				if Skillet.db.profile.plugins.ATR.useVendorCalc then
+					local buyFactor = Skillet.db.profile.plugins.ATR.buyFactor or buyFactorDef
+					value = ( select(11,C_Item.GetItemInfo(id)) or 0 ) * buyFactor
+				end
+			else
+				value = 0
+			end
+		end
 		if Skillet.db.profile.plugins.ATR.customPrice then
 			local server = Skillet.data.server or 0
 			local customPrice = Skillet.db.global.customPrice[server]
@@ -484,16 +494,6 @@ local function GetReagentData(reagent)
 			end
 		end
 		value = value * needed
-		if Skillet:VendorSellsReagent(id) then
-			if Skillet.db.profile.plugins.ATR.buyablePrices then
-				if Skillet.db.profile.plugins.ATR.useVendorCalc then
-					local buyFactor = Skillet.db.profile.plugins.ATR.buyFactor or buyFactorDef
-					value = ( select(11,C_Item.GetItemInfo(id)) or 0 ) * needed * buyFactor
-				end
-			else
-				value = 0
-			end
-		end
 	end
 	return value, needed, id, name, custom
 end
