@@ -27,6 +27,16 @@ local isMists = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC -- 19
 
 Skillet.NewsName = "Skillet-Classic News"
 Skillet.NewsData = {
+	{	version = "2.39",
+		data = {
+			{	name = "Changes",
+				data = {
+					{ header = "TOC", body = "Update TOC" },
+					{ header = "Errors", body = "Fix ADDON_ACTION_BLOCKED handling" },
+				},
+			},
+		},
+	},
 	{	version = "2.38",
 		data = {
 			{	name = "Changes",

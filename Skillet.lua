@@ -871,6 +871,7 @@ function Skillet:OnEnable()
 --	self:RegisterEvent("LEARNED_SPELL_IN_TAB") -- arg1 = professionID
 
 	self:RegisterEvent("ADDON_ACTION_BLOCKED")
+	self:RegisterEvent("ADDON_ACTION_FORBIDDEN")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 
@@ -965,10 +966,21 @@ end
 -- Skillet-Classic doesn't do well in combat. These functions need to be
 -- flushed out to deal with it gracefully.
 --
-function Skillet:ADDON_ACTION_BLOCKED()
-	DA.TRACE("ADDON_ACTION_BLOCKED()")
-	if self:HideAllWindows() then
-		DA.MARK3("|cf0f00000Skillet-Classic|r: ADDON_ACTION_BLOCKED")
+function Skillet:ADDON_ACTION_BLOCKED(event, addonName, addonFunc)
+	DA.TRACE("ADDON_ACTION_BLOCKED("..tostring(event)..", "..tostring(addonName)..", "..tostring(addonFunc)..")")
+	if strmatch(addonName, "Skillet-Classic") then
+		if self:HideAllWindows() then
+			DA.MARK3("|cf0f00000Skillet-Classic|r: ADDON_ACTION_BLOCKED")
+		end
+	end
+end
+
+function Skillet:ADDON_ACTION_FORBIDDEN(event, addonName, addonFunc)
+	DA.TRACE("ADDON_ACTION_FORBIDDEN("..tostring(event)..", "..tostring(addonName)..", "..tostring(addonFunc)..")")
+	if strmatch(addonName, "Skillet-Classic") then
+		if self:HideAllWindows() then
+			DA.MARK3("|cf0f00000Skillet-Classic|r: ADDON_ACTION_FORBIDDEN")
+		end
 	end
 end
 
