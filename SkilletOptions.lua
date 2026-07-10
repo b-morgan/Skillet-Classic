@@ -1900,7 +1900,8 @@ function Skillet:ConfigureOptions()
 	acecfg:RegisterOptionsTable("Skillet Profiles", LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db))
 	acecfg:RegisterOptionsTable("Skillet Plugins", Skillet.pluginsOptions)
 	local acedia = LibStub("AceConfigDialog-3.0")
-	Skillet.optionsFrame = acedia:AddToBlizOptions("Skillet Features", "Skillet")
+--	Skillet.optionsFrame = acedia:AddToBlizOptions("Skillet Features", "Skillet")
+	Skillet.optionsFrame, Skillet.categoryID = acedia:AddToBlizOptions("Skillet Features", "Skillet")
 	acedia:AddToBlizOptions("Skillet Appearance", "Appearance", "Skillet")
 	acedia:AddToBlizOptions("Skillet Profiles", "Profiles", "Skillet")
 	acedia:AddToBlizOptions("Skillet Plugins", "Plugins", "Skillet")
@@ -1910,6 +1911,7 @@ end
 -- Show the options window
 --
 function Skillet:ShowOptions()
-	Settings.OpenToCategory("Skillet")
+--	Settings.OpenToCategory("Skillet")
+	Settings.OpenToCategory(Skillet.categoryID)
 end
 
