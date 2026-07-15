@@ -49,9 +49,12 @@ function Skillet:AdjustInventory()
 --
 -- Update queue for faster response time
 --
-	Skillet:ScanQueuedReagents()
-	Skillet:InventoryScan()
-	self:CalculateCraftableCounts()
+-- ScanQueuedReagents/InventoryScan/CalculateCraftableCounts removed because
+-- UpdateTradeSkillWindow() performs all of them internally.
+--
+--	Skillet:ScanQueuedReagents()
+--	Skillet:InventoryScan()
+--	self:CalculateCraftableCounts()
 	self:UpdateTradeSkillWindow()
 end
 

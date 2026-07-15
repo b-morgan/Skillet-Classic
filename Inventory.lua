@@ -168,9 +168,7 @@ function Skillet:InventoryScan()
 	local numCanUse
 	if self.db.global.itemRecipeUsedIn then
 		for reagentID in pairs(self.db.global.itemRecipeUsedIn) do
-			local a = GetItemInfo(reagentID)
-			local b = inventoryData[reagentID]
-			--DA.DEBUG(2,"InventoryScan: reagent "..tostring(a).." "..tostring(b))
+			--DA.DEBUG(2,"InventoryScan: reagent "..tostring(GetItemInfo(reagentID)).." "..tostring(inventoryData[reagentID]))
 			if reagentID and not inventoryData[reagentID] then				-- have we calculated this one yet?
 				if self.currentPlayer == (UnitName("player")) then			-- if this is the current player, use the API
 					--DA.DEBUG(2,"InventoryScan: Using API")
