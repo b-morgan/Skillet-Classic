@@ -1267,10 +1267,14 @@ Skillet.options =
 			end,
 			set = function(self,value)
 				Skillet.db.profile.delayupdate = value
-				print("delayupdate= "..tostring(value))
 				if not Skillet.db.profile.updatedelay then
 					Skillet.db.profile.updatedelay = 0.5
 				end
+				if value then
+					print("delayupdate= "..tostring(value)..", updatedelay= "..tostring(Skillet.db.profile.updatedelay))
+				else
+					print("delayupdate= "..tostring(value))
+				end				
 			end,
 			order = 86
 		},
@@ -1282,10 +1286,12 @@ Skillet.options =
 				return Skillet.db.profile.updatedelay
 			end,
 			set = function(self,value)
-				local value = tonumber(value)
-				value = math.max(1,math.min(value,10))/10
-				print("updatedelay= "..tostring(value))
-				Skillet.db.profile.updatedelay = value
+				value = tonumber(value)
+				if value then
+					value = math.max(1,math.min(value,10))/10
+					Skillet.db.profile.updatedelay = value
+				end
+				print("updatedelay= "..tostring(Skillet.db.profile.updatedelay))
 			end,
 			order = 87
 		},
