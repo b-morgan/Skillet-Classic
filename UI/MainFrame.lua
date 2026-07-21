@@ -1113,6 +1113,9 @@ function Skillet:UpdateTradeSkillWindow()
 --
 	local tradeName = self:GetTradeName(self.currentTrade)
 	if not tradeName then tradeName = "" end
+	if self.isCraft then
+		tradeName = CCRAFT..tradeName.."|r"
+	end
 	local title = _G["SkilletTitleText"];
 	if title then
 		title:SetText(L["Skillet Trade Skills"] .. " "..self.version.." ("..Skillet.wowVersion.."): " .. self.currentPlayer .. "/" .. tradeName)
