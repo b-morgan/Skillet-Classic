@@ -1456,8 +1456,7 @@ end
 --
 function Skillet:SkillButton_OnEnter(button)
 	--DA.DEBUG(0,"SkillButton_OnEnter("..tostring(button)..")")
-	local id = button:GetID()
-	if not id then
+	if not button:GetID() then
 		return
 	end
 	if button.locked then return end	-- it's possible that multiple onEnters might stack ontop of each other if you scroll really quickly, this is to avoid that problem
@@ -1709,6 +1708,9 @@ function Skillet:SkillButton_OnEnter(button)
 	else
 		tip:AddLine(spell)
 	end
+	local buttonIndex = string.format("button= %d",button:GetID())
+	local recipeIndex = string.format("recipe= %d",self.data.skillIndexLookup[self.currentPlayer][button.skill.recipeID])
+	tip:AddDoubleLine(buttonIndex, recipeIndex)
 	tip:Show()
 	button.locked = false
 end
