@@ -1195,6 +1195,9 @@ end
 
 function Skillet:SPELLS_CHANGED()
 	DA.TRACE("SPELLS_CHANGED")
+	if Skillet.tradeSkillOpen then
+		Skillet.dataSourceChanged = true	-- Process on next TRADE_SKILL_UPDATE or CRAFT_UPDATE
+	end
 end
 
 function Skillet:UNIT_PORTRAIT_UPDATE()

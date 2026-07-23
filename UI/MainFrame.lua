@@ -1695,11 +1695,13 @@ function Skillet:SkillButton_OnEnter(button)
 	end
 	local text = string.format("[%s/%s/%s]", L["inventory"], L["bank"], L["craftable"])
 	tip:AddDoubleLine("\n", text)
+
+	DA.DEBUG(3,"recipe= "..DA.DUMP(recipe))
 	local item = string.format("itemID= %d",recipe.itemID)
-	local spell = string.format("spellID= %d",recipe.spellID)
 	local scroll = string.format("scrollID= %d",recipe.scrollID)
+	local spell = string.format("spellID= %d",recipe.tradeID)
 	if Skillet.isCraft then
-		item = string.format("spellID= %d",recipe.itemID)
+		spell = string.format("spellID= %d",recipe.craftID)
 	end
 	if recipe.itemID ~= 0 then
 		tip:AddDoubleLine(spell, item)
@@ -1708,9 +1710,22 @@ function Skillet:SkillButton_OnEnter(button)
 	else
 		tip:AddLine(spell)
 	end
+
 	local buttonIndex = string.format("button= %d",button:GetID())
-	local recipeIndex = string.format("recipe= %d",self.data.skillIndexLookup[self.currentPlayer][button.skill.recipeID])
-	tip:AddDoubleLine(buttonIndex, recipeIndex)
+	tip:AddDoubleLine(buttonIndex, button.skill.recipeID)
+
+	local skillIndex = self.data.skillIndexLookup[self.currentPlayer][button.skill.recipeID]
+	local recipeIndex
+	local skillName
+	if Skillet.isCraft then
+		recipeIndex = string.format("craft= %d",skillIndex)
+		skillName = GetCraftInfo(skillIndex)
+	else
+		recipeIndex = string.format("trade= %d",skillIndex)
+		skillName = GetTradeSkillInfo(skillIndex)
+	end
+	tip:AddDoubleLine(recipeIndex, skillName)
+
 	tip:Show()
 	button.locked = false
 end
@@ -1735,6 +1750,7 @@ function Skillet:SetTradeSkillToolTip(skillIndex, buttonID)
 	if Skillet.isCraft then
 		if skillIndex then
 			GameTooltip:SetCraftSpell(skillIndex)
+			GameTooltip:SetCraftItem(skillIndex)
 			if recipe and recipe.itemID ~= 0 then
 				Skillet:AddItemNotesToTooltip(GameTooltip, recipe.itemID)
 			end
@@ -2657,35 +2673,37 @@ end
 --
 function Skillet:SkillButton_OnClick(button)
 	local mouse = GetMouseButtonClicked()
+	local player = self.currentPlayer
+	local skillIndexLookup = self.data.skillIndexLookup[player]
+	local index = skillIndexLookup[button.skill.recipeID]
 	--DA.DEBUG(3,"SkillButton_OnClick("..tostring(button).."), "..tostring(mouse))
 	if (mouse == "LeftButton") then
-		Skillet:QueueManagementToggle(true)
+		self:QueueManagementToggle(true)
 		if not button.skill.mainGroup then
 			if IsShiftKeyDown() and self.skillMainSelection then
 				self:SkillButton_ClearSelections()
-				self:SkillButton_SetSelections(self.skillMainSelection, button.rawIndex)
+				self:SkillButton_SetSelections(self.skillMainSelection, index)
+			elseif IsControlKeyDown() then
+				button.skill.selected = not button.skill.selected
 			else
-				if not IsControlKeyDown() then
-					if not button.skill.subGroup then
-						if not button.skill.selected then
-							self:SkillButton_ClearSelections()
-						end
-						self:SetSelectedSkill(button:GetID())
-						button.skill.selected = true
+				if button.skill.subGroup then
+					if button.skill.selected and not self:RecipeGroupIsLocked() then
+						self:SkillButton_NameEditEnable(button)
+						return			-- avoid window update
 					else
-						if button.skill.selected and not self:RecipeGroupIsLocked() then
-							self:SkillButton_NameEditEnable(button)
-							return			-- avoid window update
-						else
-							self:SkillButton_ClearSelections()
-							self.selectedSkill = nil
-							button.skill.selected = true
-						end
+						self:SkillButton_ClearSelections()
+						self.selectedSkill = nil
+						button.skill.selected = true
 					end
-					self.skillMainSelection = button.rawIndex
 				else
-					button.skill.selected = not button.skill.selected
+					if not button.skill.selected then
+						self:SkillButton_ClearSelections()
+					end
+					DA.DEBUG(3,"SkillButton_OnClick: index= "..tostring(index))
+					self:SetSelectedSkill(index)
+					button.skill.selected = true
 				end
+				self.skillMainSelection = index
 			end
 		end
 		self:UpdateTradeSkillWindow()

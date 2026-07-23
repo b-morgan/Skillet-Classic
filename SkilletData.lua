@@ -279,6 +279,11 @@ end
 -- Enchants that produce items (needed in Classic Era, Season of Mastery)
 --
 Skillet.EnchantSpellToItem = {
+	[7421]  =  6218 , -- Runed Copper Rod
+	[7795]  =  6339 , -- Runed Silver Rod
+	[13628] = 11130 , -- Runed Golden Rod
+	[13702] = 11145 , -- Runed Truesilver Rod
+	[20051] = 16207 , -- Runed Arcanite Rod
 	[14293] = 11287 , -- Lesser Magic Wand
 	[25124] = 20744 , -- Minor Wizard Oil
 	[14807] = 11288 , -- Greater Magic Wand
@@ -1042,6 +1047,7 @@ local function ScanTrade()
 				local recipe = Skillet.data.recipeList[recipeID]
 				local recipeString
 				local toolString = "-"
+				local itemID = 0
 				local itemLinkTrade = GetTradeSkillItemLink(i)
 				local itemLinkCraft = GetCraftItemLink(i)
 				local recipeLink = GetTradeSkillRecipeLink(i)
@@ -1121,7 +1127,6 @@ local function ScanTrade()
 					--DA.DEBUG(2,"ScanTrade: itemClassID= "..tostring(itemClassID)..", itemSubClassID= "..tostring(itemSubClassID))
 					--DA.DEBUG(2,"ScanTrade: bindType= "..tostring(bindType)..", itemSetID= "..tostring(itemSetID))
 					recipe.craftID = Skillet:GetItemIDFromLink(itemLink)
-					recipe.numMade = 1
 					itemName = craftName or "e"..tostring(recipe.craftID)
 					--DA.DEBUG(2,"ScanTrade: craftID= "..tostring(recipe.craftID)..", enchantSlot= "..DA.DUMP1(Skillet.enchantSlot[recipe.craftID]))
 					if Skillet.enchantSlot[recipe.craftID] and Skillet.enchantSlot[recipe.craftID][4] then
@@ -1130,12 +1135,20 @@ local function ScanTrade()
 					--DA.DEBUG(2,"ScanTrade: craftID= "..tostring(recipe.craftID)..", itemEquipLoc= "..tostring(itemEquipLoc))
 				end
 
-				local itemID, linkType = Skillet:GetItemIDFromLink(itemLink)
-				itemID = itemID or 0
-				--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", itemID= "..tostring(itemID)..", linkType= "..tostring(linkType))
+				local linkID, linkType = Skillet:GetItemIDFromLink(itemLink)
+				DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", itemID= "..tostring(itemID)..", linkType= "..tostring(linkType))
 				local minMade,maxMade = 1, 1
 				if not Skillet.isCraft then
 					minMade,maxMade = GetTradeSkillNumMade(i)
+					itemID = linkID
+				else
+					minMade,maxMade = GetCraftNumMade(i)
+					if minMade ~= 0 then
+						DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", "..DA.DUMP(GetItemInfo(itemName)))
+					end
+					if Skillet.EnchantSpellToItem[recipe.craftID] then
+						itemID = Skillet.EnchantSpellToItem[recipe.craftID]
+					end
 				end
 				recipe.itemID = itemID
 				recipe.numMade = (minMade + maxMade)/2
