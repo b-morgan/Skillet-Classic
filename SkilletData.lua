@@ -1051,14 +1051,14 @@ local function ScanTrade()
 				local itemLinkTrade = GetTradeSkillItemLink(i)
 				local itemLinkCraft = GetCraftItemLink(i)
 				local recipeLink = GetTradeSkillRecipeLink(i)
-				--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", itemLinkCraft= "..tostring(DA.PLINK(itemLinkCraft)))
-				--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", itemLinkTrade= "..tostring(DA.PLINK(itemLinkTrade)))
-				--DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", recipeID= "..tostring(recipeID)..", recipeLink= "..tostring(DA.PLINK(recipeLink)))
+				DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", itemLinkCraft= "..tostring(DA.PLINK(itemLinkCraft)))
+				DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", itemLinkTrade= "..tostring(DA.PLINK(itemLinkTrade)))
+				DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", recipeID= "..tostring(recipeID)..", recipeLink= "..tostring(DA.PLINK(recipeLink)))
 				recipe.tradeID = tradeID
-				if isClassic or isBCC then
-					recipe.spellID = recipeID
-				else
+				if recipeLink then
 					recipe.spellID = Skillet:GetItemIDFromLink(recipeLink)
+				else
+					recipe.spellID = recipeID
 				end
 				if Skillet.scrollData then
 					recipe.scrollID = Skillet.scrollData[recipe.spellID]
@@ -1136,7 +1136,7 @@ local function ScanTrade()
 				end
 
 				local linkID, linkType = Skillet:GetItemIDFromLink(itemLink)
-				DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", itemID= "..tostring(itemID)..", linkType= "..tostring(linkType))
+				DA.DEBUG(2,"ScanTrade: i= "..tostring(i)..", itemID= "..tostring(linkID)..", linkType= "..tostring(linkType))
 				local minMade,maxMade = 1, 1
 				if not Skillet.isCraft then
 					minMade,maxMade = GetTradeSkillNumMade(i)

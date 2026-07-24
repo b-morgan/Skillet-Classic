@@ -1699,14 +1699,18 @@ function Skillet:SkillButton_OnEnter(button)
 	DA.DEBUG(3,"recipe= "..DA.DUMP(recipe))
 	local item = string.format("itemID= %d",recipe.itemID)
 	local scroll = string.format("scrollID= %d",recipe.scrollID)
-	local spell = string.format("spellID= %d",recipe.tradeID)
+	local spell
 	if Skillet.isCraft then
 		spell = string.format("spellID= %d",recipe.craftID)
+	elseif tonumber(recipe.spellID) then
+		spell = string.format("spellID= %d",recipe.spellID)
+	else
+		spell = "spellID= nil"
 	end
-	if recipe.itemID ~= 0 then
-		tip:AddDoubleLine(spell, item)
-	elseif recipe.scrollID then
+	if recipe.scrollID and recipe.scrollID ~= 0 then
 		tip:AddDoubleLine(spell, scroll)
+	elseif recipe.itemID and recipe.itemID ~= 0 then
+		tip:AddDoubleLine(spell, item)
 	else
 		tip:AddLine(spell)
 	end
@@ -1750,8 +1754,8 @@ function Skillet:SetTradeSkillToolTip(skillIndex, buttonID)
 	if Skillet.isCraft then
 		if skillIndex then
 			GameTooltip:SetCraftSpell(skillIndex)
-			GameTooltip:SetCraftItem(skillIndex)
 			if recipe and recipe.itemID ~= 0 then
+				GameTooltip:SetItemByID(recipe.itemID)
 				Skillet:AddItemNotesToTooltip(GameTooltip, recipe.itemID)
 			end
 		end
