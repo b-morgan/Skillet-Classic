@@ -1265,10 +1265,14 @@ local function ScanTrade()
 					end
 --
 -- TradeID is good but something else is different. 
--- This happens most often when a previous scan encountered a reagent item not cached yet
+-- This happens most often when a previous scan encountered a reagent item not cached yet.
+-- Make sure the tooltipCache entry is cleared so a search will update it with the newer data.
 --
 					DA.WARN("ScanTrade: replacing recipeID="..tostring(recipeID)..", '"..tostring(recipeDB[recipeID]).."' with '"..tostring(recipeString).."'")
 					recipeDB[recipeID] = recipeString
+					if Skillet.db.global.tooltipCache and Skillet.db.global.tooltipCache[tradeID] then
+						Skillet.db.global.tooltipCache[tradeID][recipeID] = nil
+					end
 				end
 			end -- if header
 		end -- if skillName
