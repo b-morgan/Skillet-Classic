@@ -32,6 +32,7 @@ Skillet.NewsData = {
 			{	name = "Changes",
 				data = {
 					{ header = "UI", body = "Fixes for issue #264" },
+					{ header = "Recipes", body = "Fix for stale tooltipCache, issue #256" },
 				},
 			},
 		},
