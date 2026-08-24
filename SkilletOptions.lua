@@ -856,7 +856,7 @@ Skillet.options =
 			end,
 			set = function(self,value)
 				Skillet.db.profile.collect_details = value
-				Skillet:Print("collect_details= "..tostring(value))
+				DA.MARK2("collect_details= "..tostring(value))
 			end,
 			order = 60
 		},
@@ -867,10 +867,10 @@ Skillet.options =
 			func = function()
 				if Skillet:IsEnabled() then
 					Skillet:Disable()
-					Skillet:Print(RED_FONT_COLOR_CODE..L["is now disabled"]..FONT_COLOR_CODE_CLOSE)
+					DA.MARK2(RED_FONT_COLOR_CODE..L["is now disabled"]..FONT_COLOR_CODE_CLOSE)
 				else
 					Skillet:Enable()
-					Skillet:Print(GREEN_FONT_COLOR_CODE..L["is now enabled"]..FONT_COLOR_CODE_CLOSE)
+					DA.MARK2(GREEN_FONT_COLOR_CODE..L["is now enabled"]..FONT_COLOR_CODE_CLOSE)
 				end
 			end,
 			guiHidden = true,

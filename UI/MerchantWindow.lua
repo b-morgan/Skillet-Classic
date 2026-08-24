@@ -312,7 +312,7 @@ function Skillet:BuyRequiredReagents()
 					local message = L["Purchased"]
 					local cash = Skillet:FormatMoneyFull(itemspent, true);
 					message = message .. ": " .. (itemstobuy*quantity) .. " x "..GetMerchantItemLink(i).." (" .. cash .. ")";
-					self:Print(message);
+					DA.MARK2(message);
 				end
 			end
 		end
@@ -321,7 +321,7 @@ function Skillet:BuyRequiredReagents()
 		local message = L["Total spent"]
 		local cash = Skillet:FormatMoneyFull(totalspent, true)
 		message = message .. ": " .. cash
-		self:Print(message)
+		DA.MARK2(message)
 	end
 --
 --	update_merchant_buy_button()

@@ -1765,7 +1765,7 @@ function Skillet:GetItemNote(key)
 	if id then
 		result = self.db.realm.notes[self.currentPlayer][id]
 	else
-		self:Print("Skillet:GetItemNote() could not determine item ID for " .. key)
+		DA.MARK2("Skillet:GetItemNote() could not determine item ID for " .. key)
 	end
 	if result and result == "" then
 		result = nil
@@ -1793,7 +1793,7 @@ function Skillet:SetItemNote(key, note)
 	if id then
 		self.db.realm.notes[self.currentPlayer][id] = note
 	else
-		self:Print("Skillet:SetItemNote() could not determine item ID for " .. key)
+		DA.MARK2("Skillet:SetItemNote() could not determine item ID for " .. key)
 	end
 end
 
