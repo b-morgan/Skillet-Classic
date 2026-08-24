@@ -339,7 +339,7 @@ function Skillet:ProcessQueue(altMode)
 					cooldown = GetTradeSkillCooldown(skillIndex)
 				end
 				if cooldown then
-					DA.MARK2(L["Skipping"],recipe.name,"-",L["has cooldown of"],SecondsToTime(cooldown))
+					DA.MARK2(L["Skipping"].." "..tostring(recipe.name).." - "..L["has cooldown of"].." "..tostring(SecondsToTime(cooldown)))
 					command.skipped = true
 					craftable = false
 				else
@@ -352,7 +352,7 @@ function Skillet:ProcessQueue(altMode)
 						local numInBank =  numInBoth - numInBags
 						--DA.DEBUG(1,"numInBoth= "..tostring(numInBoth)..", numInBags="..tostring(numInBags)..", numInBank="..tostring(numInBank))
 						if numInBags < reagent.numNeeded then
-							DA.MARK2(L["Skipping"],recipe.name,"-",L["need"],reagent.numNeeded,"x",reagentName,"("..L["have"],numInBags..")")
+							DA.MARK2(L["Skipping"].." "..recipe.name.." - "..L["need"].." "..tostring(reagent.numNeeded).." x "..reagentName.."("..L["have"].." "..tostring(numInBags)..")")
 							command.skipped = true
 							craftable = false
 							break
@@ -421,7 +421,7 @@ function Skillet:ProcessQueue(altMode)
 				if altMode then
 					itemID, missN = Skillet:GetAutoTargetItem(tradeID, spellID)
 					if not itemID then
-						DA.MARK2(L["Skipping"],self.processingSpell,"-",L["need"],missN)
+						DA.MARK2(L["Skipping"].." "..tostring(self.processingSpell).." - "..L["need"].." "..tostring(missN))
 						self.queueCasting = false
 						self:RemoveFromQueue(qpos)
 						return
