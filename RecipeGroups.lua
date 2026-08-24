@@ -455,7 +455,7 @@ end
 -- Note: this function is recursive
 --
 function Skillet:RecipeGroupFlatten(group, depth, list, index, level)
-	--DA.DEBUG(3,"RecipeGroupFlatten("..tostring(group.name)..", "..tostring(depth)..", "..tostring(list.name)..", "..tostring(index)..", "..tostring(level)..")")
+	DA.DEBUG(3,"RecipeGroupFlatten("..tostring(group.name)..", "..tostring(depth)..", "..tostring(list.name)..", "..tostring(index)..", "..tostring(level)..")")
 	--DA.DEBUG(4,"group= "..DA.DUMP(group,self.db.profile.dumplevel))
 	--DA.DEBUG(4,"list= "..DA.DUMP(list,self.db.profile.dumplevel))
 	if not level then level = 1 end

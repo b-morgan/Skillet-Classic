@@ -1235,9 +1235,8 @@ function Skillet:UpdateTradeSkillWindow()
 					button.highlight:Hide()
 				end
 			end
-			--DA.DEBUG( if self.currentGroupLabel ~= "Blizzard" then DA.DEBUG(0,"skill.subGroup = "..tostring(skill.subGroup)) end
 			if skill.subGroup then
-				--DA.DEBUG(2,"skill.subGroup= "..DA.DUMP(skill.subGroup,1))
+				DA.DEBUG(2,"skill.subGroup= "..DA.DUMP(skill.subGroup,1))
 				if SkillButtonNameEdit.originalButton ~= buttonText then
 					buttonText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, textAlpha)
 					countText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, textAlpha)
@@ -1391,6 +1390,9 @@ function Skillet:UpdateTradeSkillWindow()
 					end
 				end
 				countText:SetWidth(math.max(countText:GetStringWidth(),SKILLET_COUNT_MIN_WIDTH)) -- make end of buttonText have a fixed location
+
+				local skillIndexTest = self.data.skillIndexLookup[self.currentPlayer][sortedSkillList[rawSkillIndex].recipeID] --added line
+				DA.DEBUG(2,"skillIndex= "..tostring(skillIndex)..", skillindexTest= "..tostring(skillIndexTest))
 				button:SetID(skillIndex or 0)
 --
 -- If enhanced recipe display is enabled, show the difficulty as text,
