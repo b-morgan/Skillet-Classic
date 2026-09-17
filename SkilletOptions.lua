@@ -1049,6 +1049,18 @@ Skillet.options =
 			end,
 			order = 72
 		},
+		extratooltip = {
+			type = "toggle",
+			name = "extraTooltip",
+			desc = "Enable/Disable extra tooltip lines",
+			get = function()
+				return Skillet.db.profile.extra_tooltip
+			end,
+			set = function(self,value)
+				Skillet.db.profile.extra_tooltip = value
+			end,
+			order = 72
+		},
 --
 -- commands to toggle Blizzard's frames (beats using "/run")
 --

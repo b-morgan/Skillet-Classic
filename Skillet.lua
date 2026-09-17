@@ -88,6 +88,7 @@ local defaults = {
 		hide_blizzard_frame = true,						-- primarily for debugging
 		support_crafting = true,
 		display_skill_index = false,					-- primarily for debugging
+		extra_tooltip = false,							-- primarily for debugging
 		ignore_change = false,							-- not in Classic
 		queue_crafts = false,
 		include_craftbuttons = true,

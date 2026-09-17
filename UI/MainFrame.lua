@@ -1716,22 +1716,22 @@ function Skillet:SkillButton_OnEnter(button)
 	else
 		tip:AddLine(spell)
 	end
+	if Skillet.db.profile.extra_tooltip then
+		local buttonIndex = string.format("button= %d",button:GetID())
+		tip:AddDoubleLine(buttonIndex, button.skill.recipeID)
 
-	local buttonIndex = string.format("button= %d",button:GetID())
-	tip:AddDoubleLine(buttonIndex, button.skill.recipeID)
-
-	local skillIndex = self.data.skillIndexLookup[self.currentPlayer][button.skill.recipeID]
-	local recipeIndex
-	local skillName
-	if Skillet.isCraft then
-		recipeIndex = string.format("craft= %d",skillIndex)
-		skillName = GetCraftInfo(skillIndex)
-	else
-		recipeIndex = string.format("trade= %d",skillIndex)
-		skillName = GetTradeSkillInfo(skillIndex)
+		local skillIndex = self.data.skillIndexLookup[self.currentPlayer][button.skill.recipeID]
+		local recipeIndex
+		local skillName
+		if Skillet.isCraft then
+			recipeIndex = string.format("craft= %d",skillIndex)
+			skillName = GetCraftInfo(skillIndex)
+		else
+			recipeIndex = string.format("trade= %d",skillIndex)
+			skillName = GetTradeSkillInfo(skillIndex)
+		end
+		tip:AddDoubleLine(recipeIndex, skillName)
 	end
-	tip:AddDoubleLine(recipeIndex, skillName)
-
 	tip:Show()
 	button.locked = false
 end
