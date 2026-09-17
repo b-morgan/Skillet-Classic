@@ -151,6 +151,7 @@ function Skillet:InventorySkillIterations(tradeID, skillIndex)
 			--DA.DEBUG(1,"numCraft="..tostring(numCraft)..", numCraftable="..tostring(numCraftable)..", numCraftVendor="..tostring(numCraftVendor)..", numCraftAlts="..tostring(numCraftAlts))
 --		end
 		local numMade = recipe.numMade or 0
+		if Skillet.isCraft and numMade == 0 then numMade = 1 end
 		return numCraft * numMade, numCraftable * numMade, numCraftVendor * numMade, numCraftAlts * numMade
 	end
 	return 0, 0, 0, 0
