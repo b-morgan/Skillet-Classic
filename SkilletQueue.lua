@@ -384,8 +384,15 @@ function Skillet:ProcessQueue(altMode)
 			local tradeID = command.tradeID
 			local tradeName = command.tradeName
 			local recipeIndex = command.recipeIndex
+			local recipeIndex2 = self.data.skillIndexLookup[self.currentPlayer][recipeID]
 			local count = command.count
 			local itemID, missN
+			if recipeIndex ~= recipeIndex2 then
+				DA.WARN("ProcessQueue: recipeIndex mismatch, old= "..tostring(command.recipeIndex)..", new= "..tostring(recipeIndex2))
+				command.recipeIndex1 = recipeIndex
+				recipeIndex = recipeIndex2
+				command.recipeIndex = recipeIndex
+			end
 			if self.currentTrade ~= tradeID and tradeName then
 				--DA.DEBUG(1,"queue_crafts= "..tostring(self.db.profile.queue_crafts)..", skillIsCraft= "..tostring(self.skillIsCraft[tradeID]))
 				if self.db.profile.queue_crafts and self.skillIsCraft[tradeID] then
