@@ -36,6 +36,7 @@ Skillet.NewsData = {
 					{ header = "Debug", body = "Replace Skillet:Print with DA.MARK2" },
 					{ header = "Plugins", body = "Auctionator check for AH still open" },
 					{ header = "All", body = "Add some nil checks" },
+					{ header = "TOC", body = "Add Forever" },
 				},
 			},
 		},
