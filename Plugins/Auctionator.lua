@@ -1351,16 +1351,22 @@ function Skillet:AuctionatorSearch(whichOne)
 			end
 		end
 	end
-	if Atr_SelectPane and Atr_SearchAH then
-		--DA.DEBUG(0, "AuctionatorSearch: shoppingListName= "..tostring(shoppingListName)..", items= "..DA.DUMP1(items))
-		local BUY_TAB = 3;
-		Atr_SelectPane(BUY_TAB)
-		Atr_SearchAH(shoppingListName, items)
-	elseif useSearchExact and Auctionator.API.v1.MultiSearchExact then
-		--DA.DEBUG(0, "AuctionatorSearch: (exact) addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
-		Auctionator.API.v1.MultiSearchExact(addonName, items)
-	elseif Auctionator.API.v1.MultiSearch then
-		--DA.DEBUG(0, "AuctionatorSearch: addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
-		Auctionator.API.v1.MultiSearch(addonName, items)
+--
+-- Make sure the Auction House is still open
+--
+--[[
+	if (not AuctionHouseFrame or not AuctionHouseFrame:IsShown()) and
+	   (not AuctionFrame      or not AuctionFrame:IsShown()) then
+		return
+	end
+--]]
+	if Skillet.auctionOpen then
+		if useSearchExact and Auctionator.API.v1.MultiSearchExact then
+			--DA.DEBUG(0, "AuctionatorSearch: (exact) addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
+			Auctionator.API.v1.MultiSearchExact(addonName, items)
+		elseif Auctionator.API.v1.MultiSearch then
+			--DA.DEBUG(0, "AuctionatorSearch: addonName= "..tostring(addonName)..", items= "..DA.DUMP1(items))
+			Auctionator.API.v1.MultiSearch(addonName, items)
+		end
 	end
 end
