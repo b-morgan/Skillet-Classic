@@ -1,5 +1,5 @@
 local addonName,addonTable = ...
-local DA = _G[addonName] -- for DebugAids.lua
+local DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
 
@@ -18,12 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
 local L = Skillet.L
-local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE -- 1
-local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC -- 2
-local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC -- 5
-local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC -- 11
-local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC -- 14
-local isMists = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC -- 19
 
 Skillet.NewsName = "Skillet-Classic News"
 Skillet.NewsData = {
@@ -36,7 +30,7 @@ Skillet.NewsData = {
 					{ header = "Debug", body = "Replace Skillet:Print with DA.MARK2" },
 					{ header = "Plugins", body = "Auctionator check for AH still open" },
 					{ header = "All", body = "Add some nil checks" },
-					{ header = "TOC", body = "Add Forever" },
+					{ header = "Versioning", body = "Standardize DA initialization\nConvert local WoW version checks to globals" },
 				},
 			},
 		},

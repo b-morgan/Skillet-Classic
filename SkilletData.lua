@@ -1,21 +1,5 @@
 local addonName,addonTable = ...
-local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE -- 1
-local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC -- 2
-local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC -- 5
-local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC -- 11
-local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC -- 14
-local isMists = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC -- 19
-
-local DA
-if isRetail then
-	DA = _G[addonName] -- for DebugAids.lua
-else
-	DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
-end
-
-local GetItemInfo = C_Item and C_Item.GetItemInfo or GetItemInfo
-local GetItemCount = C_Item and C_Item.GetItemCount or GetItemCount
-
+local DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
 
@@ -32,6 +16,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
+
+local GetItemInfo = C_Item and C_Item.GetItemInfo or GetItemInfo
+local GetItemCount = C_Item and C_Item.GetItemCount or GetItemCount
 
 local L = Skillet.L
 
@@ -172,6 +159,9 @@ end
 function Skillet:ScanPlayerTradeSkills()
 	DA.DEBUG(0,"ScanPlayerTradeSkills()")
 	local player = self.currentPlayer
+	if not self.db.realm.tradeSkills then
+		self.db.realm.tradeSkills = {}
+	end
 	if not self.db.realm.tradeSkills[player] then
 		self.db.realm.tradeSkills[player] = {}
 	end
@@ -668,13 +658,15 @@ end
 
 function Skillet:GetSkillRanks(player, trade)
 	--DA.DEBUG(3,"GetSkillRanks("..tostring(player)..", "..tostring(trade)..")")
-	local name, rank, maxRank
+	local id, name, rank, maxRank
 	if player and trade then
 		if player == self.currentPlayer and trade == self.currentTrade then
 			if self.isCraft then
 				name, rank, maxRank = GetCraftDisplaySkillLine()
-			else
+			elseif GetTradeSkillLine then
 				name, rank, maxRank = GetTradeSkillLine()
+			else
+				id, name, rank, maxRank = C_TradeSkillUI.GetTradeSkillLine()
 			end
 			if self.db.realm.tradeSkills[player] and self.db.realm.tradeSkills[player][trade] then
 				if rank ~= 0 and maxRank ~= 0 then
@@ -788,13 +780,16 @@ end
 --
 local function ScanTrade()
 	DA.DEBUG(0,"ScanTrade()")
-	local profession, rank, maxRank
+	local id, profession, rank, maxRank
 	local numSkills, numCrafts
 	if Skillet.isCraft then
 		profession, rank, maxRank = GetCraftDisplaySkillLine()
 		numCrafts = GetNumCrafts()
-	else
+	elseif GetTradeSkillLine then
 		profession, rank, maxRank = GetTradeSkillLine()
+		numSkills = GetNumTradeSkills()
+	else
+		id, profession, rank, maxRank = C_TradeSkillUI.GetTradeSkillLine()
 		numSkills = GetNumTradeSkills()
 	end
 	--DA.DEBUG(2,"ScanTrade: profession= "..tostring(profession)..", rank= "..tostring(rank)..", maxRank= "..tostring(maxRank)..", numCrafts= "..tostring(numCrafts)..", numSkills= "..tostring(numSkills))

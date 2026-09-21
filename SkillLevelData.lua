@@ -17,13 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
-local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE -- 1
-local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC -- 2
-local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC -- 5
-local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC -- 11
-local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC -- 14
-local isMists = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC -- 19
-
 local PT = LibStub("LibPeriodicTable-3.1")
 
 local skillColors = {
@@ -66,7 +59,7 @@ local racialList = {
 }
 
 local function getSpellName(spell)
-	if isRetail then
+	if Skillet.isRetail then
 		return C_Spell.GetSpellName(spell)
 	else
 		return GetSpellInfo(spell)

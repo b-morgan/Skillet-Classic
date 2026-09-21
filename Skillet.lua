@@ -36,17 +36,32 @@ local GetItemInfo = C_Item and C_Item.GetItemInfo or GetItemInfo
 local GetItemCount = C_Item and C_Item.GetItemCount or GetItemCount
 
 Skillet.version = GetAddOnMetadata("Skillet-Classic", "Version")
+Skillet.isTest = string.find(Skillet.version,"-") or string.find(Skillet.version,"+")
 Skillet.interface = select(4, GetBuildInfo())
-Skillet.build = (Skillet.interface < 20000 and "Classic") or (Skillet.interface < 30000 and "BCC") or
-  (Skillet.interface < 40000 and "Wrath") or (Skillet.interface < 50000 and "Cata") or
-  (Skillet.interface < 60000 and "Mists") or "Retail"
+Skillet.build = (Skillet.interface < 20000 and Skillet.interface > 16000 and "Forever") or 
+  (Skillet.interface < 30000 and "BCC") or
+  (Skillet.interface < 40000 and "Wrath") or 
+  (Skillet.interface < 50000 and "Cata") or
+  (Skillet.interface < 60000 and "Mists") or
+  "Retail"
+
 Skillet.project = WOW_PROJECT_ID
-local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE -- 1
-local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC -- 2
-local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC -- 5
-local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC -- 11
-local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC -- 14
-local isMists = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC -- 19
+-- Temporary measure because FOREVER has no distinct _PROJECT_
+if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+	-- ___ temporary measure for Forever ___
+	if LE_EXPANSION_LEVEL_CURRENT == LE_EXPANSION_MIDNIGHT then
+		Skillet.isRetail = true
+	elseif LE_EXPANSION_LEVEL_CURRENT == LE_EXPANSION_CLASSIC then
+		Skillet.isForever = true
+	end
+end
+--Skillet.isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE -- 1
+--Skillet.isForever = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE -- 1
+Skillet.isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC -- 2
+Skillet.isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC -- 5
+Skillet.isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC -- 11
+Skillet.isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC -- 14
+Skillet.isMists = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC -- 19
 
 Skillet.isCraft = false			-- true for the Blizzard Craft UI, false for the Blizzard TradeSkill UI
 Skillet.lastCraft = false		-- help events know when to call ConfigureRecipeControls()
@@ -156,14 +171,23 @@ Skillet.unknownRecipe = {
 
 function Skillet:DisableBlizzardFrame()
 	DA.DEBUG(0,"DisableBlizzardFrame()")
+	if not ProfessionsFrame then
+		DA.WARN("DisableBlizzardFrame: ProfessionsFrame is nil")
+	elseif self.BlizzardTradeSkillFrame == nil then
+		self.BlizzardTradeSkillFrame = ProfessionsFrame
+		self.tradeSkillHide = ProfessionsFrame:GetScript("OnHide")
+		ProfessionsFrame:SetScript("OnHide", nil)
+	end
 	if self.BlizzardTradeSkillFrame == nil then
 		if (not IsAddOnLoaded("Blizzard_TradeSkillUI")) then
 			LoadAddOn("Blizzard_TradeSkillUI");
 		end
-		self.BlizzardTradeSkillFrame = TradeSkillFrame
-		self.tradeSkillHide = TradeSkillFrame:GetScript("OnHide")
-		TradeSkillFrame:SetScript("OnHide", nil)
-		HideUIPanel(TradeSkillFrame)
+		if TradeSkillFrame then
+			self.BlizzardTradeSkillFrame = TradeSkillFrame
+			self.tradeSkillHide = TradeSkillFrame:GetScript("OnHide")
+			TradeSkillFrame:SetScript("OnHide", nil)
+			HideUIPanel(TradeSkillFrame)
+		end
 	end
 	if self.BlizzardCraftFrame == nil then
 		if (not IsAddOnLoaded("Blizzard_CraftUI")) then
@@ -400,6 +424,7 @@ function Skillet:OnInitialize()
 --
 -- Hook default tooltips
 --
+--[[
 	local tooltipsToHook = { ItemRefTooltip, GameTooltip, ShoppingTooltip1, ShoppingTooltip2 };
 	for _, tooltip in pairs(tooltipsToHook) do
 		if tooltip then
@@ -408,6 +433,8 @@ function Skillet:OnInitialize()
 			end)
 		end
 	end
+--]]
+
 --
 -- configure the addon options and the slash command handler
 -- (Skillet.options is defined in SkilletOptions.lua)
@@ -481,6 +508,9 @@ function Skillet:FlushAllData()
 	Skillet.db.realm.bagDetails = {}
 	Skillet.db.realm.bankData = {}
 	Skillet.db.realm.bankDetails = {}
+	Skillet.db.realm.queueData = {}
+	Skillet.db.realm.reagentsInQueue = {}
+	Skillet.db.realm.options = {}
 	Skillet.db.realm.userIgnoredMats = {}
 	Skillet:FlushPlayerData()
 	Skillet:FlushCustomData()
@@ -495,6 +525,7 @@ end
 function Skillet:FlushPlayerData()
 	DA.DEBUG(0,"FlushPlayerData()")
 	local player = UnitName("player")
+	Skillet.currentPlayer = player
 	Skillet.db.realm.tradeSkills[player] = {}
 	Skillet.db.realm.auctionData[player] = {}
 	Skillet.db.realm.inventoryData[player] = {}
@@ -781,12 +812,12 @@ function Skillet:OnEnable()
 --
 	self:RegisterEvent("TRADE_SKILL_CLOSE")
 	self:RegisterEvent("TRADE_SKILL_SHOW")
-	self:RegisterEvent("TRADE_SKILL_UPDATE")
+--	self:RegisterEvent("TRADE_SKILL_UPDATE")
 	self:RegisterEvent("TRADE_SKILL_NAME_UPDATE")
 --	if not TSM_API then
-		self:RegisterEvent("CRAFT_CLOSE")			-- craft event (could call SkilletClose)
-		self:RegisterEvent("CRAFT_SHOW")			-- craft event (could call SkilletShow)
-		self:RegisterEvent("CRAFT_UPDATE")			-- craft event
+--		self:RegisterEvent("CRAFT_CLOSE")			-- craft event (could call SkilletClose)
+--		self:RegisterEvent("CRAFT_SHOW")			-- craft event (could call SkilletShow)
+--		self:RegisterEvent("CRAFT_UPDATE")			-- craft event
 		self:RegisterEvent("UNIT_PET_TRAINING_POINTS")	-- craft event
 --	end
 	self:RegisterEvent("UNIT_PORTRAIT_UPDATE")		-- Not sure if this is helpful but we will track it.
@@ -816,7 +847,7 @@ function Skillet:OnEnable()
 	self:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
 	self:RegisterEvent("BANKFRAME_CLOSED")
 
-	if not isClassic then
+	if not self.isClassic then
 		self:RegisterEvent("GUILDBANKFRAME_OPENED")
 		self:RegisterEvent("GUILDBANKBAGSLOTS_CHANGED")
 		self:RegisterEvent("GUILDBANKFRAME_CLOSED")
@@ -924,8 +955,17 @@ function Skillet:PLAYER_ENTERING_WORLD()
 	SkilletWho.faction = faction
 	SkilletWho.raceFile = raceFile
 	SkilletWho.classFile = classFile
+	if not self.db.realm.faction then
+		self.db.realm.faction = {}
+	end
 	self.db.realm.faction[player] = faction
+	if not self.db.realm.race then
+		self.db.realm.race = {}
+	end
 	self.db.realm.race[player] = raceFile
+	if not self.db.realm.class then
+		self.db.realm.class = {}
+	end
 	self.db.realm.class[player] = classFile
 	SkilletWho.locale = locale
 	SkilletWho.wowBuild = wowBuild
@@ -940,6 +980,9 @@ function Skillet:PLAYER_ENTERING_WORLD()
 -- Skillet.db.realm.* data needs to move to 
 -- Skillet.db.global.* data indexed by server.
 --
+		if not self.db.realm.guid then
+			self.db.realm.guid = {}
+		end
 		self.db.realm.guid[player]= guid
 		if (server) then
 			if not self.data then
@@ -947,13 +990,22 @@ function Skillet:PLAYER_ENTERING_WORLD()
 			end
 			self.data.server = server
 			self.data.realm = realm
+			if not self.db.global.server then
+				self.db.global.server = {}
+			end
 			if not self.db.global.server[server] then
 				self.db.global.server[server] = {}
 			end
 			self.db.global.server[server][realm] = player
 
+			if not self.db.global.customPrice then
+				self.db.global.customPrice = {}
+			end
 			if not self.db.global.customPrice[server] then
 				self.db.global.customPrice[server] = {}
+			end
+			if not self.db.global.faction then
+				self.db.global.faction = {}
 			end
 			if not self.db.global.faction[server] then
 				self.db.global.faction[server] = {}
@@ -1129,8 +1181,12 @@ function Skillet:TRADE_SKILL_SHOW()
 	end
 	Skillet.tradeShow = true
 	Skillet.isCraft = false
-	local name, tradeID, isCraft
-	name = GetTradeSkillLine()
+	local id, name, tradeID, isCraft
+	if GetTradeSkillLine then
+		name = GetTradeSkillLine()
+	else
+		id, name = C_TradeSkillUI.GetTradeSkillLine()
+	end
 	if name then tradeID = self.tradeSkillIDsByName[name] end
 	if tradeID then isCraft = self.skillIsCraft[tradeID] end
 	DA.TRACE("TRADE_SKILL_SHOW: name= '"..tostring(name).."', tradeID= "..tostring(tradeID)..", isCraft= "..tostring(isCraft))
@@ -1349,11 +1405,13 @@ function Skillet:SkilletShow()
 	else
 		self.currentPlayer = (UnitName("player"))
 	end
-	local name, rank, maxRank
+	local id, name, rank, maxRank
 	if self.isCraft then
 		name, rank, maxRank = GetCraftDisplaySkillLine()
-	else
+	elseif GetTradeSkillLine then
 		name, rank, maxRank = GetTradeSkillLine()
+	else
+		id, name, rank, maxRank = C_TradeSkillUI.GetTradeSkillLine()
 	end
 	DA.DEBUG(1,"SkilletShow: name= '"..tostring(name).."', rank= "..tostring(rank)..", maxRank= "..tostring(maxRank))
 	if name then self.currentTrade = self.tradeSkillIDsByName[name] end
@@ -1558,7 +1616,7 @@ function Skillet:ChangeTradeSkill(tradeID, tradeName)
 		if tradeID == 2575 then spellID = 2656 end		-- Ye old Mining vs. Smelting issue
 		local spell = self:GetTradeName(spellID)
 		DA.DEBUG(1,"tradeID= "..tostring(tradeID)..", tradeName= "..tostring(tradeName)..", Mining= "..tostring(Mining)..", Smelting= "..tostring(Smelting))
-		if Skillet.db.profile.ignore_change or isClassic then
+		if Skillet.db.profile.ignore_change or Skillet.isClassic then
 			if not self.db.realm.tradeSkills[self.currentPlayer][tradeID].count or self.db.realm.tradeSkills[self.currentPlayer][tradeID].count < 1 then
 				DA.DEBUG(1,"ChangeTradeSkill: executing ChangeTrade("..tostring(tradeID).."), count= "..tostring(self.db.realm.tradeSkills[self.currentPlayer][tradeID].count)..", tradeName= "..tostring(tradeName))
 				self.db.realm.tradeSkills[self.currentPlayer][tradeID].count = 1
@@ -1886,13 +1944,15 @@ function Skillet:SetTradeSkillOption(option, value, playerOverride, tradeOverrid
 		if not self.db.realm.options then
 			self.db.realm.options = {}
 		end
-		if not self.db.realm.options[player] then
+		if player and not self.db.realm.options[player] then
 			self.db.realm.options[player] = {}
 		end
-		if not self.db.realm.options[player][trade] then
+		if player and trade and not self.db.realm.options[player][trade] then
 			self.db.realm.options[player][trade] = {}
 		end
-		self.db.realm.options[player][trade][option] = value
+		if player and trade then
+			self.db.realm.options[player][trade][option] = value
+		end
 	end
 end
 local ChatEdit_InsertLink  = ChatFrameUtil and ChatFrameUtil.InsertLink or ChatEdit_InsertLink

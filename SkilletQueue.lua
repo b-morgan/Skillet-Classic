@@ -331,7 +331,7 @@ function Skillet:ProcessQueue(altMode)
 			local recipe = self:GetRecipe(command.recipeID)
 			local craftable = true
 			local skillIndex = skillIndexLookup[command.recipeID]
-			if isClassic and recipe.tradeID == 7411 then
+			if Skillet.isClassic and recipe.tradeID == 7411 then
 				craftable = false
 			else
 				local cooldown

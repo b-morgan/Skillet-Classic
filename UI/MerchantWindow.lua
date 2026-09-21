@@ -23,12 +23,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 local PT = LibStub("LibPeriodicTable-3.1")
 
-local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
-local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
-local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
-local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
-local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
-
 local GetItemInfo = C_Item and C_Item.GetItemInfo or GetItemInfo
 
 local merchant_inventory = {}

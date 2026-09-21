@@ -25,12 +25,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ]]--
 
-local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
-local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
-local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
-local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
-local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
-
 local L = LibStub("AceLocale-3.0"):GetLocale("Skillet")
 
 -- Stolen from the Waterfall Ace2 addon.
@@ -118,7 +112,7 @@ local function createShoppingListFrame(self)
 	SkilletShowQueuesInItemOrder:SetChecked(Skillet.db.profile.item_order)
 	SkilletShowQueuesMergeItemsText:SetText(L["Merge items"])
 	SkilletShowQueuesMergeItems:SetChecked(Skillet.db.profile.merge_items)
-	if isClassic then
+	if Skillet.isClassic then
 		SkilletShowQueuesIncludeGuildText:Hide()
 		SkilletShowQueuesIncludeGuild:Hide()
 	else
@@ -377,8 +371,10 @@ local function indexBags()
 				end -- item
 			end -- for slots
 		end -- for container
-		Skillet.db.realm.bagData[player] = data
-		if Skillet.db.profile.collect_details then
+		if player and Skillet.db.realm.bagData then
+			Skillet.db.realm.bagData[player] = data
+		end
+		if player and Skillet.db.profile.collect_details then
 			Skillet.db.realm.bagDetails[player] = details
 		else
 			--DA.DEBUG(2,"indexBags: Not collecting details")		

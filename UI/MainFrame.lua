@@ -17,13 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
-local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE -- 1
-local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC -- 2
-local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC -- 5
-local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC -- 11
-local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC -- 14
-local isMists = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC -- 19
-
 local IsAddOnLoaded = C_AddOns and C_AddOns.IsAddOnLoaded or IsAddOnLoaded
 local GetAddOnMetadata = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
 local LoadAddOn = C_AddOns and C_AddOns.LoadAddOn or LoadAddOn
@@ -2489,9 +2482,11 @@ StaticPopupDialogs["SKILLET_WowheadURL"] = {
 		local textFrame = self.Text or self.text
 		local editBox = self.EditBox or self.editBox
 		local url = "https://www.wowhead.com/"
-		if isClassic then
+		if Skillet.isClassic then
 			url = url.."classic/"
-		elseif isMists then
+		elseif Skillet.isForever then
+			url = url.."forever/"
+		elseif Skillet.isMists then
 			url = url.."mop-classic/"
 		end
 		local param = "item="..textFrame.text_arg1

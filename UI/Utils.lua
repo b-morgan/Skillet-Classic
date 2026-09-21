@@ -1,3 +1,5 @@
+local addonName,addonTable = ...
+local DA = LibStub("AceAddon-3.0"):GetAddon("Skillet") -- for DebugAids.lua
 --[[
 Skillet: A tradeskill window replacement.
 
@@ -14,12 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
-
-local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
-local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
-local isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
-local isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
-local isCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
 
 -- Handy utilities for Skillet UI methods.
 
@@ -181,30 +177,22 @@ function Skillet:ShowInventoryInfoPopup()
 	if createInfoBox then
 		createInfoBox()
 	end
-
 	infoBox:Clear()
 	infoBox:SetTitle(L["INVENTORYDESC"])
-
 	if self.inventoryCheck then
 		infoBox:AddLine(L["Library"], self.inventoryCheck:GetVersion())
-
 		local list = self.inventoryCheck:GetSupportedAddons()
 		local text = list[1]
 		for i=2, #list, 1 do
 			text = text ..", " .. list[i]
 		end
 		infoBox:AddLine(L["Supported Addons"], text)
-
 		infoBox:AddLine(L["Selected Addon"], self.inventoryCheck:GetSelectedAddon())
-
 	else
 		infoBox:AddLine(L["Supported Addons"], "<none>")
 	end
-
 	infoBox:Show()
 end
-
-
 
 -- ripped from bilzzard GameTooltip_ShowCompareItem() function
 function Skillet:Tooltip_ShowCompareItem(tip, link, sideOverride)
@@ -291,28 +279,6 @@ function Skillet:Tooltip_ShowCompareItem(tip, link, sideOverride)
 ]]--
 end
 
---[[
-Dialog:Register("SKILLETMSG", {
-	text = "",
-	on_show = function(self, data)
-		self.text:SetText(data.msg)
-	end,
-	buttons = {
-		{
-			text = OKAY,
-		},
-	},
-	show_while_dead = true,
-	hide_on_escape = true,
-})
-
-function Skillet:MessageBox(msg)
-	Dialog:Spawn("SKILLETMSG", {
-		msg = msg,
-	})
-end
-]]--
-
 StaticPopupDialogs["SKILLETMSG"] = {
 	text = "",
 	button1 = OKAY,
@@ -329,35 +295,6 @@ function Skillet:MessageBox(msg)
 	StaticPopupDialogs.SKILLETMSG.text = msg
 	StaticPopup_Show("SKILLETMSG")
 end
-
---[[
-Dialog:Register("SKILLETASKFOR", {
-	text = "",
-	on_show = function(self, data)
-		self.text:SetText(data.msg)
-	end,
-	buttons = {
-		{
-			text = YES,
-			on_click = function(self, data)
-				data.handler()
-			end,
-		},
-		{
-			text = NO,
-		},
-	},
-	show_while_dead = true,
-	hide_on_escape = true,
-})
-
-function Skillet:AskFor(msg, handler)
-	Dialog:Spawn("SKILLETASKFOR", {
-		msg = msg,
-		handler = handler,
-	})
-end
-]]--
 
 StaticPopupDialogs["SKILLETASKFOR"] = {
 	text = "",

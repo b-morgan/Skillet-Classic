@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
+local L = Skillet.L
+
 Skillet.registeredPlugins = {}		-- plugins that have registered a function
 Skillet.updatePlugins = {}			-- each plugin will register if it has an Update function
 Skillet.processQueuePlugins = {}	-- each plugin will register if it has a ProcessQueue function
