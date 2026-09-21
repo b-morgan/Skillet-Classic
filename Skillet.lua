@@ -38,7 +38,8 @@ local GetItemCount = C_Item and C_Item.GetItemCount or GetItemCount
 Skillet.version = GetAddOnMetadata("Skillet-Classic", "Version")
 Skillet.isTest = string.find(Skillet.version,"-") or string.find(Skillet.version,"+")
 Skillet.interface = select(4, GetBuildInfo())
-Skillet.build = (Skillet.interface < 20000 and Skillet.interface > 16000 and "Forever") or 
+Skillet.build = (Skillet.interface < 16000 and "Classic") or
+  (Skillet.interface < 20000 and Skillet.interface > 16000 and "Forever") or 
   (Skillet.interface < 30000 and "BCC") or
   (Skillet.interface < 40000 and "Wrath") or 
   (Skillet.interface < 50000 and "Cata") or
