@@ -172,13 +172,6 @@ Skillet.unknownRecipe = {
 
 function Skillet:DisableBlizzardFrame()
 	DA.DEBUG(0,"DisableBlizzardFrame()")
-	if not ProfessionsFrame then
-		DA.WARN("DisableBlizzardFrame: ProfessionsFrame is nil")
-	elseif self.BlizzardTradeSkillFrame == nil then
-		self.BlizzardTradeSkillFrame = ProfessionsFrame
-		self.tradeSkillHide = ProfessionsFrame:GetScript("OnHide")
-		ProfessionsFrame:SetScript("OnHide", nil)
-	end
 	if self.BlizzardTradeSkillFrame == nil then
 		if (not IsAddOnLoaded("Blizzard_TradeSkillUI")) then
 			LoadAddOn("Blizzard_TradeSkillUI");
