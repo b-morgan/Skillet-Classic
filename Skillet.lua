@@ -418,7 +418,6 @@ function Skillet:OnInitialize()
 --
 -- Hook default tooltips
 --
---[[
 	local tooltipsToHook = { ItemRefTooltip, GameTooltip, ShoppingTooltip1, ShoppingTooltip2 };
 	for _, tooltip in pairs(tooltipsToHook) do
 		if tooltip then
@@ -427,7 +426,6 @@ function Skillet:OnInitialize()
 			end)
 		end
 	end
---]]
 
 --
 -- configure the addon options and the slash command handler
@@ -806,14 +804,12 @@ function Skillet:OnEnable()
 --
 	self:RegisterEvent("TRADE_SKILL_CLOSE")
 	self:RegisterEvent("TRADE_SKILL_SHOW")
---	self:RegisterEvent("TRADE_SKILL_UPDATE")
+	self:RegisterEvent("TRADE_SKILL_UPDATE")
 	self:RegisterEvent("TRADE_SKILL_NAME_UPDATE")
---	if not TSM_API then
---		self:RegisterEvent("CRAFT_CLOSE")			-- craft event (could call SkilletClose)
---		self:RegisterEvent("CRAFT_SHOW")			-- craft event (could call SkilletShow)
---		self:RegisterEvent("CRAFT_UPDATE")			-- craft event
-		self:RegisterEvent("UNIT_PET_TRAINING_POINTS")	-- craft event
---	end
+	self:RegisterEvent("CRAFT_CLOSE")				-- craft event (could call SkilletClose)
+	self:RegisterEvent("CRAFT_SHOW")				-- craft event (could call SkilletShow)
+	self:RegisterEvent("CRAFT_UPDATE")				-- craft event
+	self:RegisterEvent("UNIT_PET_TRAINING_POINTS")	-- craft event
 	self:RegisterEvent("UNIT_PORTRAIT_UPDATE")		-- Not sure if this is helpful but we will track it.
 	self:RegisterEvent("SPELLS_CHANGED")			-- Not sure if this is helpful but we will track it.
 --	self:RegisterEvent("BAG_OPEN")					-- Not sure if this is helpful but we will track it.
