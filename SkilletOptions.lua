@@ -353,7 +353,20 @@ Skillet.options =
 					set = function(self,value)
 						Skillet.db.profile.include_craftbuttons = value
 					end,
-					width = "full",
+					width = 1.5,
+					order = 33
+				},
+				include_tradebuttons = {
+					type = "toggle",
+					name = L["TRADEBUTTONSNAME"],
+					desc = L["TRADEBUTTONSDESC"],
+					get = function()
+						return Skillet.db.profile.include_tradebuttons
+					end,
+					set = function(self,value)
+						Skillet.db.profile.include_tradebuttons = value
+					end,
+					width = 1.5,
 					order = 33
 				},
 				queue_crafts = {
@@ -369,6 +382,32 @@ Skillet.options =
 					end,
 					width = 1.5,
 					order = 34
+				},
+				queue_match_trade = {
+					type = "toggle",
+					name = L["QUEUEMATCHTRADENAME"],
+					desc = L["QUEUEMATCHTRADEDESC"],
+					get = function()
+						return Skillet.db.profile.queue_match_trade
+					end,
+					set = function(self,value)
+						Skillet.db.profile.queue_match_trade = value
+					end,
+					width = 1.5,
+					order = 35
+				},
+				queue_insert_first = {
+					type = "toggle",
+					name = L["QUEUEINSERTFIRSTNAME"],
+					desc = L["QUEUEINSERTFIRSTDESC"],
+					get = function()
+						return Skillet.db.profile.queue_insert_first
+					end,
+					set = function(self,value)
+						Skillet.db.profile.queue_insert_first = value
+					end,
+					width = 1.5,
+					order = 35
 				},
 				enchant_scrolls = {
 					hidden = isClassic,
@@ -400,19 +439,6 @@ Skillet.options =
 					order = 36
 				},
 ]]--
-				include_tradebuttons = {
-					type = "toggle",
-					name = L["TRADEBUTTONSNAME"],
-					desc = L["TRADEBUTTONSDESC"],
-					get = function()
-						return Skillet.db.profile.include_tradebuttons
-					end,
-					set = function(self,value)
-						Skillet.db.profile.include_tradebuttons = value
-					end,
-					width = "full",
-					order = 37
-				},
 				search_includes_reagents = {
 					type = "toggle",
 					name = L["INCLUDEREAGENTSNAME"],

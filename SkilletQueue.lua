@@ -67,12 +67,10 @@ function Skillet:QueueCommandIterate(recipeID, count)
 	local newCommand = {}
 	local recipe = self:GetRecipe(recipeID)
 	local tradeName = self:GetTradeName(recipe.tradeID)
-	local recipeIndex = self.data.skillIndexLookup[self.currentPlayer][recipeID]
 	newCommand.op = "iterate"
 	newCommand.recipeID = recipeID or 0
 	newCommand.tradeID = recipe.tradeID or 0
 	newCommand.tradeName = tradeName or ""
-	newCommand.recipeIndex = recipeIndex or 0
 	newCommand.count = count or 0
 	newCommand.spellID = recipe.spellID
 	return newCommand
@@ -330,13 +328,15 @@ function Skillet:ProcessQueue(altMode)
 		if command and command.op == "iterate" then
 			local recipe = self:GetRecipe(command.recipeID)
 			local craftable = true
-			local skillIndex = skillIndexLookup[command.recipeID]
+			local recipeIndex = skillIndexLookup[command.recipeID]
 			if Skillet.isClassic and recipe.tradeID == 7411 then
+				craftable = false
+			elseif self.db.profile.queue_match_trade and self.currentTrade ~= tradeID then
 				craftable = false
 			else
 				local cooldown
-				if skillIndex then
-					cooldown = GetTradeSkillCooldown(skillIndex)
+				if recipeIndex then
+					cooldown = GetTradeSkillCooldown(recipeIndex)
 				end
 				if cooldown then
 					DA.MARK2(L["Skipping"].." "..tostring(recipe.name).." - "..L["has cooldown of"].." "..tostring(SecondsToTime(cooldown)))
@@ -383,16 +383,9 @@ function Skillet:ProcessQueue(altMode)
 			local spellID = command.spellID
 			local tradeID = command.tradeID
 			local tradeName = command.tradeName
-			local recipeIndex = command.recipeIndex
-			local recipeIndex2 = self.data.skillIndexLookup[self.currentPlayer][recipeID]
+			local recipeIndex = skillIndexLookup[recipeID]
 			local count = command.count
 			local itemID, missN
-			if recipeIndex ~= recipeIndex2 then
-				DA.WARN("ProcessQueue: recipeIndex mismatch, old= "..tostring(command.recipeIndex)..", new= "..tostring(recipeIndex2))
-				command.recipeIndex1 = recipeIndex
-				recipeIndex = recipeIndex2
-				command.recipeIndex = recipeIndex
-			end
 			if self.currentTrade ~= tradeID and tradeName then
 				--DA.DEBUG(1,"queue_crafts= "..tostring(self.db.profile.queue_crafts)..", skillIsCraft= "..tostring(self.skillIsCraft[tradeID]))
 				if self.db.profile.queue_crafts and self.skillIsCraft[tradeID] then
@@ -489,9 +482,9 @@ function Skillet:QueueItems(button, count)
 	if count > 0 then
 		if self.currentTrade and self.selectedSkill then
 			if recipe then
-				local first = false
+				local first = Skillet.db.profile.queue_insert_first or false
 				if button == "RightButton" then
-					first = true
+					first = not first
 				end
 				local queueCommand = self:QueueCommandIterate(recipeID, count)
 				self:QueueAppendCommand(queueCommand, Skillet.db.profile.queue_craftable_reagents, first)

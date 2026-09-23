@@ -31,6 +31,7 @@ Skillet.NewsData = {
 					{ header = "Plugins", body = "Auctionator check for AH still open" },
 					{ header = "All", body = "Add some nil checks" },
 					{ header = "Versioning", body = "Standardize DA initialization\nConvert local WoW version checks to globals" },
+					{ header = "Queueing", body = "Remove recipeIndex from queue entries\nAdd new options for inserting and processing the queue" },
 				},
 			},
 		},
