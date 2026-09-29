@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- Includes changes from Dranni21312
 --
 
-local isRetail = Skillet.isRetail
+local isRetail = Skillet.isRetail or Skillet.isForever
 local isClassic = Skillet.isClassic
 
 Skillet.ATRPlugin = {}
@@ -451,6 +451,9 @@ local function GetReagentData(reagent)
 		else
 			id = reagent.id
 		end
+		if not id then
+			return 0,0,0,0,0
+		end
 		name = C_Item.GetItemInfo(id) or id
 		if Atr_GetAuctionBuyout then
 			value = (Atr_GetAuctionBuyout(id) or 0)
@@ -491,7 +494,7 @@ local function GetReagentData(reagent)
 end
 
 local function AddExtraText(value, needed, id, name, custom)
-	DA.DEBUG(0,"AddExtraText("..tostring(value)..", "..tostring(needed)..", "..tostring(id)..", "..tostring(name)..", "..tostring(custom)..")")
+	--DA.DEBUG(0,"AddExtraText("..tostring(value)..", "..tostring(needed)..", "..tostring(id)..", "..tostring(name)..", "..tostring(custom)..")")
 	if not Skillet:VendorSellsReagent(id) then
 --
 -- Not sold by a vendor so use the default
@@ -548,9 +551,11 @@ local function GetRecipeData(recipe)
 		end
 		local ah_tax = Skillet.db.profile.plugins.ATR.calcProfitAhTax and ahtaxDef or 1
 		profit = buyout * ah_tax - cost
-		percentage = profit * 100 / cost
 		vprofit = sellout - cost
-		vpercentage = vprofit * 100 / cost
+		if cost ~= 0 then
+			percentage = profit * 100 / cost
+			vpercentage = vprofit * 100 / cost
+		end
 		--DA.DEBUG(0,"GetRecipeData: buyout= "..tostring(buyout)..", profit= "..tostring(profit)..", percentage= "..tostring(percentage))
 		--DA.DEBUG(0,"GetRecipeData: sellout= "..tostring(sellout)..", vprofit= "..tostring(vprofit)..", vpercentage= "..tostring(vpercentage))
 		recipe.cost = cost or 0
