@@ -239,7 +239,6 @@ function Skillet:GetShoppingList(player, sameFaction, includeGuildbank, includeT
 		end
 	end
 	--DA.DEBUG(0,"shopping list for: "..(player or "all players"))
-	local usedInventory = {}  -- only use the items from each player once
 	if not usedInventory[curPlayer] then
 		usedInventory[curPlayer] = {}
 	end
