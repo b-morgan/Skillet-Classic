@@ -2467,11 +2467,8 @@ end
 StaticPopupDialogs["SKILLET_WowheadURL"] = {
 	text = "Skillet - Wowhead URL",
 	button2 = CLOSE,
-	hasEditBox = 1,
+	hasEditBox = true,
 	editBoxWidth = 300,
-	EditBoxOnTextChanged = function(self)
-		self:HighlightText()
-	end,
 	EditBoxOnEnterPressed = function(self)
 		self:GetParent():Hide()
 	end,
@@ -2482,17 +2479,23 @@ StaticPopupDialogs["SKILLET_WowheadURL"] = {
 		local textFrame = self.Text or self.text
 		local editBox = self.EditBox or self.editBox
 		local url = "https://www.wowhead.com/"
-		if Skillet.isClassic then
+		if WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
 			url = url.."classic/"
-		elseif Skillet.isForever then
-			url = url.."forever/"
-		elseif Skillet.isMists then
+		elseif WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC then
+			url = url.."cata/"
+		elseif WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC then
 			url = url.."mop-classic/"
+		elseif WOW_PROJECT_ID == WOW_PROJECT_CAMELOT then
+			url = url.."forever/"
+		elseif WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+			url = url.."retail/"
 		end
 		local param = "item="..textFrame.text_arg1
 		textFrame:SetText(textFrame:GetText().."\n\n"..textFrame.text_arg2)
-		editBox:SetText(url..param)
+		editBox.text = url..param
+		editBox:SetText(editBox.text)
 		editBox:SetFocus()
+		editBox:HighlightText()
 	end,
 	timeout = 0,
 	whileDead = 1,
