@@ -21,6 +21,15 @@ local L = Skillet.L
 
 Skillet.NewsName = "Skillet-Classic News"
 Skillet.NewsData = {
+	{	version = "2.44",
+		data = {
+			{	name = "Changes",
+				data = {
+					{ header = "Plugins", body = "Fix Auctionator\nRemove obsolete" },
+				},
+			},
+		},
+	},
 	{	version = "2.43",
 		data = {
 			{	name = "Changes",
