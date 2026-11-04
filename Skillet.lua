@@ -47,17 +47,8 @@ Skillet.build = (Skillet.interface < 16000 and "Classic") or
   "Retail"
 
 Skillet.project = WOW_PROJECT_ID
--- Temporary measure because FOREVER has no distinct _PROJECT_
-if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
-	-- ___ temporary measure for Forever ___
-	if LE_EXPANSION_LEVEL_CURRENT == LE_EXPANSION_MIDNIGHT then
-		Skillet.isRetail = true
-	elseif LE_EXPANSION_LEVEL_CURRENT == LE_EXPANSION_CLASSIC then
-		Skillet.isForever = true
-	end
-end
 --Skillet.isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE -- 1
---Skillet.isForever = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE -- 1
+--Skillet.isForever = WOW_PROJECT_ID == WOW_PROJECT_CAMELOT -- 18
 Skillet.isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC -- 2
 Skillet.isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC -- 5
 Skillet.isWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC -- 11
@@ -291,6 +282,19 @@ end
 -- Called when the addon is loaded
 --
 function Skillet:OnInitialize()
+	DA.DEBUG(0,"OnInitialize()");
+--
+--	Create the database
+--
+	self.db = AceDB:New("SkilletDB", defaults)
+--
+-- Information useful for debugging
+--
+	self.db.global.locale = GetLocale()
+	self.db.global.version = self.version
+	self.db.global.build = self.build
+	self.db.global.project = self.project
+
 	if not SkilletWho then
 		SkilletWho = {}
 	end
@@ -309,7 +313,6 @@ function Skillet:OnInitialize()
 	end
 	DA.DebugLog = SkilletDBPC
 	DA.DebugProfile = SkilletProfile
-	self.db = AceDB:New("SkilletDB", defaults)
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileReset", "InitializeProfile")
@@ -360,14 +363,6 @@ function Skillet:OnInitialize()
 		self.db.global.wowVersion = self.wowVersion -- actually TOC version
 		self:FlushRecipeData()
 	end
-
---
--- Information useful for debugging
---
-	self.db.global.locale = GetLocale()
-	self.db.global.version = self.version
-	self.db.global.build = self.build
-	self.db.global.project = self.project
 
 --
 -- Initialize global data
@@ -1965,3 +1960,18 @@ function Skillet:IsCraft()
 	return Skillet.isCraft
 end
 
+--
+-- Note: function name is intentionally different than the Blizzard function.
+--    Needed in Skillet-Classic for plugin compatibility. 
+--
+function Skillet:unitName(target)
+	if Skillet.isForever then
+		if Skillet.db.global.useFirstNameOnly then
+			return UnitName(target)
+		else
+			return GetUnitName(target)
+		end
+	else
+		return UnitName(target)
+	end
+end

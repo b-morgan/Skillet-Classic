@@ -60,7 +60,7 @@ function plugin.GetExtraText(skill, recipe)
 		local recipeData = AckisRecipeList:GetRecipeData(skill.id)
 		if recipeData == nil and not ARLProfessionInitialized[recipe.tradeID] then
 			ARLProfessionInitialized[recipe.tradeID] = true
-			local profession = GetSpellInfo(recipe.tradeID)
+			local profession = C_Spell.GetSpellName(recipe.tradeID)
 			AckisRecipeList:AddRecipeData(profession)
 			recipeData = AckisRecipeList:GetRecipeData(skill.id)
 		end
@@ -68,7 +68,7 @@ function plugin.GetExtraText(skill, recipe)
 			extra_text = AckisRecipeList:GetRecipeLocations(skill.id)
 			if extra_text == "" then extra_text = nil end
 		end
-		label = "Source:"
+		label = "|rSource:"
 	end
 	return label, extra_text
 end
