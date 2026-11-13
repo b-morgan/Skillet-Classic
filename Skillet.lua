@@ -1959,19 +1959,3 @@ end
 function Skillet:IsCraft()
 	return Skillet.isCraft
 end
-
---
--- Note: function name is intentionally different than the Blizzard function.
---    Needed in Skillet-Classic for plugin compatibility. 
---
-function Skillet:unitName(target)
-	if Skillet.isForever then
-		if Skillet.db.global.useFirstNameOnly then
-			return UnitName(target)
-		else
-			return GetUnitName(target)
-		end
-	else
-		return UnitName(target)
-	end
-end
